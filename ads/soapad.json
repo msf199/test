@@ -1,0 +1,8 @@
+{
+    "welcome_message"   :   {
+        "en"    :   "Hello Traveller!",
+        "sp"    :   "Buenos Dias Amigo",
+        "default"   :   "en"
+    },
+    "url"   :   "http://localhost/success"
+}

@@ -1,0 +1,13 @@
+<head><name>Get apps for login screen</name>
+<public>true</public>
+<db>whitespellConnection</db>
+<queue>2</queue>
+<saves>
+<save>resultObject, 600, $app, true, id</save>
+</saves>
+</head>
+<ps>SELECT `id`,`displayName`, `teamName` FROM `applications`
+ WHERE `team_members` LIKE {%,<var>$userid</var>,%}
+  OR `team_members` LIKE {<var>$userid</var>,%} OR
+   `team_members` = {<var>$userid</var>} LIMIT 100
+</ps>
