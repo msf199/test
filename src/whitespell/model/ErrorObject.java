@@ -7,12 +7,12 @@ package whitespell.model;
  */
 public class ErrorObject {
 
-    int statusCode;
+    int httpStatusCode;
     int errorId;
     String errorMessage;
 
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public void setHttpStatusCode(int httpStatusCode) {
+        this.httpStatusCode = httpStatusCode;
     }
 
     public void setErrorId(int errorId) {

@@ -52,7 +52,7 @@ public class CreateUser implements ApiInterface {
 
         // Check if all parameters are present and contain the right characters, if not throw a 400
         if (payload == null || payload.get("username") == null || payload.get("email") == null || payload.get("password") == null) {
-            context.getResponse().setStatus(HttpStatus.BAD_REQUEST_400);
+            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         } else {
             username = payload.get("username").getAsString();
@@ -64,7 +64,25 @@ public class CreateUser implements ApiInterface {
             if (username.length() > StaticRules.MAX_USERNAME_LENGTH
                     || email.length() > StaticRules.MAX_EMAIL_LENGTH
                     || password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
+
+                // return a 400
                 context.getResponse().setStatus(HttpStatus.BAD_REQUEST_400);
+
+                //write the response
+                ErrorObject eo = new ErrorObject();
+                if(username.length() > StaticRules.MAX_USERNAME_LENGTH) {
+                    eo.setErrorId(StaticRules.ErrorCodes.USERNAME_TOO_LONG.getErrorId());
+                    eo.setErrorMessage(StaticRules.ErrorCodes.USERNAME_TOO_LONG.getErrorMessage());
+                } else if(email.length() > StaticRules.MAX_EMAIL_LENGTH) {
+                    eo.setErrorId(StaticRules.ErrorCodes.EMAIL_TOO_LONG.getErrorId());
+                    eo.setErrorMessage(StaticRules.ErrorCodes.EMAIL_TOO_LONG.getErrorMessage());
+                } else if(password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
+                    eo.setErrorId(StaticRules.ErrorCodes.PASSWORD_TOO_LONG.getErrorId());
+                    eo.setErrorMessage(StaticRules.ErrorCodes.PASSWORD_TOO_LONG.getErrorMessage());
+                }
+                Gson g = new Gson();
+                String errorObject = g.toJson(eo);
+                context.getResponse().getWriter().write(errorObject);
                 return;
             }
         }
@@ -108,25 +126,15 @@ public class CreateUser implements ApiInterface {
             e.printStackTrace();
         }
 
-        // set response to 401 if username exists.
+        //throw the right error
         if (usernameExists || emailExists) {
-            ErrorObject eo = new ErrorObject();
-            if(usernameExists && emailExists) {
-                eo.setErrorId(StaticRules.ErrorCodes.USERNAME_AND_EMAIL_TAKEN.getErrorId());
-                eo.setErrorMessage(StaticRules.ErrorCodes.USERNAME_AND_EMAIL_TAKEN.getErrorMessage());
+           if(usernameExists && emailExists) {
+               context.throwHttpError(StaticRules.ErrorCodes.USERNAME_AND_EMAIL_TAKEN);
             } else if(usernameExists) {
-                eo.setErrorId(StaticRules.ErrorCodes.USERNAME_TAKEN.getErrorId());
-                eo.setErrorMessage(StaticRules.ErrorCodes.USERNAME_TAKEN.getErrorMessage());
+               context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
             } else if(emailExists) {
-                eo.setErrorId(StaticRules.ErrorCodes.EMAIL_TAKEN.getErrorId());
-                eo.setErrorMessage(StaticRules.ErrorCodes.EMAIL_TAKEN.getErrorMessage());
+               context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
             }
-
-            context.getResponse().setStatus(HttpStatus.UNAUTHORIZED_401);
-
-            Gson g = new Gson();
-            String errorObject = g.toJson(eo);
-            context.getResponse().getWriter().write(errorObject);
             return;
         }
 
@@ -178,6 +186,7 @@ public class CreateUser implements ApiInterface {
 
         if (success) {
             // successful, set authentication session that logs the IP address and other details, and write the JSON object.
+            // also construct the response.
             context.getResponse().setStatus(HttpStatus.OK_200);
             UserObject uo = new UserObject();
             uo.setUserId(user_id);
@@ -186,10 +195,8 @@ public class CreateUser implements ApiInterface {
             Gson g = new Gson();
             String json = g.toJson(uo);
             context.getResponse().getWriter().write(json);
-            System.out.println(json);
         } else {
-            // something failed, but we don't know what, write internal server error and log error.
-            context.getResponse().setStatus(HttpStatus.INTERNAL_SERVER_ERROR_500);
+            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
         }
 
 
