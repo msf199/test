@@ -47,7 +47,7 @@ public class PoolTest {
                 if (con != null)
                     con.close();
             }
-         }
+        }
 
         // process the created dataset and create useful metrics
 
@@ -56,22 +56,22 @@ public class PoolTest {
         int max = 0;
         int median = 0;
 
-        for(int i = 0; i < iterations; i++) {
+        for (int i = 0; i < iterations; i++) {
             total += tests[i];
 
-            if(tests[i] > max) {
+            if (tests[i] > max) {
                 max = tests[i];
-            } else if(tests[i] < min) {
+            } else if (tests[i] < min) {
                 min = tests[i];
             }
 
-            if(i == iterations / 2) {
+            if (i == iterations / 2) {
                 median = tests[i];
             }
         }
 
         int avg = total / iterations;
 
-        System.out.println("Averaged " + avg + " ms in " + iterations + " queries with a max of "+max+" and a min of "+min+" with median "+median+".");
+        System.out.println("Averaged " + avg + " ms in " + iterations + " queries with a max of " + max + " and a min of " + min + " with median " + median + ".");
     }
 }
