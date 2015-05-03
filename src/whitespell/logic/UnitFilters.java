@@ -42,12 +42,14 @@ public class UnitFilters implements Filter {
                 WhitespellWebServer.getCookie(((HttpServletRequest) servletRequest), "Session"));*/
 
 
+        // this header allows CORS requests.
+        ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
         ((HttpServletResponse) servletResponse).addHeader("Server", "Whitespell API Server");
-        ((HttpServletResponse) servletResponse).addHeader("Request-id", UUID.randomUUID().toString());
+        //((HttpServletResponse) servletResponse).addHeader("Request-id", UUID.randomUUID().toString());
         servletResponse.setContentType("application/json");
 
-        System.out.println("request: " + servletRequest.getRemoteAddr());
-        System.out.println("response: " + servletResponse.getContentType());
+        //System.out.println("request: " + servletRequest.getRemoteAddr());
+        //System.out.println("response: " + servletResponse.getContentType());
         filterChain.doFilter(servletRequest, servletResponse);
     }
 

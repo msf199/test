@@ -36,7 +36,7 @@ public class CreateUser implements ApiInterface {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
 
-
+        // common variables
         String username = null;
         String password = null;
         String email = null;
@@ -61,28 +61,24 @@ public class CreateUser implements ApiInterface {
 
             // check against lengths for security and UX reasons.
 
-            if (username.length() > StaticRules.MAX_USERNAME_LENGTH
-                    || email.length() > StaticRules.MAX_EMAIL_LENGTH
-                    || password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
-
-                // return a 400
-                context.getResponse().setStatus(HttpStatus.BAD_REQUEST_400);
-
-                //write the response
-                ErrorObject eo = new ErrorObject();
-                if(username.length() > StaticRules.MAX_USERNAME_LENGTH) {
-                    eo.setErrorId(StaticRules.ErrorCodes.USERNAME_TOO_LONG.getErrorId());
-                    eo.setErrorMessage(StaticRules.ErrorCodes.USERNAME_TOO_LONG.getErrorMessage());
-                } else if(email.length() > StaticRules.MAX_EMAIL_LENGTH) {
-                    eo.setErrorId(StaticRules.ErrorCodes.EMAIL_TOO_LONG.getErrorId());
-                    eo.setErrorMessage(StaticRules.ErrorCodes.EMAIL_TOO_LONG.getErrorMessage());
-                } else if(password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
-                    eo.setErrorId(StaticRules.ErrorCodes.PASSWORD_TOO_LONG.getErrorId());
-                    eo.setErrorMessage(StaticRules.ErrorCodes.PASSWORD_TOO_LONG.getErrorMessage());
-                }
-                Gson g = new Gson();
-                String errorObject = g.toJson(eo);
-                context.getResponse().getWriter().write(errorObject);
+            //check if values are too long
+            if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
+                context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TOO_LONG);
+                return;
+            } else if (email.length() > StaticRules.MAX_EMAIL_LENGTH) {
+                context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TOO_LONG);
+                return;
+            } else if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
+                context.throwHttpError(StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
+                return;
+            } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
+                context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
+                return;
+            } else if (email.length() < StaticRules.MIN_EMAIL_LENGTH) {
+                context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TOO_SHORT);
+                return;
+            } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
+                context.throwHttpError(StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
                 return;
             }
         }
@@ -127,14 +123,10 @@ public class CreateUser implements ApiInterface {
         }
 
         //throw the right error
-        if (usernameExists || emailExists) {
-           if(usernameExists && emailExists) {
-               context.throwHttpError(StaticRules.ErrorCodes.USERNAME_AND_EMAIL_TAKEN);
-            } else if(usernameExists) {
-               context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
-            } else if(emailExists) {
-               context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
-            }
+        if (usernameExists) {
+            context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
+        } else if (emailExists) {
+            context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
             return;
         }
 
@@ -197,6 +189,7 @@ public class CreateUser implements ApiInterface {
             context.getResponse().getWriter().write(json);
         } else {
             context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
 
