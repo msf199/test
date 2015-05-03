@@ -1,8 +1,7 @@
 package whitespell.sample.MyApplication.actions.keybased;
 
-import whitespell.model.Action;
-import whitespell.model.ActionType;
-import whitespell.sample.MyApplication.MyIntelligence;
+import whitespell.model.baseapi.Action;
+import whitespell.model.baseapi.ActionType;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC

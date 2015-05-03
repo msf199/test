@@ -1,4 +1,4 @@
-package whitespell.model;
+package whitespell.model.baseapi;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;

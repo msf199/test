@@ -15,7 +15,7 @@
  */
 package whitespell.net.websockets.socketio;
 
-import whitespell.model.Session;
+import whitespell.model.baseapi.Session;
 import whitespell.net.websockets.socketio.parser.Packet;
 
 import java.net.SocketAddress;

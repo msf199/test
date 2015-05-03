@@ -1,4 +1,4 @@
-package whitespell.model;
+package whitespell.model.baseapi;
 
 import java.util.HashMap;
 

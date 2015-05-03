@@ -1,9 +1,8 @@
 package whitespell.sample.MyApplication;
 
 import whitespell.sample.MyApplication.endpoints.users.*;
-import whitespell.model.WhitespellWebServer;
+import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.logic.ApiDispatcher;
-import whitespell.sample.MyApplication.endpoints.users.follow.UserFollowAction;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC

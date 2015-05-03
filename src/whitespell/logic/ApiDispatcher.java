@@ -143,7 +143,8 @@ public class ApiDispatcher extends HttpServlet {
      */
     private JsonElement getPayload(HttpServletRequest request, HttpServletResponse response)
             throws JsonParseException, IllegalStateException, IOException {
-        return new JsonParser().parse(getBody(request));
+        String body = getBody(request);
+        return new JsonParser().parse(body);
     }
 
     private String getBody(HttpServletRequest request) throws IOException {

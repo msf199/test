@@ -1,4 +1,4 @@
-package whitespell.model;
+package whitespell.model.baseapi;
 
 import whitespell.logic.UnitHandler;
 import whitespell.net.websockets.socketio.SocketIOClient;

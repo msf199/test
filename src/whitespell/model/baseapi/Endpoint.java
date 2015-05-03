@@ -1,4 +1,4 @@
-package whitespell.model;
+package whitespell.model.baseapi;
 
 import sun.security.provider.certpath.Vertex;
 import whitespell.logic.ApiInterface;

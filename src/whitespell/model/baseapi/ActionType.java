@@ -1,9 +1,10 @@
-package whitespell.model;
+package whitespell.model.baseapi;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         1/20/15
  *         whitespell.model
  */
-public class Application {
+public enum ActionType {
+    Java, XSQL, Javascript, PHP
 }

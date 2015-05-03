@@ -1,6 +1,6 @@
 package whitespell.logic;
 
-import whitespell.model.Unit;
+import whitespell.model.baseapi.Unit;
 
 import java.util.HashMap;
 import java.util.UUID;

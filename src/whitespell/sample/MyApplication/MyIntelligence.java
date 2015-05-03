@@ -1,7 +1,6 @@
 package whitespell.sample.MyApplication;
 
-import whitespell.model.WhitespellIntelligence;
-import whitespell.sample.MyApplication.actions.keybased.GenerateNewsFeedAction;
+import whitespell.model.baseapi.WhitespellIntelligence;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC

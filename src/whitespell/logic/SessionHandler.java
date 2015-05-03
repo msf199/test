@@ -1,10 +1,7 @@
 package whitespell.logic;
 
-import whitespell.model.Session;
+import whitespell.model.baseapi.Session;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 

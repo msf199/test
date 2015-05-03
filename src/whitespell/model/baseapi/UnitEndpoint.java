@@ -1,4 +1,4 @@
-package whitespell.model;
+package whitespell.model.baseapi;
 
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
@@ -22,7 +22,7 @@ public abstract class UnitEndpoint implements ApiInterface {
      * HandleDistribution is the class that the user fills in to route the correct requests to the correct personalized ads.
      * @param context               The request context
      * @param ad                    the {@link Unit}
-     * @param session               the {@link whitespell.model.Session}
+     * @param session               the {@link Session}
      */
 
     public abstract void handleDistribution(RequestContext context, Unit ad, Session session);

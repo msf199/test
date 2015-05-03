@@ -20,6 +20,6 @@ public class SearchUsers implements ApiInterface {
     /**
      * HandleDistribution is the class that the user fills in to route the correct requests to the correct personalized ads.
      * @param context               The request context
-     * @param session               the {@link whitespell.model.Session}
+     * @param session               the {@link whitespell.model.baseapi.Session}
      */
 }

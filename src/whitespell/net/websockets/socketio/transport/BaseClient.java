@@ -15,7 +15,7 @@
  */
 package whitespell.net.websockets.socketio.transport;
 
-import whitespell.model.Session;
+import whitespell.model.baseapi.Session;
 import whitespell.net.websockets.socketio.DisconnectableHub;
 import whitespell.net.websockets.socketio.SocketIOClient;
 import whitespell.net.websockets.socketio.Transport;
