@@ -36,7 +36,9 @@ CREATE TABLE `users` (
   `pass_salt` varchar(45) DEFAULT NULL,
   `pass_hash` varchar(45) DEFAULT NULL,
   `email` varchar(45) DEFAULT NULL,
-  `phone` varchar(45) DEFAULT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `username` varchar(15) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
-  UNIQUE KEY `id_UNIQUE` (`user_id`)
+  UNIQUE KEY `id_UNIQUE` (`user_id`),
+  KEY `username_INDEX` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;

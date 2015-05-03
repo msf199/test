@@ -10,6 +10,8 @@
     <orderEntry type="library" name="jetty" level="project" />
     <orderEntry type="library" name="log4j" level="project" />
     <orderEntry type="library" name="mysql-connector-java-5.1.35-bin" level="project" />
+    <orderEntry type="library" name="commons-pool2-2.3" level="project" />
+    <orderEntry type="library" name="commons-dbcp2-2.1" level="project" />
   </component>
 </module>
 

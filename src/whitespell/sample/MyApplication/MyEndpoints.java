@@ -1,11 +1,9 @@
 package whitespell.sample.MyApplication;
 
-import whitespell.sample.MyApplication.endpoints.users.NewUser;
-import whitespell.sample.MyApplication.endpoints.users.SearchUsers;
+import whitespell.sample.MyApplication.endpoints.users.*;
 import whitespell.model.WhitespellWebServer;
 import whitespell.logic.ApiDispatcher;
 import whitespell.sample.MyApplication.endpoints.users.follow.UserFollowAction;
-import whitespell.sample.MyApplication.endpoints.users.UserHandler;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -28,12 +26,8 @@ public class MyEndpoints extends WhitespellWebServer {
     protected void scheduleEndpoints(ApiDispatcher dispatcher) {
 
         // all user + authentication related queries
-        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new SearchUsers(), "/users/");
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new NewUser(), "/users/");
-        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new UserHandler(), "/users/?", "userid");
-
-        //following
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/follow", "userid");
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users/");
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication/");
     }
 
 
