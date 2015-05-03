@@ -160,7 +160,7 @@ public class CreateUser implements ApiInterface {
             PreparedStatement p = null;
             try {
                 p = con.prepareStatement(INSERT_USER_QUERY);
-                p.setString(1, password);
+                p.setString(1, passHash);
                 p.setString(2, email);
                 p.setString(3, username);
 
