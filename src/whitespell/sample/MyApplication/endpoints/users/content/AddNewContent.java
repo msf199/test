@@ -1,5 +1,6 @@
 package whitespell.sample.MyApplication.endpoints.users.content;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
@@ -8,6 +9,7 @@ import whitespell.logic.RequestContext;
 import whitespell.logic.Safety;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
+import whitespell.model.AddContentObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -80,7 +82,11 @@ public class AddNewContent implements ApiInterface {
 
         if (success[0]) {
             context.getResponse().setStatus(HttpStatus.OK_200);
-            context.getResponse().getWriter().write("{ \"content-added\" : \"true\" }");
+            AddContentObject object = new AddContentObject();
+            object.setContentAdded(true);
+            Gson g = new Gson();
+            String json = g.toJson(object);
+            context.getResponse().getWriter().write(json);
         } else {
             context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
