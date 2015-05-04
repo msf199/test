@@ -59,19 +59,20 @@ public class PathNode {
      */
     public PathNodeResult getPathNodeResult(String path) {
         String[] args = path.split("/");
-        String key;
+
+        StringBuilder pathNodeKey = new StringBuilder();
 
         if (args != null && args.length >= 1) {
-            String suffix = "/" + args[1];
+            pathNodeKey.append("/");
+            pathNodeKey.append(args[1]);
             for (int index = 2; index < args.length; index++) {
-                suffix += "/?";
+                pathNodeKey.append("/?");
             }
-            key = suffix;
         } else {
-            key = path;
+            pathNodeKey.append(path);
         }
 
-        PathNode current = children.get(key);
+        PathNode current = children.get(pathNodeKey.toString());
 
         if (current == null) {
             throw new RuntimeException("current pathnode is null!");
@@ -123,13 +124,14 @@ public class PathNode {
      */
     public void addPathNode(String identifier, ApiSpec spec) {
         int argCount = spec.argNames != null && spec.argNames.length > 0 ? spec.argNames.length : 0;
-        String suffix = "";
+
+        StringBuilder pathNodeKey = new StringBuilder();
         if (argCount >= 1) {
             for (int index = 1; index < argCount; index++) {
-                suffix += "/?";
+                pathNodeKey.append("/?");
             }
         }
-        String key = identifier + suffix;
+        String key = identifier + pathNodeKey.toString();
         if (!children.containsKey(key)) {
             children.put(key, new PathNode());
         }
