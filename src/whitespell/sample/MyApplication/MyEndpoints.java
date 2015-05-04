@@ -3,7 +3,9 @@ package whitespell.sample.MyApplication;
 import whitespell.sample.MyApplication.endpoints.users.*;
 import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.logic.ApiDispatcher;
-import whitespell.sample.MyApplication.endpoints.users.follow.UserFollowAction;
+import whitespell.sample.MyApplication.endpoints.users.UserFollowAction;
+import whitespell.sample.MyApplication.endpoints.users.content.AddNewContent;
+import whitespell.sample.MyApplication.endpoints.users.content.RequestContent;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -41,9 +43,11 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // trending {/users/{userid}/trending}
 
-        // following API /users/{userid}/following
+        // content API /content/
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AddNewContent(), "/content/");
+        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new RequestContent(), "/content/");
 
-        //dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/following/", "user_id");
+        // following API /users/{userid}/following
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/following/?", "user_id");
 
         // saved content API {/users/{userid}/saved_content}

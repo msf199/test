@@ -1,4 +1,4 @@
-package whitespell.sample.MyApplication.endpoints.users.follow;
+package whitespell.sample.MyApplication.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -16,7 +16,7 @@ import java.util.Date;
 
 /**
  * @author Pim de Witte(wwadewitte), Josh Lipson(mrgalkon), Whitespell LLC
- *         1/20/15
+ *         5/4/2015
  *         whitespell.model
  */
 public class UserFollowAction implements ApiInterface {
