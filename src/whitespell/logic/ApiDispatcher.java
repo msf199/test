@@ -99,6 +99,7 @@ public class ApiDispatcher extends HttpServlet {
      * @param response
      * @throws java.io.IOException
      */
+
     private void callHandler(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
         JsonElement payload = getPayload(request, response);
         RequestContext context = new RequestContext(

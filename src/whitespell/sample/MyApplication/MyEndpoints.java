@@ -24,9 +24,25 @@ public class MyEndpoints extends WhitespellWebServer {
     @Override
     protected void scheduleEndpoints(ApiDispatcher dispatcher) {
 
-        // all user + authentication related queries
+        //user creation
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users/");
+
+        //authentication API
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication/");
+
+        // profile API /users/{userid}/profile
+
+        // search API {/search?q=xyz}
+
+        // newsfeed {/users/{userid}/newsfeed}
+
+        // trending {/users/{userid}/trending}
+
+        // following API /users/{userid}/following
+
+        // saved content API {/users/{userid}/saved_content}
+
+        // notifications API {/users/{userid}/notifications}
     }
 
 

@@ -27,6 +27,8 @@ public class StaticRules {
         USERNAME_TAKEN(100, "Username is already taken", HttpStatus.UNAUTHORIZED_401),
         EMAIL_TAKEN(101, "Email is already taken", HttpStatus.UNAUTHORIZED_401),
         USERNAME_AND_EMAIL_TAKEN(102, "Username and email are already taken", HttpStatus.UNAUTHORIZED_401),
+        ACCOUNT_NOT_FOUND(103, "Account not found", HttpStatus.UNAUTHORIZED_401),
+        INVALID_USERNAME_OR_PASS(103, "Invalid username or Password", HttpStatus.UNAUTHORIZED_401),
 
         //110-120 is style error
         USERNAME_TOO_LONG(110, "Username is too long ("+StaticRules.MAX_USERNAME_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),

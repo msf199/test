@@ -23,6 +23,7 @@ import java.sql.SQLException;
  *         whitespell.model
  *         https://docs.google.com/document/d/1j62zQ3AIfh7XW0nbftRy_hNXTAnhy5r48yBRHm7kYZA/edit
  */
+
 public class CreateUser implements ApiInterface {
 
     private static final String INSERT_USER_QUERY = "INSERT INTO `users`(`password`, `email`, `username`) " +
