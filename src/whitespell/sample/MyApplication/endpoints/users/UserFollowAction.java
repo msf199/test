@@ -7,7 +7,8 @@ import whitespell.StaticRules;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.Safety;
-import whitespell.logic.sql.Pool;
+import whitespell.logic.sql.ExecutionBlock;
+import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.FollowActionObject;
 
 import java.io.IOException;
@@ -48,7 +49,7 @@ public class UserFollowAction implements ApiInterface {
         final int user_id = Integer.parseInt(context_user_id);
         final int following_user_id = Integer.parseInt(following_user_string);
         final String action = payload.get(ACTION_KEY).getAsString();
-        Timestamp now = new Timestamp(new Date().getTime());
+        final Timestamp now = new Timestamp(new Date().getTime());
 
         /**
          * Check that the user id and following user id are valid (>= 0 && <= Integer.MAX_VALUE).
@@ -71,8 +72,7 @@ public class UserFollowAction implements ApiInterface {
             return;
         }
 
-        boolean success = false;
-        String action_taken = null;
+        final ActionResponse response = new ActionResponse();
 
         Connection con = null;
         PreparedStatement p = null;
@@ -80,81 +80,76 @@ public class UserFollowAction implements ApiInterface {
         /**
          * Check to see if the user is already following the followed_user_id.
          */
-        boolean alreadyFollowing = false;
         try {
-            con = Pool.getConnection();
-            try {
-                p = con.prepareStatement(CHECK_FOLLOWING_QUERY);
-                p.setString(1, String.valueOf(user_id));
-                p.setString(2, String.valueOf(following_user_id));
+            StatementExecutor executor = new StatementExecutor(CHECK_FOLLOWING_QUERY);
+            executor.execute(new ExecutionBlock() {
+                @Override
+                public void prepare(PreparedStatement statement) throws SQLException {
+                    statement.setString(1, String.valueOf(user_id));
+                    statement.setString(2, String.valueOf(following_user_id));
 
-                ResultSet results = p.executeQuery();
-                if (results.next()) {
-                    alreadyFollowing = true;
+                    ResultSet results = statement.executeQuery();
+                    if (results.next()) {
+                        response.setCurrentlyFollowing(true);
+                    }
                 }
-            } finally {
-                if (con != null) {
-                    con.close();
-                }
-            }
+            });
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
         switch (action) {
+
             case "follow":
                 /**
                  * If already following, throw error.
                  */
-                if (alreadyFollowing) {
+                if (response.isCurrentlyFollowing()) {
                     context.throwHttpError(StaticRules.ErrorCodes.ALREADY_FOLLOWING_USER);
                     return;
                 }
                 try {
-                    con = Pool.getConnection();
-                    try {
-                        p = con.prepareStatement(INSERT_FOLLOW_QUERY);
-                        p.setString(1, String.valueOf(user_id));
-                        p.setString(2, String.valueOf(following_user_id));
-                        p.setString(3, now.toString());
+                    StatementExecutor executor = new StatementExecutor(INSERT_FOLLOW_QUERY);
+                    executor.execute(new ExecutionBlock() {
+                        @Override
+                        public void prepare(PreparedStatement statement) throws SQLException {
+                            statement.setString(1, String.valueOf(user_id));
+                            statement.setString(2, String.valueOf(following_user_id));
+                            statement.setString(3, now.toString());
 
-                        p.executeUpdate();
+                            statement.executeUpdate();
 
-                        success = true;
-                        action_taken = "followed";
-                    } finally {
-                        if (con != null) {
-                            con.close();
+                            response.setSuccess(true);
+                            response.setActionTaken("followed");
                         }
-                    }
+                    });
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
                 break;
+
             case "unfollow":
                 /**
                  * If not currently following, throw error.
                  */
-                if (!alreadyFollowing) {
+                if (!response.isCurrentlyFollowing()) {
                     context.throwHttpError(StaticRules.ErrorCodes.NOT_FOLLOWING_USER);
                     return;
                 }
                 try {
-                    con = Pool.getConnection();
-                    try {
-                        p = con.prepareStatement(DELETE_FOLLOWED_QUERY);
-                        p.setString(1, String.valueOf(user_id));
-                        p.setString(2, String.valueOf(following_user_id));
+                    StatementExecutor executor = new StatementExecutor(DELETE_FOLLOWED_QUERY);
+                    executor.execute(new ExecutionBlock() {
+                        @Override
+                        public void prepare(PreparedStatement statement) throws SQLException {
+                            statement.setString(1, String.valueOf(user_id));
+                            statement.setString(2, String.valueOf(following_user_id));
 
-                        p.executeUpdate();
+                            statement.executeUpdate();
 
-                        success = true;
-                        action_taken = "unfollowed";
-                    } finally {
-                        if (con != null) {
-                            con.close();
+                            response.setSuccess(true);
+                            response.setActionTaken("unfollowed");
                         }
-                    }
+                    });
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
@@ -165,10 +160,10 @@ public class UserFollowAction implements ApiInterface {
         /**
          * If the action taken was successfully performed then write the response.
          */
-        if (success) {
+        if (response.isSuccess()) {
             context.getResponse().setStatus(HttpStatus.OK_200);
             FollowActionObject followObject = new FollowActionObject();
-            followObject.setActionTaken(action_taken);
+            followObject.setActionTaken(response.getActionTaken());
             Gson g = new Gson();
             String json = g.toJson(followObject);
             context.getResponse().getWriter().write(json);
@@ -177,5 +172,46 @@ public class UserFollowAction implements ApiInterface {
             return;
         }
     }
+
+
+    private static class ActionResponse {
+
+        private boolean success;
+        private String actionTaken;
+
+        public boolean isCurrentlyFollowing() {
+            return currentlyFollowing;
+        }
+
+        public void setCurrentlyFollowing(boolean currentlyFollowing) {
+            this.currentlyFollowing = currentlyFollowing;
+        }
+
+        private boolean currentlyFollowing;
+
+        public boolean isSuccess() {
+            return success;
+        }
+
+        public void setSuccess(boolean success) {
+            this.success = success;
+        }
+
+        public String getActionTaken() {
+            return actionTaken;
+        }
+
+        public void setActionTaken(String actionTaken) {
+            this.actionTaken = actionTaken;
+        }
+
+        public ActionResponse() {
+            this.success = false;
+            this.currentlyFollowing = false;
+            this.actionTaken = null;
+        }
+
+    }
+
 
 }

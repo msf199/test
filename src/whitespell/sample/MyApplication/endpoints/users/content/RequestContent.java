@@ -12,7 +12,6 @@ import java.io.IOException;
  */
 public class RequestContent implements ApiInterface {
 
-
     public void call(RequestContext context) throws IOException {
         context.getResponse().setStatus(HttpStatus.OK_200);
         context.getResponse().getWriter().write("{}");
