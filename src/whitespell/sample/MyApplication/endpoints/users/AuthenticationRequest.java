@@ -89,6 +89,7 @@ public class AuthenticationRequest implements ApiInterface {
                             PreparedStatement insert_auth = con.prepareStatement(INSERT_AUTHENTICATION);
                             insert_auth.setInt(1, s.getInt("user_id"));
                             insert_auth.setString(2, ao.getKey());
+                            insert_auth.executeUpdate();
                             Gson g = new Gson();
                             String jsonAo = g.toJson(ao);
                             // write the authentication object

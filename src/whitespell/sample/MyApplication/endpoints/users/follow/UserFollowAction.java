@@ -13,13 +13,7 @@ import java.io.IOException;
 public class UserFollowAction implements ApiInterface {
 
     public void call(RequestContext context) throws IOException {
-        String testId = context.getUrlVariables().get("test_id");
-        context.getResponse().getWriter().write("Test:" + testId);
+        context.getResponse().getWriter().write
     }
 
-    /**
-     * HandleDistribution is the class that the user fills in to route the correct requests to the correct personalized ads.
-     * @param context               The request context
-     * @param session               the {@link whitespell.model.baseapi.Session}
-     */
 }

@@ -40,6 +40,8 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // following API /users/{userid}/following
 
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/following/", "user_id");
+
         // saved content API {/users/{userid}/saved_content}
 
         // notifications API {/users/{userid}/notifications}
