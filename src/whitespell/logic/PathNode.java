@@ -135,6 +135,7 @@ public class PathNode {
         if (!children.containsKey(key)) {
             children.put(key, new PathNode());
         }
+
         PathNode current = children.get(key);
         current.setApiSpec(spec);
     }

@@ -32,7 +32,6 @@ public class UserFollowAction implements ApiInterface {
 
 
     public void call(RequestContext context) throws IOException {
-        System.out.println("TEST2");
         String context_user_id = context.getUrlVariables().get("user_id");
 
         JsonObject payload = context.getPayload().getAsJsonObject();
