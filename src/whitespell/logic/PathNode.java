@@ -42,7 +42,6 @@ public class PathNode {
                 current = children.get(pathComponent);
             } else if (children.containsKey("?")) {
                 current = children.get("?");
-                System.out.println(current.getApiSpec() == null);
                 argValues.put(current.getApiSpec().argNames[argValues.size()], pathComponent);
             } else {
                 return null;

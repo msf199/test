@@ -30,5 +30,19 @@ public class Safety {
         return salt.toString();
     }
 
+    /**
+     * Returns whether or not the given string is strictly numeric.
+     * @param string
+     * @return
+     */
+    public static boolean isNumeric(String string) {
+        try {
+            Integer.parseInt(string);
+        } catch (NumberFormatException e) {
+            return false;
+        }
+        return true;
+    }
+
 
 }
