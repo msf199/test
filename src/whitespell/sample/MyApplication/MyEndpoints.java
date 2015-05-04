@@ -3,6 +3,7 @@ package whitespell.sample.MyApplication;
 import whitespell.sample.MyApplication.endpoints.users.*;
 import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.logic.ApiDispatcher;
+import whitespell.sample.MyApplication.endpoints.users.follow.UserFollowAction;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -25,26 +26,25 @@ public class MyEndpoints extends WhitespellWebServer {
     protected void scheduleEndpoints(ApiDispatcher dispatcher) {
 
         //user creation
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users/");
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users");
 
         //authentication API
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication/");
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication");
 
         // profile API /users/{userid}/profile
-
-        // search API {/search?q=xyz}
 
         // newsfeed {/users/{userid}/newsfeed}
 
         // trending {/users/{userid}/trending}
 
         // following API /users/{userid}/following
-
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/following/", "user_id");
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/following/?", "user_id");
 
         // saved content API {/users/{userid}/saved_content}
 
         // notifications API {/users/{userid}/notifications}
+
+        // search API {/search?q=xyz}
     }
 
 

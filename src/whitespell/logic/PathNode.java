@@ -42,6 +42,7 @@ public class PathNode {
                 current = children.get(pathComponent);
             } else if (children.containsKey("?")) {
                 current = children.get("?");
+                System.out.println(current.getApiSpec() == null);
                 argValues.put(current.getApiSpec().argNames[argValues.size()], pathComponent);
             } else {
                 return null;
@@ -58,16 +59,20 @@ public class PathNode {
      * @param apiSpec the ApiSpec to bind
      */
     public void addChildWithSubPath(String subPath, ApiSpec apiSpec) {
-        String[] pathComponents = subPath.split("/");
+        try {
+            String[] pathComponents = subPath.split("/");
 
-        PathNode current = this;
-        for (String pathComponent : pathComponents) {
-            if (!children.containsKey(pathComponent)) {
-                children.put(pathComponent, new PathNode());
+            PathNode current = this;
+            for (String pathComponent : pathComponents) {
+                if (!children.containsKey(pathComponent)) {
+                    children.put(pathComponent, new PathNode());
+                }
+                current = children.get(pathComponent);
             }
-            current = children.get(pathComponent);
+            current.setApiSpec(apiSpec);
+        }catch(Exception e) {
+            e.printStackTrace();
         }
-        current.setApiSpec(apiSpec);
     }
 
     /**
