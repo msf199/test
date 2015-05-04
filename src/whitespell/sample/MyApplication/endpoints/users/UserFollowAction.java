@@ -77,6 +77,9 @@ public class UserFollowAction implements ApiInterface {
         Connection con = null;
         PreparedStatement p = null;
 
+        /**
+         * Check to see if the user is already following the followed_user_id.
+         */
         boolean alreadyFollowing = false;
         try {
             con = Pool.getConnection();
@@ -100,6 +103,9 @@ public class UserFollowAction implements ApiInterface {
 
         switch (action) {
             case "follow":
+                /**
+                 * If already following, throw error.
+                 */
                 if (alreadyFollowing) {
                     context.throwHttpError(StaticRules.ErrorCodes.ALREADY_FOLLOWING_USER);
                     return;
@@ -126,6 +132,9 @@ public class UserFollowAction implements ApiInterface {
                 }
                 break;
             case "unfollow":
+                /**
+                 * If not currently following, throw error.
+                 */
                 if (!alreadyFollowing) {
                     context.throwHttpError(StaticRules.ErrorCodes.NOT_FOLLOWING_USER);
                     return;
@@ -153,6 +162,9 @@ public class UserFollowAction implements ApiInterface {
         }
 
 
+        /**
+         * If the action taken was successfully performed then write the response.
+         */
         if (success) {
             context.getResponse().setStatus(HttpStatus.OK_200);
             FollowActionObject followObject = new FollowActionObject();
