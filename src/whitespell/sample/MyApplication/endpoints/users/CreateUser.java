@@ -34,7 +34,7 @@ public class CreateUser implements ApiInterface {
     private static final String CHECK_USERNAME_QUERY = "SELECT `user_id` FROM `users` WHERE `username` = ? LIMIT 1";
     private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `users` WHERE `username` = ? OR `email` = ? LIMIT 1";
 
-
+    @Override
     public void call(RequestContext context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();

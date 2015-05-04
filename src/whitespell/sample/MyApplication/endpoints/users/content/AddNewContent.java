@@ -25,6 +25,7 @@ public class AddNewContent implements ApiInterface {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `user_content`(`user_id`, `content_type`, `content_description`, `timestamp`) VALUES (?,?,?,?)";
 
+    @Override
     public void call(RequestContext context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 

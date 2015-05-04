@@ -31,7 +31,7 @@ public class AuthenticationRequest implements ApiInterface {
 
     private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`) " +
                                                         "VALUES (?,?)";
-
+    @Override
     public void call(RequestContext context) throws IOException {
 
         Connection con = null;

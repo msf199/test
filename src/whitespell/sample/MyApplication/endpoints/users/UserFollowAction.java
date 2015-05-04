@@ -30,7 +30,7 @@ public class UserFollowAction implements ApiInterface {
     private static final String INSERT_FOLLOW_QUERY = "INSERT INTO `following`(`user_id`, `followed_id`, `timestamp`) VALUES (?,?,?)";
     private static final String DELETE_FOLLOWED_QUERY = "DELETE FROM `following` WHERE `user_id` = ? AND `followed_id` = ?";
 
-
+    @Override
     public void call(RequestContext context) throws IOException {
         String context_user_id = context.getUrlVariables().get("user_id");
 
