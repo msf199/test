@@ -44,5 +44,14 @@ public class Safety {
         return true;
     }
 
+    /**
+     * Returns whether or not the given id is a valid user id.
+     * @param id
+     * @return
+     */
+    public static boolean isValidUserId(int id) {
+        return id >= 0 && id <= Integer.MAX_VALUE;
+    }
+
 
 }

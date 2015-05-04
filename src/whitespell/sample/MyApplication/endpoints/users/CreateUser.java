@@ -192,7 +192,6 @@ public class CreateUser implements ApiInterface {
             context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
-
-
     }
+
 }
