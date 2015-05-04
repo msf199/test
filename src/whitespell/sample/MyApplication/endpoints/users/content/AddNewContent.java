@@ -65,13 +65,13 @@ public class AddNewContent implements ApiInterface {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
             executor.execute(new ExecutionBlock() {
                 @Override
-                public void prepare(PreparedStatement statement) throws SQLException {
-                    statement.setString(1, String.valueOf(user_id));
-                    statement.setString(2, content_type);
-                    statement.setString(3, content_description);
-                    statement.setString(4, now.toString());
+                public void prepare(PreparedStatement ps) throws SQLException {
+                    ps.setString(1, String.valueOf(user_id));
+                    ps.setString(2, content_type);
+                    ps.setString(3, content_description);
+                    ps.setString(4, now.toString());
 
-                    statement.executeUpdate();
+                    ps.executeUpdate();
 
                     success[0] = true;
                 }
