@@ -45,16 +45,16 @@ public class ApiDispatcher extends HttpServlet {
         ApiSpec spec = new ApiSpec(apiInterface, argNames);
         switch (type) {
             case GET:
-                getStructure.addChildWithSubPath(pathSpec, spec);
+                getStructure.addPathNode(pathSpec, spec);
                 break;
             case POST:
-                postStructure.addChildWithSubPath(pathSpec, spec);
+                postStructure.addPathNode(pathSpec, spec);
                 break;
             case PUT:
-                putStructure.addChildWithSubPath(pathSpec, spec);
+                putStructure.addPathNode(pathSpec, spec);
                 break;
             case DELETE:
-                delStructure.addChildWithSubPath(pathSpec, spec);
+                delStructure.addPathNode(pathSpec, spec);
                 break;
         }
     }
@@ -112,7 +112,9 @@ public class ApiDispatcher extends HttpServlet {
                 return;
             }
 
-            PathNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
+            System.out.println(request.getPathInfo());
+
+            PathNode.PathNodeResult result = apiStructure.getPathNodeResult(request.getPathInfo());
             if (result != null) {
                 urlVariables.putAll(result.getArgValues());
                 result.getApiSpec().apiInterface.call(context);

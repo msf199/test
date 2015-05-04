@@ -27,23 +27,26 @@ public class UserFollowAction implements ApiInterface {
 
     private static final String CHECK_FOLLOWING_QUERY = "SELECT * FROM `following` WHERE `user_id` = ? AND `followed_id` = ? LIMIT 1";
 
-    private static final String INSERT_FOLLOW_QUERY = "INSERT INTO `following`(`user_id`, `followed_id`, `timestamp`) " + "VALUES (?,?,?)";
+    private static final String INSERT_FOLLOW_QUERY = "INSERT INTO `following`(`user_id`, `followed_id`, `timestamp`) VALUES (?,?,?)";
     private static final String DELETE_FOLLOWED_QUERY = "DELETE FROM `following` WHERE `user_id` = ? AND `followed_id` = ?";
 
 
     public void call(RequestContext context) throws IOException {
+        System.out.println("TEST2");
         String context_user_id = context.getUrlVariables().get("user_id");
 
         JsonObject payload = context.getPayload().getAsJsonObject();
-        String following_user_string = payload.get(FOLLOWING_USER_ID_KEY).getAsString();
 
         /**
          * Check that the user id, following id, and action are valid.
          */
-        if (!Safety.isNumeric(context_user_id) || payload.get(FOLLOWING_USER_ID_KEY) == null || !Safety.isNumeric(following_user_string) || payload.get(ACTION_KEY) == null) {
+        if (!Safety.isNumeric(context_user_id) || payload.get(FOLLOWING_USER_ID_KEY) == null || !Safety.isNumeric(payload.get(FOLLOWING_USER_ID_KEY).getAsString()) || payload.get(ACTION_KEY) == null) {
             context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
+
+
+        String following_user_string = payload.get(FOLLOWING_USER_ID_KEY).getAsString();
 
         //local variables
         final int user_id = Integer.parseInt(context_user_id);
@@ -72,10 +75,10 @@ public class UserFollowAction implements ApiInterface {
             return;
         }
 
+        /**
+         * Create the {@link whitespell.sample.MyApplication.endpoints.users.UserFollowAction.ActionResponse}.
+         */
         final ActionResponse response = new ActionResponse();
-
-        Connection con = null;
-        PreparedStatement p = null;
 
         /**
          * Check to see if the user is already following the followed_user_id.

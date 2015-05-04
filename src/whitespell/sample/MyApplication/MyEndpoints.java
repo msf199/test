@@ -44,7 +44,7 @@ public class MyEndpoints extends WhitespellWebServer {
         // trending {/users/{userid}/trending}
 
         // content API /content/
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AddNewContent(), "/content/");
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AddNewContent(), "/content/?", "user_id");
         dispatcher.addHandler(ApiDispatcher.RequestType.GET, new RequestContent(), "/content/");
 
         // following API /users/{userid}/following

@@ -21,7 +21,7 @@ public class PathNode {
     private ApiSpec apiSpec = null;
 
     public PathNode() {
-        children = new HashMap<String, PathNode>();
+        children = new HashMap<>();
     }
 
     /**
@@ -32,11 +32,12 @@ public class PathNode {
      * @return a PathNodeResult containing the bound ApiSpec and all
      * matched arguments, or null if no ApiSpec was found.
      */
+    @Deprecated
     public PathNodeResult getBindingForSubPath(String subPath) {
         String[] pathComponents = subPath.split("/");
 
         PathNode current = this;
-        HashMap<String, String> argValues = new HashMap<String, String>();
+        HashMap<String, String> argValues = new HashMap<>();
         for (String pathComponent : pathComponents) {
             if (children.containsKey(pathComponent)) {
                 current = children.get(pathComponent);
@@ -51,27 +52,89 @@ public class PathNode {
     }
 
     /**
+     * Gets the {@link whitespell.logic.PathNode.PathNodeResult} for the given path.
+     * @param path  the path to find results for
+     * @return a {@link whitespell.logic.PathNode.PathNodeResult} containing
+     * the bound ApiSpec and all matched arguments, or null if no Apispec was found.
+     */
+    public PathNodeResult getPathNodeResult(String path) {
+        String[] args = path.split("/");
+        String key;
+
+        if (args != null && args.length >= 1) {
+            String suffix = "/" + args[1];
+            for (int index = 2; index < args.length; index++) {
+                suffix += "/?";
+            }
+            key = suffix;
+        } else {
+            key = path;
+        }
+
+        PathNode current = children.get(key);
+
+        if (current == null) {
+            throw new RuntimeException("current pathnode is null!");
+        }
+
+        HashMap<String, String> argValues = new HashMap<>();
+        for (int index = 2; index < args.length; index++) {
+            argValues.put(current.getApiSpec().argNames[index - 2], args[index]);
+        }
+
+        return new PathNodeResult(current.getApiSpec(), argValues);
+    }
+
+    /**
+     * Deprecated due to bug with path routing. See 'addPathNode'.
+     *
      * Traverses the trie and adds the given apiSpec as a leaf node
      * with a sub-path relative to this PathNode, or replaces an existing
      * leaf node with the same sub-path.
      * @param subPath the sub-path to bind to, relative to this node
      * @param apiSpec the ApiSpec to bind
      */
+    @Deprecated
     public void addChildWithSubPath(String subPath, ApiSpec apiSpec) {
-        try {
-            String[] pathComponents = subPath.split("/");
+        String[] pathComponents = subPath.split("/");
 
-            PathNode current = this;
-            for (String pathComponent : pathComponents) {
-                if (!children.containsKey(pathComponent)) {
-                    children.put(pathComponent, new PathNode());
-                }
-                current = children.get(pathComponent);
+        PathNode current = this;
+        for (String pathComponent : pathComponents) {
+            if (pathComponent.isEmpty()) {
+                continue;
             }
-            current.setApiSpec(apiSpec);
-        }catch(Exception e) {
-            e.printStackTrace();
+            if (!children.containsKey(pathComponent)) {
+                children.put(pathComponent, new PathNode());
+            }
+            current = children.get(pathComponent);
         }
+
+        if (current == null) {
+            throw new RuntimeException("current pathnode is null!");
+        }
+
+        current.setApiSpec(apiSpec);
+    }
+
+    /**
+     * Adds the path node and {@link ApiSpec} for the given path identifier.
+     * @param identifier the path identifier to bind to
+     * @param spec  the ApiSpec to bind
+     */
+    public void addPathNode(String identifier, ApiSpec spec) {
+        int argCount = spec.argNames != null && spec.argNames.length > 0 ? spec.argNames.length : 0;
+        String suffix = "";
+        if (argCount >= 1) {
+            for (int index = 1; index < argCount; index++) {
+                suffix += "/?";
+            }
+        }
+        String key = identifier + suffix;
+        if (!children.containsKey(key)) {
+            children.put(key, new PathNode());
+        }
+        PathNode current = children.get(key);
+        current.setApiSpec(spec);
     }
 
     /**

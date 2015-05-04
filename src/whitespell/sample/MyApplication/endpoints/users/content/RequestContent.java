@@ -13,6 +13,8 @@ import java.io.IOException;
 public class RequestContent implements ApiInterface {
 
     public void call(RequestContext context) throws IOException {
+        //TODO request content
+
         context.getResponse().setStatus(HttpStatus.OK_200);
         context.getResponse().getWriter().write("{}");
     }
