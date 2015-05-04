@@ -1,5 +1,6 @@
 package whitespell.sample.MyApplication.endpoints.users.follow;
 
+import org.eclipse.jetty.http.HttpStatus;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
 
@@ -13,7 +14,15 @@ import java.io.IOException;
 public class UserFollowAction implements ApiInterface {
 
     public void call(RequestContext context) throws IOException {
-        //context.getResponse().getWriter().write
+        context.getResponse().setStatus(HttpStatus.OK_200);
+        context.getResponse().getWriter().write("{}");
+        try {
+            String posted_user_id = context.getUrlVariables().get("user_id");
+            System.out.println(posted_user_id);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -101,20 +101,24 @@ public class ApiDispatcher extends HttpServlet {
      */
 
     private void callHandler(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
-        JsonElement payload = getPayload(request, response);
-        RequestContext context = new RequestContext(
-                request, response, urlVariables, request.getParameterMap(), payload);
-        PathNode apiStructure = getApiStructure(method);
+        try {
+            JsonElement payload = getPayload(request, response);
+            RequestContext context = new RequestContext(
+                    request, response, urlVariables, request.getParameterMap(), payload);
+            PathNode apiStructure = getApiStructure(method);
 
-        if (request.getPathInfo() == null) {
-            logger.warn("Received " + method + " request with empty path.");
-            return;
-        }
+            if (request.getPathInfo() == null) {
+                logger.warn("Received " + method + " request with empty path.");
+                return;
+            }
 
-        PathNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
-        if (result != null) {
-            urlVariables.putAll(result.getArgValues());
-            result.getApiSpec().apiInterface.call(context);
+            PathNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
+            if (result != null) {
+                urlVariables.putAll(result.getArgValues());
+                result.getApiSpec().apiInterface.call(context);
+            }
+        }catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -145,6 +149,7 @@ public class ApiDispatcher extends HttpServlet {
     private JsonElement getPayload(HttpServletRequest request, HttpServletResponse response)
             throws JsonParseException, IllegalStateException, IOException {
         String body = getBody(request);
+        System.out.println("Request body:");
         System.out.println(body);
         return new JsonParser().parse(body);
     }
