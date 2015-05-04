@@ -32,6 +32,8 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // profile API /users/{userid}/profile
 
+        // Interests API /users/{userid}/profile/interests/
+
         // search API {/search?q=xyz}
 
         // newsfeed {/users/{userid}/newsfeed}
@@ -40,7 +42,7 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // following API /users/{userid}/following
 
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/following/", "user_id");
+        //dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/following/", "user_id");
 
         // saved content API {/users/{userid}/saved_content}
 

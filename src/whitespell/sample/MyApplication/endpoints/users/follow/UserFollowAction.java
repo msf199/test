@@ -13,7 +13,7 @@ import java.io.IOException;
 public class UserFollowAction implements ApiInterface {
 
     public void call(RequestContext context) throws IOException {
-        context.getResponse().getWriter().write
+        //context.getResponse().getWriter().write
     }
 
 }
