@@ -64,6 +64,7 @@ public class UserFollowAction implements ApiInterface {
         /**
          * Check that the action being performed is valid.
          */
+        
         boolean validAction = action.equalsIgnoreCase("follow") || action.equalsIgnoreCase("unfollow");
 
         /**
@@ -103,7 +104,7 @@ public class UserFollowAction implements ApiInterface {
         switch (action) {
 
             case "follow":
-                
+
                 /**
                  * If already following, throw error.
                  */
