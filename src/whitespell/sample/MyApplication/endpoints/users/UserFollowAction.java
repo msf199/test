@@ -70,6 +70,7 @@ public class UserFollowAction implements ApiInterface {
         /**
          * If the action is invalid throw a null value error.
          */
+        
         if (!validAction) {
             context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
@@ -83,7 +84,7 @@ public class UserFollowAction implements ApiInterface {
         /**
          * Check to see if the user is already following the followed_user_id.
          */
-        
+
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_FOLLOWING_QUERY);
             executor.execute(new ExecutionBlock() {
