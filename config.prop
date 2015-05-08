@@ -4,4 +4,4 @@ SERVER_TIMEZONE=EST
 API_PORT=9001
 MYSQL_HOST=localhost
 MAX_ERROR_FOLDER_SIZE_MB=10
-ERROR_PATH=/var/log/peak-api/
+ERROR_PATH=/var/log/peak-api
