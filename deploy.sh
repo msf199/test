@@ -24,6 +24,7 @@ scp build.sh peakapi.whitespell.com:/usr/share/peak-api
 
 #kill current api, and nohup the new version
 echo 'running new api...';
-ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo pkill java && sudo nohup bash run.sh bin &";
+ssh peakapi.whitespell.com "sudo pkill java";
+ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo nohup bash run.sh bin &";
 
 echo "Deployment is finished";
