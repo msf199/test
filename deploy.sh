@@ -1,10 +1,12 @@
 #!/bin/bash
 
 #remove the directories
-ssh peakapi.whitespell.com "sudo rm -rf /usr/share/peak-api";
+ssh peakapi.whitespell.com "sudo rm -rf /usr/share/peak-api/bin";
+ssh peakapi.whitespell.com "sudo rm -rf /usr/share/peak-api/lib";
 
-#create the right directories
-ssh peakapi.whitespell.com "sudo mkdir /usr/share/peak-api && sudo chmod -R 777 /usr/share/peak-api";
+#create the peak api directory if it doesn't already exist
+ssh peakapi.whitespell.com "sudo mkdir -p /usr/share/peak-api && sudo chmod -R 777 /usr/share/peak-api";
+ssh peakapi.whitespell.com "sudo mkdir -p /var/log/peak-api && sudo chmod -R 777 /var/log/peak-api";
 ssh peakapi.whitespell.com "sudo mkdir /usr/share/peak-api/bin && sudo chmod -R 777 /usr/share/peak-api/bin";
 ssh peakapi.whitespell.com "sudo mkdir /usr/share/peak-api/lib && sudo chmod -R 777 /usr/share/peak-api/lib";
 
