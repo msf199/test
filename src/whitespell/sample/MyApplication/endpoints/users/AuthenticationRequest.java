@@ -34,7 +34,7 @@ public class AuthenticationRequest implements ApiInterface {
     @Override
     public void call(RequestContext context) throws IOException {
 
-        Connection con = null;
+        Connection con;
         String username;
         String password;
 
@@ -69,12 +69,10 @@ public class AuthenticationRequest implements ApiInterface {
             }
         }
 
-        con = null;
-
         try {
             con = Pool.getConnection();
 
-            PreparedStatement p = null;
+            PreparedStatement p;
             try {
 
                 p = con.prepareStatement(RETRIEVE_PASSWORD);
