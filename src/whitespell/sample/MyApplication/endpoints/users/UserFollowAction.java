@@ -64,7 +64,7 @@ public class UserFollowAction implements ApiInterface {
         /**
          * Check that the action being performed is valid.
          */
-        
+
         boolean validAction = action.equalsIgnoreCase("follow") || action.equalsIgnoreCase("unfollow");
 
         /**
@@ -83,6 +83,7 @@ public class UserFollowAction implements ApiInterface {
         /**
          * Check to see if the user is already following the followed_user_id.
          */
+        
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_FOLLOWING_QUERY);
             executor.execute(new ExecutionBlock() {
