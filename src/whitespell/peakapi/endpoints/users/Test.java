@@ -28,7 +28,7 @@ public class Test implements ApiInterface {
     @Override
     public void call(RequestContext context) throws IOException {
 
-       context.getResponse().getWriter().write("fff");
+       context.getResponse().getWriter().write("8u8u8u8u8u");
 
 
     }
