@@ -36,10 +36,10 @@ public class Server {
         try {
             System.setErr(new PrintStream(new Logging.ErrorFile(), true));
         }catch (Exception e) {
-            System.out.println("Error was thrown with config.prop config. Switching to errors/");
+            System.out.println("Error was thrown with config.prop config. Switching to this dir for errors");
             Logging.log("SEVERE", e);
             try {
-                System.setErr(new PrintStream(new Logging.ErrorFile("errors/"), true));
+                System.setErr(new PrintStream(new Logging.ErrorFile("."), true));
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
                 System.out.println("Closing error logging stream");
