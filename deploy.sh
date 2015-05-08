@@ -16,15 +16,15 @@ ssh peakapi.whitespell.com "sudo mkdir /usr/share/peak-api/lib && sudo chmod -R 
 
 #//todo make it zip based
 #place the right content in the directories
-scp -r bin/* peakapi.whitespell.com:/usr/share/peak-api/bin;
-scp -r lib/* peakapi.whitespell.com:/usr/share/peak-api/lib;
-scp run.sh peakapi.whitespell.com:/usr/share/peak-api;
-scp config.prop peakapi.whitespell.com:/usr/share/peak-api;
-scp build.sh peakapi.whitespell.com:/usr/share/peak-api;
+scp -r bin/* peakapi.whitespell.com:/usr/share/peak-api/bin
+scp -r lib/* peakapi.whitespell.com:/usr/share/peak-api/lib
+scp run.sh peakapi.whitespell.com:/usr/share/peak-api
+scp config.prop peakapi.whitespell.com:/usr/share/peak-api
+scp build.sh peakapi.whitespell.com:/usr/share/peak-api
 
 #kill current api, and nohup the new version
 echo 'running new api...';
 ssh peakapi.whitespell.com "sudo pkill java";
-ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo nohup bash run.sh bin >/dev/null 2>&1 & disown" >> /dev/null 2>&1 &
+ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo nohup bash run.sh bin &" >> /dev/null;
 
 echo "Deployment is finished";
