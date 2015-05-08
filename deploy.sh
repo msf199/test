@@ -27,5 +27,5 @@ ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo pkill java";
 
 #run new api
 echo 'running new api...';
-ssh -t -t peakapi.whitespell.com "sudo nohup bash run.sh bin &";
+ssh peakapi.whitespell.com "sudo sh /usr/share/peak-api/run.sh bin && disown %1";
 echo "Deployment is finished";
