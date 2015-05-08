@@ -18,3 +18,4 @@ scp build.sh peakapi.whitespell.com:/usr/share/peak-api
 
 #kill current api, and nohup the new version
 ssh peakapi.whitespell.com "cd /usr/share/peak-api && pkill java && nohup bash run.sh bin &";
+echo "Deployment is finished";
