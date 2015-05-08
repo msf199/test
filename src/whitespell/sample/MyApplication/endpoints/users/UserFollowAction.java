@@ -103,9 +103,11 @@ public class UserFollowAction implements ApiInterface {
         switch (action) {
 
             case "follow":
+                
                 /**
                  * If already following, throw error.
                  */
+
                 if (response.isCurrentlyFollowing()) {
                     context.throwHttpError(StaticRules.ErrorCodes.ALREADY_FOLLOWING_USER);
                     return;
@@ -131,9 +133,11 @@ public class UserFollowAction implements ApiInterface {
                 break;
 
             case "unfollow":
+
                 /**
                  * If not currently following, throw error.
                  */
+
                 if (!response.isCurrentlyFollowing()) {
                     context.throwHttpError(StaticRules.ErrorCodes.NOT_FOLLOWING_USER);
                     return;
