@@ -23,9 +23,8 @@ scp config.prop peakapi.whitespell.com:/usr/share/peak-api
 scp build.sh peakapi.whitespell.com:/usr/share/peak-api
 
 #kill current api, and nohup the new version
-ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo pkill java";
-
-#run new api
 echo 'running new api...';
-ssh peakapi.whitespell.com "sudo sh /usr/share/peak-api/run.sh bin && disown %1";
+ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo pkill java && sudo bash run.sh bin && disown %1";
+
+ssh peakapi.whitespell.com "";
 echo "Deployment is finished";
