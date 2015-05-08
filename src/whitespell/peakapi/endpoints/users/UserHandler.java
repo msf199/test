@@ -1,4 +1,4 @@
-package whitespell.sample.MyApplication.endpoints.users;
+package whitespell.peakapi.endpoints.users;
 
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;

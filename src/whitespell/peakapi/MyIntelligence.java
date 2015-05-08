@@ -1,11 +1,11 @@
-package whitespell.sample.MyApplication;
+package whitespell.peakapi;
 
 import whitespell.model.baseapi.WhitespellIntelligence;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         2/4/15
- *         whitespell.sample.MyApplication
+ *         whitespell.peakapi
  */
 public class MyIntelligence extends WhitespellIntelligence {
 

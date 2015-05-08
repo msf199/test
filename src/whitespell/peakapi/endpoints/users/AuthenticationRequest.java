@@ -1,8 +1,7 @@
-package whitespell.sample.MyApplication.endpoints.users;
+package whitespell.peakapi.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import sun.security.util.Password;
 import whitespell.StaticRules;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;

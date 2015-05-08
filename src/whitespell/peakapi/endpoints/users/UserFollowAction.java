@@ -1,4 +1,4 @@
-package whitespell.sample.MyApplication.endpoints.users;
+package whitespell.peakapi.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -70,14 +70,14 @@ public class UserFollowAction implements ApiInterface {
         /**
          * If the action is invalid throw a null value error.
          */
-        
+
         if (!validAction) {
             context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
         /**
-         * Create the {@link whitespell.sample.MyApplication.endpoints.users.UserFollowAction.ActionResponse}.
+         * Create the {@link whitespell.peakapi.endpoints.users.UserFollowAction.ActionResponse}.
          */
         final ActionResponse response = new ActionResponse();
 

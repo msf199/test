@@ -1,6 +1,5 @@
 package whitespell.model.baseapi;
 
-import sun.security.provider.certpath.Vertex;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
 import whitespell.net.websockets.socketio.SocketIOClient;

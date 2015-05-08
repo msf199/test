@@ -1,4 +1,4 @@
-package whitespell.sample.MyApplication.endpoints.users;
+package whitespell.peakapi.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -6,10 +6,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
-import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.Pool;
-import whitespell.logic.sql.StatementExecutor;
-import whitespell.model.ErrorObject;
 import whitespell.model.UserObject;
 import whitespell.security.PasswordHash;
 

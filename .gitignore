@@ -4,3 +4,4 @@ out/*
 .DS_STORE
 .DS_STORE/*
 api.iml
+bin

@@ -1,16 +1,16 @@
-package whitespell.sample.MyApplication;
+package whitespell.peakapi;
 
-import whitespell.sample.MyApplication.endpoints.users.*;
+import whitespell.peakapi.endpoints.users.*;
 import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.logic.ApiDispatcher;
-import whitespell.sample.MyApplication.endpoints.users.UserFollowAction;
-import whitespell.sample.MyApplication.endpoints.users.content.AddNewContent;
-import whitespell.sample.MyApplication.endpoints.users.content.RequestContent;
+import whitespell.peakapi.endpoints.users.UserFollowAction;
+import whitespell.peakapi.endpoints.users.content.AddNewContent;
+import whitespell.peakapi.endpoints.users.content.RequestContent;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         2/4/15
- *         whitespell.sample.MyApplication
+ *         whitespell.peakapi
  */
 public class MyEndpoints extends WhitespellWebServer {
 

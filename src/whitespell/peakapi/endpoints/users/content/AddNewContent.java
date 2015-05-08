@@ -1,4 +1,4 @@
-package whitespell.sample.MyApplication.endpoints.users.content;
+package whitespell.peakapi.endpoints.users.content;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

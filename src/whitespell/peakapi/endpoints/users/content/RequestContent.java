@@ -1,4 +1,4 @@
-package whitespell.sample.MyApplication.endpoints.users.content;
+package whitespell.peakapi.endpoints.users.content;
 
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
