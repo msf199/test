@@ -31,7 +31,7 @@ public class MyEndpoints extends WhitespellWebServer {
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users");
 
         //test
-        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new Test(), "/test");
+        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new Test(), "/test");
 
         //authentication API
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication");
