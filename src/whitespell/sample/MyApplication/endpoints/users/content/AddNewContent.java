@@ -66,7 +66,7 @@ public class AddNewContent implements ApiInterface {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
             executor.execute(new ExecutionBlock() {
                 @Override
-                public void prepare(PreparedStatement ps) throws SQLException {
+                public void process(PreparedStatement ps) throws SQLException {
                     ps.setString(1, String.valueOf(user_id));
                     ps.setString(2, content_type);
                     ps.setString(3, content_description);

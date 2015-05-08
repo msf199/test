@@ -16,7 +16,7 @@ public class StatementExecutor {
 
     public void execute(ExecutionBlock block) throws SQLException {
         try {
-            block.prepare(this.statement);
+            block.process(this.statement);
         } finally {
             if (this.connection != null) {
                 this.connection.close();

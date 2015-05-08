@@ -86,7 +86,7 @@ public class UserFollowAction implements ApiInterface {
             StatementExecutor executor = new StatementExecutor(CHECK_FOLLOWING_QUERY);
             executor.execute(new ExecutionBlock() {
                 @Override
-                public void prepare(PreparedStatement ps) throws SQLException {
+                public void process(PreparedStatement ps) throws SQLException {
                     ps.setString(1, String.valueOf(user_id));
                     ps.setString(2, String.valueOf(following_user_id));
 
@@ -114,7 +114,7 @@ public class UserFollowAction implements ApiInterface {
                     StatementExecutor executor = new StatementExecutor(INSERT_FOLLOW_QUERY);
                     executor.execute(new ExecutionBlock() {
                         @Override
-                        public void prepare(PreparedStatement ps) throws SQLException {
+                        public void process(PreparedStatement ps) throws SQLException {
                             ps.setString(1, String.valueOf(user_id));
                             ps.setString(2, String.valueOf(following_user_id));
                             ps.setString(3, now.toString());
@@ -142,7 +142,7 @@ public class UserFollowAction implements ApiInterface {
                     StatementExecutor executor = new StatementExecutor(DELETE_FOLLOWED_QUERY);
                     executor.execute(new ExecutionBlock() {
                         @Override
-                        public void prepare(PreparedStatement ps) throws SQLException {
+                        public void process(PreparedStatement ps) throws SQLException {
                             ps.setString(1, String.valueOf(user_id));
                             ps.setString(2, String.valueOf(following_user_id));
 

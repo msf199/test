@@ -5,6 +5,6 @@ import java.sql.SQLException;
 
 public interface ExecutionBlock {
 
-    public void prepare(PreparedStatement ps) throws SQLException;
+    public void process(PreparedStatement ps) throws SQLException;
 
 }
