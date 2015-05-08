@@ -37,7 +37,7 @@ public class StaticRules {
         EMAIL_TOO_LONG(111, "Email is too long ("+StaticRules.MAX_EMAIL_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),
         PASSWORD_TOO_LONG(112, "Password is too long ("+StaticRules.MAX_PASSWORD_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),
         NULL_VALUE_FOUND(113, "One (or more) of the required parameters was null, please check your documentation and the request parameters.", HttpStatus.UNAUTHORIZED_401),
-        USERNAME_TOO_SHORT(114, "Username is too short ("+StaticRules.MIN_USERNAME_LENGTH+" is the min)", HttpStatus.UNAUTHORIZED_401),
+        USERNAME_TOO_SHORT(114, "Username is too short ("+StaticRules.MIN_USERNAME_LENGTH+" is the minimum length)", HttpStatus.UNAUTHORIZED_401),
         EMAIL_TOO_SHORT(115, "Email is too short ("+StaticRules.MIN_EMAIL_LENGTH+" is the min)", HttpStatus.UNAUTHORIZED_401),
         PASSWORD_TOO_SHORT(116, "Password is too short ("+StaticRules.MIN_PASSWORD_LENGTH+" is the min)", HttpStatus.UNAUTHORIZED_401),
         ALREADY_FOLLOWING_USER(117, "You are already following this user!", HttpStatus.UNAUTHORIZED_401),
