@@ -26,5 +26,4 @@ scp build.sh peakapi.whitespell.com:/usr/share/peak-api
 echo 'running new api...';
 ssh peakapi.whitespell.com "cd /usr/share/peak-api && sudo pkill java && sudo nohup bash run.sh bin &";
 
-ssh peakapi.whitespell.com "";
 echo "Deployment is finished";
