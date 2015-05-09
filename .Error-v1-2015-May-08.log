@@ -1,0 +1,283 @@
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+java.lang.RuntimeException: current pathnode is null!
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:78)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+java.lang.RuntimeException: current pathnode is null!
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:78)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+java.lang.RuntimeException: current pathnode is null!
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:82)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+java.lang.RuntimeException: current pathnode is null!
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:79)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+java.lang.RuntimeException: current pathnode is null!
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:79)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+java.lang.RuntimeException: current pathnode is null!
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:79)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+java.lang.RuntimeException: current pathnode is null!
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:81)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+java.lang.ArrayIndexOutOfBoundsException: 0
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:78)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+java.lang.ArrayIndexOutOfBoundsException: 0
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:78)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+java.lang.ArrayIndexOutOfBoundsException: 0
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:78)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+java.lang.ArrayIndexOutOfBoundsException: 0
+	at whitespell.logic.PathNode.getPathNodeResult(PathNode.java:78)
+	at whitespell.logic.ApiDispatcher.callHandler(ApiDispatcher.java:117)
+	at whitespell.logic.ApiDispatcher.doGet(ApiDispatcher.java:64)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:668)
+	at javax.servlet.http.HttpServlet.service(HttpServlet.java:770)
+	at org.eclipse.jetty.servlet.ServletHolder.handle(ServletHolder.java:696)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1515)
+	at whitespell.logic.UnitFilters.doFilter(UnitFilters.java:53)
+	at org.eclipse.jetty.servlet.ServletHandler$CachedChain.doFilter(ServletHandler.java:1486)
+	at org.eclipse.jetty.servlet.ServletHandler.doHandle(ServletHandler.java:519)
+	at org.eclipse.jetty.servlet.ServletHandler.doScope(ServletHandler.java:450)
+	at org.eclipse.jetty.server.handler.ScopedHandler.handle(ScopedHandler.java:136)
+	at org.eclipse.jetty.server.handler.HandlerWrapper.handle(HandlerWrapper.java:97)
+	at org.eclipse.jetty.server.Server.handle(Server.java:446)
+	at org.eclipse.jetty.server.HttpChannel.handle(HttpChannel.java:271)
+	at org.eclipse.jetty.server.HttpConnection.onFillable(HttpConnection.java:246)
+	at org.eclipse.jetty.io.AbstractConnection$ReadCallback.run(AbstractConnection.java:358)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool.runJob(QueuedThreadPool.java:601)
+	at org.eclipse.jetty.util.thread.QueuedThreadPool$3.run(QueuedThreadPool.java:532)
+	at java.lang.Thread.run(Thread.java:745)
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
+SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+SLF4J: Defaulting to no-operation (NOP) logger implementation
+SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+ERROR StatusLogger No log4j2 configuration file found. Using default configuration: logging only errors to the console.
