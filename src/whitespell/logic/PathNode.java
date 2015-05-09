@@ -60,17 +60,11 @@ public class PathNode {
     public PathNodeResult getPathNodeResult(String path) {
         String[] args = path.split("/");
 
+
         StringBuilder pathNodeKey = new StringBuilder();
 
-        if (args != null && args.length >= 1) {
-            pathNodeKey.append("/");
-            pathNodeKey.append(args[1]);
-            for (int index = 2; index < args.length; index++) {
-                pathNodeKey.append("/?");
-            }
-        } else {
-            pathNodeKey.append(path);
-        }
+        pathNodeKey.append(path);
+
 
         PathNode current = children.get(pathNodeKey.toString());
 
@@ -79,8 +73,10 @@ public class PathNode {
         }
 
         HashMap<String, String> argValues = new HashMap<>();
-        for (int index = 2; index < args.length; index++) {
-            argValues.put(current.getApiSpec().argNames[index - 2], args[index]);
+        if(current.getApiSpec().argNames.length > 0) {
+            for (int index = 2; index < args.length; index++) {
+                argValues.put(current.getApiSpec().argNames[index - 2], args[index]);
+            }
         }
 
         return new PathNodeResult(current.getApiSpec(), argValues);

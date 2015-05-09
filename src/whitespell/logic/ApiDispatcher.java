@@ -108,9 +108,11 @@ public class ApiDispatcher extends HttpServlet {
             PathNode apiStructure = getApiStructure(method);
 
             if (request.getPathInfo() == null) {
-                logger.warn("Received " + method + " request with empty path.");
+                System.out.println("Received " + method + " request with empty path.");
                 return;
             }
+
+            System.out.println("Looking up Path Node for " + request.getPathInfo());
 
             PathNode.PathNodeResult result = apiStructure.getPathNodeResult(request.getPathInfo());
             if (result != null) {

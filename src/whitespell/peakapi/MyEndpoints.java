@@ -1,5 +1,6 @@
 package whitespell.peakapi;
 
+import whitespell.peakapi.endpoints.statistics.GetUserSignups;
 import whitespell.peakapi.endpoints.users.*;
 import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.logic.ApiDispatcher;
@@ -31,7 +32,7 @@ public class MyEndpoints extends WhitespellWebServer {
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users");
 
         //test
-        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new Test(), "/test");
+        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new GetUserSignups(), "/statistics/signups/");
 
         //authentication API
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication");
