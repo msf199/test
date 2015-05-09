@@ -125,6 +125,7 @@ public class CreateUser implements ApiInterface {
         //throw the right error
         if (usernameExists) {
             context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
+            return;
         } else if (emailExists) {
             context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
             return;

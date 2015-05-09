@@ -58,6 +58,13 @@ public class PathNode {
      * the bound ApiSpec and all matched arguments, or null if no Apispec was found.
      */
     public PathNodeResult getPathNodeResult(String path) {
+
+        // always remove the final slash
+        if(path.substring(path.length() - 1).equals("/")) {
+            path = path.substring(0, path.length() - 1);
+            System.out.println(path);
+        }
+
         String[] args = path.split("/");
 
 
@@ -119,7 +126,16 @@ public class PathNode {
      * @param spec  the ApiSpec to bind
      */
     public void addPathNode(String identifier, ApiSpec spec) {
+
+        // always remove the final slash
+        if(identifier.substring(identifier.length() - 1).equals("/")) {
+            identifier = identifier.substring(0, identifier.length() - 1);
+            System.out.println(identifier);
+        }
+
         int argCount = spec.argNames != null && spec.argNames.length > 0 ? spec.argNames.length : 0;
+
+        System.out.println(identifier + " has arg count: " + argCount);
 
         StringBuilder pathNodeKey = new StringBuilder();
         if (argCount >= 1) {
@@ -134,6 +150,7 @@ public class PathNode {
 
         PathNode current = children.get(key);
         current.setApiSpec(spec);
+        children.put(key, current);
     }
 
     /**
