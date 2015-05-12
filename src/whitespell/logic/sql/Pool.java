@@ -2,6 +2,7 @@ package whitespell.logic.sql;
 
 import org.apache.commons.dbcp2.cpdsadapter.DriverAdapterCPDS;
 import org.apache.commons.dbcp2.datasources.SharedPoolDataSource;
+import whitespell.logic.logging.Logging;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -24,12 +25,11 @@ public class Pool
         cpds.setUrl("jdbc:mysql://173.194.241.59:3306/peak");
         cpds.setUser("api");
         cpds.setPassword("LS6GP6CJ");
-
         SharedPoolDataSource tds = new SharedPoolDataSource();
         tds.setConnectionPoolDataSource(cpds);
         tds.setMaxTotal(10);
         tds.setDefaultMaxWaitMillis(50);
-
+        tds.setValidationQuery("SELECT 1");
         ds = tds;
     }
 
@@ -38,7 +38,7 @@ public class Pool
         try {
             return ds.getConnection();
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
         }
         return null;
     }

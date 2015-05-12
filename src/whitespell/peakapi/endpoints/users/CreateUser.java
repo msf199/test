@@ -6,6 +6,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
+import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.Pool;
 import whitespell.model.UserObject;
 import whitespell.security.PasswordHash;
@@ -113,13 +114,13 @@ public class CreateUser implements ApiInterface {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Logging.log("High", e);
             } finally {
                 if (con != null)
                     con.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
         }
 
         //throw the right error
@@ -137,7 +138,7 @@ public class CreateUser implements ApiInterface {
         try {
             passHash = PasswordHash.createHash(password);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.log("High", e);
         }
 
         /**
@@ -174,7 +175,7 @@ public class CreateUser implements ApiInterface {
                     con.close();
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
         }
 
         if (success) {

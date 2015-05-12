@@ -6,6 +6,7 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import whitespell.logic.logging.Logging;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -120,7 +121,7 @@ public class ApiDispatcher extends HttpServlet {
                 result.getApiSpec().apiInterface.call(context);
             }
         }catch(Exception e) {
-            e.printStackTrace();
+            Logging.log("Low", e);
         }
     }
 

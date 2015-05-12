@@ -3,6 +3,7 @@ package whitespell.peakapi.endpoints.statistics;
 import com.google.gson.Gson;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
+import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.DayResult;
@@ -56,7 +57,7 @@ public class GetUserSignups implements ApiInterface {
                 }
             });
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
         }
     }
 

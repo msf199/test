@@ -7,6 +7,7 @@ import whitespell.StaticRules;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.Safety;
+import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.FollowActionObject;
@@ -100,7 +101,7 @@ public class UserFollowAction implements ApiInterface {
                 }
             });
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
         }
 
         switch (action) {
@@ -131,7 +132,7 @@ public class UserFollowAction implements ApiInterface {
                         }
                     });
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    Logging.log("High", e);
                 }
                 break;
 
@@ -160,7 +161,7 @@ public class UserFollowAction implements ApiInterface {
                         }
                     });
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    Logging.log("High", e);
                 }
                 break;
         }

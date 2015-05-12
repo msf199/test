@@ -6,6 +6,7 @@ import whitespell.StaticRules;
 import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.SessionIdentifierGenerator;
+import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.Pool;
 import whitespell.model.AuthenticationObject;
 import whitespell.security.PasswordHash;
@@ -97,9 +98,9 @@ public class AuthenticationRequest implements ApiInterface {
                             return;
                         }
                     } catch (NoSuchAlgorithmException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
                     } catch (InvalidKeySpecException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
                     }
                 } else {
                     context.throwHttpError(StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);

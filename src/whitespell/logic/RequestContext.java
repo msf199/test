@@ -3,6 +3,7 @@ package whitespell.logic;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import whitespell.StaticRules;
+import whitespell.logic.logging.Logging;
 import whitespell.model.ErrorObject;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +69,7 @@ public class RequestContext {
         try {
             this.response.getWriter().write(errorObject);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logging.log("Low", e);
         }
     }
 }
