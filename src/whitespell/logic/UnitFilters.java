@@ -44,6 +44,7 @@ public class UnitFilters implements Filter {
 
         // this header allows CORS requests.
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
+        ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers" ,"Origin, X-Requested-With, Content-Type, Accept");
         ((HttpServletResponse) servletResponse).addHeader("Server", "Whitespell API Server");
         //((HttpServletResponse) servletResponse).addHeader("Request-id", UUID.randomUUID().toString());
         servletResponse.setContentType("application/json");
