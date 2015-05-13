@@ -35,7 +35,6 @@ public final class ServerProperties {
 			Config.SERVER_VERSION = Integer.parseInt(properties.getProperty("SERVER_VERSION"));
             Config.SERVER_TIMEZONE = (properties.getProperty("SERVER_TIMEZONE"));
 			Config.API_PORT = Integer.parseInt(properties.getProperty("API_PORT"));
-			Config.MYSQL_HOST = (properties.getProperty("MYSQL_HOST"));
 			Config.MAX_ERROR_FOLDER_SIZE_MB = Integer.parseInt(properties.getProperty("MAX_ERROR_FOLDER_SIZE_MB"));
             Config.ERROR_PATH = (properties.getProperty("ERROR_PATH"));
 		} else {

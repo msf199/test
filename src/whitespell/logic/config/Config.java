@@ -25,10 +25,6 @@ public final class Config {
     //server.Server Ports
     public static int API_PORT = 80;
 
-    //hosts
-
-    public static String MYSQL_HOST = "localhost";
-
     //security measures
     public static String ERROR_PATH = "/";
     public static int MAX_ERROR_FOLDER_SIZE_MB = 10;
