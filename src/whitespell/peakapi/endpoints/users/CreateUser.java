@@ -26,8 +26,8 @@ import java.sql.SQLException;
 
 public class CreateUser implements ApiInterface {
 
-    private static final String INSERT_USER_QUERY = "INSERT INTO `users`(`password`, `email`, `username`) " +
-            "VALUES (?,?,?)";
+    private static final String INSERT_USER_QUERY = "INSERT INTO `users`(`password`, `email`, `username`, `publisher`) " +
+            "VALUES (?,?,?, ?)";
 
     private static final String CHECK_USERNAME_QUERY = "SELECT `user_id` FROM `users` WHERE `username` = ? LIMIT 1";
     private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `users` WHERE `username` = ? OR `email` = ? LIMIT 1";
@@ -42,6 +42,7 @@ public class CreateUser implements ApiInterface {
         String password = null;
         String email = null;
         String passHash = null;
+        int publisher = 0;
         int user_id = -1;
         boolean usernameExists = false;
         boolean emailExists = false;
@@ -59,6 +60,10 @@ public class CreateUser implements ApiInterface {
             username = payload.get("username").getAsString();
             password = payload.get("password").getAsString();
             email = payload.get("email").getAsString();
+
+            if(payload.get("publisher") != null && payload.get("publisher").getAsInt() == 1) {
+                publisher = 1;
+            }
 
             // check against lengths for security and UX reasons.
 
@@ -157,6 +162,7 @@ public class CreateUser implements ApiInterface {
                 p.setString(1, passHash);
                 p.setString(2, email);
                 p.setString(3, username);
+                p.setInt(4, publisher);
 
                 /**
                  * //todo(pim) check if email checker returned positively, if so, insert into DB, if not, reject request with 403 forbidden and set success to false.

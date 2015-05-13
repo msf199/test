@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class StaticRules {
 
     public static final int MIN_USERNAME_LENGTH = 1;
-    public static final int MAX_USERNAME_LENGTH = 12;
+    public static final int MAX_USERNAME_LENGTH = 30;
     public static final int MIN_EMAIL_LENGTH = 1;
     public static final int MAX_EMAIL_LENGTH = 512;
     public static final int MIN_PASSWORD_LENGTH = 6;
