@@ -22,14 +22,17 @@ public class Pool
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
-        cpds.setUrl("jdbc:mysql://173.194.241.59:3306/peak");
+        cpds.setUrl("jdbc:mysql://173.194.241.59:3306/peak?autoreconnect=true");
         cpds.setUser("api");
         cpds.setPassword("LS6GP6CJ");
         SharedPoolDataSource tds = new SharedPoolDataSource();
         tds.setConnectionPoolDataSource(cpds);
-        tds.setMaxTotal(10);
-        tds.setDefaultMaxWaitMillis(50);
+        tds.setMaxTotal(20);
+        tds.setDefaultMaxWaitMillis(180000);
         tds.setValidationQuery("SELECT 1");
+        tds.setDefaultMaxIdle(10);
+        tds.setDefaultTestWhileIdle(true);
+        tds.setDefaultMinIdle(0);
         ds = tds;
     }
 
