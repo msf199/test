@@ -34,6 +34,7 @@ public class Pool
         SharedPoolDataSource tds = new SharedPoolDataSource();
         tds.setConnectionPoolDataSource(cpds);
         tds.setMaxTotal(20);
+        tds.setDefaultMaxWaitMillis(-1);
         tds.setValidationQuery("SELECT 1");
         tds.setDefaultMaxIdle(10);
         tds.setDefaultTestWhileIdle(true);
