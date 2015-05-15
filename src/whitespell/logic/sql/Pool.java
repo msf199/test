@@ -22,13 +22,18 @@ public class Pool
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        /*
+        Caused by: com.mysql.jdbc.exceptions.jdbc4.CommunicationsException: The last packet successfully received from the server was 50,847,327 milliseconds ago.
+         The last packet sent successfully to the server was 50,847,328 milliseconds ago. is longer than the server configured value of 'wait_timeout'.
+          You should consider either expiring and/or testing connection validity before use in your application, increasing the server configured values for client timeouts,
+          or using the Connector/J connection property 'autoReconnect=true' to avoid this problem.
+         */
         cpds.setUrl("jdbc:mysql://173.194.241.59:3306/peak?autoreconnect=true");
         cpds.setUser("api");
         cpds.setPassword("LS6GP6CJ");
         SharedPoolDataSource tds = new SharedPoolDataSource();
         tds.setConnectionPoolDataSource(cpds);
         tds.setMaxTotal(20);
-        tds.setDefaultMaxWaitMillis(180000);
         tds.setValidationQuery("SELECT 1");
         tds.setDefaultMaxIdle(10);
         tds.setDefaultTestWhileIdle(true);
