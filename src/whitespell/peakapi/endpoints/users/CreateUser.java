@@ -113,10 +113,10 @@ public class CreateUser implements ApiInterface {
                         if (s.getString("username").equalsIgnoreCase(finalUsername)) {
                             context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
                             return;
-                        } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
+                        }/* else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
                             context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
                             return;
-                        }
+                        }*/
                     } else {
                         context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                         return;
