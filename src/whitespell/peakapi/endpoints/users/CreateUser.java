@@ -169,6 +169,7 @@ public class CreateUser implements ApiInterface {
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_QUERY);
             final String finalUsername = username;
+            final String finalEmail = email;
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
@@ -178,7 +179,7 @@ public class CreateUser implements ApiInterface {
                         context.getResponse().setStatus(HttpStatus.OK_200);
                         UserObject uo = new UserObject();
                         uo.setUserId(s.getInt("user_id"));
-                        uo.setEmail(email);
+                        uo.setEmail(finalEmail);
                         uo.setUsername(finalUsername);
                         Gson g = new Gson();
                         String json = g.toJson(uo);
