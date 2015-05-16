@@ -35,7 +35,7 @@ public class CreateUser implements ApiInterface {
     private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `users` WHERE `username` = ? OR `email` = ? LIMIT 1";
 
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(final RequestContext context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
 
@@ -45,6 +45,8 @@ public class CreateUser implements ApiInterface {
         String email = null;
         String passHash = null;
         int publisher = 0;
+
+        //initialize as arrays so that they can be allocated
         final int[] user_id = {-1};
         final boolean[] usernameExists = {false};
         final boolean[] emailExists = {false};
@@ -116,6 +118,9 @@ public class CreateUser implements ApiInterface {
                         } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
                             emailExists[0] = true;
                         }
+                    } else {
+                        context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
                     }
                 }
             });
@@ -147,19 +152,18 @@ public class CreateUser implements ApiInterface {
 
 
         try {
-            StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_OR_EMAIL_QUERY);
+            StatementExecutor executor = new StatementExecutor(INSERT_USER_QUERY);
             final String finalUsername = username;
             final String finalEmail = email;
             final String finalPassHash = passHash;
-            final String finalEmail1 = email;
-            final String finalUsername1 = username;
+
             final int finalPublisher = publisher;
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
                     ps.setString(1, finalPassHash);
-                    ps.setString(2, finalEmail1);
-                    ps.setString(3, finalUsername1);
+                    ps.setString(2, finalEmail);
+                    ps.setString(3, finalUsername);
                     ps.setInt(4, finalPublisher);
 
                     /**
@@ -175,7 +179,6 @@ public class CreateUser implements ApiInterface {
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_QUERY);
             final String finalUsername = username;
-            final String finalEmail = email;
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
