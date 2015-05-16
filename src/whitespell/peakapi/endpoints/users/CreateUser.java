@@ -48,9 +48,6 @@ public class CreateUser implements ApiInterface {
 
         //initialize as arrays so that they can be allocated
         final int[] user_id = {-1};
-        final boolean[] usernameExists = {false};
-        final boolean[] emailExists = {false};
-        final boolean[] success = {false};
 
         /**
          * 400 Bad Request: Check if all data is valid
@@ -114,9 +111,11 @@ public class CreateUser implements ApiInterface {
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         if (s.getString("username").equalsIgnoreCase(finalUsername)) {
-                            usernameExists[0] = true;
+                            context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
+                            return;
                         } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
-                            emailExists[0] = true;
+                            context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
+                            return;
                         }
                     } else {
                         context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
@@ -128,14 +127,6 @@ public class CreateUser implements ApiInterface {
             Logging.log("High", e);
         }
 
-        //throw the right error
-        if (usernameExists[0]) {
-            context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
-            return;
-        } else if (emailExists[0]) {
-            context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
-            return;
-        }
 
         // Generate hash the user's password hash string (Which will result ITERATION:SALT:HASH). When we check against the password, we check it like this:
         // isValid({userpass}, databaseResult(ITERATION:SALT:HASH) and the function checks against the same salt and hash as in the database result.
@@ -156,7 +147,6 @@ public class CreateUser implements ApiInterface {
             final String finalUsername = username;
             final String finalEmail = email;
             final String finalPassHash = passHash;
-
             final int finalPublisher = publisher;
             executor.execute(new ExecutionBlock() {
                 @Override
@@ -185,31 +175,26 @@ public class CreateUser implements ApiInterface {
                     ps.setString(1, finalUsername);
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
-                        success[0] = true;
-                        user_id[0] = s.getInt("user_id");
+                        context.getResponse().setStatus(HttpStatus.OK_200);
+                        UserObject uo = new UserObject();
+                        uo.setUserId(s.getInt("user_id"));
+                        uo.setEmail(email);
+                        uo.setUsername(finalUsername);
+                        Gson g = new Gson();
+                        String json = g.toJson(uo);
+                        try {
+                            context.getResponse().getWriter().write(json);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    } else {
+                        context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
-        }
-
-
-
-        if (success[0]) {
-            // successful, set authentication session that logs the IP address and other details, and write the JSON object.
-            // also construct the response.
-            context.getResponse().setStatus(HttpStatus.OK_200);
-            UserObject uo = new UserObject();
-            uo.setUserId(user_id[0]);
-            uo.setEmail(email);
-            uo.setUsername(username);
-            Gson g = new Gson();
-            String json = g.toJson(uo);
-            context.getResponse().getWriter().write(json);
-        } else {
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
         }
     }
 
