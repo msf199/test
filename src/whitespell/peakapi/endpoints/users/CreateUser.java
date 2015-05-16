@@ -112,19 +112,16 @@ public class CreateUser implements ApiInterface {
                     if (s.next()) {
                         if (s.getString("username").equalsIgnoreCase(finalUsername)) {
                             context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
-                            return;
-                        }/* else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
+                        } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
                             context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
-                            return;
-                        }*/
-                    } else {
-                        context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        }
                         return;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            return;
         }
 
 
@@ -135,6 +132,8 @@ public class CreateUser implements ApiInterface {
             passHash = PasswordHash.createHash(password);
         } catch (Exception e) {
             Logging.log("High", e);
+            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
         /**
@@ -164,6 +163,8 @@ public class CreateUser implements ApiInterface {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
         try {
@@ -196,6 +197,8 @@ public class CreateUser implements ApiInterface {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
     }
 
