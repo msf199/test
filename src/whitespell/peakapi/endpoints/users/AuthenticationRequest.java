@@ -7,7 +7,9 @@ import whitespell.logic.ApiInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.SessionIdentifierGenerator;
 import whitespell.logic.logging.Logging;
+import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.Pool;
+import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.AuthenticationObject;
 import whitespell.security.PasswordHash;
 
@@ -30,13 +32,14 @@ public class AuthenticationRequest implements ApiInterface {
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `users` WHERE `username` = ? LIMIT 1";
 
     private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`) " +
-                                                        "VALUES (?,?)";
+            "VALUES (?,?)";
+
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(final RequestContext context) throws IOException {
 
         Connection con;
-        String username;
-        String password;
+        final String username;
+        final String password;
 
         JsonObject payload = context.getPayload().getAsJsonObject();
 
@@ -69,53 +72,68 @@ public class AuthenticationRequest implements ApiInterface {
             }
         }
 
+
+        // retrieve the password based on the username
         try {
-            con = Pool.getConnection();
+            StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
-            PreparedStatement p;
-            try {
+            executor.execute(new ExecutionBlock() {
+                @Override
+                public void process(PreparedStatement ps) throws SQLException {
+                    ps.setString(1, username);
+                    final ResultSet s = ps.executeQuery();
+                    if (s.next()) {
+                        try {
+                            // with the result set, check if password is verified
+                            boolean isVerified = PasswordHash.validatePassword(password, s.getString("password"));
+                            if (isVerified) {
+                                // initialize an authenticationobject and set the authentication key if verified
+                                final AuthenticationObject ao = new AuthenticationObject();
+                                ao.setKey(SessionIdentifierGenerator.nextSessionId());
+                                // insert the new authentication key into the database
+                                try {
+                                    StatementExecutor executor = new StatementExecutor(INSERT_AUTHENTICATION);
 
-                p = con.prepareStatement(RETRIEVE_PASSWORD);
-                p.setString(1, username);
-                ResultSet s = p.executeQuery();
-                if (s.next()) {
-                    try {
-                        boolean isVerified = PasswordHash.validatePassword(password, s.getString("password"));
-                        if(isVerified) {
-                            AuthenticationObject ao = new AuthenticationObject();
-                            ao.setKey(SessionIdentifierGenerator.nextSessionId());
-                            PreparedStatement insert_auth = con.prepareStatement(INSERT_AUTHENTICATION);
-                            insert_auth.setInt(1, s.getInt("user_id"));
-                            insert_auth.setString(2, ao.getKey());
-                            insert_auth.executeUpdate();
-                            Gson g = new Gson();
-                            String jsonAo = g.toJson(ao);
-                            // write the authentication object
-                            context.getResponse().getWriter().write(jsonAo);
-                            return;
-                        } else {
-                            context.throwHttpError(StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
-                            return;
+                                    executor.execute(new ExecutionBlock() {
+                                        @Override
+                                        public void process(PreparedStatement ps) throws SQLException {
+                                            ps.setInt(1, s.getInt("user_id"));
+                                            ps.setString(2, ao.getKey());
+                                            ps.executeUpdate();
+                                            ps.executeUpdate();
+
+                                        }
+                                    });
+                                } catch (SQLException e) {
+                                    Logging.log("High", e);
+                                }
+                                // build a gson object based on the authentication object
+                                Gson g = new Gson();
+                                String jsonAo = g.toJson(ao);
+                                // write the authentication object and the session key and return.
+                                context.getResponse().getWriter().write(jsonAo);
+                                return;
+                            } else {
+                                // if not verified, throw error
+                                context.throwHttpError(StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
+                                return;
+                            }
+                        } catch (NoSuchAlgorithmException e) {
+                            Logging.log("High", e);
+                        } catch (InvalidKeySpecException e) {
+                            Logging.log("High", e);
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (NoSuchAlgorithmException e) {
-                        Logging.log("High", e);
-                    } catch (InvalidKeySpecException e) {
-                        Logging.log("High", e);
+                    } else {
+                        context.throwHttpError(StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                        return;
                     }
-                } else {
-                    context.throwHttpError(StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                    return;
                 }
-            } finally {
-                if (con != null)
-                    con.close();
-            }
+            });
         } catch (SQLException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
         }
-
-
-
     }
 
 }
