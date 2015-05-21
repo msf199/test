@@ -32,7 +32,7 @@ public class MyEndpoints extends WhitespellWebServer {
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users");
 
         //test show alex
-        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new Test(), "/testalex");
+        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new Test(), "/heygalo/?", "userid");
 
         //sign ups
         dispatcher.addHandler(ApiDispatcher.RequestType.GET, new GetUserSignups(), "/statistics/signups");
