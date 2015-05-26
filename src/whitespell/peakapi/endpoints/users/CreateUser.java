@@ -103,6 +103,7 @@ public class CreateUser implements ApiInterface {
             StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_OR_EMAIL_QUERY);
             final String finalUsername = username;
             final String finalEmail = email;
+            final boolean[] returnCall = {false};
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
@@ -110,20 +111,25 @@ public class CreateUser implements ApiInterface {
                     ps.setString(2, finalEmail);
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
-                        Logging.log("High", new Exception("Did find result"));
                         if (s.getString("username").equalsIgnoreCase(finalUsername)) {
                             context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
                         } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
                             context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
                         }
+                        returnCall[0] = true;
                         return;
                     }
                 }
             });
+            if(returnCall[0]) {
+                return;
+            }
         } catch (SQLException e) {
             Logging.log("High", e);
             return;
         }
+
+
 
 
         // Generate hash the user's password hash string (Which will result ITERATION:SALT:HASH). When we check against the password, we check it like this:
