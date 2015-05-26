@@ -110,6 +110,7 @@ public class CreateUser implements ApiInterface {
                     ps.setString(2, finalEmail);
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
+                        Logging.log("High", new Exception("Did find result"));
                         if (s.getString("username").equalsIgnoreCase(finalUsername)) {
                             context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
                         } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
