@@ -46,16 +46,16 @@ public class ApiDispatcher extends HttpServlet {
         ApiSpec spec = new ApiSpec(apiInterface, argNames);
         switch (type) {
             case GET:
-                getStructure.addPathNode(pathSpec, spec);
+                getStructure.addChildWithSubPath(pathSpec, spec);
                 break;
             case POST:
-                postStructure.addPathNode(pathSpec, spec);
+                postStructure.addChildWithSubPath(pathSpec, spec);
                 break;
             case PUT:
-                putStructure.addPathNode(pathSpec, spec);
+                putStructure.addChildWithSubPath(pathSpec, spec);
                 break;
             case DELETE:
-                delStructure.addPathNode(pathSpec, spec);
+                delStructure.addChildWithSubPath(pathSpec, spec);
                 break;
         }
     }
@@ -115,10 +115,16 @@ public class ApiDispatcher extends HttpServlet {
 
             System.out.println("Looking up Path Node for " + request.getPathInfo());
 
-            PathNode.PathNodeResult result = apiStructure.getPathNodeResult(request.getPathInfo());
+            PathNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
             if (result != null) {
                 urlVariables.putAll(result.getArgValues());
                 result.getApiSpec().apiInterface.call(context);
+            } else {
+                System.out.println("No call handler found for " + request.getPathInfo());
+                response.getWriter().write("Error: Handler for path not found");
+                response.setStatus(404);
+                response.getWriter().close();
+                return;
             }
         }catch(Exception e) {
             Logging.log("Low", e);

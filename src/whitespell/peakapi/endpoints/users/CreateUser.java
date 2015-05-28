@@ -29,7 +29,7 @@ import java.sql.SQLException;
 public class CreateUser implements ApiInterface {
 
     private static final String INSERT_USER_QUERY = "INSERT INTO `users`(`password`, `email`, `username`, `publisher`) " +
-            "VALUES (?,?,?, ?)";
+            "VALUES (?,?,?,?)";
 
     private static final String CHECK_USERNAME_QUERY = "SELECT `user_id` FROM `users` WHERE `username` = ? LIMIT 1";
     private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `users` WHERE `username` = ? OR `email` = ? LIMIT 1";
@@ -121,6 +121,11 @@ public class CreateUser implements ApiInterface {
                     }
                 }
             });
+
+            /**
+             * This check is put in place if the request should be closed and no more logic should be executed after the query result is received. Because it is a nested function, we need to check with a finalized array
+             * whether we should return, and do so if necessary.
+             */
             if(returnCall[0]) {
                 return;
             }
