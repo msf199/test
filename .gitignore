@@ -5,4 +5,4 @@ out/*
 .DS_STORE/*
 api.iml
 bin
-.Error*
+.Error
