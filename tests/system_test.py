@@ -7,8 +7,7 @@ import unittest
 import urllib2
 from urllib import quote
 
-SQLITE_FILE = 'msf.db'
-SERVER_ROOT = 'http://localhost:8080'
+SERVER_ROOT = 'http://localhost:80'
 HTTP_TIMEOUT = 10  # require HTTP replies within this many seconds
 
 def http_request(request):

@@ -54,7 +54,7 @@ public class Server {
 
 
         // initialize MySQL Connection Pool
-      //Pool.initializePool();
+      Pool.initializePool();
 
         /* start the API */
         WhitespellWebServer testApi = new MyEndpoints("Peak API");

@@ -5,6 +5,9 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Enumeration;
 import java.util.UUID;
 
 /**
@@ -38,13 +41,20 @@ public class UnitFilters implements Filter {
             servletResponse.getWriter().close();
         }
 
+        Enumeration e = (((HttpServletRequest) servletRequest).getHeaderNames());
+
+        while(e.hasMoreElements()){
+            String param = (String) e.nextElement();
+            System.out.println(param + "->" + ((HttpServletRequest) servletRequest).getHeader(param));
+        }
+
         /*addSessionHeader((HttpServletResponse) servletResponse,
                 WhitespellWebServer.getCookie(((HttpServletRequest) servletRequest), "Session"));*/
 
 
         // this header allows CORS requests.
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
-        ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers" ,"Origin, X-Requested-With, Content-Type, Accept");
+        ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers" ,"Origin, X-Requested-With, Content-Type, Accept, x-Authentication");
         ((HttpServletResponse) servletResponse).addHeader("Server", "Whitespell API Server");
         //((HttpServletResponse) servletResponse).addHeader("Request-id", UUID.randomUUID().toString());
         servletResponse.setContentType("application/json");
