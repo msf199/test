@@ -21,7 +21,7 @@ public class AuthenticationObject {
         return this.key;
     }
 
-    public void setUserId(int userId) {
+    public void setUserId(int user_id) {
         this.user_id = user_id;
     }
 
