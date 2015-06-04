@@ -68,6 +68,7 @@ public class RequestContext {
             // write the response to the writer
         try {
             this.response.getWriter().write(errorObject);
+            this.response.getWriter().close(); // ensure no other objects can be written to a closed header because the error was thrown
         } catch (IOException e) {
             Logging.log("Low", e);
         }

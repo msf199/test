@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.ApiInterface;
+import whitespell.logic.Authentication;
 import whitespell.logic.RequestContext;
 import whitespell.logic.Safety;
 import whitespell.logic.logging.Logging;
@@ -74,6 +75,17 @@ public class UserFollowAction implements ApiInterface {
 
         if (!validAction) {
             context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            return;
+        }
+
+        /**
+         * Ensure that the user is authenticated properly
+         */
+
+        final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
+
+        if(!a.isAuthenticated() ||  a.getUserId() != user_id) {
+            context.throwHttpError(StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
 

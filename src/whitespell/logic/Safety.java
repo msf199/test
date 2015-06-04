@@ -11,6 +11,8 @@ import java.security.SecureRandom;
  */
 public class Safety {
 
+
+
     public static String getSalt() throws NoSuchAlgorithmException, NoSuchProviderException {
         //Always use a SecureRandom generator
         SecureRandom sr = SecureRandom.getInstance("SHA1PRNG", "SUN");

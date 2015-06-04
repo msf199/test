@@ -86,10 +86,12 @@ public class AuthenticationRequest implements ApiInterface {
                         try {
                             // with the result set, check if password is verified
                             boolean isVerified = PasswordHash.validatePassword(password, s.getString("password"));
+
                             if (isVerified) {
                                 // initialize an authenticationobject and set the authentication key if verified
                                 final AuthenticationObject ao = new AuthenticationObject();
                                 ao.setKey(SessionIdentifierGenerator.nextSessionId());
+                                ao.setUserId(s.getInt("user_id"));
                                 // insert the new authentication key into the database
                                 try {
                                     StatementExecutor executor = new StatementExecutor(INSERT_AUTHENTICATION);
@@ -97,9 +99,8 @@ public class AuthenticationRequest implements ApiInterface {
                                     executor.execute(new ExecutionBlock() {
                                         @Override
                                         public void process(PreparedStatement ps) throws SQLException {
-                                            ps.setInt(1, s.getInt("user_id"));
+                                            ps.setInt(1, ao.getUserId());
                                             ps.setString(2, ao.getKey());
-                                            ps.executeUpdate();
                                             ps.executeUpdate();
 
                                         }

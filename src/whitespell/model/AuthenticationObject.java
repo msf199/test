@@ -9,6 +9,8 @@ public class AuthenticationObject {
 
     String key;
 
+    int userId;
+
     long expires = -1;
 
     public void setKey(String key) {
@@ -17,6 +19,14 @@ public class AuthenticationObject {
 
     public String getKey() {
         return this.key;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
+
+    public int getUserId() {
+        return this.userId;
     }
 
 }

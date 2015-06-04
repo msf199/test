@@ -41,12 +41,13 @@ public class UnitFilters implements Filter {
             servletResponse.getWriter().close();
         }
 
+        /*
         Enumeration e = (((HttpServletRequest) servletRequest).getHeaderNames());
 
         while(e.hasMoreElements()){
             String param = (String) e.nextElement();
             System.out.println(param + "->" + ((HttpServletRequest) servletRequest).getHeader(param));
-        }
+        }*/
 
         /*addSessionHeader((HttpServletResponse) servletResponse,
                 WhitespellWebServer.getCookie(((HttpServletRequest) servletRequest), "Session"));*/

@@ -19,6 +19,9 @@ public class StaticRules {
     public static final int MAX_PASSWORD_LENGTH = 512;
     public static final int MAX_CONTENT_TYPE_LENGTH = 10;
     public static final int MAX_CONTENT_DESCRIPTION_LENGTH = 100;
+    public static final int MIN_AUTHENTICATION_HEADER_LENGTH = 1;
+    public static final int MAX_AUTHENTICATION_HEADER_LENGTH = 255;
+
 
     public enum ErrorCodes {
 
@@ -31,6 +34,7 @@ public class StaticRules {
         USERNAME_AND_EMAIL_TAKEN(102, "Username and email are already taken", HttpStatus.UNAUTHORIZED_401),
         ACCOUNT_NOT_FOUND(103, "Account not found", HttpStatus.UNAUTHORIZED_401),
         INVALID_USERNAME_OR_PASS(103, "Invalid username or Password", HttpStatus.UNAUTHORIZED_401),
+        NOT_AUTHENTICATED(103, "User is not authenticated", HttpStatus.UNAUTHORIZED_401),
 
         //110-120 is style error
         USERNAME_TOO_LONG(110, "Username is too long ("+StaticRules.MAX_USERNAME_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),

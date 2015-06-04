@@ -31,7 +31,7 @@ public class Test implements ApiInterface {
 
         Enumeration e = (context.getRequest().getHeaderNames());
 
-        while(e.hasMoreElements()){
+        while(e.hasMoreElements()) {
             String param = (String) e.nextElement();
             System.out.println(param + "->" + context.getRequest().getHeader(param));
         }
