@@ -29,7 +29,8 @@ public class MyEndpoints extends WhitespellWebServer {
     protected void scheduleEndpoints(ApiDispatcher dispatcher) {
 
         // get users
-        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new GetUsers(), "/users");
+        dispatcher.addHandler(ApiDispatcher.RequestType.GET
+                , new GetUsers(), "/users");
 
         //user creation
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users");
