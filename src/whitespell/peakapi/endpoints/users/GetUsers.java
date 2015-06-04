@@ -23,7 +23,7 @@ import java.util.ArrayList;
 public class GetUsers implements ApiInterface {
 
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `thumbnail` FROM USERS";
+    private static final String GET_USERS = "SELECT `user_id`, `username`, `thumbnail` FROM `users`";
 
     @Override
     public void call(final RequestContext context) throws IOException {
