@@ -11,6 +11,13 @@ import java.util.List;
  */
 public class UserObject {
 
+    public UserObject() {
+        this.user_id = -1;
+        this.username = "";
+        this.email = "";
+        this.thumbnail = "";
+    }
+
     public UserObject (int user_id, String username, String email, String thumbnail) {
         this.user_id = user_id;
         this.username = username;
