@@ -24,7 +24,7 @@ import java.util.Date;
  */
 public class AddNewContent implements ApiInterface {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `user_content`(`user_id`, `content_type`, `content_description`, `timestamp`) VALUES (?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `user_content`(`user_id`, `content_type`, `content_url`, `content_description`, `timestamp`) VALUES (?,?,?,?,?)";
 
     @Override
     public void call(RequestContext context) throws IOException {
@@ -35,13 +35,14 @@ public class AddNewContent implements ApiInterface {
         /**
          * Check that the user id and content is valid.
          */
-        if (!Safety.isNumeric(context_user_id) || payload.get("content_type") == null || payload.get("content_description") == null) {
+        if (!Safety.isNumeric(context_user_id) || payload.get("content_type") == null  || payload.get("content_url") == null || payload.get("content_description") == null) {
             context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
         final int user_id = Integer.parseInt(context_user_id);
         final String content_type = payload.get("content_type").getAsString();
+        final String content_url = payload.get("content_url").getAsString();
         final String content_description = payload.get("content_description").getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
 
@@ -70,6 +71,7 @@ public class AddNewContent implements ApiInterface {
                 public void process(PreparedStatement ps) throws SQLException {
                     ps.setString(1, String.valueOf(user_id));
                     ps.setString(2, content_type);
+                    ps.setString(3, content_url);
                     ps.setString(3, content_description);
                     ps.setString(4, now.toString());
 
