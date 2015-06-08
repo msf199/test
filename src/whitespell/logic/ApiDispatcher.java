@@ -118,6 +118,7 @@ public class ApiDispatcher extends HttpServlet {
             PathNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
             if (result != null) {
                 urlVariables.putAll(result.getArgValues());
+                System.out.println("Calling " + result.getApiSpec());
                 result.getApiSpec().apiInterface.call(context);
             } else {
                 System.out.println("No call handler found for " + request.getPathInfo());

@@ -1,12 +1,14 @@
 package whitespell.peakapi;
 
+import whitespell.peakapi.endpoints.content.types.AddContentType;
+import whitespell.peakapi.endpoints.content.types.RequestContentTypes;
 import whitespell.peakapi.endpoints.statistics.GetUserSignups;
 import whitespell.peakapi.endpoints.users.*;
 import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.logic.ApiDispatcher;
 import whitespell.peakapi.endpoints.users.UserFollowAction;
-import whitespell.peakapi.endpoints.users.content.AddNewContent;
-import whitespell.peakapi.endpoints.users.content.RequestContent;
+import whitespell.peakapi.endpoints.content.AddNewContent;
+import whitespell.peakapi.endpoints.content.RequestContent;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -29,8 +31,7 @@ public class MyEndpoints extends WhitespellWebServer {
     protected void scheduleEndpoints(ApiDispatcher dispatcher) {
 
         // get users
-        dispatcher.addHandler(ApiDispatcher.RequestType.GET
-                , new GetUsers(), "/users");
+        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new GetUsers(), "/users");
 
         //user creation
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new CreateUser(), "/users");
@@ -56,7 +57,12 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // content API /content/
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AddNewContent(), "/content/?", "user_id");
+
         dispatcher.addHandler(ApiDispatcher.RequestType.GET, new RequestContent(), "/content/");
+
+        dispatcher.addHandler(ApiDispatcher.RequestType.GET, new RequestContentTypes(), "/content/types");
+
+        dispatcher.addHandler(ApiDispatcher.RequestType.POST, new AddContentType(), "/content/types");
 
         // following API /users/{userid}/following
         dispatcher.addHandler(ApiDispatcher.RequestType.POST, new UserFollowAction(), "/following/?", "user_id");
@@ -67,6 +73,5 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // search API {/search?q=xyz}
     }
-
 
 }

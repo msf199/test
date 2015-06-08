@@ -26,6 +26,14 @@ public class PathNode {
         children = new HashMap<String, PathNode>();
     }
 
+    public Map<String, PathNode> getChildren() {
+        return this.children;
+    }
+
+    public void putChild(String name, PathNode child) {
+        children.put(name, child);
+    }
+
     /**
      * Traverses the tree and returns the ApiSpec matching
      * the given sub-path as well as the values of any matched
@@ -35,15 +43,28 @@ public class PathNode {
      * matched arguments, or null if no ApiSpec was found.
      */
     public PathNodeResult getBindingForSubPath(String subPath) {
+
+        System.out.println("SubPath: " + subPath);
+
+        for(String s : children.keySet()) {
+            System.out.println("Child: " + s);
+        }
+
         String[] pathComponents = subPath.split("/");
 
         PathNode current = this;
         HashMap<String, String> argValues = new HashMap<String, String>();
         for (String pathComponent : pathComponents) {
-            if (children.containsKey(pathComponent)) {
-                current = children.get(pathComponent);
-            } else if (children.containsKey("?")) {
-                current = children.get("?");
+
+            if(pathComponent == null || pathComponent.length() < 1) {
+                continue;
+            }
+
+            if (current.getChildren().containsKey(pathComponent)) {
+                System.out.println("Found path component for " + pathComponent);
+                current = current.getChildren().get(pathComponent);
+            } else if (current.getChildren().containsKey("?")) {
+                current = current.getChildren().get("?");
                 argValues.put(current.getApiSpec().argNames[argValues.size()], pathComponent);
             } else {
                 return null;
@@ -63,13 +84,32 @@ public class PathNode {
         String[] pathComponents = subPath.split("/");
 
         PathNode current = this;
-        for (String pathComponent : pathComponents) {
-            if (!children.containsKey(pathComponent)) {
-                children.put(pathComponent, new PathNode());
+
+        // iterate over all the components in the path
+
+        for(int i = 0; i < pathComponents.length; i++) {
+
+            if (pathComponents[i] == null || pathComponents[i].length() < 1) {
+                continue;
             }
-            current = children.get(pathComponent);
+
+            System.out.println("Iterating over path component: " + pathComponents[i]);
+
+            //iterate over children, create child if neceesary, and enter into the child
+            if (!current.getChildren().containsKey(pathComponents[i])) {
+                current.putChild(pathComponents[i], new PathNode());
+            }
+
+            current = current.getChildren().get(pathComponents[i]);
+
+            if (i == (pathComponents.length - 1)) {
+                System.out.println("Set API spec in " + pathComponents[i]);
+                // when we are at the last of the loop, insert the current pathnode as the api spec
+                current.setApiSpec(apiSpec);
+            }
+
         }
-        current.setApiSpec(apiSpec);
+
     }
 
     /**
