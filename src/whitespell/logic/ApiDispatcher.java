@@ -113,15 +113,12 @@ public class ApiDispatcher extends HttpServlet {
                 return;
             }
 
-            System.out.println("Looking up Path Node for " + request.getPathInfo());
 
             PathNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
             if (result != null) {
                 urlVariables.putAll(result.getArgValues());
-                System.out.println("Calling " + result.getApiSpec());
                 result.getApiSpec().apiInterface.call(context);
             } else {
-                System.out.println("No call handler found for " + request.getPathInfo());
                 response.getWriter().write("Error: Handler for path not found");
                 response.setStatus(404);
                 response.getWriter().close();
@@ -159,8 +156,6 @@ public class ApiDispatcher extends HttpServlet {
     private JsonElement getPayload(HttpServletRequest request, HttpServletResponse response)
             throws JsonParseException, IllegalStateException, IOException {
         String body = getBody(request);
-        System.out.println("Request body:");
-        System.out.println(body);
         return new JsonParser().parse(body);
     }
 

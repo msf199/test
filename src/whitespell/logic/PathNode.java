@@ -44,12 +44,6 @@ public class PathNode {
      */
     public PathNodeResult getBindingForSubPath(String subPath) {
 
-        System.out.println("SubPath: " + subPath);
-
-        for(String s : children.keySet()) {
-            System.out.println("Child: " + s);
-        }
-
         String[] pathComponents = subPath.split("/");
 
         PathNode current = this;
@@ -61,7 +55,6 @@ public class PathNode {
             }
 
             if (current.getChildren().containsKey(pathComponent)) {
-                System.out.println("Found path component for " + pathComponent);
                 current = current.getChildren().get(pathComponent);
             } else if (current.getChildren().containsKey("?")) {
                 current = current.getChildren().get("?");
@@ -92,9 +85,6 @@ public class PathNode {
             if (pathComponents[i] == null || pathComponents[i].length() < 1) {
                 continue;
             }
-
-            System.out.println("Iterating over path component: " + pathComponents[i]);
-
             //iterate over children, create child if neceesary, and enter into the child
             if (!current.getChildren().containsKey(pathComponents[i])) {
                 current.putChild(pathComponents[i], new PathNode());
@@ -103,7 +93,6 @@ public class PathNode {
             current = current.getChildren().get(pathComponents[i]);
 
             if (i == (pathComponents.length - 1)) {
-                System.out.println("Set API spec in " + pathComponents[i]);
                 // when we are at the last of the loop, insert the current pathnode as the api spec
                 current.setApiSpec(apiSpec);
             }

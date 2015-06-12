@@ -29,14 +29,14 @@ public class Test implements ApiInterface {
     @Override
     public void call(RequestContext context) throws IOException {
 
-        Enumeration e = (context.getRequest().getHeaderNames());
+        /*Enumeration e = (context.getRequest().getHeaderNames());
 
         while(e.hasMoreElements()) {
             String param = (String) e.nextElement();
             System.out.println(param + "->" + context.getRequest().getHeader(param));
-        }
+        }*/
 
-       context.getResponse().getWriter().write("Test for Galo with Galo ID:" + context.getUrlVariables().get("userid"));
+       context.getResponse().getWriter().write("Hey, I heard your name is:" + context.getUrlVariables().get("name"));
 
 
     }

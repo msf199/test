@@ -46,6 +46,10 @@ public class AddNewContent implements ApiInterface {
         final String content_title = payload.get("content_title").getAsString();
         final String content_description = payload.get("content_description").getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
+        //todo(pim) thumbnail
+        //todo(pim) content_likes
+        //todo(pim) last_comment
+        //todo(pim) content_category
 
         /**
          * Check that the user id is valid (>= 0 && <= Integer.MAX_VALUE), and content type and description are of-length.
