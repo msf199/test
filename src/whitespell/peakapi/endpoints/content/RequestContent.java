@@ -2,7 +2,7 @@ package whitespell.peakapi.endpoints.content;
 
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
-import whitespell.logic.ApiInterface;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.Safety;
 import whitespell.logic.logging.Logging;
@@ -20,7 +20,7 @@ import java.util.List;
  * @author Josh Lipson(mrgalkon)
  * 5/4/2015
  */
-public class RequestContent implements ApiInterface {
+public class RequestContent implements EndpointInterface {
 
     private static final String SELECT_FOLLOWING_IDS_QUERY = "SELECT `followed_id` FROM `following` WHERE `user_id` = ?";
     private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `user_content` WHERE `user_id` = ?";

@@ -4,17 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
-import whitespell.logic.ApiInterface;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
-import whitespell.logic.sql.Pool;
 import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.UserObject;
 import whitespell.security.PasswordHash;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,7 +24,7 @@ import java.sql.SQLException;
  *         https://docs.google.com/document/d/1j62zQ3AIfh7XW0nbftRy_hNXTAnhy5r48yBRHm7kYZA/edit
  */
 
-public class CreateUser implements ApiInterface {
+public class CreateUser implements EndpointInterface {
 
     private static final String INSERT_USER_QUERY = "INSERT INTO `users`(`password`, `email`, `username`, `publisher`) " +
             "VALUES (?,?,?,?)";

@@ -1,14 +1,12 @@
 package whitespell.peakapi.endpoints.content.types;
 
 import com.google.gson.Gson;
-import whitespell.logic.ApiInterface;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.ContentTypeObject;
-import whitespell.model.DayResult;
-import whitespell.model.UserObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -21,10 +19,10 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class RequestContentTypes implements ApiInterface {
+public class RequestContentTypes implements EndpointInterface {
 
 
-    private static final String GET_USERS = "SELECT * FROM `content_type`";
+    private static final String GET_CONTENT_TYPES = "SELECT * FROM `content_type`";
 
     @Override
     public void call(final RequestContext context) throws IOException {
@@ -32,7 +30,7 @@ public class RequestContentTypes implements ApiInterface {
          * Get the content types
          */
         try {
-            StatementExecutor executor = new StatementExecutor(GET_USERS);
+            StatementExecutor executor = new StatementExecutor(GET_CONTENT_TYPES);
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {

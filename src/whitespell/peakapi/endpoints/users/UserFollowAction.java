@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
-import whitespell.logic.ApiInterface;
 import whitespell.logic.Authentication;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.Safety;
 import whitespell.logic.logging.Logging;
@@ -14,7 +14,10 @@ import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.FollowActionObject;
 
 import java.io.IOException;
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -22,7 +25,7 @@ import java.util.Date;
  *         5/4/2015
  *         whitespell.model
  */
-public class UserFollowAction implements ApiInterface {
+public class UserFollowAction implements EndpointInterface {
 
     private static final String FOLLOWING_USER_ID_KEY = "following_id";
     private static final String ACTION_KEY = "action";

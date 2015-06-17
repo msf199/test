@@ -2,8 +2,6 @@ package whitespell;
 
 import org.eclipse.jetty.http.HttpStatus;
 
-import java.util.ArrayList;
-
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         5/3/15

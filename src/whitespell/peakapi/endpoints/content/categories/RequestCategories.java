@@ -1,4 +1,4 @@
-package whitespell.peakapi.endpoints.statistics;
+package whitespell.peakapi.endpoints.content.categories;
 
 import com.google.gson.Gson;
 import whitespell.logic.EndpointInterface;
@@ -6,7 +6,7 @@ import whitespell.logic.RequestContext;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
-import whitespell.model.DayResult;
+import whitespell.model.ContentTypeObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -19,35 +19,35 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class GetUserSignups implements EndpointInterface {
+public class RequestCategories implements EndpointInterface {
 
 
-    private static final String GET_SIGNUP_DATASET = "SELECT COUNT(1) as count, DATE(`registration_timestamp_utc`) as day FROM `users` GROUP BY DAY(`registration_timestamp_utc`)";
+    private static final String GET_CATEGORIES = "SELECT * FROM `categories`";
 
     @Override
     public void call(final RequestContext context) throws IOException {
         /**
-        * Get the signups by day
-        */
+         * Get the category types
+         */
         try {
-            StatementExecutor executor = new StatementExecutor(GET_SIGNUP_DATASET);
+            StatementExecutor executor = new StatementExecutor(GET_CATEGORIES);
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
 
                     final ResultSet results = ps.executeQuery();
-                    ArrayList<DayResult> dayResults = new ArrayList<>();
+                    ArrayList<ContentTypeObject> contentTypes = new ArrayList<>();
                     while (results.next()) {
 
-                        DayResult d = new DayResult(results.getString("day"), results.getInt("count"));
+                        ContentTypeObject d = new ContentTypeObject(results.getInt("content_type_id"), results.getString("content_type_name"));
 
-                        dayResults.add(d);
+                        contentTypes.add(d);
                     }
 
                     // put the array list into a JSON array and write it as a response
 
                     Gson g = new Gson();
-                    String response = g.toJson(dayResults);
+                    String response = g.toJson(contentTypes);
                     context.getResponse().setStatus(200);
                     try {
                         context.getResponse().getWriter().write(response);
@@ -60,5 +60,4 @@ public class GetUserSignups implements EndpointInterface {
             Logging.log("High", e);
         }
     }
-
 }

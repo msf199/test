@@ -1,7 +1,5 @@
 package whitespell.logic;
 
-import whitespell.logic.ApiSpec;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,19 +16,19 @@ import java.util.Map;
  * .../foo/bar/baz/bat will NOT match the top entry, as /foo/bar/? and /foo/bar/baz form
  * separate branches in the tree.
  */
-public class PathNode {
-    private Map<String, PathNode> children;
-    private ApiSpec apiSpec = null;
+public class EndpointNode {
+    private Map<String, EndpointNode> children;
+    private EndpointSpecification apiSpec = null;
 
-    public PathNode() {
-        children = new HashMap<String, PathNode>();
+    public EndpointNode() {
+        children = new HashMap<String, EndpointNode>();
     }
 
-    public Map<String, PathNode> getChildren() {
+    public Map<String, EndpointNode> getChildren() {
         return this.children;
     }
 
-    public void putChild(String name, PathNode child) {
+    public void putChild(String name, EndpointNode child) {
         children.put(name, child);
     }
 
@@ -46,7 +44,7 @@ public class PathNode {
 
         String[] pathComponents = subPath.split("/");
 
-        PathNode current = this;
+        EndpointNode current = this;
         HashMap<String, String> argValues = new HashMap<String, String>();
         for (String pathComponent : pathComponents) {
 
@@ -73,10 +71,10 @@ public class PathNode {
      * @param subPath the sub-path to bind to, relative to this node
      * @param apiSpec the ApiSpec to bind
      */
-    public void addChildWithSubPath(String subPath, ApiSpec apiSpec) {
+    public void addChildWithSubPath(String subPath, EndpointSpecification apiSpec) {
         String[] pathComponents = subPath.split("/");
 
-        PathNode current = this;
+        EndpointNode current = this;
 
         // iterate over all the components in the path
 
@@ -87,7 +85,7 @@ public class PathNode {
             }
             //iterate over children, create child if neceesary, and enter into the child
             if (!current.getChildren().containsKey(pathComponents[i])) {
-                current.putChild(pathComponents[i], new PathNode());
+                current.putChild(pathComponents[i], new EndpointNode());
             }
 
             current = current.getChildren().get(pathComponents[i]);
@@ -106,15 +104,15 @@ public class PathNode {
      * and the values for all matched arguments.
      */
     public class PathNodeResult {
-        private ApiSpec apiSpec;
+        private EndpointSpecification apiSpec;
         private Map<String, String> argValues;
 
-        public PathNodeResult(ApiSpec apiSpec, Map<String, String> argValues) {
+        public PathNodeResult(EndpointSpecification apiSpec, Map<String, String> argValues) {
             this.apiSpec = apiSpec;
             this.argValues = argValues;
         }
 
-        public ApiSpec getApiSpec() {
+        public EndpointSpecification getApiSpec() {
             return apiSpec;
         }
 
@@ -123,11 +121,11 @@ public class PathNode {
         }
     }
 
-    protected ApiSpec getApiSpec() {
+    protected EndpointSpecification getApiSpec() {
         return apiSpec;
     }
 
-    protected void setApiSpec(ApiSpec apiSpec) {
+    protected void setApiSpec(EndpointSpecification apiSpec) {
         this.apiSpec = apiSpec;
     }
 }

@@ -4,8 +4,6 @@ import com.google.common.io.CharStreams;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import whitespell.logic.logging.Logging;
 
 import javax.servlet.http.HttpServlet;
@@ -14,13 +12,12 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class ApiDispatcher extends HttpServlet {
-    private static final Logger logger = LogManager.getLogger(ApiDispatcher.class);
+public class EndpointDispatcher extends HttpServlet {
 
-    private static PathNode putStructure = new PathNode();
-    private static PathNode delStructure = new PathNode();
-    private static PathNode postStructure = new PathNode();
-    private static PathNode getStructure = new PathNode();
+    private static EndpointNode putStructure = new EndpointNode();
+    private static EndpointNode delStructure = new EndpointNode();
+    private static EndpointNode postStructure = new EndpointNode();
+    private static EndpointNode getStructure = new EndpointNode();
 
     private HashMap<String, String> urlVariables = new HashMap<String, String>();
 
@@ -42,8 +39,9 @@ public class ApiDispatcher extends HttpServlet {
      *                 /requiredPath/?/?.
      * @param argNames one or more argument names that map to pathSpec wildcards
      */
-    public void addHandler(RequestType type, ApiInterface apiInterface, String pathSpec, String... argNames) {
-        ApiSpec spec = new ApiSpec(apiInterface, argNames);
+
+    public void addHandler(RequestType type, EndpointInterface apiInterface, String pathSpec, String... argNames) {
+        EndpointSpecification spec = new EndpointSpecification(apiInterface, argNames);
         switch (type) {
             case GET:
                 getStructure.addChildWithSubPath(pathSpec, spec);
@@ -77,36 +75,13 @@ public class ApiDispatcher extends HttpServlet {
         callHandler("delete", request, response);
     }
 
-    /**
-     * Dispatches a request to the handler that best matches the request.
-     *
-     * In the case of conflicts, this function prefers the longest matching path.
-     *
-     * Note that, in the case that a path element could be either a wildcard or
-     * an exact match, dispatch will branch on the exact match and not backtrack.
-     * In other words, given the following two handlers:
-     * HandlerA: /foo/bar/?
-     * HandlerB: /foo/bar/baz
-     * ...HandlerB will accept requests to /foo/bar/baz properly, though it is
-     * strongly encouraged not to support this case.
-     *
-     * However, if each of these are given leaf nodes:
-     * HandlerA: /foo/bar/?/baz
-     * HandlerB: /foo/bar/bat/bar
-     * ..then /foo/bar/bat/baz will NOT be routed.
-     *
-     * @param method the request method
-     * @param request
-     * @param response
-     * @throws java.io.IOException
-     */
 
     private void callHandler(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             JsonElement payload = getPayload(request, response);
             RequestContext context = new RequestContext(
                     request, response, urlVariables, request.getParameterMap(), payload);
-            PathNode apiStructure = getApiStructure(method);
+            EndpointNode apiStructure = getApiStructure(method);
 
             if (request.getPathInfo() == null) {
                 System.out.println("Received " + method + " request with empty path.");
@@ -114,7 +89,7 @@ public class ApiDispatcher extends HttpServlet {
             }
 
 
-            PathNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
+            EndpointNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
             if (result != null) {
                 urlVariables.putAll(result.getArgValues());
                 result.getApiSpec().apiInterface.call(context);
@@ -129,7 +104,7 @@ public class ApiDispatcher extends HttpServlet {
         }
     }
 
-    private PathNode getApiStructure(String method) {
+    private EndpointNode getApiStructure(String method) {
         if(method.equalsIgnoreCase("get")) {
             return getStructure;
         } else if(method.equalsIgnoreCase("post")) {
@@ -144,14 +119,7 @@ public class ApiDispatcher extends HttpServlet {
     }
 
     /**
-     * Utility function that returns a JsonElement embedded in the payload of the request,
-     * or null if the body is missing or improper JSON.
-     * @param request
-     * @param response
-     * @return
-     * @throws com.google.gson.JsonParseException if there is an error parsing JSON from the payload
-     * @throws IllegalStateException if the body is not a JSON object
-     * @throws java.io.IOException if the payload could not be read
+     * Converts the body to a JsonElement
      */
     private JsonElement getPayload(HttpServletRequest request, HttpServletResponse response)
             throws JsonParseException, IllegalStateException, IOException {

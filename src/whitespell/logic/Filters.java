@@ -1,14 +1,9 @@
 package whitespell.logic;
 
 import javax.servlet.*;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.UUID;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -41,14 +36,11 @@ public class Filters implements Filter {
             servletResponse.getWriter().close();
         }
 
-
-        // this header allows CORS requests.
+        // These headers allow CORS requests.
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers" ,"Origin, X-Requested-With, Content-Type, Accept, x-Authentication");
         ((HttpServletResponse) servletResponse).addHeader("Server", "Whitespell Server");
-        //((HttpServletResponse) servletResponse).addHeader("Request-id", UUID.randomUUID().toString());
         servletResponse.setContentType("application/json");
-
         filterChain.doFilter(servletRequest, servletResponse);
     }
 

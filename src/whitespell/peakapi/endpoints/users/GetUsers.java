@@ -1,12 +1,11 @@
 package whitespell.peakapi.endpoints.users;
 
 import com.google.gson.Gson;
-import whitespell.logic.ApiInterface;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
-import whitespell.model.DayResult;
 import whitespell.model.UserObject;
 
 import java.io.IOException;
@@ -20,7 +19,7 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class GetUsers implements ApiInterface {
+public class GetUsers implements EndpointInterface {
 
 
     private static final String GET_USERS = "SELECT `user_id`, `username`, `thumbnail` FROM `users`";

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
-import whitespell.logic.ApiInterface;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.Safety;
 import whitespell.logic.logging.Logging;
@@ -22,7 +22,7 @@ import java.util.Date;
  * @author Josh Lipson(mrgalkon)
  * 5/4/2015
  */
-public class AddNewContent implements ApiInterface {
+public class AddNewContent implements EndpointInterface {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `user_content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `timestamp`) VALUES (?,?,?,?,?,?)";
 

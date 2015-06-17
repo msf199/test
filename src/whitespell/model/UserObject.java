@@ -1,9 +1,5 @@
 package whitespell.model;
 
-import whitespell.net.websockets.socketio.SocketIOClient;
-
-import java.util.List;
-
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         2/13/15

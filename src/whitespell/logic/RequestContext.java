@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Container for the preprocessed context of an API request.
+ * Preprocessed object containing all request data, which is parsed as a parameter to the endpoint handler.
  */
 public class RequestContext {
     private final HttpServletRequest request;

@@ -3,8 +3,8 @@ package whitespell.model.baseapi;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
+import whitespell.logic.EndpointDispatcher;
 import whitespell.logic.Filters;
-import whitespell.logic.ApiDispatcher;
 import whitespell.net.websockets.socketio.Configuration;
 import whitespell.net.websockets.socketio.SocketIOClient;
 import whitespell.net.websockets.socketio.SocketIOServer;
@@ -31,7 +31,7 @@ public abstract class WhitespellWebServer {
         ServletHandler handler = new ServletHandler();
         server.setHandler(handler);
 
-        ApiDispatcher dispatcher = new ApiDispatcher();
+        EndpointDispatcher dispatcher = new EndpointDispatcher();
         handler.addFilterWithMapping(Filters.class, "/*", EnumSet.of(DispatcherType.REQUEST));
         scheduleEndpoints(dispatcher);
         handler.addServletWithMapping(new ServletHolder(dispatcher), "/*");
@@ -42,7 +42,7 @@ public abstract class WhitespellWebServer {
 
 
 
-    protected abstract void scheduleEndpoints(ApiDispatcher dispatcher);
+    protected abstract void scheduleEndpoints(EndpointDispatcher dispatcher);
 
     public void startWebsockets() {
 

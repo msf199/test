@@ -1,4 +1,4 @@
-package whitespell.peakapi.endpoints.content.types;
+package whitespell.peakapi.endpoints.content.categories;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
  * @author Josh Lipson(mrgalkon)
  * 5/4/2015
  */
-public class AddContentType implements EndpointInterface {
+public class AddCategory implements EndpointInterface {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_type`(`content_type_name`) VALUES (?)";
 

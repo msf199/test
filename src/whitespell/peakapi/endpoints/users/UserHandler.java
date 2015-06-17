@@ -1,6 +1,6 @@
 package whitespell.peakapi.endpoints.users;
 
-import whitespell.logic.ApiInterface;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.io.IOException;
  *         1/20/15
  *         whitespell.model
  */
-public class UserHandler implements ApiInterface {
+public class UserHandler implements EndpointInterface {
 
     public void call(RequestContext context) throws IOException {
         String testId = context.getUrlVariables().get("test_id");

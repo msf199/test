@@ -3,12 +3,11 @@ package whitespell.peakapi.endpoints.users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import whitespell.StaticRules;
-import whitespell.logic.ApiInterface;
+import whitespell.logic.EndpointInterface;
 import whitespell.logic.RequestContext;
 import whitespell.logic.SessionIdentifierGenerator;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
-import whitespell.logic.sql.Pool;
 import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.AuthenticationObject;
 import whitespell.security.PasswordHash;
@@ -26,7 +25,7 @@ import java.sql.SQLException;
  *         1/20/15
  *         whitespell.model
  */
-public class AuthenticationRequest implements ApiInterface {
+public class AuthenticationRequest implements EndpointInterface {
 
 
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `users` WHERE `username` = ? LIMIT 1";
