@@ -16,9 +16,6 @@ import whitespell.peakapi.endpoints.users.*;
  */
 public class MyEndpoints extends WhitespellWebServer {
 
-    public MyEndpoints(String apiKey) {
-        super(apiKey);
-    }
 
     /**
      * The endpoints that you schedule here are handled as follows: When the user first does a REST call to the API a session ID is returned as a header.
