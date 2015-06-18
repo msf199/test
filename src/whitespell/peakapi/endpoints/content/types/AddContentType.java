@@ -59,7 +59,7 @@ public class AddContentType implements EndpointInterface {
         } catch (SQLException e) {
             Logging.log("High", e);
             if (e.getMessage().contains("FK_user_content_content_type")) {
-                context.throwHttpError(StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
+                context.throwHttpError(StaticRules.ErrorCodes.NO_SUCH_CATEGORY); //todo check if this should be category or content ype
             } else if(e.getMessage().contains("Duplicate entry")) {
                 context.throwHttpError(StaticRules.ErrorCodes.DUPLICATE_CONTENT_TYPE);
             }

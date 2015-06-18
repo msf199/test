@@ -48,6 +48,7 @@ public class StaticRules {
         CONTENT_DESCRIPTION_TOO_LONG(120, "Content description is too long ("+StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),
         NO_SUCH_CATEGORY(121, "The content type you are attempting to insert does not exist", HttpStatus.UNAUTHORIZED_401),
         DUPLICATE_CONTENT_TYPE(122, "The content type already exists", HttpStatus.UNAUTHORIZED_401),
+        DUPLICATE_CATEGORY(123, "The content type already exists", HttpStatus.UNAUTHORIZED_401),
         ;
 
         int errorId;

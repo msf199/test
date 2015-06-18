@@ -21,7 +21,7 @@ import java.sql.SQLException;
  */
 public class AddCategory implements EndpointInterface {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_type`(`content_type_name`) VALUES (?)";
+    private static final String INSERT_CATEGORY_QUERY = "INSERT INTO `categories`(`category_name`, `category_thumbnail`, `category_followers`, `category_publishers`) VALUES (?,?,?,?)";
 
     @Override
     public void call(RequestContext context) throws IOException {
@@ -30,12 +30,12 @@ public class AddCategory implements EndpointInterface {
         /**
          * Check that the user id and content is valid.
          */
-        if (payload.get("content_type_name") == null ) {
+        if (payload.get("category_name") == null ) {
             context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
-        final String content_type_name = payload.get("content_type_name").getAsString();
+        final String content_type_name = payload.get("category_name").getAsString();
 
         if (content_type_name.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
             context.throwHttpError(StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
@@ -45,7 +45,7 @@ public class AddCategory implements EndpointInterface {
         final boolean[] success = {false};
 
         try {
-            StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
+            StatementExecutor executor = new StatementExecutor(INSERT_CATEGORY_QUERY);
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
@@ -61,7 +61,7 @@ public class AddCategory implements EndpointInterface {
             if (e.getMessage().contains("FK_user_content_content_type")) {
                 context.throwHttpError(StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
             } else if(e.getMessage().contains("Duplicate entry")) {
-                context.throwHttpError(StaticRules.ErrorCodes.DUPLICATE_CONTENT_TYPE);
+                context.throwHttpError(StaticRules.ErrorCodes.DUPLICATE_CATEGORY);
             }
         }
 

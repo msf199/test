@@ -4,6 +4,7 @@ import whitespell.logic.EndpointDispatcher;
 import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.peakapi.endpoints.content.AddNewContent;
 import whitespell.peakapi.endpoints.content.RequestContent;
+import whitespell.peakapi.endpoints.content.categories.RequestCategories;
 import whitespell.peakapi.endpoints.content.types.AddContentType;
 import whitespell.peakapi.endpoints.content.types.RequestContentTypes;
 import whitespell.peakapi.endpoints.statistics.GetUserSignups;
@@ -62,6 +63,10 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // following API /users/{userid}/following
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/following/?", "user_id");
+
+        // categories API /content/categories
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestCategories(), "/content/categories");
+
 
         // saved content API {/users/{userid}/saved_content}
 
