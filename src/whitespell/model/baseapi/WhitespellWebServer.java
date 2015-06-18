@@ -18,7 +18,6 @@ import java.util.EnumSet;
 
 public abstract class WhitespellWebServer {
 
-    private final String apiKey;
 
     public WhitespellWebServer(String apiKey) {
 
@@ -43,34 +42,4 @@ public abstract class WhitespellWebServer {
 
 
     protected abstract void scheduleEndpoints(EndpointDispatcher dispatcher);
-
-    public void startWebsockets() {
-
-        Configuration config = new Configuration();
-        // config.setHostname("127.0.0.1");
-        config.setPort(9092);
-        config.setCloseTimeout(30);
-        config.setTransports(Transport.WEBSOCKET);
-        SocketIOServer server = new SocketIOServer(config);
-        server.start();
-
-        server.addConnectListener(new ConnectListener() {
-            @Override
-            public void onConnect(SocketIOClient client) {
-                System.out.println(client.getRemoteAddress());
-            }
-        });
-    }
-
-    public static Cookie getCookie(HttpServletRequest request, String name) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals(name)) {
-                    return cookie;
-                }
-            }
-        }
-
-        return null;
-    }
 }
