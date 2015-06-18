@@ -57,7 +57,7 @@ public class Server {
       Pool.initializePool();
 
         /* start the API */
-        WhitespellWebServer testApi = new MyEndpoints("Peak API");
+        WhitespellWebServer testApi = new MyEndpoints();
         System.out.println("Starting "+Config.SERVER_NAME+" on main thread.");
         testApi.startAPI(Config.API_PORT);
 
