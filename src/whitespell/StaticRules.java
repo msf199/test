@@ -16,6 +16,8 @@ public class StaticRules {
     public static final int MIN_PASSWORD_LENGTH = 6;
     public static final int MAX_PASSWORD_LENGTH = 512;
     public static final int MAX_CONTENT_TYPE_LENGTH = 10;
+    public static final int MAX_CATEGORY_LENGTH = 45;
+    public static final int MAX_THUMBNAIL_URL_LENGTH = 255;
     public static final int MAX_CONTENT_DESCRIPTION_LENGTH = 100;
     public static final int MIN_AUTHENTICATION_HEADER_LENGTH = 1;
     public static final int MAX_AUTHENTICATION_HEADER_LENGTH = 255;
@@ -45,6 +47,8 @@ public class StaticRules {
         ALREADY_FOLLOWING_USER(117, "You are already following this user!", HttpStatus.UNAUTHORIZED_401),
         NOT_FOLLOWING_USER(118, "You are not following this user!", HttpStatus.UNAUTHORIZED_401),
         CONTENT_TYPE_TOO_LONG(119, "Content type is too long ("+StaticRules.MAX_CONTENT_TYPE_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),
+        CATEGORY_TOO_LONG(119, "Category is too long ("+StaticRules.MAX_CATEGORY_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),
+        THUMBNAIL_URL_TOO_LONG(119, "Thumbnail URL is too long ("+StaticRules.MAX_THUMBNAIL_URL_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_DESCRIPTION_TOO_LONG(120, "Content description is too long ("+StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH+" is the max)", HttpStatus.UNAUTHORIZED_401),
         NO_SUCH_CATEGORY(121, "The content type you are attempting to insert does not exist", HttpStatus.UNAUTHORIZED_401),
         DUPLICATE_CONTENT_TYPE(122, "The content type already exists", HttpStatus.UNAUTHORIZED_401),

@@ -6,7 +6,7 @@ package whitespell.model;
 public class AddContentTypeObject {
 
     public boolean isContentTypeAdded() {
-        return content_type_added;
+        return this.content_type_added;
     }
 
     public void setContentTypeAdded(boolean content_type_added) {

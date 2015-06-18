@@ -9,6 +9,7 @@ import whitespell.logic.RequestContext;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
+import whitespell.model.AddCategoryObject;
 import whitespell.model.AddContentTypeObject;
 
 import java.io.IOException;
@@ -21,24 +22,30 @@ import java.sql.SQLException;
  */
 public class AddCategory implements EndpointInterface {
 
-    private static final String INSERT_CATEGORY_QUERY = "INSERT INTO `categories`(`category_name`, `category_thumbnail`, `category_followers`, `category_publishers`) VALUES (?,?,?,?)";
+    private static final String INSERT_CATEGORY_QUERY = "INSERT INTO `categories`(`category_name`, `category_thumbnail`) VALUES (?,?)";
 
     @Override
     public void call(RequestContext context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
+        System.out.println(payload.toString());
         /**
          * Check that the user id and content is valid.
          */
-        if (payload.get("category_name") == null ) {
+        if (payload.get("category_name") == null || payload.get("category_thumbnail") == null) {
             context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
-        final String content_type_name = payload.get("category_name").getAsString();
+        final String category_name = payload.get("category_name").getAsString();
+        final String category_thumbnail = payload.get("category_thumbnail").getAsString();
 
-        if (content_type_name.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
-            context.throwHttpError(StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
+        if (category_name.length() > StaticRules.MAX_CATEGORY_LENGTH) {
+            context.throwHttpError(StaticRules.ErrorCodes.CATEGORY_TOO_LONG);
+            return;
+        }
+        if (category_thumbnail.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH) {
+            context.throwHttpError(StaticRules.ErrorCodes.THUMBNAIL_URL_TOO_LONG);
             return;
         }
 
@@ -49,7 +56,8 @@ public class AddCategory implements EndpointInterface {
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
-                    ps.setString(1, content_type_name);
+                    ps.setString(1, category_name);
+                    ps.setString(2, category_thumbnail);
 
                     ps.executeUpdate();
 
@@ -67,8 +75,8 @@ public class AddCategory implements EndpointInterface {
 
         if (success[0]) {
             context.getResponse().setStatus(HttpStatus.OK_200);
-            AddContentTypeObject object = new AddContentTypeObject();
-            object.setContentTypeAdded(true);
+            AddCategoryObject object = new AddCategoryObject();
+            object.setCategoryAdded(true);
             Gson g = new Gson();
             String json = g.toJson(object);
             context.getResponse().getWriter().write(json);

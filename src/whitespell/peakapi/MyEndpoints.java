@@ -4,6 +4,7 @@ import whitespell.logic.EndpointDispatcher;
 import whitespell.model.baseapi.WhitespellWebServer;
 import whitespell.peakapi.endpoints.content.AddNewContent;
 import whitespell.peakapi.endpoints.content.RequestContent;
+import whitespell.peakapi.endpoints.content.categories.AddCategory;
 import whitespell.peakapi.endpoints.content.categories.RequestCategories;
 import whitespell.peakapi.endpoints.content.types.AddContentType;
 import whitespell.peakapi.endpoints.content.types.RequestContentTypes;
@@ -66,6 +67,7 @@ public class MyEndpoints extends WhitespellWebServer {
 
         // categories API /content/categories
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestCategories(), "/content/categories");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddCategory(), "/content/categories");
 
 
         // saved content API {/users/{userid}/saved_content}

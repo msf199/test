@@ -22,7 +22,7 @@ public class Test implements EndpointInterface {
             System.out.println(param + "->" + context.getRequest().getHeader(param));
         }*/
 
-       context.getResponse().getWriter().write("Hey, I heard your name is:" + context.getUrlVariables().get("name"));
+       context.getResponse().getWriter().write("Hey, hello:" + context.getUrlVariables().get("name"));
 
 
     }
