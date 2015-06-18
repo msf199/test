@@ -6,6 +6,7 @@ import whitespell.logic.RequestContext;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
+import whitespell.model.CategoryObject;
 import whitespell.model.ContentTypeObject;
 
 import java.io.IOException;
@@ -27,7 +28,7 @@ public class RequestCategories implements EndpointInterface {
     @Override
     public void call(final RequestContext context) throws IOException {
         /**
-         * Get the category types
+         * Get the categories
          */
         try {
             StatementExecutor executor = new StatementExecutor(GET_CATEGORIES);
@@ -36,18 +37,18 @@ public class RequestCategories implements EndpointInterface {
                 public void process(PreparedStatement ps) throws SQLException {
 
                     final ResultSet results = ps.executeQuery();
-                    ArrayList<ContentTypeObject> contentTypes = new ArrayList<>();
+                    ArrayList<CategoryObject> categoryObjects = new ArrayList<>();
                     while (results.next()) {
 
-                        ContentTypeObject d = new ContentTypeObject(results.getInt("content_type_id"), results.getString("content_type_name"));
+                        CategoryObject d = new CategoryObject(results.getInt("category_id"), results.getString("category_name"), results.getString("category_thumbnail"), results.getInt("category_followers"), results.getInt("category_publishers"));
 
-                        contentTypes.add(d);
+                        categoryObjects.add(d);
                     }
 
                     // put the array list into a JSON array and write it as a response
 
                     Gson g = new Gson();
-                    String response = g.toJson(contentTypes);
+                    String response = g.toJson(categoryObjects);
                     context.getResponse().setStatus(200);
                     try {
                         context.getResponse().getWriter().write(response);
