@@ -10,7 +10,4 @@ public abstract class WhitespellIntelligence {
     }
     public abstract void start() throws Exception;
 
-    public void addHandler(Action a) {
-        System.out.println("Added handler interface: " + a.getActionName());
-    }
 }
