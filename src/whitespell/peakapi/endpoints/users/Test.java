@@ -1,7 +1,7 @@
 package whitespell.peakapi.endpoints.users;
 
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 
 import java.io.IOException;
 
@@ -13,7 +13,7 @@ import java.io.IOException;
 public class Test implements EndpointInterface {
 
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(RequestObject context) throws IOException {
 
         /*Enumeration e = (context.getRequest().getHeaderNames());
 

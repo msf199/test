@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
@@ -33,7 +33,7 @@ public class CreateUser implements EndpointInterface {
     private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `users` WHERE `username` = ? OR `email` = ? LIMIT 1";
 
     @Override
-    public void call(final RequestContext context) throws IOException {
+    public void call(final RequestObject context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
 

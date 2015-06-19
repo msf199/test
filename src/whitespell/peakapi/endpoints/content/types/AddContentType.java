@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
@@ -24,7 +24,7 @@ public class AddContentType implements EndpointInterface {
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_type`(`content_type_name`) VALUES (?)";
 
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
         /**

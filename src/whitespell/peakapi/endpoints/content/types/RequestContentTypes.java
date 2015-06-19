@@ -2,7 +2,7 @@ package whitespell.peakapi.endpoints.content.types;
 
 import com.google.gson.Gson;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
@@ -25,7 +25,7 @@ public class RequestContentTypes implements EndpointInterface {
     private static final String GET_CONTENT_TYPES = "SELECT * FROM `content_type`";
 
     @Override
-    public void call(final RequestContext context) throws IOException {
+    public void call(final RequestObject context) throws IOException {
         /**
          * Get the content types
          */

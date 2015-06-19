@@ -14,18 +14,18 @@ import java.util.Map;
 /**
  * Preprocessed object containing all request data, which is parsed as a parameter to the endpoint handler.
  */
-public class RequestContext {
+public class RequestObject {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final Map<String, String> urlVariables;
     private final Map<String, String[]> parameterMap;
     private final JsonElement payload;
 
-    public RequestContext(HttpServletRequest request,
-                          HttpServletResponse response,
-                          Map<String, String> urlVariables,
-                          Map<String, String[]> parameterMap,
-                          JsonElement payload) {
+    public RequestObject(HttpServletRequest request,
+                         HttpServletResponse response,
+                         Map<String, String> urlVariables,
+                         Map<String, String[]> parameterMap,
+                         JsonElement payload) {
         this.request = request;
         this.response = response;
         this.urlVariables = urlVariables;

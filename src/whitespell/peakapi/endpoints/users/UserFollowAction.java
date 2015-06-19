@@ -4,10 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
-import whitespell.logic.Authentication;
-import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
-import whitespell.logic.Safety;
+import whitespell.logic.*;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
@@ -36,7 +33,7 @@ public class UserFollowAction implements EndpointInterface {
     private static final String DELETE_FOLLOWED_QUERY = "DELETE FROM `following` WHERE `user_id` = ? AND `followed_id` = ?";
 
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(RequestObject context) throws IOException {
         String context_user_id = context.getUrlVariables().get("user_id");
 
         JsonObject payload = context.getPayload().getAsJsonObject();

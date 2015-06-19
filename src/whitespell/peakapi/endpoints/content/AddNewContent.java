@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.Safety;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
@@ -27,7 +27,7 @@ public class AddNewContent implements EndpointInterface {
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `user_content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `timestamp`) VALUES (?,?,?,?,?,?)";
 
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
         String context_user_id = context.getUrlVariables().get("user_id");

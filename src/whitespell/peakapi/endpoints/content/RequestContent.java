@@ -3,7 +3,7 @@ package whitespell.peakapi.endpoints.content;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.Safety;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
@@ -26,7 +26,7 @@ public class RequestContent implements EndpointInterface {
     private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `user_content` WHERE `user_id` = ?";
 
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(RequestObject context) throws IOException {
         String context_user_id = context.getUrlVariables().get("user_id");
 
         /**

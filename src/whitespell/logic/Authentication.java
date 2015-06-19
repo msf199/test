@@ -20,6 +20,12 @@ public class Authentication {
 
     private final int userId;
     private final String key;
+
+    /**
+     * Authentication processes every authentication related function. The idea is that this object is reproducable over multiple threads.
+     * The Authentication object is created every time authentication is called, so that it is executed on the thread the request is handled.
+     * @param authenticationHeader
+     */
     public Authentication(String authenticationHeader) {
 
         if(authenticationHeader == null) {
@@ -43,7 +49,7 @@ public class Authentication {
     /**
      * Check whether the user doing an API call is authenticated properly
 
-     * @return
+     * @return whether the user is authenticated or not.
      */
     public boolean isAuthenticated() {
 
@@ -52,8 +58,6 @@ public class Authentication {
         if(userId < 0 || key == null) {
             return false;
         }
-
-        System.out.println(" user id " + " -> " + " key ->" + key);
 
         final boolean[] authenticated = new boolean[1];
 

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import whitespell.StaticRules;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.SessionIdentifierGenerator;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
@@ -34,7 +34,7 @@ public class AuthenticationRequest implements EndpointInterface {
             "VALUES (?,?)";
 
     @Override
-    public void call(final RequestContext context) throws IOException {
+    public void call(final RequestObject context) throws IOException {
 
         Connection con;
         final String username;

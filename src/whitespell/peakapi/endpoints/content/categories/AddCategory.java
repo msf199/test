@@ -5,12 +5,11 @@ import com.google.gson.JsonObject;
 import org.eclipse.jetty.http.HttpStatus;
 import whitespell.StaticRules;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.AddCategoryObject;
-import whitespell.model.AddContentTypeObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -25,7 +24,7 @@ public class AddCategory implements EndpointInterface {
     private static final String INSERT_CATEGORY_QUERY = "INSERT INTO `categories`(`category_name`, `category_thumbnail`) VALUES (?,?)";
 
     @Override
-    public void call(RequestContext context) throws IOException {
+    public void call(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
         System.out.println(payload.toString());

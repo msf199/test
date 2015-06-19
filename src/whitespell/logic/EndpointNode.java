@@ -4,48 +4,46 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * PathNode is a tree representing a path hierarchy allowing for '?' wildcard substitution
- * for each path component. Call getBindingForSubPath(subPath) to traverse the tree and
- * bind to an API handler with populated argument values or addChildWithSubPath(subPath)
- * to add a binding to the tree.
+ * The EndpointNode class is part of a tree of nodes and children.
+ * Each node can contain an EndpointSpecification (which will be called if the endpoint is called) and can also have children.
+ * Each child can be a static word such as 'statistics' or a variable (defined as '?')
  *
- * Note that the tree traversal does NOT backtrack, so given the following set of bindings:
- * HandlerA: /foo/bar/?/bat
- * HandlerB: /foo/bar/baz/bas
- *
- * .../foo/bar/baz/bat will NOT match the top entry, as /foo/bar/? and /foo/bar/baz form
- * separate branches in the tree.
+ * ===== children:
+ * GET has a root EndpointNode, for which will for example have children:
+ * 1. users, 2. statistics
+ * users will then have the children /users/? for a specific user, or /users can also be an endpoint.
  */
 public class EndpointNode {
+
+    // the children of this node, e.g. /users, or /users/?
     private Map<String, EndpointNode> children;
-    private EndpointSpecification apiSpec = null;
+
+    // the endpoint specification (the handler plus the url variables)
+    private EndpointSpecification endpointSpecification = null;
 
     public EndpointNode() {
-        children = new HashMap<String, EndpointNode>();
+        children = new HashMap<>();
     }
 
+    // get all the children for this node
     public Map<String, EndpointNode> getChildren() {
         return this.children;
     }
 
+    // add a node to the tree
     public void putChild(String name, EndpointNode child) {
         children.put(name, child);
     }
 
     /**
-     * Traverses the tree and returns the ApiSpec matching
-     * the given sub-path as well as the values of any matched
-     * arguments, or null if no ApiSpec was found.
-     * @param subPath the sub-path being called, relative to this node
-     * @return a PathNodeResult containing the bound ApiSpec and all
-     * matched arguments, or null if no ApiSpec was found.
+     * This loops through the current path and finds the right endpoint node for the path.
      */
-    public PathNodeResult getBindingForSubPath(String subPath) {
+    public EndpointResult getBindingForSubPath(String subPath) {
 
         String[] pathComponents = subPath.split("/");
 
         EndpointNode current = this;
-        HashMap<String, String> argValues = new HashMap<String, String>();
+        HashMap<String, String> argValues = new HashMap<>();
         for (String pathComponent : pathComponents) {
 
             if(pathComponent == null || pathComponent.length() < 1) {
@@ -56,20 +54,16 @@ public class EndpointNode {
                 current = current.getChildren().get(pathComponent);
             } else if (current.getChildren().containsKey("?")) {
                 current = current.getChildren().get("?");
-                argValues.put(current.getApiSpec().argNames[argValues.size()], pathComponent);
+                argValues.put(current.getEndpointSpecification().argNames[argValues.size()], pathComponent);
             } else {
                 return null;
             }
         }
-        return new PathNodeResult(current.getApiSpec(), argValues);
+        return new EndpointResult(current.getEndpointSpecification(), argValues);
     }
 
     /**
-     * Traverses the trie and adds the given apiSpec as a leaf node
-     * with a sub-path relative to this PathNode, or replaces an existing
-     * leaf node with the same sub-path.
-     * @param subPath the sub-path to bind to, relative to this node
-     * @param apiSpec the ApiSpec to bind
+     * This loops through the list of path components (e.g. /statistics/users) and adds it to the correct endpoint node.
      */
     public void addChildWithSubPath(String subPath, EndpointSpecification apiSpec) {
         String[] pathComponents = subPath.split("/");
@@ -92,7 +86,7 @@ public class EndpointNode {
 
             if (i == (pathComponents.length - 1)) {
                 // when we are at the last of the loop, insert the current pathnode as the api spec
-                current.setApiSpec(apiSpec);
+                current.setEndpointSpecification(apiSpec);
             }
 
         }
@@ -103,11 +97,12 @@ public class EndpointNode {
      * Container for PathNode traversals that includes both the API specification
      * and the values for all matched arguments.
      */
-    public class PathNodeResult {
+
+    public class EndpointResult {
         private EndpointSpecification apiSpec;
         private Map<String, String> argValues;
 
-        public PathNodeResult(EndpointSpecification apiSpec, Map<String, String> argValues) {
+        public EndpointResult(EndpointSpecification apiSpec, Map<String, String> argValues) {
             this.apiSpec = apiSpec;
             this.argValues = argValues;
         }
@@ -121,11 +116,11 @@ public class EndpointNode {
         }
     }
 
-    protected EndpointSpecification getApiSpec() {
-        return apiSpec;
+    protected EndpointSpecification getEndpointSpecification() {
+        return endpointSpecification;
     }
 
-    protected void setApiSpec(EndpointSpecification apiSpec) {
-        this.apiSpec = apiSpec;
+    protected void setEndpointSpecification(EndpointSpecification endpointSpecification) {
+        this.endpointSpecification = endpointSpecification;
     }
 }

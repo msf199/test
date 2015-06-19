@@ -79,7 +79,7 @@ public class EndpointDispatcher extends HttpServlet {
     private void callHandler(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
             JsonElement payload = getPayload(request, response);
-            RequestContext context = new RequestContext(
+            RequestObject context = new RequestObject(
                     request, response, urlVariables, request.getParameterMap(), payload);
             EndpointNode apiStructure = getApiStructure(method);
 
@@ -89,7 +89,7 @@ public class EndpointDispatcher extends HttpServlet {
             }
 
 
-            EndpointNode.PathNodeResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
+            EndpointNode.EndpointResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
             if (result != null) {
                 urlVariables.putAll(result.getArgValues());
                 result.getApiSpec().apiInterface.call(context);

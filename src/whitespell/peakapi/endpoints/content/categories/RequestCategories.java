@@ -2,12 +2,11 @@ package whitespell.peakapi.endpoints.content.categories;
 
 import com.google.gson.Gson;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
 import whitespell.model.CategoryObject;
-import whitespell.model.ContentTypeObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -26,7 +25,7 @@ public class RequestCategories implements EndpointInterface {
     private static final String GET_CATEGORIES = "SELECT * FROM `categories`";
 
     @Override
-    public void call(final RequestContext context) throws IOException {
+    public void call(final RequestObject context) throws IOException {
         /**
          * Get the categories
          */

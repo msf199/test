@@ -2,7 +2,7 @@ package whitespell.peakapi.endpoints.statistics;
 
 import com.google.gson.Gson;
 import whitespell.logic.EndpointInterface;
-import whitespell.logic.RequestContext;
+import whitespell.logic.RequestObject;
 import whitespell.logic.logging.Logging;
 import whitespell.logic.sql.ExecutionBlock;
 import whitespell.logic.sql.StatementExecutor;
@@ -25,7 +25,7 @@ public class GetUserSignups implements EndpointInterface {
     private static final String GET_SIGNUP_DATASET = "SELECT COUNT(1) as count, DATE(`registration_timestamp_utc`) as day FROM `users` GROUP BY DAY(`registration_timestamp_utc`)";
 
     @Override
-    public void call(final RequestContext context) throws IOException {
+    public void call(final RequestObject context) throws IOException {
         /**
         * Get the signups by day
         */
