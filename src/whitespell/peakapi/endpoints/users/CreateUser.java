@@ -53,7 +53,7 @@ public class CreateUser implements EndpointInterface {
 
         // Check if all parameters are present and contain the right characters, if not throw a 400
         if (payload == null || payload.get("username") == null || payload.get("email") == null || payload.get("password") == null) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         } else {
             username = payload.get("username").getAsString();
@@ -68,22 +68,22 @@ public class CreateUser implements EndpointInterface {
 
             //check if values are too long
             if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TOO_LONG);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
                 return;
             } else if (email.length() > StaticRules.MAX_EMAIL_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TOO_LONG);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOO_LONG);
                 return;
             } else if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
                 return;
             } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
                 return;
             } else if (email.length() < StaticRules.MIN_EMAIL_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TOO_SHORT);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOO_SHORT);
                 return;
             } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
                 return;
             }
         }
@@ -110,9 +110,9 @@ public class CreateUser implements EndpointInterface {
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         if (s.getString("username").equalsIgnoreCase(finalUsername)) {
-                            context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TAKEN);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TAKEN);
                         } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
-                            context.throwHttpError(StaticRules.ErrorCodes.EMAIL_TAKEN);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TAKEN);
                         }
                         returnCall[0] = true;
                         return;
@@ -142,7 +142,7 @@ public class CreateUser implements EndpointInterface {
             passHash = PasswordHash.createHash(password);
         } catch (Exception e) {
             Logging.log("High", e);
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
 
@@ -173,7 +173,7 @@ public class CreateUser implements EndpointInterface {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
 
@@ -200,14 +200,14 @@ public class CreateUser implements EndpointInterface {
                             e.printStackTrace();
                         }
                     } else {
-                        context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                         return;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

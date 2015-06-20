@@ -1,15 +1,17 @@
 package whitespell.logic;
 
 /**
- * ApiSpec is a simple container for a REST interface and a set of names
- * for URL parameters that interface expects.
+ * EndpointSpecification holds the interface (if any) for the current node, and also holds the variable name if it is a variable
  */
 public class EndpointSpecification {
     public EndpointInterface apiInterface;
-    public String[] argNames;
+    public String varName;
 
-    public EndpointSpecification(EndpointInterface apiInterface, String[] argNames) {
+    public void setVarName(String varName) {
+        this.varName = varName;
+    }
+
+    public EndpointSpecification(EndpointInterface apiInterface) {
         this.apiInterface = apiInterface;
-        this.argNames = argNames;
     }
 }

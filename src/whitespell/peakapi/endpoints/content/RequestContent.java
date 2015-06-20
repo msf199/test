@@ -33,7 +33,7 @@ public class RequestContent implements EndpointInterface {
          * Check that the user id is valid.
          */
         if (!Safety.isNumeric(context_user_id)) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 

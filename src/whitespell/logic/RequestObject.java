@@ -53,13 +53,14 @@ public class RequestObject {
         return payload;
     }
 
-    public void throwHttpError(StaticRules.ErrorCodes error) {
+    public void throwHttpError(String className, StaticRules.ErrorCodes error) {
             // set the HTTP status code to the correct status code
             this.response.setStatus(error.getHttpStatusCode());
 
             //construct the JSON object to return
             Gson g = new Gson();
             ErrorObject eo = new ErrorObject();
+            eo.setClassName(className);
             eo.setHttpStatusCode(error.getHttpStatusCode());
             eo.setErrorId(error.getErrorId());
             eo.setErrorMessage(error.getErrorMessage());

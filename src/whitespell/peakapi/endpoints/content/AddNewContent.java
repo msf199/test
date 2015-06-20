@@ -36,7 +36,7 @@ public class AddNewContent implements EndpointInterface {
          * Check that the user id and content is valid.
          */
         if (!Safety.isNumeric(context_user_id) || payload.get("content_type") == null  || payload.get("content_url") == null ||  payload.get("content_title") == null || payload.get("content_description") == null) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
@@ -55,15 +55,15 @@ public class AddNewContent implements EndpointInterface {
          * Check that the user id is valid (>= 0 && <= Integer.MAX_VALUE), and content type and description are of-length.
          */
         if (!Safety.isValidUserId(user_id)) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
         if (content_type.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
-            context.throwHttpError(StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
             return;
         }
         if (content_description.length() > StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH) {
-            context.throwHttpError(StaticRules.ErrorCodes.CONTENT_DESCRIPTION_TOO_LONG);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_DESCRIPTION_TOO_LONG);
             return;
         }
 
@@ -89,7 +89,7 @@ public class AddNewContent implements EndpointInterface {
         } catch (SQLException e) {
             Logging.log("High", e);
             if(e.getMessage().contains("FK_user_content_content_type")) {
-                context.throwHttpError(StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
             }
         }
 
@@ -101,7 +101,7 @@ public class AddNewContent implements EndpointInterface {
             String json = g.toJson(object);
             context.getResponse().getWriter().write(json);
         } else {
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

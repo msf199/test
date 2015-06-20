@@ -48,7 +48,7 @@ public class AuthenticationRequest implements EndpointInterface {
 
         // Check if all parameters are present and contain the right characters, if not throw a 400
         if (payload == null || payload.get("username") == null || payload.get("password") == null) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         } else {
             username = payload.get("username").getAsString();
@@ -57,16 +57,16 @@ public class AuthenticationRequest implements EndpointInterface {
 
             //check if values are too long
             if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TOO_LONG);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
                 return;
             } else if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
                 return;
             } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
                 return;
             } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
-                context.throwHttpError(StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
                 return;
             }
         }
@@ -115,7 +115,7 @@ public class AuthenticationRequest implements EndpointInterface {
                                 return;
                             } else {
                                 // if not verified, throw error
-                                context.throwHttpError(StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
                                 return;
                             }
                         } catch (NoSuchAlgorithmException e) {
@@ -126,7 +126,7 @@ public class AuthenticationRequest implements EndpointInterface {
                             e.printStackTrace();
                         }
                     } else {
-                        context.throwHttpError(StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
                         return;
                     }
                 }

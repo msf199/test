@@ -31,14 +31,14 @@ public class AddContentType implements EndpointInterface {
          * Check that the user id and content is valid.
          */
         if (payload.get("content_type_name") == null ) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
         final String content_type_name = payload.get("content_type_name").getAsString();
 
         if (content_type_name.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
-            context.throwHttpError(StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
             return;
         }
 
@@ -59,9 +59,9 @@ public class AddContentType implements EndpointInterface {
         } catch (SQLException e) {
             Logging.log("High", e);
             if (e.getMessage().contains("FK_user_content_content_type")) {
-                context.throwHttpError(StaticRules.ErrorCodes.NO_SUCH_CATEGORY); //todo check if this should be category or content ype
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY); //todo check if this should be category or content ype
             } else if(e.getMessage().contains("Duplicate entry")) {
-                context.throwHttpError(StaticRules.ErrorCodes.DUPLICATE_CONTENT_TYPE);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.DUPLICATE_CONTENT_TYPE);
             }
         }
 
@@ -73,7 +73,7 @@ public class AddContentType implements EndpointInterface {
             String json = g.toJson(object);
             context.getResponse().getWriter().write(json);
         } else {
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

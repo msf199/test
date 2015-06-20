@@ -63,7 +63,7 @@ public class MyEndpoints extends WhitespellWebServer {
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
 
         // following API /users/{userid}/following
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/following/?", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/following", "user_id");
 
         // categories API /content/categories
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestCategories(), "/content/categories");

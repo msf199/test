@@ -50,11 +50,15 @@ public class EndpointNode {
                 continue;
             }
 
+            // first we check if the input matches an exact new child
+
             if (current.getChildren().containsKey(pathComponent)) {
                 current = current.getChildren().get(pathComponent);
+
+            // otherwise it must be a variable if a variable exists.
             } else if (current.getChildren().containsKey("?")) {
                 current = current.getChildren().get("?");
-                argValues.put(current.getEndpointSpecification().argNames[argValues.size()], pathComponent);
+                argValues.put(current.getEndpointSpecification().varName, pathComponent);
             } else {
                 return null;
             }
@@ -65,18 +69,21 @@ public class EndpointNode {
     /**
      * This loops through the list of path components (e.g. /statistics/users) and adds it to the correct endpoint node.
      */
-    public void addChildWithSubPath(String subPath, EndpointSpecification apiSpec) {
+    public void addChildWithSubPath(String subPath, EndpointSpecification endpointSpecification, String... argNames) {
         String[] pathComponents = subPath.split("/");
 
         EndpointNode current = this;
 
         // iterate over all the components in the path
 
+        int lastVar = -1;
+
         for(int i = 0; i < pathComponents.length; i++) {
 
             if (pathComponents[i] == null || pathComponents[i].length() < 1) {
                 continue;
             }
+
             //iterate over children, create child if neceesary, and enter into the child
             if (!current.getChildren().containsKey(pathComponents[i])) {
                 current.putChild(pathComponents[i], new EndpointNode());
@@ -85,8 +92,17 @@ public class EndpointNode {
             current = current.getChildren().get(pathComponents[i]);
 
             if (i == (pathComponents.length - 1)) {
-                // when we are at the last of the loop, insert the current pathnode as the api spec
-                current.setEndpointSpecification(apiSpec);
+                // when we are at the last of the loop, insert the current node
+                current.setEndpointSpecification(endpointSpecification);
+            }
+
+            if(pathComponents[i].equals("?")) {
+                // set the name of the variable in the current endpoint specification, even if no interface exists, always incremental
+
+                if(current.getEndpointSpecification() == null) {
+                    current.setEndpointSpecification(new EndpointSpecification(null)); // specification does not have to contain an interface, can also be just variable
+                }
+                current.getEndpointSpecification().setVarName(argNames[lastVar+1]);
             }
 
         }
@@ -99,16 +115,16 @@ public class EndpointNode {
      */
 
     public class EndpointResult {
-        private EndpointSpecification apiSpec;
+        private EndpointSpecification endpointSpec;
         private Map<String, String> argValues;
 
         public EndpointResult(EndpointSpecification apiSpec, Map<String, String> argValues) {
-            this.apiSpec = apiSpec;
+            this.endpointSpec = apiSpec;
             this.argValues = argValues;
         }
 
-        public EndpointSpecification getApiSpec() {
-            return apiSpec;
+        public EndpointSpecification getEndpointSpec() {
+            return endpointSpec;
         }
 
         public Map<String, String> getArgValues() {

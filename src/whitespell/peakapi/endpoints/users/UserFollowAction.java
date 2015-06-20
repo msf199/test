@@ -42,7 +42,7 @@ public class UserFollowAction implements EndpointInterface {
          * Check that the user id, following id, and action are valid.
          */
         if (!Safety.isNumeric(context_user_id) || payload.get(FOLLOWING_USER_ID_KEY) == null || !Safety.isNumeric(payload.get(FOLLOWING_USER_ID_KEY).getAsString()) || payload.get(ACTION_KEY) == null) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
@@ -59,7 +59,7 @@ public class UserFollowAction implements EndpointInterface {
          * Check that the user id and following user id are valid (>= 0 && <= Integer.MAX_VALUE).
          */
         if (!Safety.isValidUserId(user_id) || !Safety.isValidUserId(following_user_id)) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
@@ -74,7 +74,7 @@ public class UserFollowAction implements EndpointInterface {
          */
 
         if (!validAction) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
@@ -85,7 +85,7 @@ public class UserFollowAction implements EndpointInterface {
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
 
         if(!a.isAuthenticated() ||  a.getUserId() != user_id) {
-            context.throwHttpError(StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
 
@@ -125,7 +125,7 @@ public class UserFollowAction implements EndpointInterface {
                  */
 
                 if (response.isCurrentlyFollowing()) {
-                    context.throwHttpError(StaticRules.ErrorCodes.ALREADY_FOLLOWING_USER);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ALREADY_FOLLOWING_USER);
                     return;
                 }
                 try {
@@ -155,7 +155,7 @@ public class UserFollowAction implements EndpointInterface {
                  */
 
                 if (!response.isCurrentlyFollowing()) {
-                    context.throwHttpError(StaticRules.ErrorCodes.NOT_FOLLOWING_USER);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_FOLLOWING_USER);
                     return;
                 }
                 try {
@@ -190,7 +190,7 @@ public class UserFollowAction implements EndpointInterface {
             String json = g.toJson(followObject);
             context.getResponse().getWriter().write(json);
         } else {
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

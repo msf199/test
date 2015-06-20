@@ -32,7 +32,7 @@ public class AddCategory implements EndpointInterface {
          * Check that the user id and content is valid.
          */
         if (payload.get("category_name") == null || payload.get("category_thumbnail") == null) {
-            context.throwHttpError(StaticRules.ErrorCodes.NULL_VALUE_FOUND);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
@@ -40,11 +40,11 @@ public class AddCategory implements EndpointInterface {
         final String category_thumbnail = payload.get("category_thumbnail").getAsString();
 
         if (category_name.length() > StaticRules.MAX_CATEGORY_LENGTH) {
-            context.throwHttpError(StaticRules.ErrorCodes.CATEGORY_TOO_LONG);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CATEGORY_TOO_LONG);
             return;
         }
         if (category_thumbnail.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH) {
-            context.throwHttpError(StaticRules.ErrorCodes.THUMBNAIL_URL_TOO_LONG);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.THUMBNAIL_URL_TOO_LONG);
             return;
         }
 
@@ -66,9 +66,9 @@ public class AddCategory implements EndpointInterface {
         } catch (SQLException e) {
             Logging.log("High", e);
             if (e.getMessage().contains("FK_user_content_content_type")) {
-                context.throwHttpError(StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
             } else if(e.getMessage().contains("Duplicate entry")) {
-                context.throwHttpError(StaticRules.ErrorCodes.DUPLICATE_CATEGORY);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.DUPLICATE_CATEGORY);
             }
         }
 
@@ -80,7 +80,7 @@ public class AddCategory implements EndpointInterface {
             String json = g.toJson(object);
             context.getResponse().getWriter().write(json);
         } else {
-            context.throwHttpError(StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

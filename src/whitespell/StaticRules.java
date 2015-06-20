@@ -53,6 +53,7 @@ public class StaticRules {
         NO_SUCH_CATEGORY(121, "The content type you are attempting to insert does not exist", HttpStatus.UNAUTHORIZED_401),
         DUPLICATE_CONTENT_TYPE(122, "The content type already exists", HttpStatus.UNAUTHORIZED_401),
         DUPLICATE_CATEGORY(123, "The content type already exists", HttpStatus.UNAUTHORIZED_401),
+        NO_ENDPOINT_FOUND(124, "There was no endpoint found on this path", HttpStatus.NOT_FOUND_404),
         ;
 
         int errorId;

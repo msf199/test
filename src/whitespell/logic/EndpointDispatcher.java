@@ -4,6 +4,7 @@ import com.google.common.io.CharStreams;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import whitespell.StaticRules;
 import whitespell.logic.logging.Logging;
 
 import javax.servlet.http.HttpServlet;
@@ -41,19 +42,19 @@ public class EndpointDispatcher extends HttpServlet {
      */
 
     public void addHandler(RequestType type, EndpointInterface apiInterface, String pathSpec, String... argNames) {
-        EndpointSpecification spec = new EndpointSpecification(apiInterface, argNames);
+        EndpointSpecification spec = new EndpointSpecification(apiInterface);
         switch (type) {
             case GET:
-                getStructure.addChildWithSubPath(pathSpec, spec);
+                getStructure.addChildWithSubPath(pathSpec, spec, argNames);
                 break;
             case POST:
-                postStructure.addChildWithSubPath(pathSpec, spec);
+                postStructure.addChildWithSubPath(pathSpec, spec, argNames);
                 break;
             case PUT:
-                putStructure.addChildWithSubPath(pathSpec, spec);
+                putStructure.addChildWithSubPath(pathSpec, spec, argNames);
                 break;
             case DELETE:
-                delStructure.addChildWithSubPath(pathSpec, spec);
+                delStructure.addChildWithSubPath(pathSpec, spec, argNames);
                 break;
         }
     }
@@ -92,11 +93,9 @@ public class EndpointDispatcher extends HttpServlet {
             EndpointNode.EndpointResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
             if (result != null) {
                 urlVariables.putAll(result.getArgValues());
-                result.getApiSpec().apiInterface.call(context);
+                result.getEndpointSpec().apiInterface.call(context);
             } else {
-                response.getWriter().write("Error: Handler for path not found");
-                response.setStatus(404);
-                response.getWriter().close();
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_ENDPOINT_FOUND);
                 return;
             }
         }catch(Exception e) {
