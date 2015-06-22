@@ -8,4 +8,4 @@ MAINCLASS=tests.com.whitespell.peak.Tests
 cd $OUTDIR
 
 # Start the server.
-java -cp .:$CLASSPATH $MAINCLASS
+java -cp .:/usr/share/java/junit.jar org.junit.runner.JUnitCore $CLASSPATH $MAINCLASS
