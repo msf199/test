@@ -57,7 +57,7 @@ public class RequestObject {
         this.payload = payload;
     }
 
-    public void throwHttpError(String className, StaticRules.ErrorCodes error) {
+    public void throwHttpError(String className, StaticRules.ErrorCodes error, String message) {
         // set the HTTP status code to the correct status code
         this.response.setStatus(error.getHttpStatusCode());
 
@@ -67,7 +67,7 @@ public class RequestObject {
         eo.setClassName(className);
         eo.setHttpStatusCode(error.getHttpStatusCode());
         eo.setErrorId(error.getErrorId());
-        eo.setErrorMessage(error.getErrorMessage());
+        eo.setErrorMessage(message);
         String errorObject = g.toJson(eo);
 
         // write the response to the writer
@@ -77,5 +77,9 @@ public class RequestObject {
         } catch (IOException e) {
             Logging.log("Low", e);
         }
+    }
+
+    public void throwHttpError(String className, StaticRules.ErrorCodes error) {
+        throwHttpError(className, error, error.getErrorMessage());
     }
 }
