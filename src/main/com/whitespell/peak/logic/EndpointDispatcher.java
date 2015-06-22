@@ -140,7 +140,7 @@ public class EndpointDispatcher extends HttpServlet {
     }
 
     private String getBody(HttpServletRequest request) throws IOException {
-        return CharStreams.toString((Readable) request.getInputStream());
+        return request.getInputStream().toString();
     }
 
     /**
