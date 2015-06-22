@@ -31,10 +31,7 @@ fi
 
 # The server needs config.prop, install/ddl_master.sql, and errors/ to exist.
 mkdir -p $OUTDIR/errors $OUTDIR/install
-for file in config.prop; do
-  cp -pr $ROOT/$file $OUTDIR/$file
-done
 
-for file in tests.prop; do
-  cp -pr $ROOT/$file $OUTDIR/$file
-done
+  cp config.prop $OUTDIR/config.prop
+  cp tests.prop $OUTDIR/tests.prop
+
