@@ -136,13 +136,11 @@ public class EndpointDispatcher extends HttpServlet {
     private JsonElement getPayload(HttpServletRequest request, HttpServletResponse response)
             throws JsonParseException, IllegalStateException, IOException {
         String body = getBody(request);
-        System.out.println("body:");
-        System.out.println(body);
         return new JsonParser().parse(body);
     }
 
     private String getBody(HttpServletRequest request) throws IOException {
-        return request.getInputStream().toString();
+        return CharStreams.toString(request.getReader());
     }
 
     /**
