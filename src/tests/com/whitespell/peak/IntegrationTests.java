@@ -19,10 +19,7 @@ import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -33,7 +30,7 @@ import static org.junit.Assert.assertEquals;
  *         6/21/15
  *         tests.com.whitespell.peak
  */
-public class Tests extends Server {
+public class IntegrationTests extends Server {
 
     static String TEST_DB_NAME = "test_" + (System.currentTimeMillis() / 1000);
 
@@ -63,12 +60,6 @@ public class Tests extends Server {
     HttpResponse<String> stringResponse = null;
     HttpResponse<JsonNode> jsonResponse = null;
 
-    public static void main(String[] args) {
-        Config.TESTING = true;
-        Config.CONFIGURATION_FILE = "tests.prop";
-        Server.start();
-        API = "http://localhost:" + Config.API_PORT;
-    }
 
     @Test
     public void startTests() throws Exception {
@@ -84,79 +75,79 @@ public class Tests extends Server {
     }
 
     @Test
-        public void newDatabase() throws IOException {
+    public void newDatabase() throws IOException {
 
 
-            if (Config.DB_USER.equals("testpeak")) { // ensure we are on the test server
-                // truncate peak_ci_test_ddl
+        if (Config.DB_USER.equals("testpeak")) { // ensure we are on the test server
+            // truncate peak_ci_test_ddl
 
 
-                /**
-                 * CREATING THE TEST DATABASE
-                 */
-                try {
-                    StatementExecutor executor = new StatementExecutor("CREATE DATABASE " + TEST_DB_NAME + ";");
-                    executor.execute(new ExecutionBlock() {
+            /**
+             * CREATING THE TEST DATABASE
+             */
+            try {
+                StatementExecutor executor = new StatementExecutor("CREATE DATABASE " + TEST_DB_NAME + ";");
+                executor.execute(new ExecutionBlock() {
 
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
+                    @Override
+                    public void process(PreparedStatement ps) throws SQLException {
 
-                            ps.executeUpdate();
-                        }
-                    });
-                } catch (SQLException e) {
-                    Logging.log("High", e);
-                }
-
-                /**
-                 * USING THE TEST DATABASE
-                 */
-
-                try {
-                    StatementExecutor executor = new StatementExecutor("use " + TEST_DB_NAME + ";");
-                    executor.execute(new ExecutionBlock() {
-
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
-
-                            ps.executeUpdate();
-                        }
-                    });
-                } catch (SQLException e) {
-                    Logging.log("High", e);
-                }
-
-                /**
-                 * EXECUTING DDL ON TEST DATABASE
-                 */
-
-                String[] queries = TestFunctions.readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
-
-                for (int i = 0; i < queries.length; i++) {
-                    if (queries[i] == null || queries[i].length() < 2 || queries[i].isEmpty()) {
-                        continue;
+                        ps.executeUpdate();
                     }
-                    try {
-                        StatementExecutor executor = new StatementExecutor(queries[i]);
-                        executor.execute(new ExecutionBlock() {
-
-                            @Override
-                            public void process(PreparedStatement ps) throws SQLException {
-
-                                ps.executeUpdate();
-                            }
-                        });
-                    } catch (SQLException e) {
-                        Logging.log("High", e);
-                    }
-                }
-
-
-                // set the current database to the new database and re-initialize the Pool
-                Config.DB = TEST_DB_NAME;
-                Pool.initializePool();
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
             }
+
+            /**
+             * USING THE TEST DATABASE
+             */
+
+            try {
+                StatementExecutor executor = new StatementExecutor("use " + TEST_DB_NAME + ";");
+                executor.execute(new ExecutionBlock() {
+
+                    @Override
+                    public void process(PreparedStatement ps) throws SQLException {
+
+                        ps.executeUpdate();
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
+
+            /**
+             * EXECUTING DDL ON TEST DATABASE
+             */
+
+            String[] queries = TestFunctions.readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
+
+            for (int i = 0; i < queries.length; i++) {
+                if (queries[i] == null || queries[i].length() < 2 || queries[i].isEmpty()) {
+                    continue;
+                }
+                try {
+                    StatementExecutor executor = new StatementExecutor(queries[i]);
+                    executor.execute(new ExecutionBlock() {
+
+                        @Override
+                        public void process(PreparedStatement ps) throws SQLException {
+
+                            ps.executeUpdate();
+                        }
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e);
+                }
+            }
+
+
+            // set the current database to the new database and re-initialize the Pool
+            Config.DB = TEST_DB_NAME;
+            Pool.initializePool();
         }
+    }
 
 
     @Test
@@ -188,7 +179,7 @@ public class Tests extends Server {
          */
 
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/nosuchendpoint") 
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/nosuchendpoint")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"username\":\"testaccount1\",\n" +
@@ -207,24 +198,30 @@ public class Tests extends Server {
 
     @Test
     public void createAccountTest() throws UnirestException {
+
+        /**
+         * Create the account we are testing with
+         */
         Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\""+TEST_USERNAME+"\",\n" +
-                        "\"password\" : \""+TEST_PASSWORD+"\",\n" +
-                        "\"email\" : \""+TEST_EMAIL+"\"\n" +
+                        "\"username\":\"" + TEST_USERNAME + "\",\n" +
+                        "\"password\" : \"" + TEST_PASSWORD + "\",\n" +
+                        "\"email\" : \"" + TEST_EMAIL + "\"\n" +
                         "}")
                 .asString();
+
+        /**
+         * Authenticate the user we just created
+         */
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication") // misspeled S on purpose to cause an error.
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\""+TEST_USERNAME+"\",\n" +
-                        "\"password\" : \""+TEST_PASSWORD+"\"\n" +
+                        "\"username\":\"" + TEST_USERNAME + "\",\n" +
+                        "\"password\" : \"" + TEST_PASSWORD + "\"\n" +
                         "}")
                 .asString();
-
-
 
 
         AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
@@ -232,14 +229,28 @@ public class Tests extends Server {
         TEST_KEY = a.getKey();
 
         assertEquals(a.getUserId() > -1, true);
+
+        /**
+         * Get the UserObject from the users/userid endpoint
+         */
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/"+TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        UserObject user = g.fromJson(stringResponse.getBody(), UserObject.class);
+
+        assertEquals(user.getUserId(), TEST_UID);
+        assertEquals(user.getUsername(), TEST_USERNAME);
+
     }
-
-
 
 
     @Test
     public void categoriesTest() throws UnirestException {
-        Unirest.post("http://localhost:" + Config.API_PORT + "/content/categories") 
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"category_name\": \"skydiving\",\n" +
@@ -247,7 +258,7 @@ public class Tests extends Server {
                         "}")
                 .asString();
 
-        Unirest.post("http://localhost:" + Config.API_PORT + "/content/categories") 
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"category_name\": \"roller-skating\",\n" +
@@ -267,22 +278,24 @@ public class Tests extends Server {
 
     @Test
     public void followCategoriesTest() throws UnirestException {
-        Unirest.post("http://localhost:" + Config.API_PORT + "/user/"+TEST_UID+"/categories")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/user/" + TEST_UID + "/categories")
                 .header("accept", "application/json")
-                .header("X-Authentication", ""+TEST_UID+","+TEST_KEY+"")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"category_id\": \""+categories[0].getCategory_id()+"\",\n" +
+                        "\"category_id\": \"" + categories[0].getCategory_id() + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
-        Unirest.post("http://localhost:" + Config.API_PORT + "/user/"+TEST_UID+"/categories")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/user/" + TEST_UID + "/categories")
                 .header("accept", "application/json")
-                .header("X-Authentication", ""+TEST_UID+","+TEST_KEY+"")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"category_id\": \""+categories[1].getCategory_id()+"\",\n" +
+                        "\"category_id\": \"" + categories[1].getCategory_id() + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
+
+        //todo (pim) get categories_following from user object and test whether they are skydivign and rollerskating
     }
 
     @Test
@@ -290,9 +303,9 @@ public class Tests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\""+SKYDIVER_USERNAME+"\",\n" +
-                        "\"password\" : \""+SKYDIVER_PASSWORD+"\",\n" +
-                        "\"email\" : \""+SKYDIVER_EMAIL+"\"\n" +
+                        "\"username\":\"" + SKYDIVER_USERNAME + "\",\n" +
+                        "\"password\" : \"" + SKYDIVER_PASSWORD + "\",\n" +
+                        "\"email\" : \"" + SKYDIVER_EMAIL + "\"\n" +
                         "}")
                 .asString();
 
@@ -303,33 +316,32 @@ public class Tests extends Server {
         //todo(pim) call to publish in this category
 
 
-
-
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\""+ROLLERSKATER_USERNAME+"\",\n" +
-                        "\"password\" : \""+ROLLERSKATER_PASSWORD+"\",\n" +
-                        "\"email\" : \""+ROLLERSKATER_EMAIL+"\"\n" +
+                        "\"username\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\",\n" +
+                        "\"email\" : \"" + ROLLERSKATER_EMAIL + "\"\n" +
                         "}")
                 .asString();
         UserObject rollerskater = g.fromJson(stringResponse.getBody(), UserObject.class);
         ROLLERSKATER_UID = rollerskater.getUserId();
     }
+
     @Test
     public void contentTypesTest() throws UnirestException {
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"content_type_name\": \"youtube\"\n"
-                        +"}")
+                        + "}")
                 .asString();
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"content_type_name\": \"instagram\"\n"
-                        +"}")
+                        + "}")
                 .asString();
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/types")
@@ -343,7 +355,7 @@ public class Tests extends Server {
     }
 
     @Test
-    public void getPublishersByCategory(){
+    public void getPublishersByCategory() {
         //todo(pim) do a search on /users where publishing list contains numbers category[0] and category[1] and output as json
         // then follow these users
         // then post content as the publishers
@@ -354,8 +366,6 @@ public class Tests extends Server {
     public void incurCreateAccountErrors() {
         //todo(pim) create accounts with usernames and too long strings that are already taken and should give us errors
     }
-
-
 
 
 }

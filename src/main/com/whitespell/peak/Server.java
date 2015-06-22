@@ -1,9 +1,5 @@
 package main.com.whitespell.peak;
 
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.logic.ApiThread;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.config.ServerProperties;

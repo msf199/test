@@ -39,12 +39,13 @@ public class ImportDDL {
         tables.add("category");
         tables.add("content_type");
         tables.add("content");
-        tables.add("authentication");
+
 
         // add reference tables
         tables.add("user_following");
         tables.add("category_following");
         tables.add("category_publishing");
+        tables.add("authentication");
 
 
         //build the DDL

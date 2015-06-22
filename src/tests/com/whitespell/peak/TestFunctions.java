@@ -1,14 +1,11 @@
 package tests.com.whitespell.peak;
 
-import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
-import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.PreparedStatement;
@@ -35,7 +32,7 @@ public class TestFunctions {
          * CREATING THE TEST DATABASE
          */
         try {
-            StatementExecutor executor = new StatementExecutor("DROP DATABASE " + Tests.TEST_DB_NAME + ";");
+            StatementExecutor executor = new StatementExecutor("DROP DATABASE " + IntegrationTests.TEST_DB_NAME + ";");
             executor.execute(new ExecutionBlock() {
 
                 @Override

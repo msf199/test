@@ -8,7 +8,6 @@ import main.com.whitespell.peak.logic.Safety;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
-import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;

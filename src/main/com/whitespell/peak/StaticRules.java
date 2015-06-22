@@ -60,6 +60,8 @@ public class StaticRules {
         ALREADY_FOLLOWING_CATEGORY(126, "You are already following this category!", HttpStatus.UNAUTHORIZED_401),
         ALREADY_PUBLISHING_CATEGORY(127, "You are already publishing in this category!", HttpStatus.UNAUTHORIZED_401),
         NOT_PUBLISHING_CATEGORY(128, "You are not publishing in this category!", HttpStatus.UNAUTHORIZED_401),
+        USERID_NOT_NUMERIC(129, "User ID In URL is not a numeric value", HttpStatus.BAD_REQUEST_400),
+        USER_NOT_FOUND(130, "User was not found", HttpStatus.NOT_FOUND_404);
         ;
 
         int errorId;
