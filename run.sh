@@ -2,8 +2,8 @@
 
 OUTDIR=$1
 ROOT=$(cd $(dirname $0); pwd)
-CLASSPATH=$ROOT/lib/*:$ROOT/lib/jetty/*:$ROOT/lib/log4j/*
-MAINCLASS=whitespell.Server
+CLASSPATH=$ROOT/lib/*:$ROOT/lib/jetty/*:$ROOT/lib/httpclient/*:$ROOT/lib/log4j/*
+MAINCLASS=main.com.whitespell.peak.Server
 
 cd $OUTDIR
 

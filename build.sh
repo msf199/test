@@ -2,7 +2,7 @@
 
 OUTDIR=$1
 ROOT=$(cd $(dirname $0); pwd)
-CLASSPATH=$ROOT/lib/*:$ROOT/lib/jetty/*:$ROOT/lib/log4j/*
+CLASSPATH=$ROOT/lib/*:$ROOT/lib/jetty/*:$ROOT/lib/httpclient/*:$ROOT/lib/log4j/*
 SRCDIR=$ROOT/src
 
 if [ -z "$OUTDIR" ]; then
@@ -32,5 +32,9 @@ fi
 # The server needs config.prop, install/ddl_master.sql, and errors/ to exist.
 mkdir -p $OUTDIR/errors $OUTDIR/install
 for file in config.prop; do
+  cp -pr $ROOT/$file $OUTDIR/$file
+done
+
+for file in tests.prop; do
   cp -pr $ROOT/$file $OUTDIR/$file
 done
