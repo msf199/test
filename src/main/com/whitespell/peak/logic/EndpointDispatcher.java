@@ -85,10 +85,11 @@ public class EndpointDispatcher extends HttpServlet {
             RequestObject context = new RequestObject(
                     request, response, urlVariables, request.getParameterMap(), null);
 
-            JsonElement payload = null;
+            JsonElement payload;
             try {
                 payload = getPayload(request, response);
             } catch (Exception e) {
+                Logging.log("High", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_VALID_JSON_PAYLOAD);
                 return;
             }
@@ -135,12 +136,11 @@ public class EndpointDispatcher extends HttpServlet {
     private JsonElement getPayload(HttpServletRequest request, HttpServletResponse response)
             throws JsonParseException, IllegalStateException, IOException {
         String body = getBody(request);
-        System.out.println(body);
         return new JsonParser().parse(body);
     }
 
     private String getBody(HttpServletRequest request) throws IOException {
-        return CharStreams.toString(request.getReader());
+        return CharStreams.toString((Readable) request.getInputStream());
     }
 
     /**
