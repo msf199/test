@@ -26,9 +26,6 @@ public class RequestCategories implements EndpointInterface {
 
     @Override
     public void call(final RequestObject context) throws IOException {
-        /**
-         * Get the categories
-         */
         try {
             StatementExecutor executor = new StatementExecutor(GET_CATEGORIES);
             executor.execute(new ExecutionBlock() {

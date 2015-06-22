@@ -14,18 +14,18 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=223 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=225 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
   `category_followers` int(11) DEFAULT '0',
   `category_publishers` int(11) DEFAULT '0',
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;CREATE TABLE `content_type` (
-  `content_type_id` int(11) NOT NULL DEFAULT '0',
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;CREATE TABLE `content_type` (
+  `content_type_id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`content_type_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `content` (
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;CREATE TABLE `content` (
   `content_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `content_type` int(2) DEFAULT '0',

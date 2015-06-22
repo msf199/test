@@ -15,4 +15,11 @@ public class ContentTypeObject {
         this.content_type_name = content_type_name;
     }
 
+    public int getContent_type_id() {
+        return content_type_id;
+    }
+
+    public String getContent_type_name() {
+        return content_type_name;
+    }
 }

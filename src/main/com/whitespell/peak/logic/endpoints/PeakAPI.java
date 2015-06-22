@@ -2,6 +2,7 @@ package main.com.whitespell.peak.logic.endpoints;
 
 import main.com.whitespell.peak.logic.EndpointDispatcher;
 import main.com.whitespell.peak.logic.baseapi.WhitespellAPI;
+import main.com.whitespell.peak.logic.endpoints.authentication.AuthenticationRequest;
 import main.com.whitespell.peak.logic.endpoints.content.AddNewContent;
 import main.com.whitespell.peak.logic.endpoints.content.RequestContent;
 import main.com.whitespell.peak.logic.endpoints.content.categories.AddCategory;
@@ -11,6 +12,7 @@ import main.com.whitespell.peak.logic.endpoints.content.types.RequestContentType
 import main.com.whitespell.peak.logic.endpoints.ping.Ping;
 import main.com.whitespell.peak.logic.endpoints.statistics.GetUserSignups;
 import main.com.whitespell.peak.logic.endpoints.users.*;
+import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -39,11 +41,11 @@ public class PeakAPI extends WhitespellAPI {
 
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsers(), "/users");
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateUser(), "/users");
-        ;
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/?", "user_id");
-        ;
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/?/following", "user_id");
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryFollowAction(), "/users/?/categories", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "user_id"); //always have the variable first
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsersByCategory(), "/users/categories/");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/$/following", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryFollowAction(), "/users/$/categories", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryPublishAction(), "/users/$/publishing", "user_id");
 
         /**
          * STATISTICS
@@ -63,7 +65,7 @@ public class PeakAPI extends WhitespellAPI {
          */
 
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContent(), "/content/");
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/content/?", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/content/$", "user_id");
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentTypes(), "/content/types");
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestCategories(), "/content/categories");

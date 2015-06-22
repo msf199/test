@@ -80,6 +80,7 @@ public class EndpointDispatcher extends HttpServlet {
     private void callHandler(String method, HttpServletRequest request, HttpServletResponse response) throws IOException {
         try {
 
+
             RequestObject context = new RequestObject(
                     request, response, urlVariables, request.getParameterMap(), null);
 

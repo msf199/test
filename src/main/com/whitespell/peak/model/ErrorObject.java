@@ -9,6 +9,23 @@ public class ErrorObject {
 
     String className;
     int httpStatusCode;
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public int getErrorId() {
+        return errorId;
+    }
+
+    public int getHttpStatusCode() {
+        return httpStatusCode;
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
     int errorId;
     String errorMessage;
 

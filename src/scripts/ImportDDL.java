@@ -30,7 +30,7 @@ public class ImportDDL {
 
     public static void main(String[] args) throws Exception {
 
-        Server.start();
+        Server.readConfigs();
 
         System.out.println("Getting tables");
 

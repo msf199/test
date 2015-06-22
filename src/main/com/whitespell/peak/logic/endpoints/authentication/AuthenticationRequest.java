@@ -1,4 +1,4 @@
-package main.com.whitespell.peak.logic.endpoints.users;
+package main.com.whitespell.peak.logic.endpoints.authentication;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -8,6 +8,7 @@ import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
+import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
@@ -133,30 +134,6 @@ public class AuthenticationRequest implements EndpointInterface {
         }
     }
 
-    public class AuthenticationObject {
 
-        String key;
-
-        int user_id;
-
-        long expires = -1;
-
-        public String getKey() {
-            return this.key;
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-
-        public int getUserId() {
-            return this.user_id;
-        }
-
-        public void setUserId(int user_id) {
-            this.user_id = user_id;
-        }
-
-    }
 
 }

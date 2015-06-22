@@ -21,6 +21,7 @@ public class StaticRules {
     public static final int MAX_CONTENT_DESCRIPTION_LENGTH = 100;
     public static final int MIN_AUTHENTICATION_HEADER_LENGTH = 1;
     public static final int MAX_AUTHENTICATION_HEADER_LENGTH = 255;
+    public static final int MAX_PUBLISHING_USER_SELECT = 50;
 
 
     public enum ErrorCodes {
@@ -56,7 +57,10 @@ public class StaticRules {
         DUPLICATE_CATEGORY(123, "The content type already exists", HttpStatus.UNAUTHORIZED_401),
         NO_ENDPOINT_FOUND(124, "There was no endpoint found on this path", HttpStatus.NOT_FOUND_404),
         NOT_VALID_JSON_PAYLOAD(125, "All payloads are expected to be JSON only. The payload you entered was not valid JSON. Use http://jsonlint.com/ to validate your JSON if you are testing.", HttpStatus.BAD_REQUEST_400),
-        ALREADY_FOLLOWING_CATEGORY(126, "You are already following this category!", HttpStatus.UNAUTHORIZED_401),;
+        ALREADY_FOLLOWING_CATEGORY(126, "You are already following this category!", HttpStatus.UNAUTHORIZED_401),
+        ALREADY_PUBLISHING_CATEGORY(127, "You are already publishing in this category!", HttpStatus.UNAUTHORIZED_401),
+        NOT_PUBLISHING_CATEGORY(128, "You are not publishing in this category!", HttpStatus.UNAUTHORIZED_401),
+        ;
 
         int errorId;
         String errorMessage;

@@ -1,21 +1,23 @@
 package main.com.whitespell.peak.logic;
 
+import main.com.whitespell.peak.logic.config.Config;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * The EndpointNode class is part of a tree of nodes and children.
  * Each node can contain an EndpointSpecification (which will be called if the endpoint is called) and can also have children.
- * Each child can be a static word such as 'statistics' or a variable (defined as '?')
+ * Each child can be a static word such as 'statistics' or a variable (defined as '$')
  * <p/>
  * ===== children:
  * GET has a root EndpointNode, for which will for example have children:
  * 1. users, 2. statistics
- * users will then have the children /users/? for a specific user, or /users can also be an endpoint.
+ * users will then have the children /users/$ for a specific user, or /users can also be an endpoint.
  */
 public class EndpointNode {
 
-    // the children of this node, e.g. /users, or /users/?
+    // the children of this node, e.g. /users, or /users/$
     private Map<String, EndpointNode> children;
 
     // the endpoint specification (the handler plus the url variables)
@@ -40,6 +42,11 @@ public class EndpointNode {
      */
     public EndpointResult getBindingForSubPath(String subPath) {
 
+        if(Config.TESTING) {
+            System.out.println("Received call on " + subPath);
+        }
+
+
         String[] pathComponents = subPath.split("/");
 
         EndpointNode current = this;
@@ -56,8 +63,8 @@ public class EndpointNode {
                 current = current.getChildren().get(pathComponent);
 
                 // otherwise it must be a variable if a variable exists.
-            } else if (current.getChildren().containsKey("?")) {
-                current = current.getChildren().get("?");
+            } else if (current.getChildren().containsKey("$")) {
+                current = current.getChildren().get("$");
                 argValues.put(current.getEndpointSpecification().varName, pathComponent);
             } else {
                 return null;
@@ -96,7 +103,7 @@ public class EndpointNode {
                 current.setEndpointSpecification(endpointSpecification);
             }
 
-            if (pathComponents[i].equals("?")) {
+            if (pathComponents[i].equals("$")) {
                 // set the name of the variable in the current endpoint specification, even if no interface exists, always incremental
 
                 if (current.getEndpointSpecification() == null) {

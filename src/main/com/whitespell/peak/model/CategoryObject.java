@@ -6,6 +6,25 @@ package main.com.whitespell.peak.model;
  *         whitespell.model
  */
 public class CategoryObject {
+    public int getCategory_id() {
+        return category_id;
+    }
+
+    public String getCategory_name() {
+        return category_name;
+    }
+
+    public String getCategory_thumbnail() {
+        return category_thumbnail;
+    }
+
+    public int getCategory_followers() {
+        return category_followers;
+    }
+
+    public int getCategory_publishers() {
+        return category_publishers;
+    }
 
     int category_id;
     String category_name;

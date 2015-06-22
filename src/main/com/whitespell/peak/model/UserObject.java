@@ -11,6 +11,7 @@ public class UserObject {
 
     public ArrayList<String> user_following = new ArrayList<>();
     public ArrayList<String> category_following = new ArrayList<>();
+    public ArrayList<String> category_publishing = new ArrayList<>();
     int user_id;
     String username;
     String email;

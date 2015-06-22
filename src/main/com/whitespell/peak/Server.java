@@ -1,5 +1,9 @@
 package main.com.whitespell.peak;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.logic.ApiThread;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.config.ServerProperties;
@@ -39,6 +43,7 @@ public class Server {
         apiThread.start();
     }
 
+
     public static void readConfigs() {
         systemProperties = new ServerProperties(Config.CONFIGURATION_FILE);
         ServerProperties.read();
@@ -46,7 +51,6 @@ public class Server {
             System.setErr(new PrintStream(new Logging.ErrorFile(), true));
         } catch (Exception e) {
             System.out.println("Error was thrown with config.prop config. Switching to this dir for errors");
-            Logging.log("SEVERE", e);
             try {
                 System.setErr(new PrintStream(new Logging.ErrorFile("."), true));
             } catch (FileNotFoundException e1) {
