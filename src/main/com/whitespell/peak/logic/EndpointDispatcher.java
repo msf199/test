@@ -87,7 +87,7 @@ public class EndpointDispatcher extends HttpServlet {
             JsonElement payload = null;
             try {
                 payload = getPayload(request, response);
-            } catch (JsonParseException e) {
+            } catch (Exception e) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_VALID_JSON_PAYLOAD);
                 return;
             }
