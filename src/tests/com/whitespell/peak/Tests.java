@@ -63,6 +63,13 @@ public class Tests extends Server {
     HttpResponse<String> stringResponse = null;
     HttpResponse<JsonNode> jsonResponse = null;
 
+    public static void main(String[] args) {
+        Config.TESTING = true;
+        Config.CONFIGURATION_FILE = "tests.prop";
+        Server.start();
+        API = "http://localhost:" + Config.API_PORT;
+    }
+
     @Test
     public void startTests() throws Exception {
 
