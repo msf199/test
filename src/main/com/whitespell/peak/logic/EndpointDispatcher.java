@@ -6,7 +6,6 @@ import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.logging.Logging;
-import org.apache.commons.codec.binary.Base64;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
