@@ -24,7 +24,7 @@ public class GetUsersByCategory implements EndpointInterface {
 
 
     private static final String GET_PUBLISHERS_BY_CATEGORY = "" +
-            "SELECT DISTINCT user.user_id, user.username, user.thumbnail, category_id FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id WHERE `category_id` = ? ORDER BY `category_id` LIMIT 30";
+            "SELECT DISTINCT user.user_id, user.username, user.thumbnail, category_id FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id WHERE `category_id` = ? ORDER BY `category_id` GROUP BY `user_id`,`category_id` LIMIT 30";
 
     @Override
     public void call(final RequestObject context) throws IOException {
