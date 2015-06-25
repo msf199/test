@@ -22,10 +22,6 @@ import java.util.ArrayList;
  */
 public class GetUsersByCategory implements EndpointInterface {
 
-
-    private static final String GET_PUBLISHERS_BY_CATEGORY = "" +
-            "SELECT DISTINCT user.user_id, user.username, user.thumbnail, category_id FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id WHERE `category_id` = ? ORDER BY `category_id` GROUP BY `user_id`,`category_id` LIMIT 30";
-
     @Override
     public void call(final RequestObject context) throws IOException {
         try {
@@ -76,7 +72,7 @@ public class GetUsersByCategory implements EndpointInterface {
             }
 
             StatementExecutor executor = new StatementExecutor("" +
-                    "SELECT user.user_id, user.username, user.thumbnail, category_id FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id " +
+                    "SELECT DISTINCT user.user_id, category_id, user.username, user.thumbnail FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id " +
                     whereString.toString() +
                     "ORDER BY `category_id` LIMIT " + limit + "");
             executor.execute(new ExecutionBlock() {
