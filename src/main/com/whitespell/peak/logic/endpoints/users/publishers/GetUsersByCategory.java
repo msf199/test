@@ -29,7 +29,7 @@ public class GetUsersByCategory extends EndpointHandler {
     @Override
     protected void setUserInputs() {
         parameterInput.put(PARAMETERS_LIMT_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        parameterInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
     @Override
