@@ -36,7 +36,7 @@ public class Authentication {
 
             String[] tempHeader = authenticationHeader.split(",");
 
-            if (tempHeader.length != 2 || !Safety.isNumeric(tempHeader[0]) || tempHeader[1].length() < StaticRules.MIN_AUTHENTICATION_HEADER_LENGTH || tempHeader[1].length() > StaticRules.MAX_AUTHENTICATION_HEADER_LENGTH) {
+            if (tempHeader.length != 2 || !Safety.isInteger(tempHeader[0]) || tempHeader[1].length() < StaticRules.MIN_AUTHENTICATION_HEADER_LENGTH || tempHeader[1].length() > StaticRules.MAX_AUTHENTICATION_HEADER_LENGTH) {
                 userId = -1;
                 key = null;
             } else {
@@ -48,7 +48,7 @@ public class Authentication {
     }
 
     /**
-     * Check whether the user doing an API call is authenticated properly
+     * Check whether the user doing an API safeCall is authenticated properly
      *
      * @return whether the user is authenticated or not.
      */

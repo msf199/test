@@ -18,8 +18,6 @@ public class Filters implements Filter {
 
     /**
      * doFilter adds the required filters for the API to function as an API.
-     * It also handles the session checking and creation, and gives out a Request ID for each request
-     * so that a request response for an ad can be mapped to a websocket connection.
      *
      * @param servletRequest  The request we're dealing with
      * @param servletResponse The response we're generating
@@ -40,7 +38,7 @@ public class Filters implements Filter {
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Origin", "*");
         ((HttpServletResponse) servletResponse).addHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, x-Authentication");
         ((HttpServletResponse) servletResponse).addHeader("Server", "Whitespell Server");
-        ((HttpServletResponse) servletResponse).addHeader("WWW-Authenticate", "Basic realm=\"0\"");
+        //((HttpServletResponse) servletResponse).addHeader("WWW-Authenticate", "Basic realm=\"0\"");
         servletResponse.setContentType("application/json");
         filterChain.doFilter(servletRequest, servletResponse);
     }

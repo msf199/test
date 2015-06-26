@@ -1,7 +1,7 @@
 package main.com.whitespell.peak.logic.endpoints.content;
 
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -19,22 +19,23 @@ import java.util.List;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class RequestContent implements EndpointInterface {
+public class RequestContent extends EndpointHandler {
+
+    private static final String URL_USER_ID_KEY = "user_id";
+
+    @Override
+    protected void setUserInputs() {
+        urlInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+    }
+
 
     private static final String SELECT_FOLLOWING_IDS_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `content` WHERE `user_id` = ?";
 
     @Override
-    public void call(RequestObject context) throws IOException {
+    public void safeCall(RequestObject context) throws IOException {
         String context_user_id = context.getUrlVariables().get("user_id");
 
-        /**
-         * Check that the user id is valid.
-         */
-        if (!main.com.whitespell.peak.logic.Safety.isNumeric(context_user_id)) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
 
         final int user_id = Integer.parseInt(context_user_id);
         final List<Integer> followedIds = new ArrayList<>();

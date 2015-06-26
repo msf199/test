@@ -1,7 +1,7 @@
 package main.com.whitespell.peak.logic.endpoints.content.categories;
 
 import com.google.gson.Gson;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -19,13 +19,13 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class RequestCategories implements EndpointInterface {
+public class RequestCategories extends EndpointHandler {
 
 
     private static final String GET_CATEGORIES = "SELECT * FROM `category`";
 
     @Override
-    public void call(final RequestObject context) throws IOException {
+    public void safeCall(final RequestObject context) throws IOException {
         try {
             StatementExecutor executor = new StatementExecutor(GET_CATEGORIES);
             executor.execute(new ExecutionBlock() {
@@ -56,5 +56,10 @@ public class RequestCategories implements EndpointInterface {
         } catch (SQLException e) {
             Logging.log("High", e);
         }
+    }
+
+    @Override
+    protected void setUserInputs() {
+
     }
 }

@@ -33,30 +33,48 @@ public class PeakAPI extends WhitespellAPI {
         /**
          * PING
          */
+
+        // Simple ping reques that returns true.
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Ping(), "/ping");
 
         /**
          * USERS ENDPOINTS (TREE ORDER)
          */
 
+        // get the list of users based on search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsers(), "/users");
+
+        // add a new user (create account)
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateUser(), "/users");
+
+        // Get a specific user based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "user_id"); //always have the variable first
+
+        // get all the users sorted by categories (also takes in same search criteria as /users)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsersByCategory(), "/users/categories/");
+
+        // Follow a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/$/following", "user_id");
+
+        // Follow a category
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryFollowAction(), "/users/$/categories", "user_id");
+
+        // Publish in a category
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryPublishAction(), "/users/$/publishing", "user_id");
 
         /**
          * STATISTICS
          */
 
+        // Get some sign up data
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSignups(), "/statistics/signups");
 
         /**
          * AUTHENTICATION
          */
 
+        //todo move auth under users
+        //Authenticate a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication");
 
 
@@ -64,12 +82,29 @@ public class PeakAPI extends WhitespellAPI {
          * CONTENT
          */
 
+        // Get a list of all the content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContent(), "/content/");
+
+        // Add new content as a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/content/$", "user_id");
+
+        // Get a list of all the content types
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentTypes(), "/content/types");
+
+        // Add a new content type
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestCategories(), "/content/categories");
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddCategory(), "/content/categories");
+
+        /**
+         * CATEGORIES
+         */
+
+        // Get a list of all the categories
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestCategories(), "/categories");
+
+        // Add a new category
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddCategory(), "/categories");
+
+
 
     }
 

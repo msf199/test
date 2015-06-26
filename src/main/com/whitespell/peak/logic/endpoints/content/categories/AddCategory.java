@@ -3,7 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.content.categories;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -18,15 +18,28 @@ import java.sql.SQLException;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class AddCategory implements EndpointInterface {
+public class AddCategory extends EndpointHandler {
 
     private static final String INSERT_CATEGORY_QUERY = "INSERT INTO `category`(`category_name`, `category_thumbnail`) VALUES (?,?)";
 
+    /**
+     * Define user input variables
+     */
+
+    private static final String PAYLOAD_CATEGORY_NAME_ = "category_name";
+    private static final String PAYLOAD_CATEGORY_THUMBNAIL = "category_thumbnail";
+
     @Override
-    public void call(RequestObject context) throws IOException {
+    protected void setUserInputs() {
+        payloadInput.put(PAYLOAD_CATEGORY_NAME_, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CATEGORY_THUMBNAIL, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
+
+
+    @Override
+    public void safeCall(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
-        System.out.println(payload.toString());
         /**
          * Check that the user id and content is valid.
          */

@@ -30,7 +30,7 @@ public class EndpointDispatcher extends HttpServlet {
      * @param pathSpec     is the path the handler is called on, e.g. /users/{user_id}/categories
      */
 
-    public void addHandler(RequestType type, EndpointInterface apiInterface, String pathSpec, String... argNames) {
+    public void addHandler(RequestType type, EndpointHandler apiInterface, String pathSpec, String... argNames) {
         EndpointSpecification spec = new EndpointSpecification(apiInterface);
         switch (type) {
             case GET:
@@ -102,9 +102,25 @@ public class EndpointDispatcher extends HttpServlet {
 
 
             EndpointNode.EndpointResult result = apiStructure.getBindingForSubPath(request.getPathInfo());
-            if (result != null) {
+            if (result != null && result.getEndpointSpec() != null && result.getEndpointSpec().getEndpointInterface() != null) {
                 urlVariables.putAll(result.getArgValues());
-                result.getEndpointSpec().apiInterface.call(context);
+
+                // check the input and match it with the API interface keys before calling the handler.
+
+                try {
+                    // only check payload if a payload is expected
+                    if(result.getEndpointSpec().getEndpointInterface().getPayloadInput().size() > 0) {
+                        Safety.checkPayload(result.getEndpointSpec().getEndpointInterface().getPayloadInput(), context.getPayload());
+                    }
+
+                    Safety.checkParameterInput(result.getEndpointSpec().getEndpointInterface().getParameterInput(), context.getParameterMap());
+                    Safety.checkUrlInput(result.getEndpointSpec().getEndpointInterface().getUrlInput(), context.getUrlVariables());
+                } catch(InputNotValidException p) {
+                    context.throwHttpError(result.getEndpointSpec().getEndpointInterface().getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND,
+                            p.getDetailMessage());
+                    return;
+                }
+                result.getEndpointSpec().getEndpointInterface().safeCall(context);
             } else {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_ENDPOINT_FOUND);
                 return;

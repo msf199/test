@@ -3,7 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -24,16 +24,29 @@ import java.sql.SQLException;
  *         https://docs.google.com/document/d/1j62zQ3AIfh7XW0nbftRy_hNXTAnhy5r48yBRHm7kYZA/edit
  */
 
-public class CreateUser implements EndpointInterface {
+public class CreateUser extends EndpointHandler {
 
     private static final String INSERT_USER_QUERY = "INSERT INTO `user`(`password`, `email`, `username`, `publisher`) " +
             "VALUES (?,?,?,?)";
+
+    private static final String PAYLOAD_USERNAME_KEY = "username";
+    private static final String PAYLOAD_PASSWORD_KEY = "password";
+    private static final String PAYLOAD_EMAIL_KEY = "email";
+
+    @Override
+    protected void setUserInputs() {
+
+        payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
+
 
     private static final String CHECK_USERNAME_QUERY = "SELECT `user_id` FROM `user` WHERE `username` = ? LIMIT 1";
     private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `user` WHERE `username` = ? OR `email` = ? LIMIT 1";
 
     @Override
-    public void call(final RequestObject context) throws IOException {
+    public void safeCall(final RequestObject context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
 
@@ -51,11 +64,6 @@ public class CreateUser implements EndpointInterface {
          * 400 Bad Request: Check if all data is valid
          */
 
-        // Check if all parameters are present and contain the right characters, if not throw a 400
-        if (payload == null || payload.get("username") == null || payload.get("email") == null || payload.get("password") == null) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        } else {
             username = payload.get("username").getAsString();
             password = payload.get("password").getAsString();
             email = payload.get("email").getAsString();
@@ -64,29 +72,9 @@ public class CreateUser implements EndpointInterface {
                 publisher = 1;
             }
 
-            // check against lengths for security and UX reasons.
 
-            //check if values are too long
-            if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
-                return;
-            } else if (email.length() > StaticRules.MAX_EMAIL_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOO_LONG);
-                return;
-            } else if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
-                return;
-            } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
-                return;
-            } else if (email.length() < StaticRules.MIN_EMAIL_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOO_SHORT);
-                return;
-            } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
-                return;
-            }
-        }
+
+
 
         /**
          * //todo(pim) set off email to a separate email checker thread that validates the email through mailserver checks and such.

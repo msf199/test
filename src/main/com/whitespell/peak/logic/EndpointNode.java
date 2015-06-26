@@ -43,7 +43,7 @@ public class EndpointNode {
     public EndpointResult getBindingForSubPath(String subPath) {
 
         if(Config.TESTING) {
-            System.out.println("Received call on " + subPath);
+            System.out.println("Received safeCall on " + subPath);
         }
 
 

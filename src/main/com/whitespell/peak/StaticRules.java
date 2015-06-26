@@ -9,6 +9,10 @@ import org.eclipse.jetty.http.HttpStatus;
  */
 public class StaticRules {
 
+
+
+    /** Old input checking system */
+
     public static final int MIN_USERNAME_LENGTH = 1;
     public static final int MAX_USERNAME_LENGTH = 30;
     public static final int MIN_EMAIL_LENGTH = 6;
@@ -22,6 +26,7 @@ public class StaticRules {
     public static final int MIN_AUTHENTICATION_HEADER_LENGTH = 1;
     public static final int MAX_AUTHENTICATION_HEADER_LENGTH = 255;
     public static final int MAX_PUBLISHING_USER_SELECT = 50;
+
 
 
     public enum ErrorCodes {
@@ -84,6 +89,39 @@ public class StaticRules {
 
         public int getHttpStatusCode() {
             return this.httpStatusCode;
+        }
+    }
+
+    public enum InputTypes {
+        REG_INT_REQUIRED("int", true, 1,Integer.MAX_VALUE), REG_STRING_REQUIRED("string", true, 1,255), REG_INT_OPTIONAL("int", false, 1,Integer.MAX_VALUE), REG_STRING_OPTIONAL("string", false, 1,255);
+
+        private final String type;
+        private final boolean isRequired;
+        private final int minLength;
+        private final int maxLength;
+
+        InputTypes(String type, boolean isRequired, int minLength, int maxLength) {
+            this.type = type;
+            this.isRequired = isRequired;
+            this.minLength = minLength;
+            this.maxLength = maxLength;
+        }
+
+
+        public int getMinLength() {
+            return minLength;
+        }
+
+        public int getMaxLength() {
+            return maxLength;
+        }
+
+        public boolean isRequired() {
+            return isRequired;
+        }
+
+        public String getType() {
+            return type;
         }
     }
 }

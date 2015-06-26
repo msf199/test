@@ -250,7 +250,7 @@ public class IntegrationTests extends Server {
 
     @Test
     public void categoriesTest() throws UnirestException {
-        Unirest.post("http://localhost:" + Config.API_PORT + "/content/categories")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"category_name\": \"skydiving\",\n" +
@@ -258,7 +258,7 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
 
-        Unirest.post("http://localhost:" + Config.API_PORT + "/content/categories")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"category_name\": \"roller-skating\",\n" +
@@ -266,7 +266,7 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/categories")
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .asString();
 
@@ -313,7 +313,7 @@ public class IntegrationTests extends Server {
         SKYDIVER_UID = skydiver.getUserId();
 
         //todo(pim) authenticate as user
-        //todo(pim) call to publish in this category
+        //todo(pim) safeCall to publish in this category
 
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")

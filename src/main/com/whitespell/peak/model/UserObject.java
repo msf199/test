@@ -9,9 +9,22 @@ import java.util.ArrayList;
  */
 public class UserObject {
 
+    /**
+     * A list of the users this user is following
+     */
     public ArrayList<String> user_following = new ArrayList<>();
+
+    /**
+     * A list of the categories this user is following
+     */
     public ArrayList<String> category_following = new ArrayList<>();
+
+
+    /**
+     * A list of the categories this user is publishing in
+     */
     public ArrayList<String> category_publishing = new ArrayList<>();
+
     int user_id;
     String username;
     String email;

@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -23,46 +23,36 @@ import java.util.Date;
  *         5/4/2015
  *         whitespell.model
  */
-public class UserFollowAction implements EndpointInterface {
+public class UserFollowAction extends EndpointHandler {
 
-    private static final String FOLLOWING_USER_ID_KEY = "following_id";
-    private static final String ACTION_KEY = "action";
+    private static final String PAYLOAD_FOLLOWING_USER_ID_KEY = "following_id";
+    private static final String PAYLOAD_ACTION_KEY = "action";
+    private static final String URL_USER_ID_KEY = "action";
+
+    @Override
+    protected void setUserInputs() {
+        urlInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_FOLLOWING_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_ACTION_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
+
 
     private static final String CHECK_FOLLOWING_QUERY = "SELECT 1 FROM `user_following` WHERE `user_id` = ? AND `following_id` = ? LIMIT 1";
-
     private static final String INSERT_FOLLOW_QUERY = "INSERT INTO `user_following`(`user_id`, `following_id`, `timestamp`) VALUES (?,?,?)";
     private static final String DELETE_FOLLOWED_QUERY = "DELETE FROM `user_following` WHERE `user_id` = ? AND `following_id` = ?";
 
     @Override
-    public void call(RequestObject context) throws IOException {
-        String context_user_id = context.getUrlVariables().get("user_id");
+    public void safeCall(RequestObject context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
 
-        /**
-         * Check that the user id, following id, and action are valid.
-         */
-        if (!main.com.whitespell.peak.logic.Safety.isNumeric(context_user_id) || payload.get(FOLLOWING_USER_ID_KEY) == null || !main.com.whitespell.peak.logic.Safety.isNumeric(payload.get(FOLLOWING_USER_ID_KEY).getAsString()) || payload.get(ACTION_KEY) == null) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
-
-
-        String following_user_string = payload.get(FOLLOWING_USER_ID_KEY).getAsString();
+        String following_user_string = payload.get(PAYLOAD_FOLLOWING_USER_ID_KEY).getAsString();
 
         //local variables
-        final int user_id = Integer.parseInt(context_user_id);
+        final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID_KEY));
         final int following_user_id = Integer.parseInt(following_user_string);
-        final String action = payload.get(ACTION_KEY).getAsString();
+        final String action = payload.get(PAYLOAD_ACTION_KEY).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
-
-        /**
-         * Check that the user id and following user id are valid (>= 0 && <= Integer.MAX_VALUE).
-         */
-        if (!main.com.whitespell.peak.logic.Safety.isValidUserId(user_id) || !main.com.whitespell.peak.logic.Safety.isValidUserId(following_user_id)) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
 
         /**
          * Check that the action being performed is valid.

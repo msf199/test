@@ -1,7 +1,7 @@
 package main.com.whitespell.peak.logic.endpoints.content.types;
 
 import com.google.gson.Gson;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -19,13 +19,13 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class RequestContentTypes implements EndpointInterface {
+public class RequestContentTypes extends EndpointHandler {
 
 
     private static final String GET_CONTENT_TYPES = "SELECT * FROM `content_type`";
 
     @Override
-    public void call(final RequestObject context) throws IOException {
+    public void safeCall(final RequestObject context) throws IOException {
         /**
          * Get the content types
          */
@@ -59,6 +59,11 @@ public class RequestContentTypes implements EndpointInterface {
         } catch (SQLException e) {
             Logging.log("High", e);
         }
+    }
+
+    @Override
+    protected void setUserInputs() {
+
     }
 
 }

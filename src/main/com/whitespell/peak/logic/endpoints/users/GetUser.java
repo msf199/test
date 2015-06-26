@@ -3,9 +3,8 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
-import main.com.whitespell.peak.logic.Safety;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -15,34 +14,29 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         1/20/15
  *         whitespell.model
  */
-public class GetUser implements EndpointInterface {
+public class GetUser extends EndpointHandler {
 
 
     private static final String GET_USER = "SELECT `user_id`, `username`, `thumbnail` FROM `user` WHERE `user_id` = ?";
 
+    private static final String URL_USER_ID = "user_id";
+
     @Override
-    public void call(final RequestObject context) throws IOException {
+    protected void setUserInputs() {
+        urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+    }
 
-        String user_id_str = context.getUrlVariables().get("user_id");
-        int user_id = -1;
+    @Override
+    public void safeCall(final RequestObject context) throws IOException {
 
-        if(user_id_str == null) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
+        int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
 
-        if(Safety.isNumeric(user_id_str)) {
-            user_id = Integer.parseInt(user_id_str);
-        } else {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERID_NOT_NUMERIC);
-        }
 
         /**
          * Ensure that the user is authenticated properly
@@ -91,5 +85,6 @@ public class GetUser implements EndpointInterface {
         }
 
     }
+
 
 }
