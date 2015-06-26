@@ -23,23 +23,18 @@ import java.util.ArrayList;
 public class GetUsersByCategory extends EndpointHandler {
 
 
-    private static final String PAYLOAD_CATEGORY_ID_KEY = "categories";
-    private static final String PARAMETERS_LIMT_KEY = "limit";
+    private static final String PARAMETER_CATEGORY_ID_KEY = "categories";
+    private static final String PARAMETER_LIMIT_KEY = "limit";
 
     @Override
     protected void setUserInputs() {
-        parameterInput.put(PARAMETERS_LIMT_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        parameterInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        parameterInput.put(PARAMETER_LIMIT_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        parameterInput.put(PARAMETER_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
         try {
-
-            if (context.getParameterMap().get("categories") == null) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-                return;
-            }
 
             /**
              * Object limits
