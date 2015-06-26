@@ -23,7 +23,7 @@ import java.util.Date;
  *         5/4/2015
  *         whitespell.model
  */
-public class UserFollowAction implements EndpointInterface {
+public class UserFollowAction extends EndpointInterface {
 
     private static final String FOLLOWING_USER_ID_KEY = "following_id";
     private static final String ACTION_KEY = "action";
@@ -42,7 +42,7 @@ public class UserFollowAction implements EndpointInterface {
         /**
          * Check that the user id, following id, and action are valid.
          */
-        if (!main.com.whitespell.peak.logic.Safety.isNumeric(context_user_id) || payload.get(FOLLOWING_USER_ID_KEY) == null || !main.com.whitespell.peak.logic.Safety.isNumeric(payload.get(FOLLOWING_USER_ID_KEY).getAsString()) || payload.get(ACTION_KEY) == null) {
+        if (!main.com.whitespell.peak.logic.Safety.isInteger(context_user_id) || payload.get(FOLLOWING_USER_ID_KEY) == null || !main.com.whitespell.peak.logic.Safety.isInteger(payload.get(FOLLOWING_USER_ID_KEY).getAsString()) || payload.get(ACTION_KEY) == null) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
@@ -55,14 +55,6 @@ public class UserFollowAction implements EndpointInterface {
         final int following_user_id = Integer.parseInt(following_user_string);
         final String action = payload.get(ACTION_KEY).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
-
-        /**
-         * Check that the user id and following user id are valid (>= 0 && <= Integer.MAX_VALUE).
-         */
-        if (!main.com.whitespell.peak.logic.Safety.isValidUserId(user_id) || !main.com.whitespell.peak.logic.Safety.isValidUserId(following_user_id)) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
 
         /**
          * Check that the action being performed is valid.

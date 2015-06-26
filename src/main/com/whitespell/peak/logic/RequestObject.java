@@ -2,6 +2,7 @@ package main.com.whitespell.peak.logic;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.model.ErrorObject;
@@ -9,6 +10,7 @@ import main.com.whitespell.peak.model.ErrorObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -82,4 +84,6 @@ public class RequestObject {
     public void throwHttpError(String className, StaticRules.ErrorCodes error) {
         throwHttpError(className, error, error.getErrorMessage());
     }
+
+
 }

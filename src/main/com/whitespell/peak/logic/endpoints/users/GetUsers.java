@@ -19,7 +19,7 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class GetUsers implements EndpointInterface {
+public class GetUsers extends EndpointInterface {
 
 
     private static final String GET_USERS = "SELECT `user_id`, `username`, `thumbnail` FROM `user`";

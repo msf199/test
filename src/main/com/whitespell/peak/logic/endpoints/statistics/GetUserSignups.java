@@ -18,7 +18,7 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class GetUserSignups implements EndpointInterface {
+public class GetUserSignups extends EndpointInterface {
 
 
     private static final String GET_SIGNUP_DATASET = "SELECT COUNT(1) as count, DATE(`registration_timestamp_utc`) as day FROM `user` GROUP BY DAY(`registration_timestamp_utc`)";

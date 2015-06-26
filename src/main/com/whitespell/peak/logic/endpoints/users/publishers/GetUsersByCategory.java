@@ -20,7 +20,7 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class GetUsersByCategory implements EndpointInterface {
+public class GetUsersByCategory extends EndpointInterface {
 
     @Override
     public void call(final RequestObject context) throws IOException {
@@ -39,7 +39,7 @@ public class GetUsersByCategory implements EndpointInterface {
 
             if (context.getParameterMap().get("limit") != null) {
                 String limitString = context.getParameterMap().get("limit").toString();
-                if (Safety.isNumeric(limitString)) {
+                if (Safety.isInteger(limitString)) {
                     int limitProposed = Integer.parseInt(limitString);
                     if (limitProposed > StaticRules.MAX_PUBLISHING_USER_SELECT) {
                         limit = StaticRules.MAX_PUBLISHING_USER_SELECT;
@@ -54,12 +54,12 @@ public class GetUsersByCategory implements EndpointInterface {
              * Construct the WHERE string based on the categories.
              */
 
-            String[] categories_str = context.getParameterMap().get("categories")[0].split(",");
+            String[] categories_str = context.getParameterMap().get("categories")[0].split(","); //todo(pim) make more safe with same system we used for JSON payloads.
 
             StringBuilder whereString = new StringBuilder();
             for (int i = 0; i < categories_str.length; i++) {
 
-                if (!Safety.isNumeric(categories_str[i])) {
+                if (!Safety.isInteger(categories_str[i])) {
                     continue;
                 }
 

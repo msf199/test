@@ -19,7 +19,7 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class RequestContentTypes implements EndpointInterface {
+public class RequestContentTypes extends EndpointInterface {
 
 
     private static final String GET_CONTENT_TYPES = "SELECT * FROM `content_type`";

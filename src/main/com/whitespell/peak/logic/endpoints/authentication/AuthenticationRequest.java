@@ -23,7 +23,7 @@ import java.sql.SQLException;
  *         1/20/15
  *         whitespell.model
  */
-public class AuthenticationRequest implements EndpointInterface {
+public class AuthenticationRequest extends EndpointInterface {
 
 
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";

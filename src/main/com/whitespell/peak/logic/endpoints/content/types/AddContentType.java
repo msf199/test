@@ -18,7 +18,7 @@ import java.sql.SQLException;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class AddContentType implements EndpointInterface {
+public class AddContentType extends EndpointInterface {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_type`(`content_type_name`) VALUES (?)";
 

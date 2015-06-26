@@ -19,7 +19,7 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class RequestCategories implements EndpointInterface {
+public class RequestCategories extends EndpointInterface {
 
 
     private static final String GET_CATEGORIES = "SELECT * FROM `category`";

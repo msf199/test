@@ -15,14 +15,13 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         1/20/15
  *         whitespell.model
  */
-public class GetUser implements EndpointInterface {
+public class GetUser extends EndpointInterface {
 
 
     private static final String GET_USER = "SELECT `user_id`, `username`, `thumbnail` FROM `user` WHERE `user_id` = ?";
@@ -38,7 +37,7 @@ public class GetUser implements EndpointInterface {
             return;
         }
 
-        if(Safety.isNumeric(user_id_str)) {
+        if(Safety.isInteger(user_id_str)) {
             user_id = Integer.parseInt(user_id_str);
         } else {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERID_NOT_NUMERIC);

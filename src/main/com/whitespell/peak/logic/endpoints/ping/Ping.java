@@ -16,7 +16,7 @@ import java.io.IOException;
  * Simple ping endpoint to ensure the server is online. In the future we will add things such as
  * Request in the last minute.. etc.
  */
-public class Ping implements EndpointInterface {
+public class Ping extends EndpointInterface {
 
     @Override
     public void call(final RequestObject context) throws IOException {

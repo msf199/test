@@ -18,7 +18,7 @@ import java.sql.SQLException;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class AddCategory implements EndpointInterface {
+public class AddCategory extends EndpointInterface {
 
     private static final String INSERT_CATEGORY_QUERY = "INSERT INTO `category`(`category_name`, `category_thumbnail`) VALUES (?,?)";
 

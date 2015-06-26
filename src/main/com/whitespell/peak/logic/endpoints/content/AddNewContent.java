@@ -20,7 +20,7 @@ import java.util.Date;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class AddNewContent implements EndpointInterface {
+public class AddNewContent extends EndpointInterface {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `timestamp`) VALUES (?,?,?,?,?,?)";
 
@@ -33,7 +33,7 @@ public class AddNewContent implements EndpointInterface {
         /**
          * Check that the user id and content is valid.
          */
-        if (!main.com.whitespell.peak.logic.Safety.isNumeric(context_user_id) || payload.get("content_type") == null || payload.get("content_url") == null || payload.get("content_title") == null || payload.get("content_description") == null) {
+        if (!main.com.whitespell.peak.logic.Safety.isInteger(context_user_id) || payload.get("content_type") == null || payload.get("content_url") == null || payload.get("content_title") == null || payload.get("content_description") == null) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
@@ -49,13 +49,7 @@ public class AddNewContent implements EndpointInterface {
         //todo(pim) last_comment
         //todo(pim) content_category
 
-        /**
-         * Check that the user id is valid (>= 0 && <= Integer.MAX_VALUE), and content type and description are of-length.
-         */
-        if (!main.com.whitespell.peak.logic.Safety.isValidUserId(user_id)) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
+
         if (content_type.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
             return;

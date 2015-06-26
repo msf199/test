@@ -19,7 +19,7 @@ import java.util.List;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class RequestContent implements EndpointInterface {
+public class RequestContent extends EndpointInterface {
 
     private static final String SELECT_FOLLOWING_IDS_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `content` WHERE `user_id` = ?";
@@ -31,7 +31,7 @@ public class RequestContent implements EndpointInterface {
         /**
          * Check that the user id is valid.
          */
-        if (!main.com.whitespell.peak.logic.Safety.isNumeric(context_user_id)) {
+        if (!main.com.whitespell.peak.logic.Safety.isInteger(context_user_id)) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }

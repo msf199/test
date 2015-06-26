@@ -24,7 +24,7 @@ import java.sql.SQLException;
  *         https://docs.google.com/document/d/1j62zQ3AIfh7XW0nbftRy_hNXTAnhy5r48yBRHm7kYZA/edit
  */
 
-public class CreateUser implements EndpointInterface {
+public class CreateUser extends EndpointInterface {
 
     private static final String INSERT_USER_QUERY = "INSERT INTO `user`(`password`, `email`, `username`, `publisher`) " +
             "VALUES (?,?,?,?)";
