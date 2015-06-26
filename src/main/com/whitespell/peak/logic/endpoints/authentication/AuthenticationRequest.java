@@ -30,7 +30,6 @@ public class AuthenticationRequest extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-
         payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
