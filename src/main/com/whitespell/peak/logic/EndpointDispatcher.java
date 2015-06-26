@@ -119,6 +119,9 @@ public class EndpointDispatcher extends HttpServlet {
                     context.throwHttpError(result.getEndpointSpec().getEndpointInterface().getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND,
                             p.getDetailMessage());
                     return;
+                } catch(Exception e) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE, e.getMessage());
+                    return;
                 }
                 result.getEndpointSpec().getEndpointInterface().safeCall(context);
             } else {

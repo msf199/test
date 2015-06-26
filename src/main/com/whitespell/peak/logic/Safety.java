@@ -137,7 +137,7 @@ public class Safety {
              * Check whether key is found
              */
 
-            if (parameterMap.get(key)[0] == null && inputKeyTypeMap.get(key).isRequired()) {
+            if (parameterMap.get(key) == null && inputKeyTypeMap.get(key).isRequired()) {
                 throw new InputNotValidException("Required key "+key+" was not found in the payload.");
             }
 
