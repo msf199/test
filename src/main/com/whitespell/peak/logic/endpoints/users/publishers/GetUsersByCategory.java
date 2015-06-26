@@ -23,13 +23,13 @@ import java.util.ArrayList;
 public class GetUsersByCategory extends EndpointHandler {
 
 
-    private static final String PAYLOAD_CATEGORY_ID_KEY = "categories";
+    private static final String PARAMETER_CATEGORY_ID_KEY = "categories";
     private static final String PARAMETER_LIMIT_KEY = "limit";
 
     @Override
     protected void setUserInputs() {
         parameterInput.put(PARAMETER_LIMIT_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
-        parameterInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        parameterInput.put(PARAMETER_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
     @Override

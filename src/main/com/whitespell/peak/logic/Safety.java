@@ -7,6 +7,7 @@ import main.com.whitespell.peak.StaticRules;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,10 +83,13 @@ public class Safety {
              * Check whether key is found
              */
 
-            if (payload.get(key) == null && inputKeyTypeMap.get(key).isRequired()) {
-                throw new InputNotValidException("Required key "+key+" was not found in the payload.");
+            if (payload.get(key) == null) {
+                if(inputKeyTypeMap.get(key).isRequired()) {
+                    throw new InputNotValidException("Required key " + key + " was not found in the payload.");
+                } else {
+                    continue;
+                }
             }
-
             /**
              * Check against integer value
              */
@@ -137,8 +141,12 @@ public class Safety {
              * Check whether key is found
              */
 
-            if (parameterMap.get(key) == null && inputKeyTypeMap.get(key).isRequired()) {
-                throw new InputNotValidException("Required key "+key+" was not found in the payload.");
+            if (parameterMap.get(key) == null) {
+                if(inputKeyTypeMap.get(key).isRequired()) {
+                    throw new InputNotValidException("Required key " + key + " was not found in the payload.");
+                } else {
+                    continue;
+                }
             }
 
             /** Check against values **/
@@ -150,7 +158,9 @@ public class Safety {
                  * Check against valid integer value
                  */
 
-                if (inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_REQUIRED && !Safety.isInteger(parameterMap.get(key)[0])
+            System.out.println(key + " ->" + Arrays.toString(parameterMap.get(key)));
+                if (inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_REQUIRED
+                        && !Safety.isInteger(parameterMap.get(key)[0])
                         || inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_OPTIONAL && !Safety.isInteger(parameterMap.get(key)[0])
                         ) {
                     throw new InputNotValidException("Value "+key+" was not a valid integer value.");
@@ -193,8 +203,12 @@ public class Safety {
              * Check whether key is found
              */
 
-            if (parameterMap.get(key) == null && inputKeyTypeMap.get(key).isRequired()) {
-                throw new InputNotValidException("Required key "+key+" was not found in the payload.");
+            if (parameterMap.get(key) == null) {
+                if(inputKeyTypeMap.get(key).isRequired()) {
+                    throw new InputNotValidException("Required key " + key + " was not found in the payload.");
+                } else {
+                    continue;
+                }
             }
 
             /** Check against values **/
