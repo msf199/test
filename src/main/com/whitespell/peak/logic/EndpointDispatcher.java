@@ -30,7 +30,7 @@ public class EndpointDispatcher extends HttpServlet {
      * @param pathSpec     is the path the handler is called on, e.g. /users/{user_id}/categories
      */
 
-    public void addHandler(RequestType type, EndpointInterface apiInterface, String pathSpec, String... argNames) {
+    public void addHandler(RequestType type, EndpointHandler apiInterface, String pathSpec, String... argNames) {
         EndpointSpecification spec = new EndpointSpecification(apiInterface);
         switch (type) {
             case GET:
@@ -114,14 +114,13 @@ public class EndpointDispatcher extends HttpServlet {
                     }
 
                     Safety.checkParameterInput(result.getEndpointSpec().getEndpointInterface().getParameterInput(), context.getParameterMap());
-
                     Safety.checkUrlInput(result.getEndpointSpec().getEndpointInterface().getUrlInput(), context.getUrlVariables());
                 } catch(InputNotValidException p) {
                     context.throwHttpError(result.getEndpointSpec().getEndpointInterface().getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND,
                             p.getDetailMessage());
                     return;
                 }
-                result.getEndpointSpec().getEndpointInterface().call(context);
+                result.getEndpointSpec().getEndpointInterface().safeCall(context);
             } else {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_ENDPOINT_FOUND);
                 return;

@@ -48,7 +48,7 @@ public class Authentication {
     }
 
     /**
-     * Check whether the user doing an API call is authenticated properly
+     * Check whether the user doing an API safeCall is authenticated properly
      *
      * @return whether the user is authenticated or not.
      */

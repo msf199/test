@@ -3,7 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.content;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -20,25 +20,27 @@ import java.util.Date;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class AddNewContent extends EndpointInterface {
+public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `timestamp`) VALUES (?,?,?,?,?,?)";
 
+
+    private static final String PAYLOAD_CONTENT_TYPE = "content_type";
+    private static final String URL_USER_ID_KEY = "user_id";
+
     @Override
-    public void call(RequestObject context) throws IOException {
+    protected void setUserInputs() {
+        urlInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_TYPE, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
+
+
+    @Override
+    public void safeCall(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
-        String context_user_id = context.getUrlVariables().get("user_id");
 
-        /**
-         * Check that the user id and content is valid.
-         */
-        if (!main.com.whitespell.peak.logic.Safety.isInteger(context_user_id) || payload.get("content_type") == null || payload.get("content_url") == null || payload.get("content_title") == null || payload.get("content_description") == null) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
-
-        final int user_id = Integer.parseInt(context_user_id);
+        final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID_KEY));
         final String content_type = payload.get("content_type").getAsString();
         final String content_url = payload.get("content_url").getAsString();
         final String content_title = payload.get("content_title").getAsString();

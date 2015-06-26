@@ -313,7 +313,7 @@ public class IntegrationTests extends Server {
         SKYDIVER_UID = skydiver.getUserId();
 
         //todo(pim) authenticate as user
-        //todo(pim) call to publish in this category
+        //todo(pim) safeCall to publish in this category
 
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")

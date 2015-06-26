@@ -16,28 +16,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.HashMap;
 
 /**
  * @author Pim de Witte(wwadewitte), Pim de Witte, Whitespell Inc., Whitespell LLC
  *         5/4/2015
  *         whitespell.model
  */
-public class CategoryFollowAction extends EndpointInterface {
-
-    /**
-     * Define user input variables
-     */
-
-    private static final String PAYLOAD_CATEGORY_ID_KEY = "category_id";
-    private static final String PAYLOAD_ACTION_KEY = "action";
-    private static final String URL_USER_ID = "user_id";
-
-    public CategoryFollowAction() {
-        urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_ACTION_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
-    }
+public class CategoryFollowAction extends EndpointHandler {
 
     /**
      * Define used queries
@@ -47,6 +32,22 @@ public class CategoryFollowAction extends EndpointInterface {
     private static final String INSERT_FOLLOW_CATEGORY_QUERY = "INSERT INTO `category_following`(`user_id`, `category_id`, `timestamp`) VALUES (?,?,?)";
     private static final String DELETE_FOLLOW_CATEGORY_QUERY = "DELETE FROM `category_following` WHERE `user_id` = ? AND `category_id` = ?";
 
+    /**
+     * Define user input variables
+     */
+
+    private static final String PAYLOAD_CATEGORY_ID_KEY = "category_id";
+    private static final String PAYLOAD_ACTION_KEY = "action";
+    private static final String URL_USER_ID = "user_id";
+
+    @Override
+    protected void setUserInputs() {
+        urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_ACTION_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
+
+
 
     /**
      * Handling method for API request
@@ -54,7 +55,7 @@ public class CategoryFollowAction extends EndpointInterface {
      * @throws IOException
      */
     @Override
-    public void call(RequestObject context) throws IOException {
+    public void safeCall(RequestObject context) throws IOException {
 
         String context_user_id = context.getUrlVariables().get("user_id");
 

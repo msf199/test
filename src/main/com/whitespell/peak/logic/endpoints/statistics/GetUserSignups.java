@@ -1,7 +1,7 @@
 package main.com.whitespell.peak.logic.endpoints.statistics;
 
 import com.google.gson.Gson;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -18,13 +18,13 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class GetUserSignups extends EndpointInterface {
+public class GetUserSignups extends EndpointHandler {
 
 
     private static final String GET_SIGNUP_DATASET = "SELECT COUNT(1) as count, DATE(`registration_timestamp_utc`) as day FROM `user` GROUP BY DAY(`registration_timestamp_utc`)";
 
     @Override
-    public void call(final RequestObject context) throws IOException {
+    public void safeCall(final RequestObject context) throws IOException {
         /**
          * Get the signups by day
          */
@@ -58,6 +58,11 @@ public class GetUserSignups extends EndpointInterface {
         } catch (SQLException e) {
             Logging.log("High", e);
         }
+    }
+
+    @Override
+    protected void setUserInputs() {
+
     }
 
     public class DayResult {

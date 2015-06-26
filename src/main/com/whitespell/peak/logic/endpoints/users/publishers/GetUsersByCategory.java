@@ -2,7 +2,7 @@ package main.com.whitespell.peak.logic.endpoints.users.publishers;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.Safety;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -20,10 +20,20 @@ import java.util.ArrayList;
  *         1/20/15
  *         whitespell.model
  */
-public class GetUsersByCategory extends EndpointInterface {
+public class GetUsersByCategory extends EndpointHandler {
+
+
+    private static final String PAYLOAD_CATEGORY_ID_KEY = "categories";
+    private static final String PARAMETERS_LIMT_KEY = "limit";
 
     @Override
-    public void call(final RequestObject context) throws IOException {
+    protected void setUserInputs() {
+        parameterInput.put(PARAMETERS_LIMT_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
+
+    @Override
+    public void safeCall(final RequestObject context) throws IOException {
         try {
 
             if (context.getParameterMap().get("categories") == null) {

@@ -5,7 +5,12 @@ import main.com.whitespell.peak.StaticRules;
 import java.io.IOException;
 import java.util.HashMap;
 
-public abstract class EndpointInterface {
+public abstract class EndpointHandler {
+
+    public EndpointHandler() {
+        this.setUserInputs();
+    }
+
     public HashMap<String, StaticRules.InputTypes> getUrlInput() {
         return urlInput;
     }
@@ -21,5 +26,8 @@ public abstract class EndpointInterface {
     public HashMap<String, StaticRules.InputTypes> payloadInput = new HashMap<>();
     public HashMap<String, StaticRules.InputTypes> urlInput = new HashMap<>();
     public HashMap<String, StaticRules.InputTypes> parameterInput = new HashMap<>();
-    public abstract void call(RequestObject context) throws IOException;
+
+
+    public abstract void safeCall(RequestObject context) throws IOException;
+    protected abstract void setUserInputs();
 }

@@ -3,7 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.authentication;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -23,7 +23,17 @@ import java.sql.SQLException;
  *         1/20/15
  *         whitespell.model
  */
-public class AuthenticationRequest extends EndpointInterface {
+public class AuthenticationRequest extends EndpointHandler {
+
+    private static final String PAYLOAD_USERNAME_KEY = "username";
+    private static final String PAYLOAD_PASSWORD_KEY = "password";
+
+    @Override
+    protected void setUserInputs() {
+
+        payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
 
 
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
@@ -32,7 +42,7 @@ public class AuthenticationRequest extends EndpointInterface {
             "VALUES (?,?)";
 
     @Override
-    public void call(final RequestObject context) throws IOException {
+    public void safeCall(final RequestObject context) throws IOException {
 
         Connection con;
         final String username;
@@ -45,10 +55,6 @@ public class AuthenticationRequest extends EndpointInterface {
          */
 
         // Check if all parameters are present and contain the right characters, if not throw a 400
-        if (payload == null || payload.get("username") == null || payload.get("password") == null) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        } else {
             username = payload.get("username").getAsString();
             password = payload.get("password").getAsString();
             // check against lengths for security and UX reasons.
@@ -67,7 +73,7 @@ public class AuthenticationRequest extends EndpointInterface {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
                 return;
             }
-        }
+
 
 
         // retrieve the password based on the username

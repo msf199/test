@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -24,10 +24,18 @@ import java.util.Date;
  *         5/4/2015
  *         whitespell.model
  */
-public class CategoryPublishAction extends EndpointInterface {
+public class CategoryPublishAction extends EndpointHandler {
 
     private static final String CATEGORY_ID_KEY = "category_id";
     private static final String ACTION_KEY = "action";
+    private static final String USER_ID_KEY = "user_id";
+
+    @Override
+    protected void setUserInputs() {
+        urlInput.put(CATEGORY_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(ACTION_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
+
 
     private static final String CHECK_PUBLISHING_CATEGORY_QUERY = "SELECT 1 FROM `category_publishing` WHERE `user_id` = ? AND `category_id` = ? LIMIT 1";
 
@@ -35,24 +43,14 @@ public class CategoryPublishAction extends EndpointInterface {
     private static final String DELETE_PUBLISH_CATEGORY_QUERY = "DELETE FROM `category_publishing` WHERE `user_id` = ? AND `category_id` = ?";
 
     @Override
-    public void call(RequestObject context) throws IOException {
-        String context_user_id = context.getUrlVariables().get("user_id");
+    public void safeCall(RequestObject context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
-
-        /**
-         * Check that the user id, following id, and action are valid.
-         */
-        if (!main.com.whitespell.peak.logic.Safety.isInteger(context_user_id) || payload.get(CATEGORY_ID_KEY) == null || !main.com.whitespell.peak.logic.Safety.isInteger(payload.get(CATEGORY_ID_KEY).getAsString()) || payload.get(ACTION_KEY) == null) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
-
 
         String category_id_string = payload.get(CATEGORY_ID_KEY).getAsString();
 
         //local variables
-        final int user_id = Integer.parseInt(context_user_id);
+        final int user_id = Integer.parseInt(context.getUrlVariables().get(USER_ID_KEY));
         final int category_id = Integer.parseInt(category_id_string);
         final String action = payload.get(ACTION_KEY).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());

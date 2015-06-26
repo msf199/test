@@ -3,7 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.content.types;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EndpointInterface;
+import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -18,28 +18,23 @@ import java.sql.SQLException;
  * @author Pim de Witte, Whitespell Inc.
  *         5/4/2015
  */
-public class AddContentType extends EndpointInterface {
+public class AddContentType extends EndpointHandler {
+
+
+    private static final String PAYLOAD_CONTENT_TYPE_NAME = "content_type_name";
+
+    @Override
+    protected void setUserInputs() {
+        payloadInput.put(PAYLOAD_CONTENT_TYPE_NAME, StaticRules.InputTypes.REG_STRING_REQUIRED);
+    }
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_type`(`content_type_name`) VALUES (?)";
 
     @Override
-    public void call(RequestObject context) throws IOException {
+    public void safeCall(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
-        /**
-         * Check that the user id and content is valid.
-         */
-        if (payload.get("content_type_name") == null) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
-            return;
-        }
-
-        final String content_type_name = payload.get("content_type_name").getAsString();
-
-        if (content_type_name.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
-            return;
-        }
+        final String content_type_name = payload.get(PAYLOAD_CONTENT_TYPE_NAME).getAsString();
 
         final boolean[] success = {false};
 
