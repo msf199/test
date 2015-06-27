@@ -113,10 +113,10 @@ public class EndpointDispatcher extends HttpServlet {
                         Safety.checkPayload(result.getEndpointSpec().getEndpointInterface().getPayloadInput(), context.getPayload());
                     }
                     if(result.getEndpointSpec().getEndpointInterface().getParameterInput().size() > 0) {
-                        Safety.checkParameterInput(result.getEndpointSpec().getEndpointInterface().getParameterInput(), context.getParameterMap());
+                        Safety.checkQueryStringInput(result.getEndpointSpec().getEndpointInterface().getParameterInput(), context.getParameterMap());
                     }
                     if(result.getEndpointSpec().getEndpointInterface().getUrlInput().size() > 0) {
-                        Safety.checkUrlInput(result.getEndpointSpec().getEndpointInterface().getUrlInput(), context.getUrlVariables());
+                        Safety.checkUrlVariableInput(result.getEndpointSpec().getEndpointInterface().getUrlInput(), context.getUrlVariables());
                     }
                 } catch(InputNotValidException p) {
                     context.throwHttpError(result.getEndpointSpec().getEndpointInterface().getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND,

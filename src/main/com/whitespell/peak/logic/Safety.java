@@ -97,7 +97,7 @@ public class Safety {
             if (inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_REQUIRED && !Safety.isInteger(payload.get(key).getAsString())
                     || inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_OPTIONAL && !Safety.isInteger(payload.get(key).getAsString())
                     ) {
-                throw new InputNotValidException("Value "+key+" was not a valid integer value.");
+                throw new InputNotValidException("Value '"+key+"' was not a valid integer value.");
             }
 
 
@@ -106,9 +106,9 @@ public class Safety {
 
             if (inputKeyTypeMap.get(key).getType().equals("int")) {
                 if (payload.get(key).getAsInt() < inputKeyTypeMap.get(key).getMinLength()) {
-                    throw new InputNotValidException("Integer key "+key+" was smaller than the minimum value.");// int is smaller than least allowed value
+                    throw new InputNotValidException("Integer key '"+key+"' was smaller than the minimum value.");// int is smaller than least allowed value
                 } else if (payload.get(key).getAsInt() > inputKeyTypeMap.get(key).getMaxLength()) {
-                    throw new InputNotValidException("Integer key "+key+" was not bigger than the maximum value.");
+                    throw new InputNotValidException("Integer key '"+key+"' was not bigger than the maximum value.");
                 }
             }
 
@@ -116,9 +116,9 @@ public class Safety {
 
             if (inputKeyTypeMap.get(key).getType().equals("string")) {
                 if (payload.get(key).getAsString().length() < inputKeyTypeMap.get(key).getMinLength()) {
-                    throw new InputNotValidException("Required key "+key+" length was smaller than the minimum");
+                    throw new InputNotValidException("Required key '"+key+"' length was smaller than the minimum");
                 } else if (payload.get(key).getAsString().length() > inputKeyTypeMap.get(key).getMaxLength()) {
-                    throw new InputNotValidException("Required key "+key+" length was bigger than the maximum");
+                    throw new InputNotValidException("Required key '"+key+"' length was bigger than the maximum");
                 }
             }
         }
@@ -133,7 +133,7 @@ public class Safety {
      * @return
      * @throws InputNotValidException
      */
-    public static void checkParameterInput(HashMap<String, StaticRules.InputTypes> inputKeyTypeMap, Map<String, String[]> parameterMap) throws InputNotValidException {
+    public static void checkQueryStringInput(HashMap<String, StaticRules.InputTypes> inputKeyTypeMap, Map<String, String[]> parameterMap) throws InputNotValidException {
 
         for (String key : inputKeyTypeMap.keySet()) {
 
@@ -143,7 +143,7 @@ public class Safety {
 
             if (parameterMap.get(key) == null) {
                 if(inputKeyTypeMap.get(key).isRequired()) {
-                    throw new InputNotValidException("Required key " + key + " was not found in the payload.");
+                    throw new InputNotValidException("Required key '" + key + "' was not found in the query string. See the documentation for all the requirements.");
                 } else {
                     continue;
                 }
@@ -163,14 +163,14 @@ public class Safety {
                         && !Safety.isInteger(parameterMap.get(key)[0])
                         || inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_OPTIONAL && !Safety.isInteger(parameterMap.get(key)[0])
                         ) {
-                    throw new InputNotValidException("Value "+key+" was not a valid integer value.");
+                    throw new InputNotValidException("Value '"+key+"' was not a valid integer value.");
                 }
 
 
                 if (Integer.parseInt(parameterMap.get(key)[0]) < inputKeyTypeMap.get(key).getMinLength()) {
-                    throw new InputNotValidException("Integer key "+key+" was smaller than the minimum value.");// int is smaller than least allowed value
+                    throw new InputNotValidException("Integer key '"+key+"' was smaller than the minimum value.");// int is smaller than least allowed value
                 } else if (Integer.parseInt(parameterMap.get(key)[0]) > inputKeyTypeMap.get(key).getMaxLength()) {
-                    throw new InputNotValidException("Integer key "+key+" was not bigger than the maximum value.");
+                    throw new InputNotValidException("Integer key '"+key+"' was not bigger than the maximum value.");
                 }
             }
 
@@ -178,9 +178,9 @@ public class Safety {
 
             if (inputKeyTypeMap.get(key).getType().equals("string")) {
                 if (parameterMap.get(key)[0].length() < inputKeyTypeMap.get(key).getMinLength()) {
-                    throw new InputNotValidException("Required key "+key+" length was smaller than the minimum");
+                    throw new InputNotValidException("Required key '"+key+"' length was smaller than the minimum");
                 } else if (parameterMap.get(key)[0].length() > inputKeyTypeMap.get(key).getMaxLength()) {
-                    throw new InputNotValidException("Required key "+key+" length was bigger than the maximum");
+                    throw new InputNotValidException("Required key '"+key+"' length was bigger than the maximum");
                 }
             }
         }
@@ -195,7 +195,7 @@ public class Safety {
      * @return
      * @throws InputNotValidException
      */
-    public static void checkUrlInput(HashMap<String, StaticRules.InputTypes> inputKeyTypeMap, Map<String, String> parameterMap) throws InputNotValidException {
+    public static void checkUrlVariableInput(HashMap<String, StaticRules.InputTypes> inputKeyTypeMap, Map<String, String> parameterMap) throws InputNotValidException {
 
         for (String key : inputKeyTypeMap.keySet()) {
 
@@ -205,7 +205,7 @@ public class Safety {
 
             if (parameterMap.get(key) == null) {
                 if(inputKeyTypeMap.get(key).isRequired()) {
-                    throw new InputNotValidException("Required key " + key + " was not found in the payload.");
+                    throw new InputNotValidException("Unique required key " + key + " was not found in the URL variables.");
                 } else {
                     continue;
                 }
@@ -223,14 +223,14 @@ public class Safety {
                 if (inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_REQUIRED && !Safety.isInteger(parameterMap.get(key))
                         || inputKeyTypeMap.get(key) == StaticRules.InputTypes.REG_INT_OPTIONAL && !Safety.isInteger(parameterMap.get(key))
                         ) {
-                    throw new InputNotValidException("Value "+key+" was not a valid integer value.");
+                    throw new InputNotValidException("Value '"+key+"' was not a valid integer value.");
                 }
 
 
                 if (Integer.parseInt(parameterMap.get(key)) < inputKeyTypeMap.get(key).getMinLength()) {
-                    throw new InputNotValidException("Integer key "+key+" was smaller than the minimum value.");// int is smaller than least allowed value
+                    throw new InputNotValidException("Integer key '"+key+"' was smaller than the minimum value.");// int is smaller than least allowed value
                 } else if (Integer.parseInt(parameterMap.get(key)) > inputKeyTypeMap.get(key).getMaxLength()) {
-                    throw new InputNotValidException("Integer key "+key+" was not bigger than the maximum value.");
+                    throw new InputNotValidException("Integer key '"+key+"' was not bigger than the maximum value.");
                 }
             }
 
@@ -238,9 +238,9 @@ public class Safety {
 
             if (inputKeyTypeMap.get(key).getType().equals("string")) {
                 if (parameterMap.get(key).length() < inputKeyTypeMap.get(key).getMinLength()) {
-                    throw new InputNotValidException("Required key "+key+" length was smaller than the minimum");
+                    throw new InputNotValidException("Required key '"+key+"' length was smaller than the minimum");
                 } else if (parameterMap.get(key).length() > inputKeyTypeMap.get(key).getMaxLength()) {
-                    throw new InputNotValidException("Required key "+key+" length was bigger than the maximum");
+                    throw new InputNotValidException("Required key '"+key+"' length was bigger than the maximum");
                 }
             }
         }
