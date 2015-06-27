@@ -60,7 +60,7 @@ public class StaticRules {
         NO_SUCH_CATEGORY(121, "The content type you are attempting to insert does not exist", HttpStatus.UNAUTHORIZED_401),
         DUPLICATE_CONTENT_TYPE(122, "The content type already exists", HttpStatus.UNAUTHORIZED_401),
         DUPLICATE_CATEGORY(123, "The content type already exists", HttpStatus.UNAUTHORIZED_401),
-        NO_ENDPOINT_FOUND(124, "There was no endpoint found on this path", HttpStatus.NOT_FOUND_404),
+        NO_ENDPOINT_FOUND(124, "There was no endpoint found on this path. Make sure you're using the right method (GET,POST,etc.)", HttpStatus.NOT_FOUND_404),
         NOT_VALID_JSON_PAYLOAD(125, "All payloads are expected to be JSON only. The payload you entered was not valid JSON. Use http://jsonlint.com/ to validate your JSON if you are testing.", HttpStatus.BAD_REQUEST_400),
         ALREADY_FOLLOWING_CATEGORY(126, "You are already following this category!", HttpStatus.UNAUTHORIZED_401),
         ALREADY_PUBLISHING_CATEGORY(127, "You are already publishing in this category!", HttpStatus.UNAUTHORIZED_401),

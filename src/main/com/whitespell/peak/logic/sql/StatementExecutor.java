@@ -1,5 +1,7 @@
 package main.com.whitespell.peak.logic.sql;
 
+import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -17,6 +19,8 @@ public class StatementExecutor {
     public void execute(ExecutionBlock block) throws SQLException {
         try {
             block.process(this.statement);
+        } catch (CommunicationsException e) {
+            Pool.initializePool();
         } finally {
             if (this.connection != null) {
                 this.connection.close();

@@ -9,7 +9,7 @@ import main.com.whitespell.peak.logic.endpoints.content.categories.AddCategory;
 import main.com.whitespell.peak.logic.endpoints.content.categories.RequestCategories;
 import main.com.whitespell.peak.logic.endpoints.content.types.AddContentType;
 import main.com.whitespell.peak.logic.endpoints.content.types.RequestContentTypes;
-import main.com.whitespell.peak.logic.endpoints.ping.Ping;
+import main.com.whitespell.peak.logic.endpoints.monitoring.Ping;
 import main.com.whitespell.peak.logic.endpoints.statistics.GetUserSignups;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
@@ -35,7 +35,7 @@ public class PeakAPI extends WhitespellAPI {
          */
 
         // Simple ping reques that returns true.
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Ping(), "/ping");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Ping(), "/monitoring/ping");
 
         /**
          * USERS ENDPOINTS (TREE ORDER)

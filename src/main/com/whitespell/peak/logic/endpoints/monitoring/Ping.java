@@ -1,4 +1,4 @@
-package main.com.whitespell.peak.logic.endpoints.ping;
+package main.com.whitespell.peak.logic.endpoints.monitoring;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.logic.EndpointHandler;
