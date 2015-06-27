@@ -37,7 +37,6 @@ public class GetUser extends EndpointHandler {
 
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
 
-
         /**
          * Ensure that the user is authenticated properly
          */
