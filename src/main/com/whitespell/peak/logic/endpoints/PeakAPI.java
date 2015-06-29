@@ -53,6 +53,9 @@ public class PeakAPI extends WhitespellAPI {
         // get all the users sorted by categories (also takes in same search criteria as /users)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsersByCategory(), "/users/categories/");
 
+        // Add new content as a user
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/users/$/content/", "user_id");
+
         // Follow a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/$/following", "user_id");
 
@@ -85,8 +88,6 @@ public class PeakAPI extends WhitespellAPI {
         // Get a list of all the content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContent(), "/content/");
 
-        // Add new content as a user
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/content/$", "user_id");
 
         // Get a list of all the content types
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentTypes(), "/content/types");
