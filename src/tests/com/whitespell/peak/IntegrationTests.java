@@ -46,6 +46,8 @@ public class IntegrationTests extends Server {
     static String TEST_EMAIL = "pimdewitte95@gmail.com";
     static int TEST_UID = -1;
     static String TEST_KEY;
+    static int TEST2_UID;
+    static String TEST2_KEY;
 
     static CategoryObject[] categories;
     static ContentTypeObject[] contentTypes;
@@ -197,7 +199,7 @@ public class IntegrationTests extends Server {
 
 
         ErrorObject e = g.fromJson(stringResponse.getBody(), ErrorObject.class);
-        assertEquals("There was no endpoint found on this path", e.getErrorMessage());
+        assertEquals("There was no endpoint found on this path. Make sure you're using the right method (GET,POST,etc.)", e.getErrorMessage());
         assertEquals("EndpointDispatcher", e.getClassName());
         assertEquals(404, e.getHttpStatusCode());
         assertEquals(124, e.getErrorId());
@@ -219,7 +221,20 @@ public class IntegrationTests extends Server {
                 .asString();
 
         /**
-         * Authenticate the user we just created
+         * Create a second account to test following and content
+         */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"username\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\",\n" +
+                        "\"email\" : \"" + ROLLERSKATER_EMAIL + "\"\n" +
+                        "}")
+                .asString();
+
+
+        /**
+         * Authenticate first user we just created
          */
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication") // misspeled S on purpose to cause an error.
@@ -238,6 +253,25 @@ public class IntegrationTests extends Server {
         assertEquals(a.getUserId() > -1, true);
 
         /**
+        * Authenticate the 2nd User
+        * */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"username\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\"\n" +
+                        "}")
+                .asString();
+
+
+        AuthenticationObject b = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST2_UID = b.getUserId();
+        TEST2_KEY = b.getKey();
+
+        assertEquals(b.getUserId() > -1, true);
+
+        /**
          * Get the UserObject from the users/userid endpoint
          */
 
@@ -251,6 +285,20 @@ public class IntegrationTests extends Server {
 
         assertEquals(user.getUserId(), TEST_UID);
         assertEquals(user.getUsername(), TEST_USERNAME);
+
+
+        /**
+        * Get the 2nd UserObject from the users/userid endpoint
+        * */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/"+ TEST2_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+
+        UserObject user2 = g.fromJson(stringResponse.getBody(), UserObject.class);
+
+        assertEquals(user2.getUserId(), TEST2_UID);
+        assertEquals(user2.getUsername(), ROLLERSKATER_USERNAME);
     }
 
 
@@ -367,7 +415,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"following_id\": \"" + ROLLERSKATER_UID + "\",\n" +
+                        "\"following_id\": \"" + TEST2_UID + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
@@ -377,9 +425,9 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testB_contentTest() throws UnirestException {
-        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + TEST_UID)
+        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
                 .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
                         "\"content_type\": \""+contentTypes[0].getContent_type_id()+"\",\n" +
                         "\"content_description\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
@@ -396,7 +444,7 @@ public class IntegrationTests extends Server {
 
         System.out.println("stringresponse: " + stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content[0].getContent_type(), 1);
+        assertEquals(content[0].getContent_type(), contentTypes[0].getContent_type_id());
         assertEquals(content[0].getContent_title(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContent_url(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContent_description(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
