@@ -25,13 +25,20 @@ public class AddNewContent extends EndpointHandler {
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `timestamp`) VALUES (?,?,?,?,?,?)";
 
 
-    private static final String PAYLOAD_CONTENT_TYPE = "content_type";
+    private static final String PAYLOAD_CONTENT_TYPE_ID = "content_type";
+    private static final String PAYLOAD_CONTENT_TITLE = "content_title";
+    private static final String PAYLOAD_CONTENT_URL = "content_url";
+    private static final String PAYLOAD_CONTENT_DESCRIPTION = "content_description";
+
     private static final String URL_USER_ID_KEY = "user_id";
 
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_CONTENT_TYPE, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_TYPE_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_TITLE, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_URL, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
 
@@ -39,12 +46,11 @@ public class AddNewContent extends EndpointHandler {
     public void safeCall(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
-
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID_KEY));
-        final String content_type = payload.get("content_type").getAsString();
-        final String content_url = payload.get("content_url").getAsString();
-        final String content_title = payload.get("content_title").getAsString();
-        final String content_description = payload.get("content_description").getAsString();
+        final String content_type = payload.get(PAYLOAD_CONTENT_TYPE_ID).getAsString();
+        final String content_url = payload.get(PAYLOAD_CONTENT_URL).getAsString();
+        final String content_title = payload.get(PAYLOAD_CONTENT_TITLE).getAsString();
+        final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
         //todo(pim) thumbnail
         //todo(pim) content_likes
@@ -69,7 +75,7 @@ public class AddNewContent extends EndpointHandler {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
                     ps.setString(1, String.valueOf(user_id));
-                    ps.setString(2, content_type);
+                    ps.setInt(2, Integer.parseInt(content_type));
                     ps.setString(3, content_url);
                     ps.setString(4, content_title);
                     ps.setString(5, content_description);
@@ -85,6 +91,7 @@ public class AddNewContent extends EndpointHandler {
             if (e.getMessage().contains("FK_user_content_content_type")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
             }
+            return;
         }
 
         if (success[0]) {

@@ -27,7 +27,7 @@ public class UserFollowAction extends EndpointHandler {
 
     private static final String PAYLOAD_FOLLOWING_USER_ID_KEY = "following_id";
     private static final String PAYLOAD_ACTION_KEY = "action";
-    private static final String URL_USER_ID_KEY = "action";
+    private static final String URL_USER_ID_KEY = "user_id";
 
     @Override
     protected void setUserInputs() {
@@ -35,7 +35,6 @@ public class UserFollowAction extends EndpointHandler {
         payloadInput.put(PAYLOAD_FOLLOWING_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(PAYLOAD_ACTION_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
-
 
     private static final String CHECK_FOLLOWING_QUERY = "SELECT 1 FROM `user_following` WHERE `user_id` = ? AND `following_id` = ? LIMIT 1";
     private static final String INSERT_FOLLOW_QUERY = "INSERT INTO `user_following`(`user_id`, `following_id`, `timestamp`) VALUES (?,?,?)";
