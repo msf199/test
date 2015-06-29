@@ -1,4 +1,4 @@
-package tests.com.whitespell.peak;
+package com.whitespell.peak;
 
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
@@ -11,15 +11,21 @@ import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
-import main.com.whitespell.peak.model.CategoryObject;
-import main.com.whitespell.peak.model.ContentTypeObject;
-import main.com.whitespell.peak.model.ErrorObject;
-import main.com.whitespell.peak.model.UserObject;
+import main.com.whitespell.peak.model.*;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 import org.junit.Test;
+import org.junit.FixMethodOrder;
+import org.junit.runners.MethodSorters;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -30,6 +36,7 @@ import static org.junit.Assert.assertEquals;
  *         6/21/15
  *         tests.com.whitespell.peak
  */
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTests extends Server {
 
     static String TEST_DB_NAME = "test_" + (System.currentTimeMillis() / 1000);
@@ -42,6 +49,7 @@ public class IntegrationTests extends Server {
 
     static CategoryObject[] categories;
     static ContentTypeObject[] contentTypes;
+    static ContentObject[] content;
 
     static String SKYDIVER_USERNAME = "skydiver10";
     static String SKYDIVER_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -53,7 +61,6 @@ public class IntegrationTests extends Server {
     static String ROLLERSKATER_EMAIL = "rollerskater10@gmail.com";
     static int ROLLERSKATER_UID;
 
-
     static String API = null;
 
     Gson g = new Gson();
@@ -62,7 +69,7 @@ public class IntegrationTests extends Server {
 
 
     @Test
-    public void startTests() throws Exception {
+    public void test1_startTests() throws Exception {
 
         // load the system with test properties
         Config.TESTING = true;
@@ -75,7 +82,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void newDatabase() throws IOException {
+    public void test2_newDatabase() throws IOException {
 
 
         if (Config.DB_USER.equals("testpeak")) { // ensure we are on the test server
@@ -121,7 +128,7 @@ public class IntegrationTests extends Server {
              * EXECUTING DDL ON TEST DATABASE
              */
 
-            String[] queries = TestFunctions.readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
+            String[] queries = readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
 
             for (int i = 0; i < queries.length; i++) {
                 if (queries[i] == null || queries[i].length() < 2 || queries[i].isEmpty()) {
@@ -151,14 +158,14 @@ public class IntegrationTests extends Server {
 
 
     @Test
-    public void waitForOnlineTest() {
-        int attempts = 20;
+    public void test3_waitForOnlineTest() {
+        int attempts = 45;
 
         boolean isOnline = false;
 
         while (attempts > 0 && !isOnline) {
             try {
-                isOnline = HttpHandler.isOnline(API + "/ping");
+                isOnline = isOnline(API + "/monitoring/ping");
             } catch (Exception e) {
 
             }
@@ -173,7 +180,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void forceErrorTest() throws UnirestException {
+    public void test4_forceErrorTest() throws UnirestException {
         /**
          * Force an error
          */
@@ -197,7 +204,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void createAccountTest() throws UnirestException {
+    public void test5_createAccountTest() throws UnirestException {
 
         /**
          * Create the account we are testing with
@@ -244,12 +251,11 @@ public class IntegrationTests extends Server {
 
         assertEquals(user.getUserId(), TEST_UID);
         assertEquals(user.getUsername(), TEST_USERNAME);
-
     }
 
 
     @Test
-    public void categoriesTest() throws UnirestException {
+    public void test6_categoriesTest() throws UnirestException {
         Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
@@ -277,7 +283,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void followCategoriesTest() throws UnirestException {
+    public void test7_followCategoriesTest() throws UnirestException {
         Unirest.post("http://localhost:" + Config.API_PORT + "/user/" + TEST_UID + "/categories")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -299,7 +305,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void createPublishers() throws UnirestException {
+    public void test8_createPublishers() throws UnirestException {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
@@ -329,7 +335,8 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void contentTypesTest() throws UnirestException {
+    public void test9_contentTypesTest() throws UnirestException {
+
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .body("{\n" +
@@ -355,7 +362,48 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void getPublishersByCategory() {
+    public void testA_followTest() throws UnirestException {
+        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"following_id\": \"" + ROLLERSKATER_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+
+        System.out.println(a.getBody());
+    }
+
+    @Test
+    public void testB_contentTest() throws UnirestException {
+        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"content_type\": \""+contentTypes[0].getContent_type_id()+"\",\n" +
+                        "\"content_description\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
+                        "\"content_title\": \"10-Minute No-Equipment Home Workout\",\n" +
+                        "\"content_url\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"\n}")
+                .asString();
+
+        System.out.println(a.getBody());
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println("stringresponse: " + stringResponse.getBody());
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getContent_type(), 1);
+        assertEquals(content[0].getContent_title(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContent_url(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
+        assertEquals(content[0].getContent_description(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+    }
+
+    @Test
+    public void testC_getPublishersByCategory() {
         //todo(pim) do a search on /users where publishing list contains numbers category[0] and category[1] and output as json
         // then follow these users
         // then post content as the publishers
@@ -363,8 +411,60 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void incurCreateAccountErrors() {
+    public void testD_incurCreateAccountErrors() {
         //todo(pim) create accounts with usernames and too long strings that are already taken and should give us errors
+    }
+
+
+
+
+    static String readFile(String path, Charset encoding)
+            throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
+    }
+
+
+    public static String returnGetRequest(String url) throws Exception {
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        con.setRequestMethod("GET");
+
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 ;Windows NT 6.1; WOW64; Trident/7.0; rv:11.0; like Gecko");
+
+        //int responseCode = con.getResponseCode();
+
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            if(inputLine.length() > 0) {
+                response.append(inputLine);
+            }
+        }
+        in.close();
+
+        return response.toString();
+
+    }
+
+    public static boolean isOnline(String url) throws Exception {
+
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+        con.setRequestMethod("GET");
+
+        con.setRequestProperty("User-Agent", "Mozilla/5.0 ;Windows NT 6.1; WOW64; Trident/7.0; rv:11.0; like Gecko");
+
+        int responseCode = con.getResponseCode();
+
+        return responseCode == 200;
+
     }
 
 
