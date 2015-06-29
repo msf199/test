@@ -37,19 +37,17 @@ public class RequestCategories extends EndpointHandler {
                     while (results.next()) {
 
                         CategoryObject d = new CategoryObject(results.getInt("category_id"), results.getString("category_name"), results.getString("category_thumbnail"), results.getInt("category_followers"), results.getInt("category_publishers"));
-
                         categoryObjects.add(d);
                     }
 
                     // put the array list into a JSON array and write it as a response
-
                     Gson g = new Gson();
                     String response = g.toJson(categoryObjects);
                     context.getResponse().setStatus(200);
                     try {
                         context.getResponse().getWriter().write(response);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
                     }
                 }
             });
