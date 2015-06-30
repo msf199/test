@@ -16,7 +16,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         1/20/15
  *         whitespell.model
  */
@@ -27,20 +27,15 @@ public class GetUser extends EndpointHandler {
 
     private static final String URL_USER_ID = "user_id";
 
-    private static final String PAYLOAD_USERNAME_KEY = "username";
-    private static final String PAYLOAD_EMAIL_KEY = "email";
-    private static final String PAYLOAD_THUMBNAIL_KEY = "thumbnail";
-    private static final String PAYLOAD_COVER_PHOTO_KEY = "cover_photo";
-    private static final String PAYLOAD_SLOGAN_KEY = "slogan";
+    private static final String USERNAME_KEY = "username";
+    private static final String EMAIL_KEY = "email";
+    private static final String THUMBNAIL_KEY = "thumbnail";
+    private static final String COVER_PHOTO_KEY = "cover_photo";
+    private static final String SLOGAN_KEY = "slogan";
 
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
-		payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-		payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-		payloadInput.put(PAYLOAD_THUMBNAIL_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-		payloadInput.put(PAYLOAD_COVER_PHOTO_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-		payloadInput.put(PAYLOAD_SLOGAN_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
 
     @Override
@@ -74,9 +69,9 @@ public class GetUser extends EndpointHandler {
 
                     if (results.next()) {
 
-                        user = new UserObject(results.getInt(URL_USER_ID), results.getString(PAYLOAD_USERNAME_KEY),
-                                results.getString(PAYLOAD_EMAIL_KEY), results.getString(PAYLOAD_THUMBNAIL_KEY), results.getString(PAYLOAD_SLOGAN_KEY),
-                                results.getString(PAYLOAD_COVER_PHOTO_KEY));
+                        user = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY),
+                                results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(SLOGAN_KEY),
+                                results.getString(COVER_PHOTO_KEY));
                     } else {
                         context.throwHttpError("GetUser", StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;

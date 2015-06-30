@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         6/21/15
  *         tests.com.whitespell.peak
  */
@@ -425,7 +425,7 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testB_contentTest() throws UnirestException {
-        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
@@ -435,14 +435,12 @@ public class IntegrationTests extends Server {
                         "\"content_url\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"\n}")
                 .asString();
 
-        System.out.println(a.getBody());
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
-        System.out.println("stringresponse: " + stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContent_type(), contentTypes[0].getContent_type_id());
         assertEquals(content[0].getContent_title(), "10-Minute No-Equipment Home Workout");
@@ -462,6 +460,36 @@ public class IntegrationTests extends Server {
     public void testD_incurCreateAccountErrors() {
         //todo(pim) create accounts with usernames and too long strings that are already taken and should give us errors
     }
+
+	@Test
+	public void testE_editUser() throws UnirestException{
+		HttpResponse<String> a = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+				.header("accept", "application/json")
+				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+				.asString();
+
+		System.out.println(a.getBody());
+
+		stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+				.header("accept", "application/json")
+				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+				.body("{\n" +
+						"\"username\": \"thisisanewuser\",\n" +
+						"\"email\": \"dem0@peak.com\",\n" +
+						"\"thumbnail\": \"http://www.waywood.com/images/test.jpg\",\n" +
+						"\"cover_photo\": \"http://www.indiamike.com/files/images/26/11/08/kali-river-flowing-through-deep-valley.jpg\",\n" +
+						"\"slogan\": \"Never Give Up!\"\n}")
+				.asString();
+
+		System.out.println("stringresponse: " + stringResponse.getBody());
+		UserObject userEdited = g.fromJson(stringResponse.getBody(), UserObject.class);
+		assertEquals(userEdited.getUserId(), TEST_UID);
+		assertEquals(userEdited.getUsername(),"thisisanewuser");
+		assertEquals(userEdited.getEmail(), "dem0@peak.com");
+		assertEquals(userEdited.getThumbnail(), "http://www.waywood.com/images/test.jpg");
+		assertEquals(userEdited.getCover_photo(), "http://www.indiamike.com/files/images/26/11/08/kali-river-flowing-through-deep-valley.jpg");
+		assertEquals(userEdited.getSlogan(), "Never Give Up!");
+	}
 
 
 

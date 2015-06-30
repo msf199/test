@@ -1,6 +1,7 @@
 package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
+import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -15,16 +16,29 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         1/20/15
  *         whitespell.model
  */
 public class GetUsers extends EndpointHandler {
 
-
     private static final String GET_USERS = "SELECT `user_id`, `username`, `thumbnail` FROM `user`";
 
-    @Override
+
+	private static final String URL_USER_ID = "user_id";
+
+	private static final String USERNAME_KEY = "username";
+	private static final String EMAIL_KEY = "email";
+	private static final String THUMBNAIL_KEY = "thumbnail";
+	private static final String COVER_PHOTO_KEY = "cover_photo";
+	private static final String SLOGAN_KEY = "slogan";
+
+	@Override
+	protected void setUserInputs() {
+		urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+	}
+
+	@Override
     public void safeCall(final RequestObject context) throws IOException {
         try {
             StatementExecutor executor = new StatementExecutor(GET_USERS);
@@ -36,7 +50,9 @@ public class GetUsers extends EndpointHandler {
                     ArrayList<UserObject> users = new ArrayList<>();
                     while (results.next()) {
 
-                        UserObject d = new UserObject(results.getInt("user_id"), results.getString("username"), "hidden", results.getString("thumbnail"));
+                        UserObject d = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY),
+								results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(SLOGAN_KEY),
+								results.getString(COVER_PHOTO_KEY));
 
                         users.add(d);
                     }
@@ -57,10 +73,4 @@ public class GetUsers extends EndpointHandler {
             Logging.log("High", e);
         }
     }
-
-    @Override
-    protected void setUserInputs() {
-
-    }
-
 }

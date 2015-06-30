@@ -22,7 +22,8 @@ import java.sql.SQLException;
      */
     public class EditUser extends EndpointHandler {
 
-        private static final String EDIT_USER = "UPDATE `username`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
+
+        private static final String EDIT_USER = "UPDATE `user` SET `username` = ?, `email` = ?, `thumbnail` = ?, `cover_photo` = ?, `slogan` = ? WHERE `user_id` = ?";
 
         private static final String URL_USER_ID = "user_id";
 
@@ -37,9 +38,9 @@ import java.sql.SQLException;
             urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
 			payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
 			payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
-			payloadInput.put(PAYLOAD_THUMBNAIL_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-			payloadInput.put(PAYLOAD_COVER_PHOTO_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-			payloadInput.put(PAYLOAD_SLOGAN_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+			payloadInput.put(PAYLOAD_THUMBNAIL_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+			payloadInput.put(PAYLOAD_COVER_PHOTO_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+			payloadInput.put(PAYLOAD_SLOGAN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
         }
 
         private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `user` WHERE `username` = ? OR `email` = ? LIMIT 1";
@@ -47,9 +48,12 @@ import java.sql.SQLException;
         @Override
         public void safeCall(final RequestObject context) throws IOException {
 
-            int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
+            final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
             String username = context.getPayload().getAsJsonObject().get(PAYLOAD_USERNAME_KEY).getAsString();
             String email = context.getPayload().getAsJsonObject().get(PAYLOAD_EMAIL_KEY).getAsString();
+			String thumbnail = context.getPayload().getAsJsonObject().get(PAYLOAD_THUMBNAIL_KEY).getAsString();
+			String cover_photo = context.getPayload().getAsJsonObject().get(PAYLOAD_COVER_PHOTO_KEY).getAsString();
+			String slogan = context.getPayload().getAsJsonObject().get(PAYLOAD_SLOGAN_KEY).getAsString();
 
             /**
              * Ensure that the user is authenticated properly
@@ -110,24 +114,35 @@ import java.sql.SQLException;
             try {
                 StatementExecutor executor = new StatementExecutor(EDIT_USER);
                 final int finalUser_id = user_id;
-                executor.execute(new ExecutionBlock() {
+				final String finalUsername = username;
+				final String finalEmail = email;
+				final String finalThumbnail = thumbnail;
+				final String finalCoverPhoto = cover_photo;
+				final String finalSlogan = slogan;
+
+				executor.execute(new ExecutionBlock() {
                     @Override
                     public void process(PreparedStatement ps) throws SQLException {
 
                         UserObject user = null;
 
-                        ps.setInt(1, finalUser_id);
+                        ps.setString(1, finalUsername);
+						ps.setString(2, finalEmail);
+						ps.setString(3, finalThumbnail);
+						ps.setString(4, finalCoverPhoto);
+						ps.setString(5, finalSlogan);
+						ps.setInt(6, finalUser_id);
 
-                        final ResultSet results = ps.executeQuery();
+						final int update = ps.executeUpdate();
 
-                        if (results.next()) {
-
-                            user = new UserObject(results.getInt(URL_USER_ID), results.getString(PAYLOAD_USERNAME_KEY), results.getString(PAYLOAD_EMAIL_KEY), results.getString(PAYLOAD_THUMBNAIL_KEY),
-                                    results.getString(PAYLOAD_COVER_PHOTO_KEY), results.getString(PAYLOAD_SLOGAN_KEY));
-                        } else {
-                            context.throwHttpError("EditUser", StaticRules.ErrorCodes.USER_NOT_FOUND);
-                            return;
-                        }
+						if(update > 0){
+							user = new UserObject(finalUser_id, finalUsername, finalEmail, finalThumbnail,
+									finalCoverPhoto, finalSlogan);
+						}
+						else {
+								context.throwHttpError("EditUser", StaticRules.ErrorCodes.USER_NOT_EDITED);
+								return;
+						}
 
                         Gson g = new Gson();
                         String response = g.toJson(user);
@@ -135,7 +150,7 @@ import java.sql.SQLException;
                         try {
                             context.getResponse().getWriter().write(response);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            Logging.log("High", e);
                         }
                     }
                 });

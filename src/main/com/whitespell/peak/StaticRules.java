@@ -66,7 +66,8 @@ public class StaticRules {
         ALREADY_PUBLISHING_CATEGORY(127, "You are already publishing in this category!", HttpStatus.UNAUTHORIZED_401),
         NOT_PUBLISHING_CATEGORY(128, "You are not publishing in this category!", HttpStatus.UNAUTHORIZED_401),
         USERID_NOT_NUMERIC(129, "User ID In URL is not a numeric value", HttpStatus.BAD_REQUEST_400),
-        USER_NOT_FOUND(130, "User was not found", HttpStatus.NOT_FOUND_404);
+        USER_NOT_FOUND(130, "User was not found", HttpStatus.NOT_FOUND_404),
+		USER_NOT_EDITED(131, "User was not edited in profile edit", HttpStatus.BAD_REQUEST_400);
         ;
 
         int errorId;
