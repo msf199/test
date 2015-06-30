@@ -23,13 +23,24 @@ import java.sql.SQLException;
 public class GetUser extends EndpointHandler {
 
 
-    private static final String GET_USER = "SELECT `user_id`, `username`, `thumbnail` FROM `user` WHERE `user_id` = ?";
+    private static final String GET_USER = "SELECT `user_id`, `username`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
 
     private static final String URL_USER_ID = "user_id";
+
+    private static final String PAYLOAD_USERNAME_KEY = "username";
+    private static final String PAYLOAD_EMAIL_KEY = "email";
+    private static final String PAYLOAD_THUMBNAIL_KEY = "thumbnail";
+    private static final String PAYLOAD_COVER_PHOTO_KEY = "cover_photo";
+    private static final String PAYLOAD_SLOGAN_KEY = "slogan";
 
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+		payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+		payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+		payloadInput.put(PAYLOAD_THUMBNAIL_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+		payloadInput.put(PAYLOAD_COVER_PHOTO_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+		payloadInput.put(PAYLOAD_SLOGAN_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
 
     @Override
@@ -63,7 +74,9 @@ public class GetUser extends EndpointHandler {
 
                     if (results.next()) {
 
-                        user = new UserObject(results.getInt("user_id"), results.getString("username"), "hidden", results.getString("thumbnail"));
+                        user = new UserObject(results.getInt(URL_USER_ID), results.getString(PAYLOAD_USERNAME_KEY),
+                                results.getString(PAYLOAD_EMAIL_KEY), results.getString(PAYLOAD_THUMBNAIL_KEY), results.getString(PAYLOAD_SLOGAN_KEY),
+                                results.getString(PAYLOAD_COVER_PHOTO_KEY));
                     } else {
                         context.throwHttpError("GetUser", StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;
@@ -75,15 +88,15 @@ public class GetUser extends EndpointHandler {
                     try {
                         context.getResponse().getWriter().write(response);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+						return;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+			return;
         }
 
     }
-
-
 }

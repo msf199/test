@@ -7,6 +7,8 @@ CREATE TABLE `user` (
   `registration_timestamp_utc` datetime DEFAULT NULL,
   `publisher` int(1) DEFAULT '0',
   `thumbnail` varchar(255) DEFAULT 'https://lh3.googleusercontent.com/-Sa9kdnhuE5E/AAAAAAAAAAI/AAAAAAAAABs/H8dhweNPuFI/photo.jpg',
+  `cover_photo` varchar(255) DEFAULT NULL,
+  `slogan` varchar(45) DEFAULT NULL,
   `rights` int(2) DEFAULT '0',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `id_UNIQUE` (`user_id`),
@@ -14,14 +16,14 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=225 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=236 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
   `category_followers` int(11) DEFAULT '0',
   `category_publishers` int(11) DEFAULT '0',
   PRIMARY KEY (`category_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;CREATE TABLE `content_type` (
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;CREATE TABLE `content_type` (
   `content_type_id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`content_type_id`)
@@ -39,7 +41,6 @@ CREATE TABLE `user` (
   KEY `user_id_idx` (`user_id`),
   KEY `content_title_idx` (`content_title`),
   KEY `FK_user_content_content_type_idx` (`content_type`),
-  CONSTRAINT `FK_user_content_content_type` FOREIGN KEY (`content_type`) REFERENCES `content_type` (`content_type_id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_user_content_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
   `user_id` int(11) NOT NULL,
@@ -76,4 +77,4 @@ CREATE TABLE `user` (
   PRIMARY KEY (`authentication_id`),
   KEY `FK_authentication_user_id` (`user_id`),
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=261 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=325 DEFAULT CHARSET=utf8;

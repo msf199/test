@@ -50,7 +50,10 @@ public class PeakAPI extends WhitespellAPI {
         // Get a specific user based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "user_id"); //always have the variable first
 
-        // get all the users sorted by categories (also takes in same search criteria as /users)
+		//As a user, edit your user profile
+		dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new EditUser(), "/users/$", "user_id");
+
+		// get all the users sorted by categories (also takes in same search criteria as /users)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsersByCategory(), "/users/categories/");
 
         // Add new content as a user
