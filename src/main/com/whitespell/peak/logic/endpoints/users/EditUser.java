@@ -43,7 +43,7 @@ import java.sql.SQLException;
 			payloadInput.put(PAYLOAD_SLOGAN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
         }
 
-        private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `user` WHERE `username` = ? OR `email` = ? LIMIT 1";
+        private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `user_id`, `username`, `email` FROM `user` WHERE (`username` = ? OR `email` = ?) AND `user_id` != ? LIMIT 1";
 
         @Override
         public void safeCall(final RequestObject context) throws IOException {
@@ -69,10 +69,9 @@ import java.sql.SQLException;
             /**
              * 401 Unauthorized: Check if username exists
              */
-
-
             try {
                 StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_OR_EMAIL_QUERY);
+                final int finalUser_id = user_id;
                 final String finalUsername = username;
                 final String finalEmail = email;
                 final boolean[] returnCall = {false};
@@ -81,6 +80,7 @@ import java.sql.SQLException;
                     public void process(PreparedStatement ps) throws SQLException {
                         ps.setString(1, finalUsername);
                         ps.setString(2, finalEmail);
+                        ps.setInt(3, finalUser_id);
                         ResultSet s = ps.executeQuery();
                         if (s.next()) {
                             if (s.getString("username").equalsIgnoreCase(finalUsername)) {
