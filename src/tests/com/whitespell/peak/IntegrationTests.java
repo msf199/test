@@ -469,6 +469,7 @@ public class IntegrationTests extends Server {
 				.asString();
 
 
+        //Change all fields
 		stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
 				.header("accept", "application/json")
 				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -488,6 +489,7 @@ public class IntegrationTests extends Server {
 		assertEquals(userEdited.getCover_photo(), "http://www.indiamike.com/files/images/26/11/08/kali-river-flowing-through-deep-valley.jpg");
 		assertEquals(userEdited.getSlogan(), "Never Give Up!");
 
+        //change only thumbnail coverphoto and slogan
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -507,6 +509,8 @@ public class IntegrationTests extends Server {
         assertEquals(userEdited2.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdited2.getSlogan(), "Whoops!");
 
+
+        //change username only
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -526,6 +530,8 @@ public class IntegrationTests extends Server {
         assertEquals(userEdited3.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdited3.getSlogan(), "Whoops!");
 
+
+        //change email only
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -545,6 +551,8 @@ public class IntegrationTests extends Server {
         assertEquals(userEdited4.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdited4.getSlogan(), "Whoops!");
 
+
+        //change both username and email simultaneously
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
