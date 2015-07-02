@@ -4,6 +4,7 @@ CREATE TABLE `user` (
   `email` varchar(45) DEFAULT NULL,
   `phone` varchar(20) DEFAULT NULL,
   `username` varchar(30) DEFAULT NULL,
+  `displayname` varchar(30) DEFAULT NULL,
   `registration_timestamp_utc` datetime DEFAULT NULL,
   `publisher` int(1) DEFAULT '0',
   `thumbnail` varchar(255) DEFAULT 'https://lh3.googleusercontent.com/-Sa9kdnhuE5E/AAAAAAAAAAI/AAAAAAAAABs/H8dhweNPuFI/photo.jpg',

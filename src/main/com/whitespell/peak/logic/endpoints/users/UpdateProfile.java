@@ -20,14 +20,15 @@ import java.sql.SQLException;
      *         6/30/15
      *         whitespell.model
      */
-    public class EditUser extends EndpointHandler {
+    public class UpdateProfile extends EndpointHandler {
 
 
-        private static final String EDIT_USER = "UPDATE `user` SET `username` = ?, `email` = ?, `thumbnail` = ?, `cover_photo` = ?, `slogan` = ? WHERE `user_id` = ?";
+        private static final String EDIT_USER = "UPDATE `user` SET `username` = ?, `displayname` = ? `slogan` = ? WHERE `user_id` = ?";
 
         private static final String URL_USER_ID = "user_id";
 
 		private static final String PAYLOAD_USERNAME_KEY = "username";
+        private static final String PAYLOAD_DISPLAYNAME_KEY = "displayname";
 		private static final String PAYLOAD_EMAIL_KEY = "email";
 		private static final String PAYLOAD_THUMBNAIL_KEY = "thumbnail";
 		private static final String PAYLOAD_COVER_PHOTO_KEY = "cover_photo";
@@ -36,20 +37,19 @@ import java.sql.SQLException;
         @Override
         protected void setUserInputs() {
             urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
-			payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
-			payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
-			payloadInput.put(PAYLOAD_THUMBNAIL_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
-			payloadInput.put(PAYLOAD_COVER_PHOTO_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
-			payloadInput.put(PAYLOAD_SLOGAN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+			payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+            payloadInput.put(PAYLOAD_DISPLAYNAME_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+			payloadInput.put(PAYLOAD_SLOGAN_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         }
 
-        private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `user_id`, `username`, `email` FROM `user` WHERE (`username` = ? OR `email` = ?) AND `user_id` != ? LIMIT 1";
+        private static final String CHECK_USERNAME_TAKEN_QUERY = "SELECT `user_id`, `username` FROM `user` WHERE `username` = ? AND `user_id` != ? LIMIT 1";
 
         @Override
         public void safeCall(final RequestObject context) throws IOException {
 
             final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
             String username = context.getPayload().getAsJsonObject().get(PAYLOAD_USERNAME_KEY).getAsString();
+            String displayname = context.getPayload().getAsJsonObject().get(PAYLOAD_DISPLAYNAME_KEY).getAsString();
             String email = context.getPayload().getAsJsonObject().get(PAYLOAD_EMAIL_KEY).getAsString();
 			String thumbnail = context.getPayload().getAsJsonObject().get(PAYLOAD_THUMBNAIL_KEY).getAsString();
 			String cover_photo = context.getPayload().getAsJsonObject().get(PAYLOAD_COVER_PHOTO_KEY).getAsString();
@@ -70,7 +70,7 @@ import java.sql.SQLException;
              * 401 Unauthorized: Check if username exists
              */
             try {
-                StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_OR_EMAIL_QUERY);
+                StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_TAKEN_QUERY);
                 final int finalUser_id = user_id;
                 final String finalUsername = username;
                 final String finalEmail = email;
@@ -115,6 +115,7 @@ import java.sql.SQLException;
                 StatementExecutor executor = new StatementExecutor(EDIT_USER);
                 final int finalUser_id = user_id;
 				final String finalUsername = username;
+                final String finalDisplayname = displayname;
 				final String finalEmail = email;
 				final String finalThumbnail = thumbnail;
 				final String finalCoverPhoto = cover_photo;
@@ -136,11 +137,11 @@ import java.sql.SQLException;
 						final int update = ps.executeUpdate();
 
 						if(update > 0){
-							user = new UserObject(finalUser_id, finalUsername, finalEmail, finalThumbnail,
+							user = new UserObject(finalUser_id, finalUsername, finalDisplayname, finalEmail, finalThumbnail,
 									finalCoverPhoto, finalSlogan);
 						}
 						else {
-								context.throwHttpError("EditUser", StaticRules.ErrorCodes.USER_NOT_EDITED);
+								context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);
 								return;
 						}
 
@@ -151,6 +152,7 @@ import java.sql.SQLException;
                             context.getResponse().getWriter().write(response);
                         } catch (Exception e) {
                             Logging.log("High", e);
+                            return;
                         }
                     }
                 });

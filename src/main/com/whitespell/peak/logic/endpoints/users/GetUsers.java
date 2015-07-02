@@ -22,13 +22,13 @@ import java.util.ArrayList;
  */
 public class GetUsers extends EndpointHandler {
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `thumbnail` FROM `user`";
-
+    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `slogan`, `cover_photo` FROM `user`";
 
 	private static final String URL_USER_ID = "user_id";
 
 	private static final String USERNAME_KEY = "username";
-	private static final String EMAIL_KEY = "email";
+    private static final String DISPLAYNAME_KEY = "displayname";
+    private static final String EMAIL_KEY = "email";
 	private static final String THUMBNAIL_KEY = "thumbnail";
 	private static final String COVER_PHOTO_KEY = "cover_photo";
 	private static final String SLOGAN_KEY = "slogan";
@@ -50,7 +50,7 @@ public class GetUsers extends EndpointHandler {
                     ArrayList<UserObject> users = new ArrayList<>();
                     while (results.next()) {
 
-                        UserObject d = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY),
+                        UserObject d = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
 								results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(SLOGAN_KEY),
 								results.getString(COVER_PHOTO_KEY));
 
@@ -65,12 +65,14 @@ public class GetUsers extends EndpointHandler {
                     try {
                         context.getResponse().getWriter().write(response);
                     } catch (Exception e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+                        return;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            return;
         }
     }
 }

@@ -468,48 +468,33 @@ public class IntegrationTests extends Server {
 				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
 				.asString();
 
-
-        //Change all fields
-		stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
-				.header("accept", "application/json")
-				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-				.body("{\n" +
-						"\"username\": \"thisisanewuser\",\n" +
-						"\"email\": \"dem0@peak.com\",\n" +
-						"\"thumbnail\": \"http://www.waywood.com/images/test.jpg\",\n" +
-						"\"cover_photo\": \"http://www.indiamike.com/files/images/26/11/08/kali-river-flowing-through-deep-valley.jpg\",\n" +
-						"\"slogan\": \"Never Give Up!\"\n}")
-				.asString();
-
-		UserObject userEdit = g.fromJson(stringResponse.getBody(), UserObject.class);
-		assertEquals(userEdit.getUserId(), TEST_UID);
-		assertEquals(userEdit.getUsername(),"thisisanewuser");
-		assertEquals(userEdit.getEmail(), "dem0@peak.com");
-		assertEquals(userEdit.getThumbnail(), "http://www.waywood.com/images/test.jpg");
-		assertEquals(userEdit.getCover_photo(), "http://www.indiamike.com/files/images/26/11/08/kali-river-flowing-through-deep-valley.jpg");
-		assertEquals(userEdit.getSlogan(), "Never Give Up!");
-
-        //change only thumbnail coverphoto and slogan
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+        //change only thumbnail
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/thumbnail")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"username\": \"thisisanewuser\",\n" +
-                        "\"email\": \"dem0@peak.com\",\n" +
-                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"slogan\": \"Whoops!\"\n}")
+                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
+                .asString();
+
+        UserObject userEdit = g.fromJson(stringResponse.getBody(), UserObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit.getUserId(), TEST_UID);
+        assertEquals(userEdit.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+
+        //change only coverphoto
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/coverphoto")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
                 .asString();
 
         UserObject userEdit2 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdit2.getUserId(), TEST_UID);
-        assertEquals(userEdit2.getUsername(),"thisisanewuser");
-        assertEquals(userEdit2.getEmail(), "dem0@peak.com");
-        assertEquals(userEdit2.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit2.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit2.getSlogan(), "Whoops!");
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit2.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
 
 
+/*
         //change username only
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
@@ -527,7 +512,7 @@ public class IntegrationTests extends Server {
         assertEquals(userEdit3.getUsername(),"changename");
         assertEquals(userEdit3.getEmail(), "dem0@peak.com");
         assertEquals(userEdit3.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit3.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit3.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdit3.getSlogan(), "Whoops!");
 
 
@@ -548,7 +533,7 @@ public class IntegrationTests extends Server {
         assertEquals(userEdit4.getUsername(),"changename");
         assertEquals(userEdit4.getEmail(), "change@peak.com");
         assertEquals(userEdit4.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit4.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit4.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdit4.getSlogan(), "Whoops!");
 
 
@@ -569,7 +554,7 @@ public class IntegrationTests extends Server {
         assertEquals(userEdit5.getUsername(),"lastchange");
         assertEquals(userEdit5.getEmail(), "lastchange@peak.com");
         assertEquals(userEdit5.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit5.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit5.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdit5.getSlogan(), "Whoops!");
 
         //cause an error by requesting in use username
@@ -598,7 +583,7 @@ public class IntegrationTests extends Server {
                         "\"slogan\": \"Whoops!\"\n}")
                 .asString();
         System.out.println(stringResponse.getBody());
-        //UserObject userEdit6 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        //UserObject userEdit6 = g.fromJson(stringResponse.getBody(), UserObject.class);*/
 	}
 
 

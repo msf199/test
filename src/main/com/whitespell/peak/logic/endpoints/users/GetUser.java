@@ -23,11 +23,12 @@ import java.sql.SQLException;
 public class GetUser extends EndpointHandler {
 
 
-    private static final String GET_USER = "SELECT `user_id`, `username`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
+    private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
 
     private static final String URL_USER_ID = "user_id";
 
     private static final String USERNAME_KEY = "username";
+    private static final String DISPLAYNAME_KEY = "displayname";
     private static final String EMAIL_KEY = "email";
     private static final String THUMBNAIL_KEY = "thumbnail";
     private static final String COVER_PHOTO_KEY = "cover_photo";
@@ -69,11 +70,11 @@ public class GetUser extends EndpointHandler {
 
                     if (results.next()) {
 
-                        user = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY),
+                        user = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                                 results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(SLOGAN_KEY),
                                 results.getString(COVER_PHOTO_KEY));
                     } else {
-                        context.throwHttpError("GetUser", StaticRules.ErrorCodes.USER_NOT_FOUND);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;
                     }
 
