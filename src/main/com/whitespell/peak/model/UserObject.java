@@ -38,7 +38,7 @@ public class UserObject {
         this.email = "";
         this.thumbnail = "";
         this.cover_photo = "https://www.rmiguides.com/_includes/_images/Everest-Header-7.jpg?v=2014_03_04";
-        this.slogan = "Fitness is 24/7.";
+        this.slogan = "";
     }
 
     public UserObject(int user_id, String username, String email, String thumbnail, String slogan) {
