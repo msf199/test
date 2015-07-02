@@ -23,16 +23,19 @@ import java.sql.SQLException;
     public class UpdateProfile extends EndpointHandler {
 
 
-        private static final String EDIT_USER = "UPDATE `user` SET `username` = ?, `displayname` = ? `slogan` = ? WHERE `user_id` = ?";
+        private static final String UPDATE_USER = "UPDATE `user` SET `username` = ?, `displayname` = ? `slogan` = ? WHERE `user_id` = ?";
+        private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
 
         private static final String URL_USER_ID = "user_id";
 
 		private static final String PAYLOAD_USERNAME_KEY = "username";
         private static final String PAYLOAD_DISPLAYNAME_KEY = "displayname";
-		private static final String PAYLOAD_EMAIL_KEY = "email";
-		private static final String PAYLOAD_THUMBNAIL_KEY = "thumbnail";
-		private static final String PAYLOAD_COVER_PHOTO_KEY = "cover_photo";
-		private static final String PAYLOAD_SLOGAN_KEY = "slogan";
+        private static final String PAYLOAD_SLOGAN_KEY = "slogan";
+
+		private static final String EMAIL_KEY = "email";
+		private static final String THUMBNAIL_KEY = "thumbnail";
+		private static final String COVER_PHOTO_KEY = "cover_photo";
+
 
         @Override
         protected void setUserInputs() {
@@ -50,9 +53,6 @@ import java.sql.SQLException;
             final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
             String username = context.getPayload().getAsJsonObject().get(PAYLOAD_USERNAME_KEY).getAsString();
             String displayname = context.getPayload().getAsJsonObject().get(PAYLOAD_DISPLAYNAME_KEY).getAsString();
-            String email = context.getPayload().getAsJsonObject().get(PAYLOAD_EMAIL_KEY).getAsString();
-			String thumbnail = context.getPayload().getAsJsonObject().get(PAYLOAD_THUMBNAIL_KEY).getAsString();
-			String cover_photo = context.getPayload().getAsJsonObject().get(PAYLOAD_COVER_PHOTO_KEY).getAsString();
 			String slogan = context.getPayload().getAsJsonObject().get(PAYLOAD_SLOGAN_KEY).getAsString();
 
             /**
@@ -73,20 +73,16 @@ import java.sql.SQLException;
                 StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_TAKEN_QUERY);
                 final int finalUser_id = user_id;
                 final String finalUsername = username;
-                final String finalEmail = email;
                 final boolean[] returnCall = {false};
                 executor.execute(new ExecutionBlock() {
                     @Override
                     public void process(PreparedStatement ps) throws SQLException {
                         ps.setString(1, finalUsername);
-                        ps.setString(2, finalEmail);
                         ps.setInt(3, finalUser_id);
                         ResultSet s = ps.executeQuery();
                         if (s.next()) {
                             if (s.getString("username").equalsIgnoreCase(finalUsername)) {
                                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TAKEN);
-                            } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TAKEN);
                             }
                             returnCall[0] = true;
                             return;
@@ -106,61 +102,93 @@ import java.sql.SQLException;
                 return;
             }
 
-			/**
-			 * (todo cmcan)Handle password change
-			 */
 
-
+            /**
+             * Get the user values
+             */
             try {
-                StatementExecutor executor = new StatementExecutor(EDIT_USER);
+                StatementExecutor executor = new StatementExecutor(GET_USER);
                 final int finalUser_id = user_id;
-				final String finalUsername = username;
-                final String finalDisplayname = displayname;
-				final String finalEmail = email;
-				final String finalThumbnail = thumbnail;
-				final String finalCoverPhoto = cover_photo;
-				final String finalSlogan = slogan;
-
-				executor.execute(new ExecutionBlock() {
+                executor.execute(new ExecutionBlock() {
                     @Override
                     public void process(PreparedStatement ps) throws SQLException {
 
                         UserObject user = null;
 
-                        ps.setString(1, finalUsername);
-						ps.setString(2, finalEmail);
-						ps.setString(3, finalThumbnail);
-						ps.setString(4, finalCoverPhoto);
-						ps.setString(5, finalSlogan);
-						ps.setInt(6, finalUser_id);
+                        ps.setInt(1, finalUser_id);
 
-						final int update = ps.executeUpdate();
+                        final ResultSet results = ps.executeQuery();
 
-						if(update > 0){
-							user = new UserObject(finalUser_id, finalUsername, finalDisplayname, finalEmail, finalThumbnail,
-									finalCoverPhoto, finalSlogan);
-						}
-						else {
-								context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);
-								return;
-						}
+                        if (results.next()) {
 
-                        Gson g = new Gson();
-                        String response = g.toJson(user);
-                        context.getResponse().setStatus(200);
-                        try {
-                            context.getResponse().getWriter().write(response);
-                        } catch (Exception e) {
-                            Logging.log("High", e);
+                            final String username = results.getString(PAYLOAD_USERNAME_KEY);
+                            final String displayname = results.getString(PAYLOAD_DISPLAYNAME_KEY);
+                            final String email = results.getString(EMAIL_KEY);
+                            final String thumbnail = results.getString(THUMBNAIL_KEY);
+                            final String cover_photo = results.getString(COVER_PHOTO_KEY);
+                            final String slogan = results.getString(PAYLOAD_SLOGAN_KEY);
+
+                            /**
+                             * Check if Thumbnail changed, if yes, Update the Thumbnail
+                             */
+                            //if(!old_thumbnail.equals(thumbnail)) {
+                            try {
+                                StatementExecutor executor = new StatementExecutor(UPDATE_USER);
+                                final int finalUser_id = user_id;
+                                final String finalUsername = username;
+                                final String finalDisplayname = displayname;
+                                final String finalEmail = email;
+                                final String finalThumbnail = thumbnail;
+                                final String finalCoverPhoto = cover_photo;
+                                final String finalSlogan = slogan;
+
+
+                                executor.execute(new ExecutionBlock() {
+                                    @Override
+                                    public void process(PreparedStatement ps) throws SQLException {
+
+                                        UserObject user = null;
+
+                                        ps.setString(1, finalThumbnail);
+                                        ps.setInt(2, finalUser_id);
+
+                                        final int update = ps.executeUpdate();
+
+                                        if (update > 0) {
+                                            user = new UserObject(finalUser_id, finalUsername, finalDisplayname, finalEmail, finalThumbnail,
+                                                    finalCoverPhoto, finalSlogan);
+                                        } else {
+                                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);
+                                            return;
+                                        }
+
+                                        Gson g = new Gson();
+                                        String response = g.toJson(user);
+                                        context.getResponse().setStatus(200);
+                                        try {
+                                            context.getResponse().getWriter().write(response);
+                                        } catch (Exception e) {
+                                            Logging.log("High", e);
+                                            return;
+                                        }
+                                    }
+                                });
+                            } catch (SQLException e) {
+                                Logging.log("High", e);
+                                return;
+                            }//end update Thumbnail
+                            //}//end if old_thumbnail.equals(newThumb)
+
+                        } else {
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);
                             return;
                         }
                     }
                 });
             } catch (SQLException e) {
                 Logging.log("High", e);
-				return;
+                return;
             }
-
         }
     }
 

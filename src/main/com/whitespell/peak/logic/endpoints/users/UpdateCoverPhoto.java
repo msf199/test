@@ -46,6 +46,7 @@ public class UpdateCoverPhoto extends EndpointHandler{
 		final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
 		final String cover_photo = context.getPayload().getAsJsonObject().get(PAYLOAD_COVER_PHOTO_KEY).getAsString();
 
+
 		/**
 		 * Ensure that the user is authenticated properly
 		 */
