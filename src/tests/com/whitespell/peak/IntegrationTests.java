@@ -132,7 +132,7 @@ public class IntegrationTests extends Server {
 
             String[] queries = readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
 
-            for (int i = 0; i < queries.length; i++) {
+            for (int i = 0; i < queries.length - 1; i++) {
                 if (queries[i] == null || queries[i].length() < 2 || queries[i].isEmpty()) {
                     continue;
                 }
@@ -169,7 +169,7 @@ public class IntegrationTests extends Server {
             try {
                 isOnline = isOnline(API + "/monitoring/ping");
             } catch (Exception e) {
-
+                Logging.log("Low", e);
             }
             System.out.println("Waiting for API to come online..... " + attempts + " attempts left..");
             attempts--;
@@ -481,13 +481,13 @@ public class IntegrationTests extends Server {
 						"\"slogan\": \"Never Give Up!\"\n}")
 				.asString();
 
-		UserObject userEdited = g.fromJson(stringResponse.getBody(), UserObject.class);
-		assertEquals(userEdited.getUserId(), TEST_UID);
-		assertEquals(userEdited.getUsername(),"thisisanewuser");
-		assertEquals(userEdited.getEmail(), "dem0@peak.com");
-		assertEquals(userEdited.getThumbnail(), "http://www.waywood.com/images/test.jpg");
-		assertEquals(userEdited.getCover_photo(), "http://www.indiamike.com/files/images/26/11/08/kali-river-flowing-through-deep-valley.jpg");
-		assertEquals(userEdited.getSlogan(), "Never Give Up!");
+		UserObject userEdit = g.fromJson(stringResponse.getBody(), UserObject.class);
+		assertEquals(userEdit.getUserId(), TEST_UID);
+		assertEquals(userEdit.getUsername(),"thisisanewuser");
+		assertEquals(userEdit.getEmail(), "dem0@peak.com");
+		assertEquals(userEdit.getThumbnail(), "http://www.waywood.com/images/test.jpg");
+		assertEquals(userEdit.getCover_photo(), "http://www.indiamike.com/files/images/26/11/08/kali-river-flowing-through-deep-valley.jpg");
+		assertEquals(userEdit.getSlogan(), "Never Give Up!");
 
         //change only thumbnail coverphoto and slogan
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
@@ -501,13 +501,13 @@ public class IntegrationTests extends Server {
                         "\"slogan\": \"Whoops!\"\n}")
                 .asString();
 
-        UserObject userEdited2 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdited2.getUserId(), TEST_UID);
-        assertEquals(userEdited2.getUsername(),"thisisanewuser");
-        assertEquals(userEdited2.getEmail(), "dem0@peak.com");
-        assertEquals(userEdited2.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited2.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited2.getSlogan(), "Whoops!");
+        UserObject userEdit2 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(userEdit2.getUserId(), TEST_UID);
+        assertEquals(userEdit2.getUsername(),"thisisanewuser");
+        assertEquals(userEdit2.getEmail(), "dem0@peak.com");
+        assertEquals(userEdit2.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit2.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit2.getSlogan(), "Whoops!");
 
 
         //change username only
@@ -522,13 +522,13 @@ public class IntegrationTests extends Server {
                         "\"slogan\": \"Whoops!\"\n}")
                 .asString();
 
-        UserObject userEdited3 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdited3.getUserId(), TEST_UID);
-        assertEquals(userEdited3.getUsername(),"changename");
-        assertEquals(userEdited3.getEmail(), "dem0@peak.com");
-        assertEquals(userEdited3.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited3.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited3.getSlogan(), "Whoops!");
+        UserObject userEdit3 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(userEdit3.getUserId(), TEST_UID);
+        assertEquals(userEdit3.getUsername(),"changename");
+        assertEquals(userEdit3.getEmail(), "dem0@peak.com");
+        assertEquals(userEdit3.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit3.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit3.getSlogan(), "Whoops!");
 
 
         //change email only
@@ -543,13 +543,13 @@ public class IntegrationTests extends Server {
                         "\"slogan\": \"Whoops!\"\n}")
                 .asString();
 
-        UserObject userEdited4 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdited4.getUserId(), TEST_UID);
-        assertEquals(userEdited4.getUsername(),"changename");
-        assertEquals(userEdited4.getEmail(), "change@peak.com");
-        assertEquals(userEdited4.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited4.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited4.getSlogan(), "Whoops!");
+        UserObject userEdit4 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(userEdit4.getUserId(), TEST_UID);
+        assertEquals(userEdit4.getUsername(),"changename");
+        assertEquals(userEdit4.getEmail(), "change@peak.com");
+        assertEquals(userEdit4.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit4.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit4.getSlogan(), "Whoops!");
 
 
         //change both username and email simultaneously
@@ -564,13 +564,41 @@ public class IntegrationTests extends Server {
                         "\"slogan\": \"Whoops!\"\n}")
                 .asString();
 
-        UserObject userEdited5 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdited5.getUserId(), TEST_UID);
-        assertEquals(userEdited5.getUsername(),"lastchange");
-        assertEquals(userEdited5.getEmail(), "lastchange@peak.com");
-        assertEquals(userEdited5.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited5.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdited5.getSlogan(), "Whoops!");
+        UserObject userEdit5 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(userEdit5.getUserId(), TEST_UID);
+        assertEquals(userEdit5.getUsername(),"lastchange");
+        assertEquals(userEdit5.getEmail(), "lastchange@peak.com");
+        assertEquals(userEdit5.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit5.getCover_photo(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit5.getSlogan(), "Whoops!");
+
+        //cause an error by requesting in use username
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"username\": \""+ ROLLERSKATER_USERNAME +"\",\n" +
+                        "\"email\": \"lastchange@peak.com\",\n" +
+                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"slogan\": \"Whoops!\"\n}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        //UserObject userEdit5 = g.fromJson(stringResponse.getBody(), UserObject.class);
+
+        //cause an error by requesting in use email
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"username\": \"amilliamillia\",\n" +
+                        "\"email\": \""+ROLLERSKATER_EMAIL+"\",\n" +
+                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"slogan\": \"Whoops!\"\n}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        //UserObject userEdit6 = g.fromJson(stringResponse.getBody(), UserObject.class);
 	}
 
 
@@ -597,7 +625,7 @@ public class IntegrationTests extends Server {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
         String inputLine;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null) {
             if(inputLine.length() > 0) {
