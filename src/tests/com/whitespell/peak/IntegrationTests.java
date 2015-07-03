@@ -463,26 +463,21 @@ public class IntegrationTests extends Server {
 
 	@Test
 	public void testE_editUser() throws UnirestException{
+        /**
+         * Currently the response for this object is only the values the user updated. This is to avoid an additional
+         * get of the user's current fields.
+         */
+
+
 		Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
 				.header("accept", "application/json")
 				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
 				.asString();
 
         /**
-         * Cause error, change thumbnail
-         */
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/thumbnail")
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\n}")
-                .asString();
-        System.out.println(stringResponse.getBody());
-
-        /**
          * Change only thumbnail
          */
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/thumbnail")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
@@ -493,119 +488,37 @@ public class IntegrationTests extends Server {
         assertEquals(userEdit.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
 
         /**
-         * Cause error: change cover_photo
-         */
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/coverphoto")
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\n}")
-                .asString();
-        System.out.println(stringResponse.getBody());
-
-        /**
          * Change only cover_photo
          */
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/coverphoto")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
                 .asString();
-//
         UserObject userEdit2 = g.fromJson(stringResponse.getBody(), UserObject.class);
         System.out.println(stringResponse.getBody());
         assertEquals(userEdit2.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
 
-/*
-        //change username only
+
+        /**
+         * Change multiple fields
+         */
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"username\": \"changename\",\n" +
-                        "\"email\": \"dem0@peak.com\",\n" +
-                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"username\": \"p1mw1n\",\n" +
+                        "\"displayname\": \"new\",\n" +
                         "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"slogan\": \"Whoops!\"\n}")
+                        "\"slogan\": \"slogan\"\n" +
+                        "}")
                 .asString();
-
         UserObject userEdit3 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdit3.getUserId(), TEST_UID);
-        assertEquals(userEdit3.getUsername(),"changename");
-        assertEquals(userEdit3.getEmail(), "dem0@peak.com");
-        assertEquals(userEdit3.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit3.getUsername(), "p1mw1n");
+        assertEquals(userEdit3.getDisplayname(), "new");
         assertEquals(userEdit3.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit3.getSlogan(), "Whoops!");
-
-
-        //change email only
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\"username\": \"changename\",\n" +
-                        "\"email\": \"change@peak.com\",\n" +
-                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"slogan\": \"Whoops!\"\n}")
-                .asString();
-
-        UserObject userEdit4 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdit4.getUserId(), TEST_UID);
-        assertEquals(userEdit4.getUsername(),"changename");
-        assertEquals(userEdit4.getEmail(), "change@peak.com");
-        assertEquals(userEdit4.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit4.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit4.getSlogan(), "Whoops!");
-
-
-        //change both username and email simultaneously
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\"username\": \"lastchange\",\n" +
-                        "\"email\": \"lastchange@peak.com\",\n" +
-                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"slogan\": \"Whoops!\"\n}")
-                .asString();
-
-        UserObject userEdit5 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userEdit5.getUserId(), TEST_UID);
-        assertEquals(userEdit5.getUsername(),"lastchange");
-        assertEquals(userEdit5.getEmail(), "lastchange@peak.com");
-        assertEquals(userEdit5.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit5.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
-        assertEquals(userEdit5.getSlogan(), "Whoops!");
-
-        //cause an error by requesting in use username
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\"username\": \""+ ROLLERSKATER_USERNAME +"\",\n" +
-                        "\"email\": \"lastchange@peak.com\",\n" +
-                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"slogan\": \"Whoops!\"\n}")
-                .asString();
-        System.out.println(stringResponse.getBody());
-        //UserObject userEdit5 = g.fromJson(stringResponse.getBody(), UserObject.class);
-
-        //cause an error by requesting in use email
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\"username\": \"amilliamillia\",\n" +
-                        "\"email\": \""+ROLLERSKATER_EMAIL+"\",\n" +
-                        "\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
-                        "\"slogan\": \"Whoops!\"\n}")
-                .asString();
-        System.out.println(stringResponse.getBody());
-        //UserObject userEdit6 = g.fromJson(stringResponse.getBody(), UserObject.class);*/
+        assertEquals(userEdit3.getSlogan(), "slogan");
 	}
 
 
