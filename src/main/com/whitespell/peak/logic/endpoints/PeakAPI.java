@@ -111,6 +111,12 @@ public class PeakAPI extends WhitespellAPI {
         // Add a new category
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddCategory(), "/categories");
 
+        /**
+         * SEARCH
+         */
+
+        // Get a search object
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Search(), "/search");
 
 
     }
