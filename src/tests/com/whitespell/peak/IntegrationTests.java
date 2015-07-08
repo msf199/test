@@ -13,6 +13,7 @@ import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.*;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
+import main.com.whitespell.peak.security.PasswordHash;
 import org.junit.Test;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
@@ -26,6 +27,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -463,16 +466,16 @@ public class IntegrationTests extends Server {
 
 	@Test
 	public void testE_editUser() throws UnirestException{
+
         /**
          * Currently the response for this object is only the values the user updated. This is to avoid an additional
          * get of the user's current fields.
          */
-
-
 		Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
 				.header("accept", "application/json")
 				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
 				.asString();
+
 
         /**
          * Change only thumbnail
@@ -519,7 +522,83 @@ public class IntegrationTests extends Server {
         assertEquals(userEdit3.getDisplayname(), "new");
         assertEquals(userEdit3.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdit3.getSlogan(), "slogan");
+
+        /**
+         * Change only username
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"username\": \"evenneweruser\"\n}")
+                .asString();
+        UserObject userEdit4 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit4.getUserId(), TEST_UID);
+        assertEquals(userEdit4.getUsername(), "evenneweruser");
+
+        /**
+         * Change username and slogan
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"username\": \"evenneweruser2\",\n" +
+                        "\"slogan\": \"slogan\"\n" +
+                        "}")
+                .asString();
+        UserObject userEdit5 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit5.getUserId(), TEST_UID);
+        assertEquals(userEdit5.getUsername(), "evenneweruser2");
+        assertEquals(userEdit5.getSlogan(), "slogan");
 	}
+
+    @Test
+    public void testF_editSettings() throws UnirestException{
+
+        /**
+         * Currently the response for this object is only the values the user updated. This is to avoid an additional
+         * get of the user's current fields.
+         */
+        Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        /**
+         * Change only email
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/settings")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"password\": \"" + TEST_PASSWORD + "\",\n" +
+                        "\"email\": \"newtestemail@lol.com\"\n" +
+                        "}")
+                .asString();
+
+        /**
+         * Change only password
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/settings")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"password\": \"" + TEST_PASSWORD + "\",\n" +
+                        "\"new_password\": \"!@#$%^&*()~\"\n" +
+                        "}")
+                .asString();
+
+        /**
+         * Change both email & password
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/settings")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"password\": \"!@#$%^&*()~\",\n" +
+                        "\"new_password\": \")(*&^%$#@!~\",\n" +
+                        "\"email\": \"newtestemail2@lol.com\"\n" +
+                        "}")
+                .asString();
+    }
 
 
 

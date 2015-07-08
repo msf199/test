@@ -32,43 +32,45 @@ public class UpdateSettings extends EndpointHandler {
     //need an identifier for old and new pass
     //we can ensure that the user always enters their current password when changing email or password
     private static final String PAYLOAD_CURRENT_PASSWORD_KEY = "password";
+    private static final String PAYLOAD_NEW_PASSWORD_KEY = "new_password";
 
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(PAYLOAD_CURRENT_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_NEW_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
 
     private static final String CHECK_EMAIL_TAKEN_QUERY = "SELECT `user_id`, `email` FROM `user` WHERE `email` = ? AND `user_id` != ? LIMIT 1";
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `user_id` = ? LIMIT 1";
 
-    private static final String UPDATE_AUTHENTICATION = "UPDATE `authentication` SET `key` WHERE `user_id` = ?";
+    private static final String UPDATE_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`) " +
+            "VALUES (?,?)";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
         JsonObject j = context.getPayload().getAsJsonObject();
-        String temp = "", temp1 = "", temp2 = "";
+        String temp = "", temp1 = "";
         final ArrayList<String> updateKeys = new ArrayList<>();
         final ArrayList<String> updateValues = new ArrayList<>();
 
+        final String current_pass = j.get(PAYLOAD_CURRENT_PASSWORD_KEY).getAsString();
         if (j.get(PAYLOAD_EMAIL_KEY) != null) {
             temp = j.get(PAYLOAD_EMAIL_KEY).getAsString();
             updateKeys.add(PAYLOAD_EMAIL_KEY);
             updateValues.add(temp);
         }
-        if (j.get(PAYLOAD_CURRENT_PASSWORD_KEY) != null) {
-            temp1 = j.get(PAYLOAD_CURRENT_PASSWORD_KEY).getAsString();
+        if (j.get(PAYLOAD_NEW_PASSWORD_KEY) != null) {
+            temp1 = j.get(PAYLOAD_NEW_PASSWORD_KEY).getAsString();
             updateKeys.add(PAYLOAD_CURRENT_PASSWORD_KEY);
             updateValues.add(temp1);
         }
-
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         final String email = temp;
-        final String password = temp1;
-        //final String new_pass = temp2;
-        String passHash;
+        final String new_pass = temp1;
+        String passHash = "";
 
         /**
          * Ensure that the user is authenticated properly
@@ -119,19 +121,21 @@ public class UpdateSettings extends EndpointHandler {
         }
 
         /**
-         * Check if user password is correct and if new password restrictions are violated
+         * Check if new_pass restrictions are violated
          */
         //check if values are too long
-        if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
-            return;
-        }  else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
-            return;
+        if(updateKeys.contains(PAYLOAD_NEW_PASSWORD_KEY)) {
+            if (new_pass.length() > StaticRules.MAX_PASSWORD_LENGTH) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
+                return;
+            } else if (new_pass.length() < StaticRules.MIN_PASSWORD_LENGTH) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
+                return;
+            }
         }
 
 
-        // retrieve the password based on user_id, verify the password.
+        // retrieve the current_pass based on user_id, verify the current_pass.
         try {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
@@ -142,8 +146,8 @@ public class UpdateSettings extends EndpointHandler {
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         try {
-                            // with the result set, check if password is verified
-                            boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(password, s.getString("password"));
+                            // with the result set, check if current_pass is verified
+                            boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(current_pass, s.getString(PAYLOAD_CURRENT_PASSWORD_KEY));
 
                             if (isVerified) {
                                 // initialize an authenticationobject and set the authentication key if verified
@@ -193,17 +197,16 @@ public class UpdateSettings extends EndpointHandler {
             Logging.log("High", e);
         }
 
-
-        //create a new passHash for the new password, prepare for database update
-
-        try {
-            passHash = PasswordHash.createHash(password);
-        } catch (Exception e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
+        //create a new passHash for the new_pass, prepare for database update
+        if(updateKeys.contains(PAYLOAD_CURRENT_PASSWORD_KEY)) {
+            try {
+                passHash = PasswordHash.createHash(new_pass);
+            } catch (Exception e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
         }
-
 
         /**
          * Construct the SET string based on the fields the user wants to update.
@@ -230,7 +233,7 @@ public class UpdateSettings extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(UPDATE_USER);
             final int finalUser_id = user_id;
-            final String finalUsername = email;
+            final String finalEmail = email;
             final String finalPassword = passHash;
 
             executor.execute(new ExecutionBlock() {
@@ -240,11 +243,11 @@ public class UpdateSettings extends EndpointHandler {
                     UserObject user = null;
                     int count = 1;
 
-                    if (updateValues.contains(finalUsername)) {
-                        ps.setString(count, finalUsername);
+                    if (updateValues.contains(finalEmail)) {
+                        ps.setString(count, finalEmail);
                         count++;
                     }
-                    if (updateValues.contains(finalPassword)) {
+                    if (updateKeys.contains(PAYLOAD_CURRENT_PASSWORD_KEY)) {
                         ps.setString(count, finalPassword);
                         count++;
                     }
@@ -255,6 +258,7 @@ public class UpdateSettings extends EndpointHandler {
 
                     if (update > 0) {
                         System.out.println("success");
+                        context.getResponse().setStatus(200);
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);
                         return;
@@ -266,5 +270,4 @@ public class UpdateSettings extends EndpointHandler {
             return;
         }//end update profile
     }
-
 }
