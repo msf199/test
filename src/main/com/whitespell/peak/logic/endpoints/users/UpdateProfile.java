@@ -96,20 +96,20 @@ import java.util.ArrayList;
         }
 
         /**
-         * Check that username meets requirements
-         */
-        if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
-            return;
-        }  else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
-            return;
-        }
-
-        /**
          * 401 Unauthorized: Check if username exists
          */
         if (updateKeys.contains(PAYLOAD_USERNAME_KEY)) {
+            /**
+             * Check that username meets requirements
+             */
+            if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
+                return;
+            }  else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
+                return;
+            }
+
             try {
                 StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_TAKEN_QUERY);
                 final int finalUser_id = user_id;

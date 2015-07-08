@@ -29,8 +29,6 @@ public class UpdateSettings extends EndpointHandler {
 
     private static final String PAYLOAD_EMAIL_KEY = "email";
 
-    //need an identifier for old and new pass
-    //we can ensure that the user always enters their current password when changing email or password
     private static final String PAYLOAD_CURRENT_PASSWORD_KEY = "password";
     private static final String PAYLOAD_NEW_PASSWORD_KEY = "new_password";
 
@@ -75,7 +73,6 @@ public class UpdateSettings extends EndpointHandler {
         /**
          * Ensure that the user is authenticated properly
          */
-
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
 
         if (!a.isAuthenticated()) {
@@ -123,7 +120,6 @@ public class UpdateSettings extends EndpointHandler {
         /**
          * Check if new_pass restrictions are violated
          */
-        //check if values are too long
         if(updateKeys.contains(PAYLOAD_NEW_PASSWORD_KEY)) {
             if (new_pass.length() > StaticRules.MAX_PASSWORD_LENGTH) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
@@ -132,10 +128,15 @@ public class UpdateSettings extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
                 return;
             }
+            if(new_pass.equals(current_pass)){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
+                return;
+            }
         }
 
-
-        // retrieve the current_pass based on user_id, verify the current_pass.
+        /**
+         * Validate the current password and create a new session key for this user_id
+         */
         try {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
@@ -182,10 +183,13 @@ public class UpdateSettings extends EndpointHandler {
                             }
                         } catch (NoSuchAlgorithmException e) {
                             Logging.log("High", e);
+                            return;
                         } catch (InvalidKeySpecException e) {
                             Logging.log("High", e);
+                            return;
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Logging.log("High", e);
+                            return;
                         }
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
@@ -195,9 +199,12 @@ public class UpdateSettings extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            return;
         }
 
-        //create a new passHash for the new_pass, prepare for database update
+        /**
+         * Create a new passhash and prepare for database query
+         */
         if(updateKeys.contains(PAYLOAD_CURRENT_PASSWORD_KEY)) {
             try {
                 passHash = PasswordHash.createHash(new_pass);
@@ -229,7 +236,9 @@ public class UpdateSettings extends EndpointHandler {
         final String UPDATE_USER = setString.toString();
         System.out.println(UPDATE_USER);
 
-        //try to update user
+        /**
+         * Try to update settings in database
+         */
         try {
             StatementExecutor executor = new StatementExecutor(UPDATE_USER);
             final int finalUser_id = user_id;
@@ -268,6 +277,6 @@ public class UpdateSettings extends EndpointHandler {
         } catch (SQLException e) {
             Logging.log("High", e);
             return;
-        }//end update profile
+        }//end update settings
     }
 }

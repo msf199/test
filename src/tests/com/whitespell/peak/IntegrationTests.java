@@ -471,11 +471,11 @@ public class IntegrationTests extends Server {
          * Currently the response for this object is only the values the user updated. This is to avoid an additional
          * get of the user's current fields.
          */
-		Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+		stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
 				.header("accept", "application/json")
 				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
 				.asString();
-
+        System.out.println(stringResponse.getBody());
 
         /**
          * Change only thumbnail
