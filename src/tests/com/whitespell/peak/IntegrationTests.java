@@ -32,7 +32,7 @@ import java.sql.SQLException;
 import static org.junit.Assert.assertEquals;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         6/21/15
  *         tests.com.whitespell.peak
  */
@@ -132,7 +132,7 @@ public class IntegrationTests extends Server {
 
             String[] queries = readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
 
-            for (int i = 0; i < queries.length; i++) {
+            for (int i = 0; i < queries.length - 1; i++) {
                 if (queries[i] == null || queries[i].length() < 2 || queries[i].isEmpty()) {
                     continue;
                 }
@@ -169,7 +169,7 @@ public class IntegrationTests extends Server {
             try {
                 isOnline = isOnline(API + "/monitoring/ping");
             } catch (Exception e) {
-
+                Logging.log("Low", e);
             }
             System.out.println("Waiting for API to come online..... " + attempts + " attempts left..");
             attempts--;
@@ -425,7 +425,7 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testB_contentTest() throws UnirestException {
-        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
@@ -435,14 +435,12 @@ public class IntegrationTests extends Server {
                         "\"content_url\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"\n}")
                 .asString();
 
-        System.out.println(a.getBody());
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
-        System.out.println("stringresponse: " + stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContent_type(), contentTypes[0].getContent_type_id());
         assertEquals(content[0].getContent_title(), "10-Minute No-Equipment Home Workout");
@@ -462,6 +460,66 @@ public class IntegrationTests extends Server {
     public void testD_incurCreateAccountErrors() {
         //todo(pim) create accounts with usernames and too long strings that are already taken and should give us errors
     }
+
+	@Test
+	public void testE_editUser() throws UnirestException{
+        /**
+         * Currently the response for this object is only the values the user updated. This is to avoid an additional
+         * get of the user's current fields.
+         */
+
+
+		Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+				.header("accept", "application/json")
+				.header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+				.asString();
+
+        /**
+         * Change only thumbnail
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
+                .asString();
+        UserObject userEdit = g.fromJson(stringResponse.getBody(), UserObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit.getUserId(), TEST_UID);
+        assertEquals(userEdit.getThumbnail(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+
+        /**
+         * Change only cover_photo
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
+                .asString();
+        UserObject userEdit2 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit2.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+
+
+        /**
+         * Change multiple fields
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"username\": \"p1mw1n\",\n" +
+                        "\"displayname\": \"new\",\n" +
+                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"slogan\": \"slogan\"\n" +
+                        "}")
+                .asString();
+        UserObject userEdit3 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(userEdit3.getUsername(), "p1mw1n");
+        assertEquals(userEdit3.getDisplayname(), "new");
+        assertEquals(userEdit3.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
+        assertEquals(userEdit3.getSlogan(), "slogan");
+	}
 
 
 
@@ -487,7 +545,7 @@ public class IntegrationTests extends Server {
         BufferedReader in = new BufferedReader(
                 new InputStreamReader(con.getInputStream()));
         String inputLine;
-        StringBuffer response = new StringBuffer();
+        StringBuilder response = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null) {
             if(inputLine.length() > 0) {

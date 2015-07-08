@@ -7,3 +7,4 @@ api.iml
 bin
 .Error*
 errors/*
+*.iml

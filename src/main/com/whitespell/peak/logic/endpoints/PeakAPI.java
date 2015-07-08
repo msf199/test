@@ -15,7 +15,7 @@ import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         2/4/15
  *         whitespell.endpoints
  */
@@ -50,7 +50,13 @@ public class PeakAPI extends WhitespellAPI {
         // Get a specific user based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "user_id"); //always have the variable first
 
-        // get all the users sorted by categories (also takes in same search criteria as /users)
+		// As a user, update your username, displayname, and slogan
+		dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateProfile(), "/users/$", "user_id");
+
+        // As a user, update your email or password
+        //(todo cmcan) Create UpdateSettings() endpoint for email and password updates.
+
+		// get all the users sorted by categories (also takes in same search criteria as /users)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsersByCategory(), "/users/categories/");
 
         // Add new content as a user
