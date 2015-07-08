@@ -10,6 +10,8 @@ public class ContentObject {
     String content_title;
     String content_url;
     String content_description;
+    int likes = 100;
+    String thumbnail = "https://s-media-cache-ak0.pinimg.com/originals/c2/1e/ce/c21ecebc560514fe3e48ca5eef1c09b8.jpg";
 
     public ContentObject(int content_type, String content_title,
                          String content_url, String content_description) {
