@@ -71,8 +71,7 @@ public class GetUser extends EndpointHandler {
                     if (results.next()) {
 
                         user = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
-                                results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(SLOGAN_KEY),
-                                results.getString(COVER_PHOTO_KEY));
+                                results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;
