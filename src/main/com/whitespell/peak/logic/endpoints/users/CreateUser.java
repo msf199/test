@@ -183,7 +183,8 @@ public class CreateUser extends EndpointHandler {
                         try {
                             context.getResponse().getWriter().write(json);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Logging.log("High", e);
+                            return;
                         }
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
