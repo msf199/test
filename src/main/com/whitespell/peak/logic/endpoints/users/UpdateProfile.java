@@ -99,6 +99,17 @@ import java.util.ArrayList;
          * 401 Unauthorized: Check if username exists
          */
         if (updateKeys.contains(PAYLOAD_USERNAME_KEY)) {
+            /**
+             * Check that username meets requirements
+             */
+            if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
+                return;
+            }  else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
+                return;
+            }
+
             try {
                 StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_TAKEN_QUERY);
                 final int finalUser_id = user_id;
@@ -197,7 +208,7 @@ import java.util.ArrayList;
 
                     if (update > 0) {
                         //outputs only the updated user fields, others will be ""
-                        user = new UserObject(finalUser_id, finalUsername, finalDisplayname, finalThumbnail,
+                        user = new UserObject(finalUser_id, finalUsername, finalDisplayname, "", finalThumbnail,
                                 finalCoverPhoto, finalSlogan);
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);

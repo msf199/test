@@ -43,14 +43,6 @@ public class UserObject {
         this.slogan = "";
     }
 
-    public UserObject(int user_id, String username, String displayname, String thumbnail, String cover_photo, String slogan){
-        this.user_id = user_id;
-        this.username = username;
-        this.displayname = displayname;
-        this.thumbnail = thumbnail;
-        this.coverPhoto = cover_photo;
-        this.slogan = slogan;
-    }
 
     public UserObject(int user_id, String username, String displayname, String email, String thumbnail, String cover_photo, String slogan) {
         this.user_id = user_id;
