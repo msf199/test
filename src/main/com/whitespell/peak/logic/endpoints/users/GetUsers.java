@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class GetUsers extends EndpointHandler {
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `slogan`, `cover_photo` FROM `user`";
+    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user`";
 
 	private static final String URL_USER_ID = "user_id";
 
@@ -51,8 +51,8 @@ public class GetUsers extends EndpointHandler {
                     while (results.next()) {
 
                         UserObject d = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
-								results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(SLOGAN_KEY),
-								results.getString(COVER_PHOTO_KEY));
+								results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY),
+                                results.getString(SLOGAN_KEY));
 
                         users.add(d);
                     }
