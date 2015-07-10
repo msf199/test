@@ -75,7 +75,7 @@ public class UpdateSettings extends EndpointHandler {
          */
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
 
-        if (!a.isAuthenticated()) {
+        if (!a.isAuthenticated() || user_id != a.getUserId()) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }

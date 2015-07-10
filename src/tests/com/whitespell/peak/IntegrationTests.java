@@ -13,7 +13,6 @@ import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.*;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
-import main.com.whitespell.peak.security.PasswordHash;
 import org.junit.Test;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
@@ -27,8 +26,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
@@ -266,7 +263,7 @@ public class IntegrationTests extends Server {
         UserObject user = g.fromJson(stringResponse.getBody(), UserObject.class);
 
         assertEquals(user.getUserId(), TEST_UID);
-        assertEquals(user.getUsername(), TEST_USERNAME);
+        assertEquals(user.getUserName(), TEST_USERNAME);
 
 
         /**
@@ -280,7 +277,7 @@ public class IntegrationTests extends Server {
         UserObject user2 = g.fromJson(stringResponse.getBody(), UserObject.class);
 
         assertEquals(user2.getUserId(), TEST2_UID);
-        assertEquals(user2.getUsername(), ROLLERSKATER_USERNAME);
+        assertEquals(user2.getUserName(), ROLLERSKATER_USERNAME);
     }
 
 
@@ -308,8 +305,8 @@ public class IntegrationTests extends Server {
 
         categories = g.fromJson(stringResponse.getBody(), CategoryObject[].class);
         assertEquals(categories.length, 2);
-        assertEquals(categories[0].getCategory_name(), "skydiving");
-        assertEquals(categories[1].getCategory_name(), "roller-skating");
+        assertEquals(categories[0].getCategoryName(), "skydiving");
+        assertEquals(categories[1].getCategoryName(), "roller-skating");
     }
 
     @Test
@@ -318,7 +315,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"category_id\": \"" + categories[0].getCategory_id() + "\",\n" +
+                        "\"category_id\": \"" + categories[0].getCategoryId() + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
@@ -326,7 +323,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"category_id\": \"" + categories[1].getCategory_id() + "\",\n" +
+                        "\"category_id\": \"" + categories[1].getCategoryId() + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
@@ -387,8 +384,8 @@ public class IntegrationTests extends Server {
 
         contentTypes = g.fromJson(stringResponse.getBody(), ContentTypeObject[].class);
         assertEquals(contentTypes.length, 2);
-        assertEquals(contentTypes[0].getContent_type_name(), "youtube");
-        assertEquals(contentTypes[1].getContent_type_name(), "instagram");
+        assertEquals(contentTypes[0].getContentTypeName(), "youtube");
+        assertEquals(contentTypes[1].getContentTypeName(), "instagram");
     }
 
     @Test
@@ -411,7 +408,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
-                        "\"content_type\": \""+contentTypes[0].getContent_type_id()+"\",\n" +
+                        "\"content_type\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
                         "\"content_description\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"content_title\": \"10-Minute No-Equipment Home Workout\",\n" +
                         "\"content_url\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"\n}")
@@ -424,10 +421,10 @@ public class IntegrationTests extends Server {
                 .asString();
 
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content[0].getContent_type(), contentTypes[0].getContent_type_id());
-        assertEquals(content[0].getContent_title(), "10-Minute No-Equipment Home Workout");
-        assertEquals(content[0].getContent_url(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
-        assertEquals(content[0].getContent_description(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
+        assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
     }
 
     @Test
@@ -497,8 +494,8 @@ public class IntegrationTests extends Server {
                 .asString();
         UserObject userEdit3 = g.fromJson(stringResponse.getBody(), UserObject.class);
         System.out.println(stringResponse.getBody());
-        assertEquals(userEdit3.getUsername(), "p1mw1n");
-        assertEquals(userEdit3.getDisplayname(), "new");
+        assertEquals(userEdit3.getUserName(), "p1mw1n");
+        assertEquals(userEdit3.getDisplayName(), "new");
         assertEquals(userEdit3.getCoverPhoto(), "https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO");
         assertEquals(userEdit3.getSlogan(), "slogan");
 
@@ -513,7 +510,7 @@ public class IntegrationTests extends Server {
         UserObject userEdit4 = g.fromJson(stringResponse.getBody(), UserObject.class);
         System.out.println(stringResponse.getBody());
         assertEquals(userEdit4.getUserId(), TEST_UID);
-        assertEquals(userEdit4.getUsername(), "evenneweruser");
+        assertEquals(userEdit4.getUserName(), "evenneweruser");
 
         /**
          * Change username and slogan
@@ -528,7 +525,7 @@ public class IntegrationTests extends Server {
         UserObject userEdit5 = g.fromJson(stringResponse.getBody(), UserObject.class);
         System.out.println(stringResponse.getBody());
         assertEquals(userEdit5.getUserId(), TEST_UID);
-        assertEquals(userEdit5.getUsername(), "evenneweruser2");
+        assertEquals(userEdit5.getUserName(), "evenneweruser2");
         assertEquals(userEdit5.getSlogan(), "slogan");
 	}
 

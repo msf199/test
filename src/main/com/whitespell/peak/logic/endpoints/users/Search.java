@@ -22,10 +22,20 @@ import java.util.ArrayList;
 public class Search extends EndpointHandler {
 
     private static final String QS_SEARCH_QUERY_KEY = "q";
+
+    /**
+     * What we're getting from user
+     */
     private static final String USER_ID_KEY = "user_id";
     private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
     private static final String THUMBNAIL_KEY = "thumbnail";
+
+    /**
+     * What we're getting from categories
+     */
+
+
 
     protected ArrayList<UserObject> tempUsers = new ArrayList<>();
     protected ArrayList<Integer> tempCategories = new ArrayList<>();

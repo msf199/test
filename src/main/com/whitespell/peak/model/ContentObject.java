@@ -6,28 +6,30 @@ package main.com.whitespell.peak.model;
  *          whitespell.model
  */
 public class ContentObject {
-    int content_type;
-    String content_title;
-    String content_url;
-    String content_description;
+    int contentType;
+    String contentTitle;
+    String contentUrl;
+    String contentDescription;
     int likes = 100;
     String thumbnail = "https://s-media-cache-ak0.pinimg.com/originals/c2/1e/ce/c21ecebc560514fe3e48ca5eef1c09b8.jpg";
 
-    public ContentObject(int content_type, String content_title,
-                         String content_url, String content_description) {
-        this.content_type = content_type;
-        this.content_title = content_title;
-        this.content_url = content_url;
-        this.content_description = content_description;
+    public ContentObject(int contentType, String contentTitle,
+                         String contentUrl, String contentDescription) {
+        this.contentType = contentType;
+        this.contentTitle = contentTitle;
+        this.contentUrl = contentUrl;
+        this.contentDescription = contentDescription;
     }
 
-    public int getContent_type() { return content_type; }
+    public int getContentType() { return contentType; }
 
-    public String getContent_title() { return content_title; }
+    public String getContentTitle() { return contentTitle; }
 
-    public String getContent_url() { return content_url; }
+    public String getContentUrl() { return contentUrl; }
 
-    public String getContent_description() {
-        return content_description;
-    }
+    public String getContentDescription() { return contentDescription; }
+
+    public int getLikes() { return likes; }
+
+    public String getThumbnail() { return thumbnail; }
 }

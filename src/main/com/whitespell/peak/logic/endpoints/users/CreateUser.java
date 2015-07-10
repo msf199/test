@@ -174,7 +174,7 @@ public class CreateUser extends EndpointHandler {
                         UserObject uo = new UserObject();
                         uo.setUserId(s.getInt("user_id"));
                         uo.setEmail(finalEmail);
-                        uo.setUsername(finalUsername);
+                        uo.setUserName(finalUsername);
                         Gson g = new Gson();
                         String json = g.toJson(uo);
                         try {
