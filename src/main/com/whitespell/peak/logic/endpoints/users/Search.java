@@ -34,6 +34,12 @@ public class Search extends EndpointHandler {
 
         SearchResponse search = new SearchResponse();
 
+        /**
+         * In this endpoint we want to:
+         * Concurrently query the database for three different queries in different
+         */
+
+
 
         Gson g = new Gson();
         String response = g.toJson(search);
