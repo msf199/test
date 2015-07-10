@@ -28,27 +28,24 @@ public class RequestCategories extends EndpointHandler {
     public void safeCall(final RequestObject context) throws IOException {
         try {
             StatementExecutor executor = new StatementExecutor(GET_CATEGORIES);
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
+            executor.execute(ps -> {
 
-                    final ResultSet results = ps.executeQuery();
-                    ArrayList<CategoryObject> categoryObjects = new ArrayList<>();
-                    while (results.next()) {
+                final ResultSet results = ps.executeQuery();
+                ArrayList<CategoryObject> categoryObjects = new ArrayList<>();
+                while (results.next()) {
 
-                        CategoryObject d = new CategoryObject(results.getInt("category_id"), results.getString("category_name"), results.getString("category_thumbnail"), results.getInt("category_followers"), results.getInt("category_publishers"));
-                        categoryObjects.add(d);
-                    }
+                    CategoryObject d = new CategoryObject(results.getInt("category_id"), results.getString("category_name"), results.getString("category_thumbnail"), results.getInt("category_followers"), results.getInt("category_publishers"));
+                    categoryObjects.add(d);
+                }
 
-                    // put the array list into a JSON array and write it as a response
-                    Gson g = new Gson();
-                    String response = g.toJson(categoryObjects);
-                    context.getResponse().setStatus(200);
-                    try {
-                        context.getResponse().getWriter().write(response);
-                    } catch (Exception e) {
-                        Logging.log("High", e);
-                    }
+                // put the array list into a JSON array and write it as a response
+                Gson g = new Gson();
+                String response = g.toJson(categoryObjects);
+                context.getResponse().setStatus(200);
+                try {
+                    context.getResponse().getWriter().write(response);
+                } catch (Exception e) {
+                    Logging.log("High", e);
                 }
             });
         } catch (SQLException e) {

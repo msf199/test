@@ -24,9 +24,7 @@ public class GetUser extends EndpointHandler {
 
 
     private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
-
     private static final String URL_USER_ID = "user_id";
-
     private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
     private static final String EMAIL_KEY = "email";

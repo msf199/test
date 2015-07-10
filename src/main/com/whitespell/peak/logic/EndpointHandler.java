@@ -15,8 +15,8 @@ public abstract class EndpointHandler {
         return urlInput;
     }
 
-    public HashMap<String, StaticRules.InputTypes> getParameterInput() {
-        return parameterInput;
+    public HashMap<String, StaticRules.InputTypes> getQueryStringInput() {
+        return queryStringInput;
     }
 
     public HashMap<String, StaticRules.InputTypes> getPayloadInput() {
@@ -25,7 +25,7 @@ public abstract class EndpointHandler {
 
     public HashMap<String, StaticRules.InputTypes> payloadInput = new HashMap<>();
     public HashMap<String, StaticRules.InputTypes> urlInput = new HashMap<>();
-    public HashMap<String, StaticRules.InputTypes> parameterInput = new HashMap<>();
+    public HashMap<String, StaticRules.InputTypes> queryStringInput = new HashMap<>();
 
 
     public abstract void safeCall(RequestObject context) throws IOException;

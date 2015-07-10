@@ -112,8 +112,8 @@ public class EndpointDispatcher extends HttpServlet {
                     if(result.getEndpointSpec().getEndpointInterface().getPayloadInput().size() > 0) {
                         Safety.checkPayload(result.getEndpointSpec().getEndpointInterface().getPayloadInput(), context.getPayload());
                     }
-                    if(result.getEndpointSpec().getEndpointInterface().getParameterInput().size() > 0) {
-                        Safety.checkQueryStringInput(result.getEndpointSpec().getEndpointInterface().getParameterInput(), context.getParameterMap());
+                    if(result.getEndpointSpec().getEndpointInterface().getQueryStringInput().size() > 0) {
+                        Safety.checkQueryStringInput(result.getEndpointSpec().getEndpointInterface().getQueryStringInput(), context.getQueryString());
                     }
                     if(result.getEndpointSpec().getEndpointInterface().getUrlInput().size() > 0) {
                         Safety.checkUrlVariableInput(result.getEndpointSpec().getEndpointInterface().getUrlInput(), context.getUrlVariables());

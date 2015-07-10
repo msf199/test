@@ -61,28 +61,25 @@ public class RequestContent extends EndpointHandler {
 
             try {
                 StatementExecutor executor = new StatementExecutor(SELECT_CONTENT_FOR_ID_QUERY);
-                executor.execute(new ExecutionBlock() {
-                    @Override
-                    public void process(PreparedStatement ps) throws SQLException {
-                        ArrayList<ContentObject> contents = new ArrayList<>();
-                        ResultSet results = ps.executeQuery();
+                executor.execute(ps -> {
+                    ArrayList<ContentObject> contents = new ArrayList<>();
+                    ResultSet results = ps.executeQuery();
 
-                        //display results
-                        while (results.next()) {
-                            ContentObject content = new ContentObject(results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                                    results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION));
-                            contents.add(content);
-                        }
+                    //display results
+                    while (results.next()) {
+                        ContentObject content = new ContentObject(results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
+                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION));
+                        contents.add(content);
+                    }
 
-                        Gson g = new Gson();
-                        String response = g.toJson(contents);
-                        context.getResponse().setStatus(200);
-                        try {
-                            context.getResponse().getWriter().write(response);
-                        } catch (Exception e) {
-                            Logging.log("High", e);
-                            return;
-                        }
+                    Gson g = new Gson();
+                    String response = g.toJson(contents);
+                    context.getResponse().setStatus(200);
+                    try {
+                        context.getResponse().getWriter().write(response);
+                    } catch (Exception e) {
+                        Logging.log("High", e);
+                        return;
                     }
                 });
             } catch (SQLException e) {
