@@ -34,14 +34,10 @@ public class Search extends EndpointHandler {
     /**
      * What we're getting from categories
      */
+    private static final String CATEGORY_ID_KEY = "category_id";
 
 
 
-    protected ArrayList<UserObject> tempUsers = new ArrayList<>();
-    protected ArrayList<Integer> tempCategories = new ArrayList<>();
-    protected ArrayList<ContentObject> tempContent = new ArrayList<>(
-
-    );
 
 
     @Override
@@ -52,13 +48,17 @@ public class Search extends EndpointHandler {
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
+        ArrayList<UserObject> tempUsers = new ArrayList<>();
+        ArrayList<Integer> tempCategories = new ArrayList<>();
+       W ArrayList<ContentObject> tempContent = new ArrayList<>();
+
         /**
          * Initialize the locks to ensure each query is finished with processing before rendering the result
          * (Purposely chose 3 different objects, and not a boolean array due to multithreading)
          */
 
         final boolean[] userThreadLockRemoved = {false};
-        final boolean[] categoryThreadLockRemoved = {true}; //todo(pim) CHANGE TO FALSE WHEN MAKE
+        final boolean[] categoryThreadLockRemoved = {false};
         final boolean[] contentThreadLockRemoved = {true}; //todo(pim) CHANGE TO FALSE WHEN MAKE
 
         /**
@@ -101,7 +101,22 @@ public class Search extends EndpointHandler {
 
         new Thread(
                 () -> {
-                    //mysql stuff
+                    try {
+                        StatementExecutor executor = new StatementExecutor("SELECT `"+CATEGORY_ID_KEY+"` FROM `category` WHERE `category_name` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
+                        executor.execute(ps -> {
+                            ResultSet results = ps.executeQuery();
+
+                            while(results.next()) {
+                                System.out.println(results.getString(CATEGORY_ID_KEY));
+                                tempCategories.add(results.getInt(CATEGORY_ID_KEY));
+                            }
+
+                        });
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } finally {
+                        categoryThreadLockRemoved[0] = true;
+                    }
                 }
         ).start();
 
@@ -151,8 +166,6 @@ public class Search extends EndpointHandler {
             this.users = users;
             this.categories = categories;
             this.content = content;
-
-
         }
 
         public ArrayList<UserObject> users;
