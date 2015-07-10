@@ -159,13 +159,10 @@ public class UpdateSettings extends EndpointHandler {
                                 try {
                                     StatementExecutor executor = new StatementExecutor(UPDATE_AUTHENTICATION);
 
-                                    executor.execute(new ExecutionBlock() {
-                                        @Override
-                                        public void process(PreparedStatement ps) throws SQLException {
-                                            ps.setInt(1, ao.getUserId());
-                                            ps.setString(2, ao.getKey());
-                                            ps.executeUpdate();
-                                        }
+                                    executor.execute(ps1 -> {
+                                        ps1.setInt(1, ao.getUserId());
+                                        ps1.setString(2, ao.getKey());
+                                        ps1.executeUpdate();
                                     });
                                 } catch (SQLException e) {
                                     Logging.log("High", e);

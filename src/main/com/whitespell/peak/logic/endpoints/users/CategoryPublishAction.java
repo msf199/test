@@ -93,16 +93,13 @@ public class CategoryPublishAction extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_PUBLISHING_CATEGORY_QUERY);
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
-                    ps.setString(1, String.valueOf(user_id));
-                    ps.setString(2, String.valueOf(category_id));
+            executor.execute(ps -> {
+                ps.setString(1, String.valueOf(user_id));
+                ps.setString(2, String.valueOf(category_id));
 
-                    ResultSet results = ps.executeQuery();
-                    if (results.next()) {
-                        response.setCurrentlyPublishing(true);
-                    }
+                ResultSet results = ps.executeQuery();
+                if (results.next()) {
+                    response.setCurrentlyPublishing(true);
                 }
             });
         } catch (SQLException e) {
@@ -123,18 +120,15 @@ public class CategoryPublishAction extends EndpointHandler {
                 }
                 try {
                     StatementExecutor executor = new StatementExecutor(INSERT_PUBLISH_CATEGORY_QUERY);
-                    executor.execute(new ExecutionBlock() {
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
-                            ps.setString(1, String.valueOf(user_id));
-                            ps.setString(2, String.valueOf(category_id));
-                            ps.setString(3, now.toString());
+                    executor.execute(ps -> {
+                        ps.setString(1, String.valueOf(user_id));
+                        ps.setString(2, String.valueOf(category_id));
+                        ps.setString(3, now.toString());
 
-                            ps.executeUpdate();
+                        ps.executeUpdate();
 
-                            response.setSuccess(true);
-                            response.setActionTaken("published");
-                        }
+                        response.setSuccess(true);
+                        response.setActionTaken("published");
                     });
                 } catch (MySQLIntegrityConstraintViolationException e) {
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
@@ -156,17 +150,14 @@ public class CategoryPublishAction extends EndpointHandler {
                 }
                 try {
                     StatementExecutor executor = new StatementExecutor(DELETE_PUBLISH_CATEGORY_QUERY);
-                    executor.execute(new ExecutionBlock() {
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
-                            ps.setString(1, String.valueOf(user_id));
-                            ps.setString(2, String.valueOf(category_id));
+                    executor.execute(ps -> {
+                        ps.setString(1, String.valueOf(user_id));
+                        ps.setString(2, String.valueOf(category_id));
 
-                            ps.executeUpdate();
+                        ps.executeUpdate();
 
-                            response.setSuccess(true);
-                            response.setActionTaken("unpublish");
-                        }
+                        response.setSuccess(true);
+                        response.setActionTaken("unpublish");
                     });
                 } catch (SQLException e) {
                     Logging.log("High", e);

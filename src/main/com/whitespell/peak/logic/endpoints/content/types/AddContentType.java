@@ -40,15 +40,12 @@ public class AddContentType extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
-                    ps.setString(1, content_type_name);
+            executor.execute(ps -> {
+                ps.setString(1, content_type_name);
 
-                    ps.executeUpdate();
+                ps.executeUpdate();
 
-                    success[0] = true;
-                }
+                success[0] = true;
             });
         } catch (SQLException e) {
             Logging.log("High", e);

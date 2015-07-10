@@ -143,19 +143,16 @@ public class CreateUser extends EndpointHandler {
             final String finalEmail = email;
             final String finalPassHash = passHash;
             final int finalPublisher = publisher;
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
-                    ps.setString(1, finalPassHash);
-                    ps.setString(2, finalEmail);
-                    ps.setString(3, finalUsername);
-                    ps.setInt(4, finalPublisher);
+            executor.execute(ps -> {
+                ps.setString(1, finalPassHash);
+                ps.setString(2, finalEmail);
+                ps.setString(3, finalUsername);
+                ps.setInt(4, finalPublisher);
 
-                    /**
-                     * //todo(pim) check if email checker returned positively, if so, insert into DB, if not, reject request with 403 forbidden and set success to false.
-                     */
-                    ps.executeUpdate();
-                }
+                /**
+                 * //todo(pim) check if email checker returned positively, if so, insert into DB, if not, reject request with 403 forbidden and set success to false.
+                 */
+                ps.executeUpdate();
             });
         } catch (SQLException e) {
             Logging.log("High", e);

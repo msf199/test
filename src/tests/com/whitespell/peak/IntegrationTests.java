@@ -99,14 +99,7 @@ public class IntegrationTests extends Server {
              */
             try {
                 StatementExecutor executor = new StatementExecutor("CREATE DATABASE " + TEST_DB_NAME + ";");
-                executor.execute(new ExecutionBlock() {
-
-                    @Override
-                    public void process(PreparedStatement ps) throws SQLException {
-
-                        ps.executeUpdate();
-                    }
-                });
+                executor.execute(ps -> ps.executeUpdate());
             } catch (SQLException e) {
                 Logging.log("High", e);
             }
@@ -117,14 +110,7 @@ public class IntegrationTests extends Server {
 
             try {
                 StatementExecutor executor = new StatementExecutor("use " + TEST_DB_NAME + ";");
-                executor.execute(new ExecutionBlock() {
-
-                    @Override
-                    public void process(PreparedStatement ps) throws SQLException {
-
-                        ps.executeUpdate();
-                    }
-                });
+                executor.execute(ps -> ps.executeUpdate());
             } catch (SQLException e) {
                 Logging.log("High", e);
             }
@@ -141,14 +127,7 @@ public class IntegrationTests extends Server {
                 }
                 try {
                     StatementExecutor executor = new StatementExecutor(queries[i]);
-                    executor.execute(new ExecutionBlock() {
-
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
-
-                            ps.executeUpdate();
-                        }
-                    });
+                    executor.execute(ps -> ps.executeUpdate());
                 } catch (SQLException e) {
                     Logging.log("High", e);
                 }

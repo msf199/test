@@ -5,5 +5,17 @@ package main.com.whitespell.peak.logic.sql;
  *         7/10/15
  *         main.com.whitespell.peak.logic.sql
  */
-public class ExtraSqlThread {
+public class ExtraSqlThread implements Runnable {
+
+    StatementExecutor statement;
+
+    @Override
+    public void run() {
+
+    }
+
+    public void run(StatementExecutor s){
+        this.statement = s;
+        this.run();
+    }
 }
