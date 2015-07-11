@@ -2,7 +2,6 @@ package main.com.whitespell.peak.logic;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.model.ErrorObject;
@@ -10,7 +9,6 @@ import main.com.whitespell.peak.model.ErrorObject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -20,18 +18,18 @@ public class RequestObject {
     private final HttpServletRequest request;
     private final HttpServletResponse response;
     private final Map<String, String> urlVariables;
-    private final Map<String, String[]> parameterMap;
+    private final Map<String, String[]> queryString;
     private JsonElement payload;
 
     public RequestObject(HttpServletRequest request,
                          HttpServletResponse response,
                          Map<String, String> urlVariables,
-                         Map<String, String[]> parameterMap,
+                         Map<String, String[]> queryString,
                          JsonElement payload) {
         this.request = request;
         this.response = response;
         this.urlVariables = urlVariables;
-        this.parameterMap = parameterMap;
+        this.queryString = queryString;
         this.payload = payload;
     }
 
@@ -47,8 +45,8 @@ public class RequestObject {
         return urlVariables;
     }
 
-    public Map<String, String[]> getParameterMap() {
-        return parameterMap;
+    public Map<String, String[]> getQueryString() {
+        return queryString;
     }
 
     public JsonElement getPayload() {

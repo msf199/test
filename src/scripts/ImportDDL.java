@@ -53,17 +53,13 @@ public class ImportDDL {
         for(final String table: tables) {
             try {
                 StatementExecutor executor = new StatementExecutor("show create table " + table);
-                executor.execute(new ExecutionBlock() {
+                executor.execute(ps -> {
 
-                    @Override
-                    public void process(PreparedStatement ps) throws SQLException {
+                    final ResultSet results = ps.executeQuery();
+                    while (results.next()) {
 
-                        final ResultSet results = ps.executeQuery();
-                        while (results.next()) {
-
-                            String table_ddl = results.getString("Create Table");
-                            s.append(table_ddl + ";");
-                        }
+                        String table_ddl = results.getString("Create Table");
+                        s.append(table_ddl + ";");
                     }
                 });
             } catch (SQLException e) {

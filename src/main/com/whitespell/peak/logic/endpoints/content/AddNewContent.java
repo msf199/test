@@ -71,20 +71,17 @@ public class AddNewContent extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
-                    ps.setString(1, String.valueOf(user_id));
-                    ps.setInt(2, Integer.parseInt(content_type));
-                    ps.setString(3, content_url);
-                    ps.setString(4, content_title);
-                    ps.setString(5, content_description);
-                    ps.setString(6, now.toString());
+            executor.execute(ps -> {
+                ps.setString(1, String.valueOf(user_id));
+                ps.setInt(2, Integer.parseInt(content_type));
+                ps.setString(3, content_url);
+                ps.setString(4, content_title);
+                ps.setString(5, content_description);
+                ps.setString(6, now.toString());
 
-                    ps.executeUpdate();
+                ps.executeUpdate();
 
-                    success[0] = true;
-                }
+                success[0] = true;
             });
         } catch (SQLException e) {
             Logging.log("High", e);

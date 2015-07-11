@@ -6,11 +6,9 @@ import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.Safety;
 import main.com.whitespell.peak.logic.logging.Logging;
-import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -28,8 +26,8 @@ public class GetUsersByCategory extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        parameterInput.put(PARAMETER_LIMIT_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
-        parameterInput.put(PARAMETER_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        queryStringInput.put(PARAMETER_LIMIT_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(PARAMETER_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
     @Override
@@ -42,8 +40,8 @@ public class GetUsersByCategory extends EndpointHandler {
 
             int limit = StaticRules.MAX_PUBLISHING_USER_SELECT;
 
-            if (context.getParameterMap().get("limit") != null) {
-                String limitString = context.getParameterMap().get("limit").toString();
+            if (context.getQueryString().get("limit") != null) {
+                String limitString = context.getQueryString().get("limit").toString();
                 if (Safety.isInteger(limitString)) {
                     int limitProposed = Integer.parseInt(limitString);
                     if (limitProposed > StaticRules.MAX_PUBLISHING_USER_SELECT) {
@@ -59,7 +57,7 @@ public class GetUsersByCategory extends EndpointHandler {
              * Construct the WHERE string based on the categories.
              */
 
-            String[] categories_str = context.getParameterMap().get("categories")[0].split(","); //todo(pim) make more safe with same system we used for JSON payloads.
+            String[] categories_str = context.getQueryString().get("categories")[0].split(","); //todo(pim) make more safe with same system we used for JSON payloads.
 
             StringBuilder whereString = new StringBuilder();
             for (int i = 0; i < categories_str.length; i++) {
@@ -80,28 +78,25 @@ public class GetUsersByCategory extends EndpointHandler {
                     "SELECT DISTINCT user.user_id, category_id, user.username, user.thumbnail FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id " +
                     whereString.toString() +
                     "ORDER BY `category_id` LIMIT " + limit + "");
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
+            executor.execute(ps -> {
 
-                    final ResultSet results = ps.executeQuery();
-                    ArrayList<CategorizedUserObject> users = new ArrayList<>();
-                    while (results.next()) {
+                final ResultSet results = ps.executeQuery();
+                ArrayList<CategorizedUserObject> users = new ArrayList<>();
+                while (results.next()) {
 
-                        CategorizedUserObject d = new CategorizedUserObject(results.getInt("user_id"), results.getString("username"), results.getString("thumbnail"), results.getInt("category_id"));
-                        users.add(d);
-                    }
+                    CategorizedUserObject d = new CategorizedUserObject(results.getInt("user_id"), results.getString("username"), results.getString("thumbnail"), results.getInt("category_id"));
+                    users.add(d);
+                }
 
-                    // put the array list into a JSON array and write it as a response
+                // put the array list into a JSON array and write it as a response
 
-                    Gson g = new Gson();
-                    String response = g.toJson(users);
-                    context.getResponse().setStatus(200);
-                    try {
-                        context.getResponse().getWriter().write(response);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                Gson g = new Gson();
+                String response = g.toJson(users);
+                context.getResponse().setStatus(200);
+                try {
+                    context.getResponse().getWriter().write(response);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         } catch (SQLException e) {

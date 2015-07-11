@@ -90,16 +90,13 @@ public class UserFollowAction extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_FOLLOWING_QUERY);
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
-                    ps.setString(1, String.valueOf(user_id));
-                    ps.setString(2, String.valueOf(following_user_id));
+            executor.execute(ps -> {
+                ps.setString(1, String.valueOf(user_id));
+                ps.setString(2, String.valueOf(following_user_id));
 
-                    ResultSet results = ps.executeQuery();
-                    if (results.next()) {
-                        response.setCurrentlyFollowing(true);
-                    }
+                ResultSet results = ps.executeQuery();
+                if (results.next()) {
+                    response.setCurrentlyFollowing(true);
                 }
             });
         } catch (SQLException e) {
@@ -120,18 +117,15 @@ public class UserFollowAction extends EndpointHandler {
                 }
                 try {
                     StatementExecutor executor = new StatementExecutor(INSERT_FOLLOW_QUERY);
-                    executor.execute(new ExecutionBlock() {
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
-                            ps.setString(1, String.valueOf(user_id));
-                            ps.setString(2, String.valueOf(following_user_id));
-                            ps.setString(3, now.toString());
+                    executor.execute(ps -> {
+                        ps.setString(1, String.valueOf(user_id));
+                        ps.setString(2, String.valueOf(following_user_id));
+                        ps.setString(3, now.toString());
 
-                            ps.executeUpdate();
+                        ps.executeUpdate();
 
-                            response.setSuccess(true);
-                            response.setActionTaken("followed");
-                        }
+                        response.setSuccess(true);
+                        response.setActionTaken("followed");
                     });
                 } catch (SQLException e) {
                     Logging.log("High", e);
@@ -150,17 +144,14 @@ public class UserFollowAction extends EndpointHandler {
                 }
                 try {
                     StatementExecutor executor = new StatementExecutor(DELETE_FOLLOWED_QUERY);
-                    executor.execute(new ExecutionBlock() {
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
-                            ps.setString(1, String.valueOf(user_id));
-                            ps.setString(2, String.valueOf(following_user_id));
+                    executor.execute(ps -> {
+                        ps.setString(1, String.valueOf(user_id));
+                        ps.setString(2, String.valueOf(following_user_id));
 
-                            ps.executeUpdate();
+                        ps.executeUpdate();
 
-                            response.setSuccess(true);
-                            response.setActionTaken("unfollowed");
-                        }
+                        response.setSuccess(true);
+                        response.setActionTaken("unfollowed");
                     });
                 } catch (SQLException e) {
                     Logging.log("High", e);

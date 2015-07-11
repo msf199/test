@@ -7,19 +7,19 @@ package main.com.whitespell.peak.model;
  */
 public class ContentTypeObject {
 
-    int content_type_id;
-    String content_type_name;
-    public ContentTypeObject(int content_type_id, String content_type_name) {
+    int contentTypeId;
+    String contentTypeName;
+    public ContentTypeObject(int contentTypeId, String contentTypeName) {
 
-        this.content_type_id = content_type_id;
-        this.content_type_name = content_type_name;
+        this.contentTypeId = contentTypeId;
+        this.contentTypeName = contentTypeName;
     }
 
-    public int getContent_type_id() {
-        return content_type_id;
+    public int getContentTypeId() {
+        return contentTypeId;
     }
 
-    public String getContent_type_name() {
-        return content_type_name;
+    public String getContentTypeName() {
+        return contentTypeName;
     }
 }

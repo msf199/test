@@ -69,17 +69,14 @@ public class Authentication {
         try {
             StatementExecutor executor = new StatementExecutor(IS_AUTHENTICATED);
 
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
-                    ps.setInt(1, userId);
-                    ps.setString(2, key);
-                    final ResultSet s = ps.executeQuery();
+            executor.execute(ps -> {
+                ps.setInt(1, userId);
+                ps.setString(2, key);
+                final ResultSet s = ps.executeQuery();
 
-                    // if we do find a result, we have been authenticated
-                    if (s.next()) {
-                        authenticated[0] = true;
-                    }
+                // if we do find a result, we have been authenticated
+                if (s.next()) {
+                    authenticated[0] = true;
                 }
             });
         } catch (SQLException e) {

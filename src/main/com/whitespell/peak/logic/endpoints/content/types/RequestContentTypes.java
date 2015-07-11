@@ -31,29 +31,26 @@ public class RequestContentTypes extends EndpointHandler {
          */
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_TYPES);
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
+            executor.execute(ps -> {
 
-                    final ResultSet results = ps.executeQuery();
-                    ArrayList<ContentTypeObject> contentTypes = new ArrayList<>();
-                    while (results.next()) {
+                final ResultSet results = ps.executeQuery();
+                ArrayList<ContentTypeObject> contentTypes = new ArrayList<>();
+                while (results.next()) {
 
-                        ContentTypeObject d = new ContentTypeObject(results.getInt("content_type_id"), results.getString("content_type_name"));
+                    ContentTypeObject d = new ContentTypeObject(results.getInt("content_type_id"), results.getString("content_type_name"));
 
-                        contentTypes.add(d);
-                    }
+                    contentTypes.add(d);
+                }
 
-                    // put the array list into a JSON array and write it as a response
+                // put the array list into a JSON array and write it as a response
 
-                    Gson g = new Gson();
-                    String response = g.toJson(contentTypes);
-                    context.getResponse().setStatus(200);
-                    try {
-                        context.getResponse().getWriter().write(response);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                Gson g = new Gson();
+                String response = g.toJson(contentTypes);
+                context.getResponse().setStatus(200);
+                try {
+                    context.getResponse().getWriter().write(response);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         } catch (SQLException e) {

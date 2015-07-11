@@ -54,7 +54,7 @@ public class PeakAPI extends WhitespellAPI {
 		dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateProfile(), "/users/$", "user_id");
 
         // As a user, update your email or password
-        //(todo cmcan) Create UpdateSettings() endpoint for email and password updates.
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateSettings(), "/users/$/settings", "user_id");
 
 		// get all the users sorted by categories (also takes in same search criteria as /users)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsersByCategory(), "/users/categories/");
@@ -111,6 +111,12 @@ public class PeakAPI extends WhitespellAPI {
         // Add a new category
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddCategory(), "/categories");
 
+        /**
+         * SEARCH
+         */
+
+        // Get a search object
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Search(), "/search");
 
 
     }

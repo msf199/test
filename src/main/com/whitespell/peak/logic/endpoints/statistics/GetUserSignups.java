@@ -30,29 +30,26 @@ public class GetUserSignups extends EndpointHandler {
          */
         try {
             StatementExecutor executor = new StatementExecutor(GET_SIGNUP_DATASET);
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
+            executor.execute(ps -> {
 
-                    final ResultSet results = ps.executeQuery();
-                    ArrayList<DayResult> dayResults = new ArrayList<>();
-                    while (results.next()) {
+                final ResultSet results = ps.executeQuery();
+                ArrayList<DayResult> dayResults = new ArrayList<>();
+                while (results.next()) {
 
-                        DayResult d = new DayResult(results.getString("day"), results.getInt("count"));
+                    DayResult d = new DayResult(results.getString("day"), results.getInt("count"));
 
-                        dayResults.add(d);
-                    }
+                    dayResults.add(d);
+                }
 
-                    // put the array list into a JSON array and write it as a response
+                // put the array list into a JSON array and write it as a response
 
-                    Gson g = new Gson();
-                    String response = g.toJson(dayResults);
-                    context.getResponse().setStatus(200);
-                    try {
-                        context.getResponse().getWriter().write(response);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                Gson g = new Gson();
+                String response = g.toJson(dayResults);
+                context.getResponse().setStatus(200);
+                try {
+                    context.getResponse().getWriter().write(response);
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
             });
         } catch (SQLException e) {
