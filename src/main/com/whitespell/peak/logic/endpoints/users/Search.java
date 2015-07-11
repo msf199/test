@@ -36,6 +36,16 @@ public class Search extends EndpointHandler {
      */
     private static final String CATEGORY_ID_KEY = "category_id";
 
+    /**
+     * What we're getting from content
+     */
+
+    private static final String CONTENT_ID_KEY = "content_id";
+    private static final String CONTENT_TYPE_KEY = "content_type";
+    private static final String CONTENT_URL_KEY = "content_url";
+    private static final String CONTENT_DESCRIPTION_KEY = "content_description";
+    private static final String CONTENT_TITLE_KEY = "content_title";
+    private static final String CONTENT_THUMBNAIL_KEY = "thumbnail_url";
 
 
 
@@ -50,7 +60,7 @@ public class Search extends EndpointHandler {
 
         ArrayList<UserObject> tempUsers = new ArrayList<>();
         ArrayList<Integer> tempCategories = new ArrayList<>();
-       W ArrayList<ContentObject> tempContent = new ArrayList<>();
+        ArrayList<ContentObject> tempContent = new ArrayList<>();
 
         /**
          * Initialize the locks to ensure each query is finished with processing before rendering the result
@@ -59,7 +69,7 @@ public class Search extends EndpointHandler {
 
         final boolean[] userThreadLockRemoved = {false};
         final boolean[] categoryThreadLockRemoved = {false};
-        final boolean[] contentThreadLockRemoved = {true}; //todo(pim) CHANGE TO FALSE WHEN MAKE
+        final boolean[] contentThreadLockRemoved = {false}; //todo(pim) CHANGE TO FALSE WHEN MAKE
 
         /**
          * Get all the users that match the search query
@@ -69,7 +79,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"`, `"+THUMBNAIL_KEY+"` FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
+                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"` FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -126,7 +136,22 @@ public class Search extends EndpointHandler {
 
         new Thread(
                 () -> {
-                    /// mysql stuff
+                    try {
+                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` WHERE `content_title` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
+                        executor.execute(ps -> {
+                            ResultSet results = ps.executeQuery();
+
+                            while(results.next()) {
+                                tempContent.add(new ContentObject(results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_KEY), results.getString(CONTENT_TITLE_KEY),
+                                        results.getString(CONTENT_URL_KEY), results.getString(CONTENT_DESCRIPTION_KEY),  results.getString(CONTENT_THUMBNAIL_KEY)));
+                            }
+
+                        });
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    } finally {
+                        contentThreadLockRemoved[0] = true;
+                    }
                 }
         ).start();
 

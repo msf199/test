@@ -6,6 +6,8 @@ package main.com.whitespell.peak.model;
  *          whitespell.model
  */
 public class ContentObject {
+
+    int contentId;
     int contentType;
     String contentTitle;
     String contentUrl;
@@ -13,12 +15,14 @@ public class ContentObject {
     int likes = 100;
     String thumbnail = "https://s-media-cache-ak0.pinimg.com/originals/c2/1e/ce/c21ecebc560514fe3e48ca5eef1c09b8.jpg";
 
-    public ContentObject(int contentType, String contentTitle,
-                         String contentUrl, String contentDescription) {
+    public ContentObject(int contentId, int contentType, String contentTitle,
+                         String contentUrl, String contentDescription, String thumbnail) {
+        this.contentId = contentId;
         this.contentType = contentType;
         this.contentTitle = contentTitle;
         this.contentUrl = contentUrl;
         this.contentDescription = contentDescription;
+        this.thumbnail = thumbnail;
     }
 
     public int getContentType() { return contentType; }
