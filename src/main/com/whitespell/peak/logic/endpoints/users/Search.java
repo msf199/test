@@ -137,7 +137,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` WHERE `content_title` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
+                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` WHERE `content_title` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' OR `content_description` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
