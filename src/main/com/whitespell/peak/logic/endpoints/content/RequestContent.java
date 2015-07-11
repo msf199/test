@@ -28,6 +28,7 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_SIZE_LIMIT = "limit";
     private static final String CONTENT_OFFSET = "offset";
     private static final String FOLLOWING_ID = "following_id";
+    private static final String CONTENT_ID_KEY = "content_id";
     private static final String CONTENT_TYPE_ID = "content_type";
     private static final String CONTENT_TITLE = "content_title";
     private static final String CONTENT_URL = "content_url";
@@ -67,8 +68,8 @@ public class RequestContent extends EndpointHandler {
 
                     //display results
                     while (results.next()) {
-                        ContentObject content = new ContentObject(results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION));
+                        ContentObject content = new ContentObject(results.getInt(CONTENT_ID_KEY),results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
+                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), null);
                         contents.add(content);
                     }
 
