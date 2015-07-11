@@ -96,14 +96,7 @@ public class IntegrationTests extends Server {
              */
             try {
                 StatementExecutor executor = new StatementExecutor("CREATE DATABASE " + TEST_DB_NAME + ";");
-                executor.execute(new ExecutionBlock() {
-
-                    @Override
-                    public void process(PreparedStatement ps) throws SQLException {
-
-                        ps.executeUpdate();
-                    }
-                });
+                executor.execute(ps -> ps.executeUpdate());
             } catch (SQLException e) {
                 Logging.log("High", e);
             }
@@ -114,14 +107,7 @@ public class IntegrationTests extends Server {
 
             try {
                 StatementExecutor executor = new StatementExecutor("use " + TEST_DB_NAME + ";");
-                executor.execute(new ExecutionBlock() {
-
-                    @Override
-                    public void process(PreparedStatement ps) throws SQLException {
-
-                        ps.executeUpdate();
-                    }
-                });
+                executor.execute(ps -> ps.executeUpdate());
             } catch (SQLException e) {
                 Logging.log("High", e);
             }
@@ -138,14 +124,7 @@ public class IntegrationTests extends Server {
                 }
                 try {
                     StatementExecutor executor = new StatementExecutor(queries[i]);
-                    executor.execute(new ExecutionBlock() {
-
-                        @Override
-                        public void process(PreparedStatement ps) throws SQLException {
-
-                            ps.executeUpdate();
-                        }
-                    });
+                    executor.execute(ps -> ps.executeUpdate());
                 } catch (SQLException e) {
                     Logging.log("High", e);
                 }
@@ -595,6 +574,48 @@ public class IntegrationTests extends Server {
                         "\"email\": \"newtestemail2@lol.com\"\n" +
                         "}")
                 .asString();
+    }
+
+
+    @Test
+    public void testG_search() throws UnirestException{
+
+        /**
+         * Test search for the content we've added.
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/search?q=excuse")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody()
+        );
+
+        assertEquals(stringResponse.getBody().contains("10-Minute No-Equipment Home Workout"), true);
+
+        /**
+         * Test search for the user we've added.
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/search?q=even")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+
+        assertEquals(stringResponse.getBody().contains("evenneweruser2"), true);
+
+        /**
+         * Test search for the category we've added.
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/search?q=roller")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+
+        assertEquals(stringResponse.getBody().contains("["+categories[1].getCategoryId()+"]"), true);
     }
 
 
