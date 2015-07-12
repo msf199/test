@@ -580,6 +580,8 @@ public class IntegrationTests extends Server {
     @Test
     public void testG_search() throws UnirestException{
 
+        assertEquals(true,false); //purposely fail test to test jenkins
+
         /**
          * Test search for the content we've added.
          */
