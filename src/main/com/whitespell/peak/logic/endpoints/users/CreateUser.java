@@ -64,14 +64,30 @@ public class CreateUser extends EndpointHandler {
          * 400 Bad Request: Check if all data is valid
          */
 
-            username = payload.get("username").getAsString();
-            password = payload.get("password").getAsString();
-            email = payload.get("email").getAsString();
+        username = payload.get("username").getAsString();
+        password = payload.get("password").getAsString();
+        email = payload.get("email").getAsString();
 
-            if (payload.get("publisher") != null && payload.get("publisher").getAsInt() == 1) {
-                publisher = 1;
-            }
+        if (payload.get("publisher") != null && payload.get("publisher").getAsInt() == 1) {
+            publisher = 1;
+        }
 
+        /**
+         * Check username and password requirements
+         */
+        if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
+            return;
+        } else if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
+            return;
+        } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
+            return;
+        } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
+            return;
+        }
 
 
 

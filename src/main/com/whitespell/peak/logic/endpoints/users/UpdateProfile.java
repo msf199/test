@@ -28,7 +28,7 @@ import java.util.ArrayList;
     private static final String PAYLOAD_USERNAME_KEY = "username";
     private static final String PAYLOAD_DISPLAYNAME_KEY = "displayname";
     private static final String PAYLOAD_THUMBNAIL_KEY = "thumbnail";
-    private static final String PAYLOAD_COVER_PHOTO_KEY = "cover_photo";
+    private static final String PAYLOAD_COVER_PHOTO_KEY = "coverPhoto";
     private static final String PAYLOAD_SLOGAN_KEY = "slogan";
 
     @Override
@@ -68,7 +68,7 @@ import java.util.ArrayList;
         }
         if (j.get(PAYLOAD_COVER_PHOTO_KEY) != null) {
             temp3 = j.get(PAYLOAD_COVER_PHOTO_KEY).getAsString();
-            updateKeys.add(PAYLOAD_COVER_PHOTO_KEY);
+            updateKeys.add("cover_photo");
             updateValues.add(temp3);
         }
         if (j.get(PAYLOAD_SLOGAN_KEY) != null) {

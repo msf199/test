@@ -30,7 +30,7 @@ public class UpdateSettings extends EndpointHandler {
     private static final String PAYLOAD_EMAIL_KEY = "email";
 
     private static final String PAYLOAD_CURRENT_PASSWORD_KEY = "password";
-    private static final String PAYLOAD_NEW_PASSWORD_KEY = "new_password";
+    private static final String PAYLOAD_NEW_PASSWORD_KEY = "newPassword";
 
     @Override
     protected void setUserInputs() {
