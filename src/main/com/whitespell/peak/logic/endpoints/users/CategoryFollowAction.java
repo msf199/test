@@ -36,7 +36,7 @@ public class CategoryFollowAction extends EndpointHandler {
      * Define user input variables
      */
 
-    private static final String PAYLOAD_CATEGORY_ID_KEY = "category_id";
+    private static final String PAYLOAD_CATEGORY_ID_KEY = "categoryId";
     private static final String PAYLOAD_ACTION_KEY = "action";
     private static final String URL_USER_ID = "user_id";
 

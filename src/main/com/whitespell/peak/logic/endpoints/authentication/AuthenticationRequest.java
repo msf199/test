@@ -54,26 +54,24 @@ public class AuthenticationRequest extends EndpointHandler {
          */
 
         // Check if all parameters are present and contain the right characters, if not throw a 400
-            username = payload.get("username").getAsString();
-            password = payload.get("password").getAsString();
-            // check against lengths for security and UX reasons.
+        username = payload.get("username").getAsString();
+        password = payload.get("password").getAsString();
 
-            //check if values are too long
-            if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
-                return;
-            } else if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
-                return;
-            } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
-                return;
-            } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
-                return;
-            }
-
-
+        // check against lengths for security and UX reasons.
+        //check if values are too long
+        if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
+            return;
+        } else if (password.length() > StaticRules.MAX_PASSWORD_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
+            return;
+        } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
+            return;
+        } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
+            return;
+        }
 
         // retrieve the password based on the username
         try {

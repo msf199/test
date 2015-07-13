@@ -25,7 +25,7 @@ import java.util.Date;
  */
 public class UserFollowAction extends EndpointHandler {
 
-    private static final String PAYLOAD_FOLLOWING_USER_ID_KEY = "following_id";
+    private static final String PAYLOAD_FOLLOWING_USER_ID_KEY = "followingId";
     private static final String PAYLOAD_ACTION_KEY = "action";
     private static final String URL_USER_ID_KEY = "user_id";
 

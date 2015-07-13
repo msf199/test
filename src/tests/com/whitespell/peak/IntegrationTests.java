@@ -7,6 +7,8 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.endpoints.users.CategoryFollowAction;
+import main.com.whitespell.peak.logic.endpoints.users.UserFollowAction;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.Pool;
@@ -286,23 +288,23 @@ public class IntegrationTests extends Server {
         Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"category_name\": \"skydiving\",\n" +
-                        "\"category_thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
+                        "\"categoryName\": \"skydiving\",\n" +
+                        "\"categoryThumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
                         "}")
                 .asString();
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"category_name\": \"roller-skating\",\n" +
-                        "\"category_thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
+                        "\"categoryName\": \"roller-skating\",\n" +
+                        "\"categoryThumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
                         "}")
                 .asString();
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .asString();
-
+        System.out.println(stringResponse.getBody());
         categories = g.fromJson(stringResponse.getBody(), CategoryObject[].class);
         assertEquals(categories.length, 2);
         assertEquals(categories[0].getCategoryName(), "skydiving");
@@ -311,24 +313,28 @@ public class IntegrationTests extends Server {
 
     @Test
     public void test7_followCategoriesTest() throws UnirestException {
-        Unirest.post("http://localhost:" + Config.API_PORT + "/user/" + TEST_UID + "/categories")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/categories")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"category_id\": \"" + categories[0].getCategoryId() + "\",\n" +
+                        "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
-        Unirest.post("http://localhost:" + Config.API_PORT + "/user/" + TEST_UID + "/categories")
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\"category_id\": \"" + categories[1].getCategoryId() + "\",\n" +
-                        "\"action\": \"follow\"\n" +
-                        "}")
-                .asString();
+        CategoryFollowAction.FollowCategoryActionObject h = g.fromJson(stringResponse.getBody(), CategoryFollowAction.FollowCategoryActionObject.class);
 
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/categories")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+        CategoryFollowAction.FollowCategoryActionObject f = g.fromJson(stringResponse.getBody(), CategoryFollowAction.FollowCategoryActionObject.class);
         //todo (pim) get categories_following from user object and test whether they are skydivign and rollerskating
+        assertEquals(h.getActionTaken(), "followed");
+        assertEquals(f.getActionTaken(), "followed");
     }
 
     @Test
@@ -357,6 +363,7 @@ public class IntegrationTests extends Server {
                         "\"email\" : \"" + ROLLERSKATER_EMAIL + "\"\n" +
                         "}")
                 .asString();
+        System.out.println(stringResponse.getBody());
         UserObject rollerskater = g.fromJson(stringResponse.getBody(), UserObject.class);
         ROLLERSKATER_UID = rollerskater.getUserId();
     }
@@ -367,21 +374,21 @@ public class IntegrationTests extends Server {
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"content_type_name\": \"youtube\"\n"
+                        "\"contentTypeName\": \"youtube\"\n"
                         + "}")
                 .asString();
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"content_type_name\": \"instagram\"\n"
+                        "\"contentTypeName\": \"instagram\"\n"
                         + "}")
                 .asString();
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .asString();
-
+        System.out.println(stringResponse.getBody());
         contentTypes = g.fromJson(stringResponse.getBody(), ContentTypeObject[].class);
         assertEquals(contentTypes.length, 2);
         assertEquals(contentTypes[0].getContentTypeName(), "youtube");
@@ -390,16 +397,18 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testA_followTest() throws UnirestException {
-        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"following_id\": \"" + TEST2_UID + "\",\n" +
+                        "\"followingId\": \"" + TEST2_UID + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
 
-        System.out.println(a.getBody());
+        UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(b.getActionTaken(),"followed");
     }
 
     @Test
@@ -408,10 +417,10 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
-                        "\"content_type\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
-                        "\"content_description\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
-                        "\"content_title\": \"10-Minute No-Equipment Home Workout\",\n" +
-                        "\"content_url\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"\n}")
+                        "\"contentType\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
+                        "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
+                        "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"\n}")
                 .asString();
 
 
@@ -419,7 +428,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-
+        System.out.println(stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
@@ -472,7 +481,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
+                .body("{\n\"coverPhoto\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
                 .asString();
         UserObject userEdit2 = g.fromJson(stringResponse.getBody(), UserObject.class);
         System.out.println(stringResponse.getBody());
@@ -488,7 +497,7 @@ public class IntegrationTests extends Server {
                 .body("{\n" +
                         "\"username\": \"p1mw1n\",\n" +
                         "\"displayname\": \"new\",\n" +
-                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"coverPhoto\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
                         "\"slogan\": \"slogan\"\n" +
                         "}")
                 .asString();
@@ -559,7 +568,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n\"password\": \"" + TEST_PASSWORD + "\",\n" +
-                        "\"new_password\": \"!@#$%^&*()~\"\n" +
+                        "\"newPassword\": \"!@#$%^&*()~\"\n" +
                         "}")
                 .asString();
 
@@ -570,15 +579,18 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n\"password\": \"!@#$%^&*()~\",\n" +
-                        "\"new_password\": \")(*&^%$#@!~\",\n" +
+                        "\"newPassword\": \")(*&^%$#@!~\",\n" +
                         "\"email\": \"newtestemail2@lol.com\"\n" +
                         "}")
                 .asString();
+        System.out.println(stringResponse.getBody());
     }
 
 
     @Test
     public void testG_search() throws UnirestException{
+
+        //assertEquals(true,false); //purposely fail test to test jenkins
 
         /**
          * Test search for the content we've added.
@@ -588,8 +600,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
-        System.out.println(stringResponse.getBody()
-        );
+        System.out.println(stringResponse.getBody());
 
         assertEquals(stringResponse.getBody().contains("10-Minute No-Equipment Home Workout"), true);
 
