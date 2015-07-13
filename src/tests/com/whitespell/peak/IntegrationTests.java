@@ -472,7 +472,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
+                .body("{\n\"coverPhoto\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n}")
                 .asString();
         UserObject userEdit2 = g.fromJson(stringResponse.getBody(), UserObject.class);
         System.out.println(stringResponse.getBody());
@@ -488,7 +488,7 @@ public class IntegrationTests extends Server {
                 .body("{\n" +
                         "\"username\": \"p1mw1n\",\n" +
                         "\"displayname\": \"new\",\n" +
-                        "\"cover_photo\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
+                        "\"coverPhoto\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
                         "\"slogan\": \"slogan\"\n" +
                         "}")
                 .asString();
@@ -559,7 +559,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n\"password\": \"" + TEST_PASSWORD + "\",\n" +
-                        "\"new_password\": \"!@#$%^&*()~\"\n" +
+                        "\"newPassword\": \"!@#$%^&*()~\"\n" +
                         "}")
                 .asString();
 
@@ -570,7 +570,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n\"password\": \"!@#$%^&*()~\",\n" +
-                        "\"new_password\": \")(*&^%$#@!~\",\n" +
+                        "\"newPassword\": \")(*&^%$#@!~\",\n" +
                         "\"email\": \"newtestemail2@lol.com\"\n" +
                         "}")
                 .asString();
@@ -580,7 +580,7 @@ public class IntegrationTests extends Server {
     @Test
     public void testG_search() throws UnirestException{
 
-        assertEquals(true,false); //purposely fail test to test jenkins
+        //assertEquals(true,false); //purposely fail test to test jenkins
 
         /**
          * Test search for the content we've added.
