@@ -7,6 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.endpoints.users.UserFollowAction;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.Pool;
@@ -286,16 +287,16 @@ public class IntegrationTests extends Server {
         Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"category_name\": \"skydiving\",\n" +
-                        "\"category_thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
+                        "\"categoryName\": \"skydiving\",\n" +
+                        "\"categoryThumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
                         "}")
                 .asString();
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"category_name\": \"roller-skating\",\n" +
-                        "\"category_thumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
+                        "\"categoryName\": \"roller-skating\",\n" +
+                        "\"categoryThumbnail\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\"\n" +
                         "}")
                 .asString();
 
@@ -390,16 +391,18 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testA_followTest() throws UnirestException {
-        HttpResponse<String> a = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"following_id\": \"" + TEST2_UID + "\",\n" +
+                        "\"followingId\": \"" + TEST2_UID + "\",\n" +
                         "\"action\": \"follow\"\n" +
                         "}")
                 .asString();
 
-        System.out.println(a.getBody());
+        UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+
+        assertEquals(b.getActionTaken(),"followed");
     }
 
     @Test
