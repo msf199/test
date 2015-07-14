@@ -34,7 +34,7 @@ public class RequestContent extends EndpointHandler {
     }
 
 
-    private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `content` LIMIT ? OFFSET ?";
+    private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `content` WHERE `content_id` > ? LIMIT ?";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
@@ -60,8 +60,8 @@ public class RequestContent extends EndpointHandler {
                 final int finalOffset = GenericAPIActions.getOffset(context.getQueryString());
                 executor.execute(ps -> {
                     ArrayList<ContentObject> contents = new ArrayList<>();
-                    ps.setInt(1, finalLimit);
-                    ps.setInt(2, finalOffset);
+                    ps.setInt(1, finalOffset);
+                    ps.setInt(2, finalLimit);
                     ResultSet results = ps.executeQuery();
 
                     //display results

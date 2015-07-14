@@ -62,7 +62,7 @@ public class GetUsersByCategory extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor("" +
                     "SELECT DISTINCT user.user_id, category_id, user.username, user.thumbnail FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id " +
                     whereString.toString() +
-                    "ORDER BY `category_id` LIMIT " + GenericAPIActions.getLimit(context.getQueryString()) + " OFFSET " + GenericAPIActions.getOffset(context.getQueryString()));
+                    "ORDER BY `category_id` LIMIT " + GenericAPIActions.getLimit(context.getQueryString()));
             executor.execute(ps -> {
 
                 final ResultSet results = ps.executeQuery();

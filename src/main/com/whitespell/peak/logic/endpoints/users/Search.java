@@ -62,6 +62,7 @@ public class Search extends EndpointHandler {
         int limit =  GenericAPIActions.getLimit(context.getQueryString());
         int offset =  GenericAPIActions.getOffset(context.getQueryString());
 
+
         ArrayList<UserObject> tempUsers = new ArrayList<>();
         ArrayList<Integer> tempCategories = new ArrayList<>();
         ArrayList<ContentObject> tempContent = new ArrayList<>();
@@ -83,7 +84,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"` FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' LIMIT "+limit+" OFFSET "+offset+"");
+                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"` FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' AND `user_id` > "+GenericAPIActions.getOffset(context.getQueryString())+" LIMIT "+limit+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -116,7 +117,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                        StatementExecutor executor = new StatementExecutor("SELECT `"+CATEGORY_ID_KEY+"` FROM `category` WHERE `category_name` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' LIMIT "+limit+" OFFSET "+offset+"");
+                        StatementExecutor executor = new StatementExecutor("SELECT `"+CATEGORY_ID_KEY+"` FROM `category` WHERE `category_name` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' LIMIT "+limit+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -141,7 +142,14 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` WHERE `content_title` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' OR `content_description` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' LIMIT "+limit+" OFFSET "+offset+"");
+                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content`" +
+                                " WHERE `content_title`" +
+                                " LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'" +
+                                " AND `content_id` > "+GenericAPIActions.getOffset(context.getQueryString())+"" +
+                                " OR `content_description`" +
+                                " LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'" +
+                                " AND `content_id` > "+GenericAPIActions.getOffset(context.getQueryString())+"" +
+                                " LIMIT "+limit+" OFFSET "+offset+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
