@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -22,7 +23,9 @@ import java.sql.SQLException;
  */
 public class GetUser extends EndpointHandler {
 
+    private static final String QS_FOLLOWERS_KEY = "includeFollowing";
 
+    private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
     private static final String URL_USER_ID = "user_id";
     private static final String USERNAME_KEY = "username";
@@ -35,12 +38,23 @@ public class GetUser extends EndpointHandler {
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+        queryStringInput.put(QS_FOLLOWERS_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
+        boolean getFollowers = false;
+
+        /**
+         * Check if we want to see the users we are following
+         */
+        if(context.getQueryString().get(QS_FOLLOWERS_KEY) != null){
+            if(context.getQueryString().get(QS_FOLLOWERS_KEY)[0].equals("1")){
+                getFollowers = true;
+            }
+        }
 
         /**
          * Ensure that the user is authenticated properly
@@ -48,9 +62,27 @@ public class GetUser extends EndpointHandler {
 
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
 
-        if (!a.isAuthenticated() || user_id != a.getUserId()) {
+        if (!a.isAuthenticated()) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
+        }
+
+        final ArrayList<Integer> initialFollowing = new ArrayList<>();
+        if(getFollowers) {
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_FOLLOWING_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(user_id));
+                    UserObject user = null;
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialFollowing.add(results.getInt("following_id"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
         }
 
         try {
@@ -67,9 +99,13 @@ public class GetUser extends EndpointHandler {
                     final ResultSet results = ps.executeQuery();
 
                     if (results.next()) {
-
-                        user = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
-                                results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
+                        if(initialFollowing != null){
+                            user = new UserObject(initialFollowing, results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                                    results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
+                        }else{
+                            user = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                                    results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
+                        }
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;

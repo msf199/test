@@ -256,7 +256,7 @@ public class IntegrationTests extends Server {
          * Get the UserObject from the users/userid endpoint
          */
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/"+TEST_UID)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
@@ -353,7 +353,7 @@ public class IntegrationTests extends Server {
 
         //todo(pim) authenticate as user
         //todo(pim) safeCall to publish in this category
-
+        System.out.println("SKY: " + SKYDIVER_UID);
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
@@ -366,6 +366,7 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
         UserObject rollerskater = g.fromJson(stringResponse.getBody(), UserObject.class);
         ROLLERSKATER_UID = rollerskater.getUserId();
+        System.out.println("ROLLER: " +ROLLERSKATER_UID);
     }
 
     @Test
@@ -626,7 +627,37 @@ public class IntegrationTests extends Server {
 
         System.out.println(stringResponse.getBody());
 
-        assertEquals(stringResponse.getBody().contains("["+categories[1].getCategoryId()+"]"), true);
+        assertEquals(stringResponse.getBody().contains("[" + categories[1].getCategoryId() + "]"), true);
+    }
+
+    @Test
+    public void testH_getUserFollowing() throws UnirestException{
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + SKYDIVER_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+
+        UserFollowAction.FollowActionObject a = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(a.getActionTaken(),"followed");
+
+        /**
+         * List followers for user that followed other users previously
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/?includeFollowing=1")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(userThatFollows.getUserFollowing().get(0).intValue(), TEST2_UID);
+        assertEquals(userThatFollows.getUserFollowing().get(1).intValue(), SKYDIVER_UID);
     }
 
 

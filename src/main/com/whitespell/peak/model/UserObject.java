@@ -12,22 +12,21 @@ public class UserObject {
     /**
      * A list of the users this user is following
      */
-    public ArrayList<Integer> userFollowing = new ArrayList<>();
-
+    public ArrayList<Integer> userFollowing = null;
     /**
      * A list of the users that are following this user
      */
-    public ArrayList<Integer> usersFollowed = new ArrayList<>();
+    public ArrayList<Integer> usersFollowed = null;
 
     /**
      * A list of the categories this user is following
      */
-    public ArrayList<Integer> categoryFollowing = new ArrayList<>();
+    public ArrayList<Integer> categoryFollowing = null;
 
     /**
      * A list of the categories this user is publishing in
      */
-    public ArrayList<Integer> categoryPublishing = new ArrayList<>();
+    public ArrayList<Integer> categoryPublishing = null;
 
     int userId;
     String userName;
@@ -47,6 +46,16 @@ public class UserObject {
         this.slogan = "";
     }
 
+    public UserObject(ArrayList<Integer> userFollowing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
+        this.userFollowing = userFollowing;
+        this.userId = userId;
+        this.userName = userName;
+        this.displayName = displayName;
+        this.email = email;
+        this.thumbnail = thumbnail;
+        this.coverPhoto = cover_photo;
+        this.slogan = slogan;
+    }
 
     public UserObject(int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
         this.userId = userId;
