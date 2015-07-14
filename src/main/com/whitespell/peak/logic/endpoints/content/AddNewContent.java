@@ -25,10 +25,10 @@ public class AddNewContent extends EndpointHandler {
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `timestamp`) VALUES (?,?,?,?,?,?)";
 
 
-    private static final String PAYLOAD_CONTENT_TYPE_ID = "content_type";
-    private static final String PAYLOAD_CONTENT_TITLE = "content_title";
-    private static final String PAYLOAD_CONTENT_URL = "content_url";
-    private static final String PAYLOAD_CONTENT_DESCRIPTION = "content_description";
+    private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
+    private static final String PAYLOAD_CONTENT_TITLE = "contentTitle";
+    private static final String PAYLOAD_CONTENT_URL = "contentUrl";
+    private static final String PAYLOAD_CONTENT_DESCRIPTION = "contentDescription";
 
     private static final String URL_USER_ID_KEY = "user_id";
 

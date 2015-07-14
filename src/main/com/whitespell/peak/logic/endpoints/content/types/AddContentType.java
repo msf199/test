@@ -21,7 +21,7 @@ import java.sql.SQLException;
 public class AddContentType extends EndpointHandler {
 
 
-    private static final String PAYLOAD_CONTENT_TYPE_NAME = "content_type_name";
+    private static final String PAYLOAD_CONTENT_TYPE_NAME = "contentTypeName";
 
     @Override
     protected void setUserInputs() {

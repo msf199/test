@@ -26,8 +26,8 @@ public class AddCategory extends EndpointHandler {
      * Define user input variables
      */
 
-    private static final String PAYLOAD_CATEGORY_NAME_ = "category_name";
-    private static final String PAYLOAD_CATEGORY_THUMBNAIL = "category_thumbnail";
+    private static final String PAYLOAD_CATEGORY_NAME_ = "categoryName";
+    private static final String PAYLOAD_CATEGORY_THUMBNAIL = "categoryThumbnail";
 
     @Override
     protected void setUserInputs() {
@@ -43,13 +43,13 @@ public class AddCategory extends EndpointHandler {
         /**
          * Check that the user id and content is valid.
          */
-        if (payload.get("category_name") == null || payload.get("category_thumbnail") == null) {
+        if (payload.get(PAYLOAD_CATEGORY_NAME_) == null || payload.get(PAYLOAD_CATEGORY_THUMBNAIL) == null) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NULL_VALUE_FOUND);
             return;
         }
 
-        final String category_name = payload.get("category_name").getAsString();
-        final String category_thumbnail = payload.get("category_thumbnail").getAsString();
+        final String category_name = payload.get(PAYLOAD_CATEGORY_NAME_).getAsString();
+        final String category_thumbnail = payload.get(PAYLOAD_CATEGORY_THUMBNAIL).getAsString();
 
         if (category_name.length() > StaticRules.MAX_CATEGORY_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CATEGORY_TOO_LONG);
