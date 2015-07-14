@@ -29,8 +29,8 @@ public class RequestContent extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        payloadInput.put(CONTENT_SIZE_LIMIT, StaticRules.InputTypes.REG_INT_OPTIONAL);
-        payloadInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(CONTENT_SIZE_LIMIT, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
 

@@ -420,7 +420,8 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
                         "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"\n}")
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"" +
+                        "\n}")
                 .asString();
 
 
