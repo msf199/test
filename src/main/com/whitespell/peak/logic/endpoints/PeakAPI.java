@@ -117,6 +117,7 @@ public class PeakAPI extends WhitespellAPI {
 
         // Get a search object
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Search(), "/search");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Trending(), "/trending");
 
 
     }
