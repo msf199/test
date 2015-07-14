@@ -25,7 +25,7 @@ public class GetUsers extends EndpointHandler {
 
     private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` > ? LIMIT ?";
 
-	private static final String URL_USER_ID = "user_id";
+	private static final String USER_ID = "user_id";
 
 	private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
@@ -36,7 +36,6 @@ public class GetUsers extends EndpointHandler {
 
 	@Override
 	protected void setUserInputs() {
-		urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
 	}
 
 	@Override
@@ -52,7 +51,7 @@ public class GetUsers extends EndpointHandler {
 
                 while (results.next()) {
 
-                    UserObject d = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                    UserObject d = new UserObject(results.getInt(USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                             results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY),
                             results.getString(SLOGAN_KEY));
 
