@@ -22,7 +22,7 @@ import java.util.ArrayList;
  */
 public class GetUsers extends EndpointHandler {
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user`";
+    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` LIMIT ? OFFSET ?";
 
 	private static final String URL_USER_ID = "user_id";
 

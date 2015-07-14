@@ -48,7 +48,8 @@ public class GetUser extends EndpointHandler {
 
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
 
-        if (!a.isAuthenticated() || user_id != a.getUserId()) {
+        boolean isMe = (user_id == a.getUserId());
+        if (!a.isAuthenticated()) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }

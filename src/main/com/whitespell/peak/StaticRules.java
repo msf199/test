@@ -25,7 +25,8 @@ public class StaticRules {
     public static final int MAX_CONTENT_DESCRIPTION_LENGTH = 100;
     public static final int MIN_AUTHENTICATION_HEADER_LENGTH = 1;
     public static final int MAX_AUTHENTICATION_HEADER_LENGTH = 255;
-    public static final int MAX_PUBLISHING_USER_SELECT = 50;
+    public static final int DEFAULT_MAX_LIMIT = 50;
+    public static final int DEFAULT_MIN_OFFSET = 0;
 
 
 
