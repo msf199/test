@@ -12,22 +12,22 @@ public class UserObject {
     /**
      * A list of the users this user is following
      */
-    public ArrayList<String> userFollowing = new ArrayList<>();
+    public ArrayList<Integer> userFollowing = new ArrayList<>();
 
     /**
      * A list of the users that are following this user
      */
-    public ArrayList<String> usersFollowed = new ArrayList<>();
+    public ArrayList<Integer> usersFollowed = new ArrayList<>();
 
     /**
      * A list of the categories this user is following
      */
-    public ArrayList<String> categoryFollowing = new ArrayList<>();
+    public ArrayList<Integer> categoryFollowing = new ArrayList<>();
 
     /**
      * A list of the categories this user is publishing in
      */
-    public ArrayList<String> categoryPublishing = new ArrayList<>();
+    public ArrayList<Integer> categoryPublishing = new ArrayList<>();
 
     int userId;
     String userName;
@@ -43,7 +43,7 @@ public class UserObject {
         this.displayName = "";
         this.email = "";
         this.thumbnail = "";
-        this.coverPhoto = "https://www.rmiguides.com/_includes/_images/Everest-Header-7.jpg?v=2014_03_04";
+        this.coverPhoto = "";
         this.slogan = "";
     }
 
@@ -98,23 +98,23 @@ public class UserObject {
 
     public String getCoverPhoto() { return coverPhoto; }
 
-    public void setCoverPhoto(String cover_photo) { this.coverPhoto = cover_photo; }
+    public void setCoverPhoto(String coverPhoto) { this.coverPhoto = coverPhoto; }
 
-    public void followUser(String username) { userFollowing.add(username); }
+    public void followUser(int userId) { userFollowing.add(userId); }
 
-    public void followCategory(String category) { categoryFollowing.add(category); }
+    public void followCategory(int categoryId) { categoryFollowing.add(categoryId); }
 
-    public void publishCategory(String category) { categoryPublishing.add(category); }
+    public void publishCategory(int categoryId) { categoryPublishing.add(categoryId); }
 
-    public ArrayList<String> getUserFollowing() { return userFollowing; }
+    public ArrayList<Integer> getUserFollowing() { return userFollowing; }
 
-    public ArrayList<String> getUsersFollowed() { return usersFollowed; }
+    public ArrayList<Integer> getUsersFollowed() { return usersFollowed; }
 
-    public ArrayList<String> getCategoryFollowing() {
+    public ArrayList<Integer> getCategoryFollowing() {
         return categoryFollowing;
     }
 
-    public ArrayList<String> getCategoryPublishing() {
+    public ArrayList<Integer> getCategoryPublishing() {
         return categoryPublishing;
     }
 }
