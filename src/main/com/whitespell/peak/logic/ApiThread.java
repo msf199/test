@@ -9,6 +9,7 @@ public class ApiThread extends Thread {
     boolean running = false;
     public void run() {
         running = true;
+        int attempts = 0;
         do {
             try {
                 /* start the API */
@@ -17,7 +18,14 @@ public class ApiThread extends Thread {
                 api.startAPI(Config.API_PORT);
 
             } catch (Exception e) {
-                Logging.log("LimitSelector problem", e);
+                attempts++;
+                Logging.log("API problem", e);
+
+                if(attempts > 5) {
+                    System.out.println("Couldn't start API on API Thread. Exiting the program.");
+                    System.exit(0);
+                    return;
+                }
             }
         } while (running);
     }

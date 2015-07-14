@@ -3,6 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.Safety;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -58,35 +59,8 @@ public class Search extends EndpointHandler {
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
-
-        /**
-         * Object limits
-         */
-
-        int limit = StaticRules.DEFAULT_MAX_LIMIT;
-
-
-        if (context.getQueryString().get(CONTENT_SIZE_LIMIT) != null) {
-            String limitString = context.getQueryString().get(CONTENT_SIZE_LIMIT).toString();
-            if (Safety.isInteger(limitString)) {
-                int limitProposed = Integer.parseInt(limitString);
-                if (limitProposed > StaticRules.DEFAULT_MAX_LIMIT) {
-                    limit = StaticRules.DEFAULT_MAX_LIMIT;
-                } else {
-                    limit = limitProposed;
-                }
-            }
-        }
-
-        int offset = 0;
-
-        if (context.getQueryString().get(CONTENT_OFFSET) != null) {
-            String offsetString = context.getQueryString().get(CONTENT_OFFSET).toString();
-            if (Safety.isInteger(offsetString)) {
-                offset = Integer.parseInt(offsetString);
-            }
-        }
-
+        int limit =  GenericAPIActions.getLimit(context.getQueryString());
+        int offset =  GenericAPIActions.getOffset(context.getQueryString());
 
         ArrayList<UserObject> tempUsers = new ArrayList<>();
         ArrayList<Integer> tempCategories = new ArrayList<>();
@@ -109,7 +83,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"` FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
+                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"` FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' LIMIT "+limit+" OFFSET "+offset+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -142,7 +116,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                        StatementExecutor executor = new StatementExecutor("SELECT `"+CATEGORY_ID_KEY+"` FROM `category` WHERE `category_name` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
+                        StatementExecutor executor = new StatementExecutor("SELECT `"+CATEGORY_ID_KEY+"` FROM `category` WHERE `category_name` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' LIMIT "+limit+" OFFSET "+offset+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -167,7 +141,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` WHERE `content_title` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' OR `content_description` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'");
+                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` WHERE `content_title` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' OR `content_description` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' LIMIT "+limit+" OFFSET "+offset+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
