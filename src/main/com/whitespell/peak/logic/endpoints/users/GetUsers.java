@@ -3,6 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
  */
 public class GetUsers extends EndpointHandler {
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` LIMIT ? OFFSET ?";
+    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` > ? LIMIT ?";
 
 	private static final String URL_USER_ID = "user_id";
 
@@ -46,6 +47,9 @@ public class GetUsers extends EndpointHandler {
 
                 final ResultSet results = ps.executeQuery();
                 ArrayList<UserObject> users = new ArrayList<>();
+                ps.setInt(1, GenericAPIActions.getOffset(context.getQueryString()));
+                ps.setInt(2, GenericAPIActions.getLimit(context.getQueryString()));
+
                 while (results.next()) {
 
                     UserObject d = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
