@@ -12,22 +12,21 @@ public class UserObject {
     /**
      * A list of the users this user is following
      */
-    public ArrayList<String> userFollowing = new ArrayList<>();
-
+    public ArrayList<Integer> userFollowing = null;
     /**
      * A list of the users that are following this user
      */
-    public ArrayList<String> usersFollowed = new ArrayList<>();
+    public ArrayList<Integer> usersFollowed = null;
 
     /**
      * A list of the categories this user is following
      */
-    public ArrayList<String> categoryFollowing = new ArrayList<>();
+    public ArrayList<Integer> categoryFollowing = null;
 
     /**
      * A list of the categories this user is publishing in
      */
-    public ArrayList<String> categoryPublishing = new ArrayList<>();
+    public ArrayList<Integer> categoryPublishing = null;
 
     int userId;
     String userName;
@@ -43,10 +42,20 @@ public class UserObject {
         this.displayName = "";
         this.email = "";
         this.thumbnail = "";
-        this.coverPhoto = "https://www.rmiguides.com/_includes/_images/Everest-Header-7.jpg?v=2014_03_04";
+        this.coverPhoto = "";
         this.slogan = "";
     }
 
+    public UserObject(ArrayList<Integer> userFollowing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
+        this.userFollowing = userFollowing;
+        this.userId = userId;
+        this.userName = userName;
+        this.displayName = displayName;
+        this.email = email;
+        this.thumbnail = thumbnail;
+        this.coverPhoto = cover_photo;
+        this.slogan = slogan;
+    }
 
     public UserObject(int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
         this.userId = userId;
@@ -98,23 +107,23 @@ public class UserObject {
 
     public String getCoverPhoto() { return coverPhoto; }
 
-    public void setCoverPhoto(String cover_photo) { this.coverPhoto = cover_photo; }
+    public void setCoverPhoto(String coverPhoto) { this.coverPhoto = coverPhoto; }
 
-    public void followUser(String username) { userFollowing.add(username); }
+    public void followUser(int userId) { userFollowing.add(userId); }
 
-    public void followCategory(String category) { categoryFollowing.add(category); }
+    public void followCategory(int categoryId) { categoryFollowing.add(categoryId); }
 
-    public void publishCategory(String category) { categoryPublishing.add(category); }
+    public void publishCategory(int categoryId) { categoryPublishing.add(categoryId); }
 
-    public ArrayList<String> getUserFollowing() { return userFollowing; }
+    public ArrayList<Integer> getUserFollowing() { return userFollowing; }
 
-    public ArrayList<String> getUsersFollowed() { return usersFollowed; }
+    public ArrayList<Integer> getUsersFollowed() { return usersFollowed; }
 
-    public ArrayList<String> getCategoryFollowing() {
+    public ArrayList<Integer> getCategoryFollowing() {
         return categoryFollowing;
     }
 
-    public ArrayList<String> getCategoryPublishing() {
+    public ArrayList<Integer> getCategoryPublishing() {
         return categoryPublishing;
     }
 }
