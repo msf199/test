@@ -90,16 +90,16 @@ public class GetUsersByCategory extends EndpointHandler {
     }
 
     class CategorizedUserObject {
-        int user_id;
+        int userId;
         String username;
         String thumbnail;
-        int category_id;
+        int categoryId;
 
-        public CategorizedUserObject(int user_id, String username, String thumbnail, int category_id) {
-            this.user_id = user_id;
+        public CategorizedUserObject(int userId, String username, String thumbnail, int categoryId) {
+            this.userId = userId;
             this.username = username;
             this.thumbnail = thumbnail;
-            this.category_id = category_id;
+            this.categoryId = categoryId;
         }
     }
 
