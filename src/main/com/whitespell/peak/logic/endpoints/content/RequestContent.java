@@ -2,22 +2,15 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.EndpointHandler;
-import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.logging.Logging;
-import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
-import main.com.whitespell.peak.model.ContentTypeObject;
-import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Pim de Witte, Whitespell Inc.
@@ -36,15 +29,16 @@ public class RequestContent extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        /*payloadInput.put(CONTENT_SIZE_LIMIT, StaticRules.InputTypes.REG_STRING_REQUIRED);
-        payloadInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_STRING_REQUIRED);*/
+        payloadInput.put(CONTENT_SIZE_LIMIT, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        payloadInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
 
-    private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `content`";
+    private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `content` LIMIT ? OFFSET ?";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
+
         /**
          * Ensure that the user is authenticated properly
          */
@@ -62,8 +56,12 @@ public class RequestContent extends EndpointHandler {
 
             try {
                 StatementExecutor executor = new StatementExecutor(SELECT_CONTENT_FOR_ID_QUERY);
+                final int finalLimit = GenericAPIActions.getLimit(context.getQueryString());
+                final int finalOffset = GenericAPIActions.getOffset(context.getQueryString());
                 executor.execute(ps -> {
                     ArrayList<ContentObject> contents = new ArrayList<>();
+                    ps.setInt(1, finalLimit);
+                    ps.setInt(2, finalOffset);
                     ResultSet results = ps.executeQuery();
 
                     //display results

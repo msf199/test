@@ -2,6 +2,7 @@ package main.com.whitespell.peak.logic.endpoints.users.publishers;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.Safety;
@@ -23,34 +24,18 @@ public class GetUsersByCategory extends EndpointHandler {
 
     private static final String PARAMETER_CATEGORY_ID_KEY = "categories";
     private static final String PARAMETER_LIMIT_KEY = "limit";
+    private static final String PARAMETER_OFFSET_KEY = "offset";
 
     @Override
     protected void setUserInputs() {
         queryStringInput.put(PARAMETER_LIMIT_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(PARAMETER_OFFSET_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(PARAMETER_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
         try {
-
-            /**
-             * Object limits
-             */
-
-            int limit = StaticRules.MAX_PUBLISHING_USER_SELECT;
-
-            if (context.getQueryString().get("limit") != null) {
-                String limitString = context.getQueryString().get("limit").toString();
-                if (Safety.isInteger(limitString)) {
-                    int limitProposed = Integer.parseInt(limitString);
-                    if (limitProposed > StaticRules.MAX_PUBLISHING_USER_SELECT) {
-                        limit = StaticRules.MAX_PUBLISHING_USER_SELECT;
-                    } else {
-                        limit = limitProposed;
-                    }
-                }
-            }
 
 
             /**
@@ -77,7 +62,7 @@ public class GetUsersByCategory extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor("" +
                     "SELECT DISTINCT user.user_id, category_id, user.username, user.thumbnail FROM `category_publishing` INNER JOIN user ON user.user_id=category_publishing.user_id " +
                     whereString.toString() +
-                    "ORDER BY `category_id` LIMIT " + limit + "");
+                    "ORDER BY `category_id` LIMIT " + GenericAPIActions.getLimit(context.getQueryString()) + " OFFSET " + GenericAPIActions.getOffset(context.getQueryString()));
             executor.execute(ps -> {
 
                 final ResultSet results = ps.executeQuery();
