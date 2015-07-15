@@ -140,7 +140,7 @@ public class Trending extends EndpointHandler {
                 () -> {
                     try {
                         StatementExecutor executor = new StatementExecutor("SELECT * FROM `content`" +
-                                " ORDER BY `content_id` DESC LIMIT LIMIT "+limit+"");
+                                " ORDER BY `content_id` DESC LIMIT "+limit+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 

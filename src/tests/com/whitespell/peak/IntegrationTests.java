@@ -424,7 +424,6 @@ public class IntegrationTests extends Server {
                         "\n}")
                 .asString();
 
-
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -436,6 +435,19 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + TEST2_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
+        assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
+        assertEquals(content[0].getUserId(), TEST2_UID);
     }
 
     @Test
@@ -690,8 +702,15 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
     }
 
+    @Test
+    public void testK_getEmptyNewsfeedUserIds() throws UnirestException{
 
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/empty")
+                .header("accept", "application/json")
+                .asString();
 
+        System.out.println(stringResponse.getBody());
+    }
 
     static String readFile(String path, Charset encoding)
             throws IOException {

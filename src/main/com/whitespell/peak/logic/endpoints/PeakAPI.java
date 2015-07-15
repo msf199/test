@@ -10,6 +10,8 @@ import main.com.whitespell.peak.logic.endpoints.content.categories.RequestCatego
 import main.com.whitespell.peak.logic.endpoints.content.types.AddContentType;
 import main.com.whitespell.peak.logic.endpoints.content.types.RequestContentTypes;
 import main.com.whitespell.peak.logic.endpoints.monitoring.Ping;
+import main.com.whitespell.peak.logic.endpoints.newsfeed.GetEmptyNewsfeed;
+import main.com.whitespell.peak.logic.endpoints.newsfeed.NewsFeed;
 import main.com.whitespell.peak.logic.endpoints.statistics.GetUserSignups;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
@@ -119,7 +121,11 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Search(), "/search");
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new Trending(), "/trending");
 
-
+        /**
+         * NEWSFEED
+         */
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new NewsFeed(), "/newsfeed");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetEmptyNewsfeed(), "/newsfeed/empty");
     }
 
 }
