@@ -662,7 +662,24 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testI_getUsers() throws UnirestException{
+    public void testI_getCategoryFollowing() throws UnirestException{
+
+        /**
+         * List categories user is following
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/?includeCategories=1")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(userThatFollows.getCategoryFollowing().get(0).intValue(), 5);
+        assertEquals(userThatFollows.getCategoryFollowing().get(1).intValue(), 6);
+    }
+
+    @Test
+    public void testJ_getUsers() throws UnirestException{
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/?offset=1&limit=50")
                 .header("accept", "application/json")

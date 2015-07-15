@@ -11,6 +11,7 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,8 +25,10 @@ import java.util.ArrayList;
 public class GetUser extends EndpointHandler {
 
     private static final String QS_FOLLOWERS_KEY = "includeFollowing";
+    private static final String QS_CATEGORIES_KEY = "includeCategories";
 
     private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
+    private static final String FIND_CATEGORIES_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
     private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
     private static final String URL_USER_ID = "user_id";
     private static final String USERNAME_KEY = "username";
@@ -46,6 +49,7 @@ public class GetUser extends EndpointHandler {
 
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         boolean getFollowers = false;
+        boolean getCategories = false;
 
         /**
          * Check if we want to see the users we are following
@@ -53,6 +57,15 @@ public class GetUser extends EndpointHandler {
         if(context.getQueryString().get(QS_FOLLOWERS_KEY) != null){
             if(context.getQueryString().get(QS_FOLLOWERS_KEY)[0].equals("1")){
                 getFollowers = true;
+            }
+        }
+
+        /**
+         * Check if we want to see the categories we are following
+         */
+        if(context.getQueryString().get(QS_CATEGORIES_KEY) != null){
+            if(context.getQueryString().get(QS_CATEGORIES_KEY)[0].equals("1")){
+                getCategories = true;
             }
         }
 
@@ -75,11 +88,27 @@ public class GetUser extends EndpointHandler {
                 StatementExecutor executor = new StatementExecutor(FIND_FOLLOWING_QUERY);
                 executor.execute(ps -> {
                     ps.setString(1, String.valueOf(user_id));
-                    UserObject user = null;
 
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
                         initialFollowing.add(results.getInt("following_id"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
+        }
+
+        final ArrayList<Integer> initialCategories = new ArrayList<>();
+        if(getCategories){
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_CATEGORIES_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(user_id));
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialCategories.add(results.getInt("category_id"));
                     }
                 });
             } catch (SQLException e) {
@@ -101,13 +130,8 @@ public class GetUser extends EndpointHandler {
                     final ResultSet results = ps.executeQuery();
 
                     if (results.next()) {
-                        if(initialFollowing != null){
-                            user = new UserObject(initialFollowing, results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
-                                    results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
-                        }else{
-                            user = new UserObject(results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
-                                    results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
-                        }
+                        user = new UserObject(initialCategories, initialFollowing, results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                                results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;
