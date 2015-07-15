@@ -22,13 +22,15 @@ import java.util.Date;
  */
 public class AddNewContent extends EndpointHandler {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `timestamp`) VALUES (?,?,?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?)";
 
 
     private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
     private static final String PAYLOAD_CONTENT_TITLE = "contentTitle";
     private static final String PAYLOAD_CONTENT_URL = "contentUrl";
     private static final String PAYLOAD_CONTENT_DESCRIPTION = "contentDescription";
+    private static final String PAYLOAD_CONTENT_THUMBNAIL = "thumbnailUrl";
+
 
     private static final String URL_USER_ID_KEY = "user_id";
 
@@ -39,6 +41,7 @@ public class AddNewContent extends EndpointHandler {
         payloadInput.put(PAYLOAD_CONTENT_TITLE, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_URL, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
 
@@ -51,7 +54,9 @@ public class AddNewContent extends EndpointHandler {
         final String content_url = payload.get(PAYLOAD_CONTENT_URL).getAsString();
         final String content_title = payload.get(PAYLOAD_CONTENT_TITLE).getAsString();
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
+        final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
+
         //todo(pim) thumbnail
         //todo(pim) content_likes
         //todo(pim) last_comment
@@ -77,7 +82,8 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(3, content_url);
                 ps.setString(4, content_title);
                 ps.setString(5, content_description);
-                ps.setString(6, now.toString());
+                ps.setString(6, thumbnail_url);
+                ps.setString(7, now.toString());
 
                 ps.executeUpdate();
 
