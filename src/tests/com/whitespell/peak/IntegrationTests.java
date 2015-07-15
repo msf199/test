@@ -702,6 +702,16 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
     }
 
+    @Test
+    public void testK_getEmptyNewsfeedUserIds() throws UnirestException{
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/empty")
+                .header("accept", "application/json")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+    }
+
     static String readFile(String path, Charset encoding)
             throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
