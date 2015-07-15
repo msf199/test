@@ -366,7 +366,7 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
         UserObject rollerskater = g.fromJson(stringResponse.getBody(), UserObject.class);
         ROLLERSKATER_UID = rollerskater.getUserId();
-        System.out.println("ROLLER: " +ROLLERSKATER_UID);
+        System.out.println("ROLLER: " + ROLLERSKATER_UID);
     }
 
     @Test
@@ -659,6 +659,18 @@ public class IntegrationTests extends Server {
         UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(userThatFollows.getUserFollowing().get(0).intValue(), TEST2_UID);
         assertEquals(userThatFollows.getUserFollowing().get(1).intValue(), SKYDIVER_UID);
+    }
+
+    @Test
+    public void testI_getUsers() throws UnirestException{
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/?offset=1&limit=50")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        UserObject[] a = g.fromJson(stringResponse.getBody(), UserObject[].class);
+        System.out.println(stringResponse.getBody());
     }
 
 
