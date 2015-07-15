@@ -39,6 +39,7 @@ public class ImportDDL {
         tables.add("category");
         tables.add("content_type");
         tables.add("content");
+        tables.add("newsfeed");
 
 
         // add reference tables

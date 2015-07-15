@@ -11,13 +11,15 @@ CREATE TABLE `user` (
   `rights` int(2) DEFAULT '0',
   `cover_photo` varchar(255) DEFAULT 'https://s-media-cache-ak0.pinimg.com/736x/13/23/c1/1323c17e88c80e988fa14b31b6fed07b.jpg',
   `slogan` varchar(255) DEFAULT '',
+  `newsfeed_processed` datetime DEFAULT NULL,
+  `newsfeed_processing` datetime DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `id_UNIQUE` (`user_id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=275 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=7047 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
@@ -28,7 +30,7 @@ CREATE TABLE `user` (
   `content_type_id` int(11) NOT NULL AUTO_INCREMENT,
   `content_type_name` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`content_type_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;CREATE TABLE `content` (
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;CREATE TABLE `content` (
   `content_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `content_type` int(2) DEFAULT '0',
@@ -36,14 +38,25 @@ CREATE TABLE `user` (
   `content_title` varchar(45) DEFAULT NULL,
   `content_description` varchar(100) DEFAULT NULL,
   `timestamp` datetime DEFAULT NULL,
-  `thumbnail_url` varchar(255) DEFAULT NULL,
+  `thumbnail_url` varchar(255) DEFAULT 'http://telecoms.com/wp-content/blogs.dir/1/files/2012/06/euro-football-sport.jpg',
+  `content_likes` int(10) DEFAULT '0',
+  `content_views` bigint(15) DEFAULT '0',
+  `content_displays` bigint(15) DEFAULT '0',
+  `content_comments` int(10) DEFAULT '0',
   PRIMARY KEY (`content_id`),
   UNIQUE KEY `content_id_UNIQUE` (`content_id`),
   KEY `user_id_idx` (`user_id`),
   KEY `content_title_idx` (`content_title`),
   KEY `FK_user_content_content_type_idx` (`content_type`),
   CONSTRAINT `FK_user_content_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
+) ENGINE=InnoDB AUTO_INCREMENT=4758 DEFAULT CHARSET=utf8;CREATE TABLE `newsfeed` (
+  `user_id` int(11) NOT NULL,
+  `newsfeed_object` longtext,
+  `last_generated` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `user_id_UNIQUE` (`user_id`),
+  CONSTRAINT `FK_newsfeed_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
   `user_id` int(11) NOT NULL,
   `following_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,
@@ -78,4 +91,4 @@ CREATE TABLE `user` (
   PRIMARY KEY (`authentication_id`),
   KEY `FK_authentication_user_id` (`user_id`),
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=422 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8125 DEFAULT CHARSET=utf8;
