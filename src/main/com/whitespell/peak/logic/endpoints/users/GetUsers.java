@@ -5,6 +5,7 @@ import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.Safety;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 public class GetUsers extends EndpointHandler {
 
     private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` > ? LIMIT ?";
+    private static final String GET_USERS_EXCLUDE_TEMP = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` > ?  AND `email` NOT LIKE '%temporary.email' LIMIT ?";
 
 	private static final String USER_ID = "user_id";
 
@@ -33,15 +35,26 @@ public class GetUsers extends EndpointHandler {
 	private static final String THUMBNAIL_KEY = "thumbnail";
 	private static final String COVER_PHOTO_KEY = "cover_photo";
 	private static final String SLOGAN_KEY = "slogan";
+	private static final String EXCLUDE_TEMP_USERS = "excludeTempUsers";
 
 	@Override
 	protected void setUserInputs() {
+        queryStringInput.put(EXCLUDE_TEMP_USERS, StaticRules.InputTypes.REG_INT_OPTIONAL);
 	}
 
 	@Override
     public void safeCall(final RequestObject context) throws IOException {
+
+        boolean excludeTempUsers = false;
+        String[] excludeTempUsersValue = context.getQueryString().get(EXCLUDE_TEMP_USERS);
+        if(excludeTempUsersValue != null) {
+              if(excludeTempUsersValue[0].equals("1")) {
+                  excludeTempUsers = true;
+          }
+        }
         try {
-            StatementExecutor executor = new StatementExecutor(GET_USERS);
+            StatementExecutor executor = new StatementExecutor(excludeTempUsers ? GET_USERS_EXCLUDE_TEMP : GET_USERS);
+
             executor.execute(ps -> {
 
                 ps.setInt(1, GenericAPIActions.getOffset(context.getQueryString()));
