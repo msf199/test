@@ -26,6 +26,7 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_TITLE = "content_title";
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
+    private static final String CONTENT_THUMBNAIL = "thumbnail_url";
 
     @Override
     protected void setUserInputs() {
@@ -67,7 +68,7 @@ public class RequestContent extends EndpointHandler {
                     //display results
                     while (results.next()) {
                         ContentObject content = new ContentObject(results.getInt(CONTENT_ID_KEY),results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), null);
+                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
                         contents.add(content);
                     }
 

@@ -13,16 +13,16 @@ public class ContentObject {
     String contentUrl;
     String contentDescription;
     int likes = 100;
-    String thumbnail = "https://s-media-cache-ak0.pinimg.com/originals/c2/1e/ce/c21ecebc560514fe3e48ca5eef1c09b8.jpg";
+    String thumbnailUrl;
 
     public ContentObject(int contentId, int contentType, String contentTitle,
-                         String contentUrl, String contentDescription, String thumbnail) {
+                         String contentUrl, String contentDescription, String thumbnailUrl) {
         this.contentId = contentId;
         this.contentType = contentType;
         this.contentTitle = contentTitle;
         this.contentUrl = contentUrl;
         this.contentDescription = contentDescription;
-        this.thumbnail = thumbnail;
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public int getContentType() { return contentType; }
@@ -35,5 +35,5 @@ public class ContentObject {
 
     public int getLikes() { return likes; }
 
-    public String getThumbnail() { return thumbnail; }
+    public String getThumbnailUrl() { return thumbnailUrl; }
 }

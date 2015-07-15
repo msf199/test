@@ -46,7 +46,8 @@ public class UserObject {
         this.slogan = "";
     }
 
-    public UserObject(ArrayList<Integer> userFollowing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
+    public UserObject(ArrayList<Integer> categoryFollowing, ArrayList<Integer> userFollowing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
+        this.categoryFollowing = categoryFollowing;
         this.userFollowing = userFollowing;
         this.userId = userId;
         this.userName = userName;
