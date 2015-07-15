@@ -28,17 +28,31 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
 
+    private static final String QS_USER_ID = "userId";
+
     @Override
     protected void setUserInputs() {
         queryStringInput.put(CONTENT_SIZE_LIMIT, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_USER_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
-
+    private static final String SELECT_CONTENT_BY_USER_ID = "SELECT * FROM `content` WHERE `content_id` > ? AND `user_id` = ? LIMIT ?";
     private static final String SELECT_CONTENT_FOR_ID_QUERY = "SELECT * FROM `content` WHERE `content_id` > ? LIMIT ?";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
+
+        int userId = 0;
+        boolean getContentByUserId = false;
+        String REQUEST_CONTENT = SELECT_CONTENT_FOR_ID_QUERY;
+        if(context.getQueryString().get(QS_USER_ID) != null){
+            if(Safety.isInteger(context.getQueryString().get(QS_USER_ID)[0])){
+                REQUEST_CONTENT = SELECT_CONTENT_BY_USER_ID;
+                userId = Integer.parseInt(context.getQueryString().get(QS_USER_ID)[0]);
+                getContentByUserId = true;
+            }
+        }
 
         /**
          * Ensure that the user is authenticated properly
@@ -56,20 +70,36 @@ public class RequestContent extends EndpointHandler {
          */
 
             try {
-                StatementExecutor executor = new StatementExecutor(SELECT_CONTENT_FOR_ID_QUERY);
+                StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
                 final int finalLimit = GenericAPIActions.getLimit(context.getQueryString());
                 final int finalOffset = GenericAPIActions.getOffset(context.getQueryString());
+                final int finalUserId = userId;
+                final boolean finalContentUserId = getContentByUserId;
                 executor.execute(ps -> {
                     ArrayList<ContentObject> contents = new ArrayList<>();
-                    ps.setInt(1, finalOffset);
-                    ps.setInt(2, finalLimit);
+                    if(finalContentUserId){
+                        ps.setInt(1, finalOffset);
+                        ps.setInt(2, finalUserId);
+                        ps.setInt(3, finalLimit);
+                    }else{
+                        ps.setInt(1, finalOffset);
+                        ps.setInt(2, finalLimit);
+                    }
+
                     ResultSet results = ps.executeQuery();
 
                     //display results
                     while (results.next()) {
-                        ContentObject content = new ContentObject(results.getInt(CONTENT_ID_KEY),results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-                        contents.add(content);
+                        if(finalUserId != 0){
+                            ContentObject content = new ContentObject(finalUserId, results.getInt(CONTENT_ID_KEY),results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
+                                    results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                            contents.add(content);
+                        }
+                        else{
+                            ContentObject content = new ContentObject(results.getInt(CONTENT_ID_KEY),results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
+                                    results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                            contents.add(content);
+                        }
                     }
 
                     Gson g = new Gson();
@@ -86,7 +116,5 @@ public class RequestContent extends EndpointHandler {
                 Logging.log("High", e);
                 return;
             }
-
     }
-
 }
