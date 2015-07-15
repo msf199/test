@@ -57,10 +57,10 @@ public class GetUsers extends EndpointHandler {
 
             executor.execute(ps -> {
 
-                final ResultSet results = ps.executeQuery();
-                ArrayList<UserObject> users = new ArrayList<>();
                 ps.setInt(1, GenericAPIActions.getOffset(context.getQueryString()));
                 ps.setInt(2, GenericAPIActions.getLimit(context.getQueryString()));
+                final ResultSet results = ps.executeQuery();
+                ArrayList<UserObject> users = new ArrayList<>();
 
                 while (results.next()) {
 

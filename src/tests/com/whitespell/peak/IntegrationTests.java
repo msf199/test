@@ -10,7 +10,6 @@ import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.users.CategoryFollowAction;
 import main.com.whitespell.peak.logic.endpoints.users.UserFollowAction;
 import main.com.whitespell.peak.logic.logging.Logging;
-import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.*;
@@ -28,7 +27,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 import static org.junit.Assert.assertEquals;
@@ -366,7 +364,7 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
         UserObject rollerskater = g.fromJson(stringResponse.getBody(), UserObject.class);
         ROLLERSKATER_UID = rollerskater.getUserId();
-        System.out.println("ROLLER: " +ROLLERSKATER_UID);
+        System.out.println("ROLLER: " + ROLLERSKATER_UID);
     }
 
     @Test
@@ -421,7 +419,8 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
                         "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
                         "\n}")
                 .asString();
 
@@ -436,6 +435,7 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
     }
 
     @Test
@@ -659,6 +659,18 @@ public class IntegrationTests extends Server {
         UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(userThatFollows.getUserFollowing().get(0).intValue(), TEST2_UID);
         assertEquals(userThatFollows.getUserFollowing().get(1).intValue(), SKYDIVER_UID);
+    }
+
+    @Test
+    public void testI_getUsers() throws UnirestException{
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/?offset=1&limit=50")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        UserObject[] a = g.fromJson(stringResponse.getBody(), UserObject[].class);
+        System.out.println(stringResponse.getBody());
     }
 
 
