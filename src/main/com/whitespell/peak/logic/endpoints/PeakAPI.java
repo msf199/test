@@ -126,7 +126,7 @@ public class PeakAPI extends WhitespellAPI {
          * NEWSFEED
          */
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewsfeed(), "/newsfeed/$", "userId" );
-      // dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetNewsfeed(), "/newsfeed/$", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetNewsfeed(), "/newsfeed/$", "userId");
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetEmptyNewsfeed(), "/newsfeed/empty");
     }
 
