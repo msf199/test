@@ -6,13 +6,14 @@ import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
-import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -34,8 +35,7 @@ public class AuthenticationRequest extends EndpointHandler {
     }
 
     private static final String RETRIEVE_USERNAME = "SELECT `username` FROM `user` WHERE `email` = ? LIMIT 1";
-    private static final String RETRIEVE_PASSWORD_WITH_USERNAME = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
-    private static final String RETRIEVE_PASSWORD_WITH_EMAIL = "SELECT `user_id`,`password` FROM `user` WHERE `email` = ? LIMIT 1";
+    private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
 
     private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`) " +
             "VALUES (?,?)";
@@ -47,10 +47,8 @@ public class AuthenticationRequest extends EndpointHandler {
         //Connection con;
         final String username;
         final String password;
-        String RETRIEVE_PASSWORD = RETRIEVE_PASSWORD_WITH_USERNAME;
         String payloadUsername = payload.get("username").getAsString();
         ArrayList<String> temp = new ArrayList<>();
-
 
         /**
          * Handle username is the user's email
@@ -78,7 +76,6 @@ public class AuthenticationRequest extends EndpointHandler {
             }
         }else{
             username = payloadUsername;
-            RETRIEVE_PASSWORD = RETRIEVE_PASSWORD_WITH_EMAIL;
         }
 
         password = payload.get("password").getAsString();
@@ -106,7 +103,9 @@ public class AuthenticationRequest extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
-            executor.execute(ps-> {
+            executor.execute(new ExecutionBlock() {
+                @Override
+                public void process(PreparedStatement ps) throws SQLException {
                     ps.setString(1, username);
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
@@ -121,9 +120,9 @@ public class AuthenticationRequest extends EndpointHandler {
                                 ao.setUserId(s.getInt("user_id"));
                                 // insert the new authentication key into the database
                                 try {
-                                    StatementExecutor executor1 = new StatementExecutor(INSERT_AUTHENTICATION);
+                                    StatementExecutor executor = new StatementExecutor(INSERT_AUTHENTICATION);
 
-                                    executor1.execute(ps1 -> {
+                                    executor.execute(ps1 -> {
                                         ps1.setInt(1, ao.getUserId());
                                         ps1.setString(2, ao.getKey());
                                         ps1.executeUpdate();
@@ -154,6 +153,7 @@ public class AuthenticationRequest extends EndpointHandler {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
                         return;
                     }
+                }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
