@@ -121,6 +121,10 @@ public class Safety {
                     throw new InputNotValidException("Required key '"+key+"' length was bigger than the maximum");
                 }
             }
+
+            if (inputKeyTypeMap.get(key).getType().equals("jsonarray")) {
+
+            }
         }
     }
 

@@ -30,12 +30,14 @@ public class AddNewsfeed extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        payloadInput.put(POST_NEWSFEED, StaticRules.InputTypes.LONG_STRING_REQUIRED);
+        payloadInput.put(POST_NEWSFEED, StaticRules.InputTypes.JSON_ARRAY_REQUIRED);
         urlInput.put(USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
+
+        System.out.println("received");
 
         final boolean[] success = {false};
 
@@ -56,7 +58,7 @@ public class AddNewsfeed extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(ADD_NEWSFEED_QUERY);
             executor.execute(ps -> {
                 ps.setInt(1, Integer.parseInt(context.getUrlVariables().get(USER_ID)));
-                ps.setString(2, context.getPayload().getAsJsonObject().get(POST_NEWSFEED).getAsString());
+                ps.setString(2, context.getPayload().getAsJsonObject().get(POST_NEWSFEED).getAsJsonArray().toString());
                 ps.executeUpdate();
                 success[0] = true;
 
