@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class GetEmptyNewsfeed extends EndpointHandler {
 
     private static final String USER_ID_KEY = "user_id";
-    private static String EMPTY_NEWSFEED_QUERY = "SELECT * FROM `user` WHERE `user`.`user_id` NOT IN (SELECT `user_id` FROM (`newsfeed`)) AND `email` NOT LIKE '%temporary.email'";
+    private static String EMPTY_NEWSFEED_QUERY = "SELECT `user_id` FROM `user` WHERE `user`.`user_id` NOT IN (SELECT `user_id` FROM (`newsfeed`)) AND `email` NOT LIKE '%temporary.email'";
 
 
     @Override
@@ -41,7 +41,6 @@ public class GetEmptyNewsfeed extends EndpointHandler {
 
                     while (results.next()) {
                         emptyNewsfeedUsers.add(results.getInt(USER_ID_KEY));
-                        System.out.println("add");
                     }
 
                     context.getResponse().setStatus(200);
