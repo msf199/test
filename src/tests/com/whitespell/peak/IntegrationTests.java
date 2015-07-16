@@ -46,7 +46,7 @@ public class IntegrationTests extends Server {
     static String TEST_EMAIL = "pimdewitte95@gmail.com";
     static int TEST_UID = -1;
     static String TEST_KEY;
-    static int TEST2_UID;
+    static int TEST2_UID = -1;
     static String TEST2_KEY;
 
     static CategoryObject[] categories;
@@ -216,7 +216,7 @@ public class IntegrationTests extends Server {
          * Authenticate first user we just created
          */
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication") // misspeled S on purpose to cause an error.
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"username\":\"" + TEST_USERNAME + "\",\n" +
@@ -232,7 +232,26 @@ public class IntegrationTests extends Server {
         assertEquals(a.getUserId() > -1, true);
 
         /**
-        * Authenticate the 2nd User
+         * Authenticate first user we just created with email instead of username
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"username\":\"" + TEST_EMAIL + "\",\n" +
+                        "\"password\" : \"" + TEST_PASSWORD + "\"\n" +
+                        "}")
+                .asString();
+
+
+        AuthenticationObject b = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST_UID = b.getUserId();
+        TEST_KEY = b.getKey();
+
+        assertEquals(b.getUserId() > -1, true);
+
+        /**
+        * Authenticate the 2nd User with username
         * */
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
@@ -244,9 +263,28 @@ public class IntegrationTests extends Server {
                 .asString();
 
 
-        AuthenticationObject b = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-        TEST2_UID = b.getUserId();
-        TEST2_KEY = b.getKey();
+        AuthenticationObject c = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST2_UID = c.getUserId();
+        TEST2_KEY = c.getKey();
+
+        assertEquals(b.getUserId() > -1, true);
+
+        /**
+         * Authenticate the 2nd User with email
+         * */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"username\":\"" + ROLLERSKATER_EMAIL + "\",\n" +
+                        "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\"\n" +
+                        "}")
+                .asString();
+
+
+        AuthenticationObject d = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST2_UID = d.getUserId();
+        TEST2_KEY = d.getKey();
 
         assertEquals(b.getUserId() > -1, true);
 
@@ -264,7 +302,6 @@ public class IntegrationTests extends Server {
 
         assertEquals(user.getUserId(), TEST_UID);
         assertEquals(user.getUserName(), TEST_USERNAME);
-
 
         /**
         * Get the 2nd UserObject from the users/userid endpoint
