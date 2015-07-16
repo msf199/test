@@ -6,7 +6,6 @@ import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
-import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 
@@ -14,12 +13,12 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         1/20/15
  *         whitespell.model
  */
@@ -34,8 +33,9 @@ public class AuthenticationRequest extends EndpointHandler {
         payloadInput.put(PAYLOAD_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
-
-    private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
+    private static final String RETRIEVE_USERNAME = "SELECT `username` FROM `user` WHERE `email` = ? LIMIT 1";
+    private static final String RETRIEVE_PASSWORD_WITH_USERNAME = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
+    private static final String RETRIEVE_PASSWORD_WITH_EMAIL = "SELECT `user_id`,`password` FROM `user` WHERE `email` = ? LIMIT 1";
 
     private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`) " +
             "VALUES (?,?)";
@@ -43,22 +43,51 @@ public class AuthenticationRequest extends EndpointHandler {
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
-        Connection con;
+        JsonObject payload = context.getPayload().getAsJsonObject();
+        //Connection con;
         final String username;
         final String password;
+        String RETRIEVE_PASSWORD = RETRIEVE_PASSWORD_WITH_USERNAME;
+        String payloadUsername = payload.get("username").getAsString();
+        ArrayList<String> temp = new ArrayList<>();
 
-        JsonObject payload = context.getPayload().getAsJsonObject();
 
         /**
-         * 400 Bad Request: Check if all data is valid
+         * Handle username is the user's email
          */
+        if(payloadUsername.contains("@") && payloadUsername.contains(".")){
+            try {
+                StatementExecutor executor = new StatementExecutor(RETRIEVE_USERNAME);
 
-        // Check if all parameters are present and contain the right characters, if not throw a 400
-        username = payload.get("username").getAsString();
+                executor.execute(ps -> {
+                    ps.setString(1, payloadUsername);
+                    final ResultSet s = ps.executeQuery();
+                    if (s.next()) {
+                       temp.add(s.getString("username"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
+            if(temp.size() > 0){
+                username = temp.get(0);
+            }else{
+                // if not verified, throw error
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
+                return;
+            }
+        }else{
+            username = payloadUsername;
+            RETRIEVE_PASSWORD = RETRIEVE_PASSWORD_WITH_EMAIL;
+        }
+
         password = payload.get("password").getAsString();
 
         // check against lengths for security and UX reasons.
         //check if values are too long
+        /**
+         * 400 Bad Request: Check if all data is valid
+         */
         if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
             return;
@@ -77,9 +106,7 @@ public class AuthenticationRequest extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
+            executor.execute(ps-> {
                     ps.setString(1, username);
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
@@ -94,9 +121,9 @@ public class AuthenticationRequest extends EndpointHandler {
                                 ao.setUserId(s.getInt("user_id"));
                                 // insert the new authentication key into the database
                                 try {
-                                    StatementExecutor executor = new StatementExecutor(INSERT_AUTHENTICATION);
+                                    StatementExecutor executor1 = new StatementExecutor(INSERT_AUTHENTICATION);
 
-                                    executor.execute(ps1 -> {
+                                    executor1.execute(ps1 -> {
                                         ps1.setInt(1, ao.getUserId());
                                         ps1.setString(2, ao.getKey());
                                         ps1.executeUpdate();
@@ -127,13 +154,9 @@ public class AuthenticationRequest extends EndpointHandler {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
                         return;
                     }
-                }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
         }
     }
-
-
-
 }
