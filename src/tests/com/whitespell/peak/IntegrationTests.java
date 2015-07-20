@@ -412,15 +412,29 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testB_contentTest() throws UnirestException {
-        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
                 .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
+                        "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
                         "\"contentType\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
                         "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"," +
                         "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[1].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
+                        "\"contentDescription\": \"content2\",\n" +
+                        "\"contentTitle\": \"content2\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=content2\"," +
+                        "\"thumbnailUrl\": \"thumb.com\"" +
                         "\n}")
                 .asString();
 
@@ -431,22 +445,53 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + TEST2_UID)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         System.out.println(stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
+        assertEquals(content[0].getUserId(), TEST_UID);
+
+        //todo(make sure this works)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[0].getCategoryId() )
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
+        assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
+        assertEquals(content[0].getUserId(), TEST_UID);
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[1].getCategoryId() )
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getCategoryId(), categories[1].getCategoryId());
+        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentTitle(), "content2");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=content2");
+        assertEquals(content[0].getContentDescription(), "content2");
+        assertEquals(content[0].getThumbnailUrl(), "thumb.com");
         assertEquals(content[0].getUserId(), TEST2_UID);
     }
 

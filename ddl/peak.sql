@@ -19,7 +19,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=7047 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=11515 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
@@ -49,9 +49,9 @@ CREATE TABLE `user` (
   KEY `content_title_idx` (`content_title`),
   KEY `FK_user_content_content_type_idx` (`content_type`),
   CONSTRAINT `FK_user_content_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=4758 DEFAULT CHARSET=utf8;CREATE TABLE `newsfeed` (
+) ENGINE=InnoDB AUTO_INCREMENT=8418 DEFAULT CHARSET=utf8;CREATE TABLE `newsfeed` (
   `user_id` int(11) NOT NULL,
-  `newsfeed_object` longtext,
+  `newsfeed_object` longtext NOT NULL,
   `last_generated` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `user_id_UNIQUE` (`user_id`),
@@ -64,6 +64,13 @@ CREATE TABLE `user` (
   KEY `user_id` (`user_id`),
   CONSTRAINT `FK_user_following_following_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_user_following_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `content_category` (
+  `content_id` int(11) DEFAULT NULL,
+  `category_id` int(11) DEFAULT NULL,
+  KEY `content_id` (`content_id`),
+  KEY `category_id` (`category_id`),
+  CONSTRAINT `content_category_ibfk_1` FOREIGN KEY (`content_id`) REFERENCES `content` (`content_id`),
+  CONSTRAINT `content_category_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `category_following` (
   `category_id` int(11) DEFAULT NULL,
   `user_id` int(11) DEFAULT NULL,
@@ -91,4 +98,4 @@ CREATE TABLE `user` (
   PRIMARY KEY (`authentication_id`),
   KEY `FK_authentication_user_id` (`user_id`),
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8125 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12955 DEFAULT CHARSET=utf8;
