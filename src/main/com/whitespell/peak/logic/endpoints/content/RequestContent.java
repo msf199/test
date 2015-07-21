@@ -47,9 +47,7 @@ public class RequestContent extends EndpointHandler {
 
         int temp = 0, temp2 = 0;
         ArrayList<String> queryKeys = new ArrayList<>();
-        ArrayList<String> queryKeys2 = new ArrayList<>();
         ArrayList<Integer> queryValues = new ArrayList<>();
-        ArrayList<Integer> queryValues2 = new ArrayList<>();
         Map<String, String[]> urlQueryString = context.getQueryString();
 
         if (urlQueryString.get(QS_USER_ID) != null) {
@@ -62,8 +60,8 @@ public class RequestContent extends EndpointHandler {
         if (urlQueryString.get(QS_CATEGORY_ID) != null) {
             if (Safety.isInteger(urlQueryString.get(QS_CATEGORY_ID)[0])) {
                 temp2 = Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]);
-                queryKeys2.add("category_id");
-                queryValues2.add(temp2);
+                queryKeys.add("category_id");
+                queryValues.add(temp2);
             }
         }
         int userId = temp;
@@ -92,18 +90,6 @@ public class RequestContent extends EndpointHandler {
         final String REQUEST_CONTENT = selectString.toString();
 
         /**
-         * Construct the SELECT FROM CONTENT_CATEGORY query based on categoryId
-         */
-        selectString = new StringBuilder();
-        selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
-        for (String s : queryKeys2) {
-            selectString.append("AND `" + s + "` = ? ");
-        }
-        selectString.append("LIMIT ?");
-        final String SELECT_CONTENT_CATEGORY = selectString.toString();
-        System.out.println(SELECT_CONTENT_CATEGORY);
-
-        /**
          * Request the content based on query string
          */
         try {
@@ -111,16 +97,20 @@ public class RequestContent extends EndpointHandler {
             final int finalLimit = GenericAPIActions.getLimit(context.getQueryString());
             final int finalOffset = GenericAPIActions.getOffset(context.getQueryString());
             final int finalCategoryId = categoryId;
-            StatementExecutor executor2 = new StatementExecutor(REQUEST_CONTENT);
+            StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
             final int finalUserId = userId;
             System.out.println("CategoryId: " + categoryId);
             System.out.println("Offset: " + finalOffset);
-            executor2.execute(ps -> {
+            executor.execute(ps -> {
                 ps.setInt(1, finalOffset);
                 int count = 2;
 
                 if (queryValues.contains(finalUserId)) {
                     ps.setInt(count, finalUserId);
+                    count++;
+                }
+                if (queryValues.contains(finalCategoryId)) {
+                    ps.setInt(count, finalCategoryId);
                     count++;
                 }
 
@@ -130,27 +120,10 @@ public class RequestContent extends EndpointHandler {
 
                 //display results
                 while (results.next()) {
-                    StatementExecutor executor = new StatementExecutor(SELECT_CONTENT_CATEGORY);
-                    executor.execute(ps2 -> {
-                        ps2.setInt(1, finalOffset);
-                        int count2 = 2;
-                        if (queryValues2.contains(finalCategoryId)) {
-                            ps2.setInt(count2, finalCategoryId);
-                            count2++;
-                        }
-                        ps2.setInt(count2, finalLimit);
 
-                        ResultSet results2 = ps2.executeQuery();
-
-                        //display results
-                        while (results2.next()) {
-                            if (results.getInt(CONTENT_ID_KEY) == results2.getInt(CONTENT_ID_KEY)) {
-                                ContentObject content = new ContentObject(results2.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                                        results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-                                contents.add(content);
-                            }
-                        }
-                    });
+                    ContentObject content = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
+                            results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                    contents.add(content);
                 }
 
                 Gson g = new Gson();

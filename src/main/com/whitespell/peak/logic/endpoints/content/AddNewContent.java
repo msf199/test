@@ -21,9 +21,7 @@ import java.util.Date;
  */
 public class AddNewContent extends EndpointHandler {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?)";
-    private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ? LIMIT 1";
-    private static final String INSERT_CONTENT_CATEGORY_QUERY = "INSERT INTO `content_category`(`content_id`, `category_id`) VALUES (?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
 
     private static final String PAYLOAD_CATEGORY_ID = "categoryId";
     private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
@@ -74,22 +72,22 @@ public class AddNewContent extends EndpointHandler {
         }
 
         final boolean[] success = {false};
-        final boolean[] success2 = {false};
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
             executor.execute(ps -> {
                 ps.setString(1, String.valueOf(user_id));
-                ps.setInt(2, Integer.parseInt(content_type));
-                ps.setString(3, content_url);
-                ps.setString(4, content_title);
-                ps.setString(5, content_description);
-                ps.setString(6, thumbnail_url);
-                ps.setString(7, now.toString());
+                ps.setInt(2, category_id);
+                ps.setInt(3, Integer.parseInt(content_type));
+                ps.setString(4, content_url);
+                ps.setString(5, content_title);
+                ps.setString(6, content_description);
+                ps.setString(7, thumbnail_url);
+                ps.setString(8, now.toString());
 
                 int rows = ps.executeUpdate();
-                if(rows > 0){
+                if (rows > 0) {
                     success[0] = true;
-                }else {
+                } else {
                     System.out.println("Failed to insert content");
                     return;
                 }
@@ -102,48 +100,7 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
-        if(success[0]) {
-            try {
-                StatementExecutor executor = new StatementExecutor(GET_CONTENT_ID_QUERY);
-                executor.execute(ps -> {
-                    ps.setString(1, content_url);
-
-                    ResultSet results = ps.executeQuery();
-                    if (results.next()) {
-                        final int content_id = results.getInt("content_id");
-
-                        try {
-                            StatementExecutor executor2 = new StatementExecutor(INSERT_CONTENT_CATEGORY_QUERY);
-                            executor2.execute(ps2 -> {
-                                ps2.setInt(1, content_id);
-                                ps2.setInt(2, category_id);
-
-                                int rows = ps2.executeUpdate();
-                                if (rows > 0) {
-                                    success2[0] = true;
-                                } else {
-                                    System.out.println("no row added in insert content_category");
-                                }
-                            });
-                        } catch (SQLException e) {
-                            Logging.log("High", e);
-                            if (e.getMessage().contains("content_category_ibfk_2")) {
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
-                            }
-                            return;
-                        }
-                    }
-                });
-            } catch (SQLException e) {
-                Logging.log("High", e);
-                if (e.getMessage().contains("FK_user_content_content_type")) {
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
-                }
-                return;
-            }
-        }
-
-        if (success2[0]) {
+        if (success[0]) {
             context.getResponse().setStatus(HttpStatus.OK_200);
             AddContentObject object = new AddContentObject();
             object.setContentAdded(true);

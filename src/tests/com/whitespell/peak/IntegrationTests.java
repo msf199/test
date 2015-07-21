@@ -734,8 +734,8 @@ public class IntegrationTests extends Server {
 
         System.out.println(stringResponse.getBody());
         UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userThatFollows.getCategoryFollowing().get(0).intValue(), 5);
-        assertEquals(userThatFollows.getCategoryFollowing().get(1).intValue(), 6);
+        assertEquals(userThatFollows.getCategoryFollowing().get(0).intValue(), 6);
+        assertEquals(userThatFollows.getCategoryFollowing().get(1).intValue(), 7);
     }
 
     @Test
