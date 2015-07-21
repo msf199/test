@@ -81,7 +81,7 @@ public class Trending extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"` FROM `user` ORDER BY `user_id` DESC LIMIT "+limit+"");
+                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"`, `"+THUMBNAIL_KEY+"`, FROM `user` ORDER BY `user_id` DESC LIMIT "+limit+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -92,7 +92,7 @@ public class Trending extends EndpointHandler {
                                 results.getString((USERNAME_KEY)),
                                 results.getString(DISPLAYNAME_KEY),
                                 null,
-                                null,
+                                results.getString(THUMBNAIL_KEY),
                                 null,
                                 null
                                 ));

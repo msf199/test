@@ -84,7 +84,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"` FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' AND `user_id` > "+GenericAPIActions.getOffset(context.getQueryString())+" LIMIT "+limit+"");
+                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"`, `"+THUMBNAIL_KEY+"`, FROM `user` WHERE `username` LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%' AND `user_id` > "+GenericAPIActions.getOffset(context.getQueryString())+" LIMIT "+limit+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -95,7 +95,7 @@ public class Search extends EndpointHandler {
                                 results.getString((USERNAME_KEY)),
                                 results.getString(DISPLAYNAME_KEY),
                                 null,
-                                null,
+                                results.getString(THUMBNAIL_KEY),
                                 null,
                                 null
                                 ));
