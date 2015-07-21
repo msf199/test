@@ -22,6 +22,7 @@ import java.util.Date;
 public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
+    private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
 
     private static final String PAYLOAD_CATEGORY_ID = "categoryId";
     private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
@@ -72,6 +73,7 @@ public class AddNewContent extends EndpointHandler {
         }
 
         final boolean[] success = {false};
+        final boolean[] success2 = {false};
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
             executor.execute(ps -> {
@@ -101,12 +103,36 @@ public class AddNewContent extends EndpointHandler {
         }
 
         if (success[0]) {
-            context.getResponse().setStatus(HttpStatus.OK_200);
-            AddContentObject object = new AddContentObject();
-            object.setContentAdded(true);
-            Gson g = new Gson();
-            String json = g.toJson(object);
-            context.getResponse().getWriter().write(json);
+            try {
+                StatementExecutor executor = new StatementExecutor(UPDATE_USER_AS_PUBLISHER_QUERY);
+                executor.execute(ps -> {
+                    ps.setInt(1, 1);
+                    ps.setInt(2, user_id);
+
+                    int rows = ps.executeUpdate();
+                    if (rows > 0) {
+                        success2[0] = true;
+                    } else {
+                        System.out.println("Failed to update user as publisher");
+                        return;
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                if (e.getMessage().contains("FK_user_content_content_type")) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
+                }
+                return;
+            }
+
+            if(success2[0]){
+                context.getResponse().setStatus(HttpStatus.OK_200);
+                AddContentObject object = new AddContentObject();
+                object.setContentAdded(true);
+                Gson g = new Gson();
+                String json = g.toJson(object);
+                context.getResponse().getWriter().write(json);
+            }
         } else {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
