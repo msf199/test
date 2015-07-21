@@ -6,6 +6,17 @@ package main.com.whitespell.peak.model;
 public class NewsfeedObject {
 
 
+    public int newsfeed_id;
+    public String newsfeed_object;
+    public UserObject user;
+    public ContentObject content;
+
+    public NewsfeedObject(int newsfeed_id, UserObject following, ContentObject content){
+        this.newsfeed_id = newsfeed_id;
+        user = following;
+        this.content = content;
+    }
+
     public NewsfeedObject(int newsfeed_id, String newsfeed_object) {
         this.newsfeed_id = newsfeed_id;
         this.newsfeed_object = newsfeed_object;
@@ -29,7 +40,6 @@ public class NewsfeedObject {
         this.newsfeed_id = newsfeed_id;
     }
 
-    public int newsfeed_id;
 
     public String getNewsfeed_object() {
         return newsfeed_object;
@@ -39,6 +49,5 @@ public class NewsfeedObject {
         this.newsfeed_object = newsfeed_object;
     }
 
-    public String newsfeed_object;
 
 }

@@ -52,6 +52,7 @@ public class IntegrationTests extends Server {
     static CategoryObject[] categories;
     static ContentTypeObject[] contentTypes;
     static ContentObject[] content;
+    static int[] emptyNewsfeedUserIds;
 
     static String SKYDIVER_USERNAME = "skydiver10";
     static String SKYDIVER_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -367,6 +368,8 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
         CategoryFollowAction.FollowCategoryActionObject f = g.fromJson(stringResponse.getBody(), CategoryFollowAction.FollowCategoryActionObject.class);
+
+
         //todo (pim) get categories_following from user object and test whether they are skydivign and rollerskating
         assertEquals(h.getActionTaken(), "followed");
         assertEquals(f.getActionTaken(), "followed");
@@ -449,15 +452,29 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testB_contentTest() throws UnirestException {
-        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
                 .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
+                        "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
                         "\"contentType\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
                         "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"," +
                         "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[1].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
+                        "\"contentDescription\": \"content2\",\n" +
+                        "\"contentTitle\": \"content2\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=content2\"," +
+                        "\"thumbnailUrl\": \"thumb.com\"" +
                         "\n}")
                 .asString();
 
@@ -468,22 +485,53 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + TEST2_UID)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         System.out.println(stringResponse.getBody());
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
+        assertEquals(content[0].getUserId(), TEST_UID);
+
+        //todo(make sure this works)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[0].getCategoryId() )
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
+        assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
+        assertEquals(content[0].getUserId(), TEST_UID);
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[1].getCategoryId() )
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getCategoryId(), categories[1].getCategoryId());
+        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentTitle(), "content2");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=content2");
+        assertEquals(content[0].getContentDescription(), "content2");
+        assertEquals(content[0].getThumbnailUrl(), "thumb.com");
         assertEquals(content[0].getUserId(), TEST2_UID);
     }
 
@@ -723,8 +771,8 @@ public class IntegrationTests extends Server {
 
         System.out.println(stringResponse.getBody());
         UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userThatFollows.getCategoryFollowing().get(0).intValue(), 5);
-        assertEquals(userThatFollows.getCategoryFollowing().get(1).intValue(), 6);
+        assertEquals(userThatFollows.getCategoryFollowing().get(0).intValue(), 6);
+        assertEquals(userThatFollows.getCategoryFollowing().get(1).intValue(), 7);
     }
 
     @Test
@@ -739,22 +787,11 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
     }
 
-    @Test
-    public void testK_getEmptyNewsfeedUserIds() throws UnirestException{
-
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/empty")
-                .header("accept", "application/json")
-                .asString();
-
-        System.out.println(stringResponse.getBody());
-    }
-
     static String readFile(String path, Charset encoding)
             throws IOException {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
     }
-
 
     public static String returnGetRequest(String url) throws Exception {
 
