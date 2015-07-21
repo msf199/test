@@ -90,13 +90,12 @@ public class RequestContent extends EndpointHandler {
         }
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
-        System.out.println(REQUEST_CONTENT);
 
         /**
          * Construct the SELECT FROM CONTENT_CATEGORY query based on categoryId
          */
         selectString = new StringBuilder();
-        selectString.append("SELECT * FROM `content_category` WHERE `content_id` > ? ");
+        selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
         for (String s : queryKeys2) {
             selectString.append("AND `" + s + "` = ? ");
         }
@@ -114,8 +113,8 @@ public class RequestContent extends EndpointHandler {
             final int finalCategoryId = categoryId;
             StatementExecutor executor2 = new StatementExecutor(REQUEST_CONTENT);
             final int finalUserId = userId;
-            System.out.println("finalCategoryId: " + categoryId);
-            System.out.println("finalUserId: "+userId);
+            System.out.println("CategoryId: " + categoryId);
+            System.out.println("Offset: " + finalOffset);
             executor2.execute(ps -> {
                 ps.setInt(1, finalOffset);
                 int count = 2;

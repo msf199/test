@@ -39,7 +39,7 @@ public class GetNewsfeed extends EndpointHandler {
 
             try {
                 // make a call to the users endpoint with the current offset
-                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowing=1&includeCategoriesFollowing=1")
+                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowing=1&includeCategories=1")
                         .header("accept", "application/json")
                         .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
                         .asString();
@@ -49,8 +49,6 @@ public class GetNewsfeed extends EndpointHandler {
                 int usersAdded = 0;
                 if (user.getUserFollowing() != null && user.getUserFollowing().size() > 0) {
                     for (int i : user.getUserFollowing()) {
-
-
                         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + i)
                                 .header("accept", "application/json")
                                 .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
@@ -73,24 +71,35 @@ public class GetNewsfeed extends EndpointHandler {
                     }
                 }
 
-
                 if(newsfeedObjects.size() < 1) {
                     System.out.println("Nothing to post, show trending");
-
-                    stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/trending?limit=5")
-                            .header("accept", "application/json")
-                            .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
-                            .asString();
-
                     //todo(cmcan) make it so that trending is based on categories and content
-                    stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "includeCategoriesFollowing=1")
+                    stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeCategories=1")
                             .header("accept", "application/json")
                             .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
                             .asString();
+                    System.out.println("userWCategory"+stringResponse.getBody());
                     UserObject userTrending = g.fromJson(stringResponse.getBody(), UserObject.class);
-                    if (user.getCategoryFollowing() != null && user.getCategoryFollowing().size() > 0) {
-                        for (int i : user.getCategoryFollowing()) {
+                    if (userTrending.getCategoryFollowing() != null && userTrending.getCategoryFollowing().size() > 0) {
+                        for (int i : userTrending.getCategoryFollowing()) {
 
+                            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + i)
+                                    .header("accept", "application/json")
+                                    .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
+                                    .asString();
+                            ContentObject[] content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+                            System.out.println("contentCategory: "+stringResponse.getBody());
+
+                            for(ContentObject c: content) {
+                                int contentUserId = c.getUserId();
+                                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + contentUserId+"?includeFollowing=1&includeCategories=1")
+                                        .header("accept", "application/json")
+                                        .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
+                                        .asString();
+                                System.out.println("contentUser: "+stringResponse.getBody());
+                                UserObject contentUser = g.fromJson(stringResponse.getBody(), UserObject.class);
+                                newsfeedObjects.add(new NewsfeedObject(newsfeedObjects.size(), contentUser, c));
+                            }
                         }
                     }
 

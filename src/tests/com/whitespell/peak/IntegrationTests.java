@@ -52,6 +52,7 @@ public class IntegrationTests extends Server {
     static CategoryObject[] categories;
     static ContentTypeObject[] contentTypes;
     static ContentObject[] content;
+    static int[] emptyNewsfeedUserIds;
 
     static String SKYDIVER_USERNAME = "skydiver10";
     static String SKYDIVER_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -330,6 +331,8 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
         CategoryFollowAction.FollowCategoryActionObject f = g.fromJson(stringResponse.getBody(), CategoryFollowAction.FollowCategoryActionObject.class);
+
+
         //todo (pim) get categories_following from user object and test whether they are skydivign and rollerskating
         assertEquals(h.getActionTaken(), "followed");
         assertEquals(f.getActionTaken(), "followed");
@@ -748,10 +751,20 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testK_getEmptyNewsfeedUserIds() throws UnirestException{
+    public void testK_createNewsfeed() throws UnirestException{
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/empty")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + 134)
                 .header("accept", "application/json")
+                .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
+                .body("{" + "\"username\" : \"admin\",\n" +
+                         "\"password\" : \"qqqqqq\",\n" +
+                        "\"email\" : \"a@b.c\"\n" +
+                        "}")
+                .asString();
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
         System.out.println(stringResponse.getBody());
@@ -762,7 +775,6 @@ public class IntegrationTests extends Server {
         byte[] encoded = Files.readAllBytes(Paths.get(path));
         return new String(encoded, encoding);
     }
-
 
     public static String returnGetRequest(String url) throws Exception {
 
