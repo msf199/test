@@ -38,39 +38,6 @@ public class GetNewsfeed extends EndpointHandler {
             ArrayList<NewsfeedObject> newsfeedObjects = new ArrayList<>();
 
             try {
-                // make a call to the users endpoint with the current offset
-                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowing=1&includeCategories=1")
-                        .header("accept", "application/json")
-                        .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
-                        .asString();
-                UserObject user = g.fromJson(stringResponse.getBody(), UserObject.class);
-
-                // count the amount of users we added.
-                int usersAdded = 0;
-                if (user.getUserFollowing() != null && user.getUserFollowing().size() > 0) {
-                    for (int i : user.getUserFollowing()) {
-                        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + i)
-                                .header("accept", "application/json")
-                                .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
-                                .asString();
-                        UserObject followingUser = g.fromJson(stringResponse.getBody(), UserObject.class);
-
-                        if(stringResponse.getStatus() == 200){
-                            usersAdded++;
-                        }
-
-                        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/?userId=" + i)
-                                .header("accept", "application/json")
-                                .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
-                                .asString();
-                        ContentObject[] content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-                        System.out.println("Processing newsfeed for user " + user.getUserId());
-                        for(ContentObject c: content) {
-                            newsfeedObjects.add(new NewsfeedObject(newsfeedObjects.size(), followingUser, c));
-                        }
-                    }
-                }
-
                 if(newsfeedObjects.size() < 1) {
                     System.out.println("Nothing to post, show trending");
                     //todo(cmcan) make it so that trending is based on categories and content
