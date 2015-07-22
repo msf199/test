@@ -2,11 +2,15 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
+import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
@@ -74,6 +78,7 @@ public class AddNewContent extends EndpointHandler {
 
         final boolean[] success = {false};
         final boolean[] success2 = {false};
+        final boolean[] success3 = {false};
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
             executor.execute(ps -> {
@@ -119,17 +124,49 @@ public class AddNewContent extends EndpointHandler {
                 });
             } catch (SQLException e) {
                 Logging.log("High", e);
-                if (e.getMessage().contains("FK_user_content_content_type")) {
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
-                }
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
 
-            if(success2[0]){
+            Gson g = new Gson();
+            try{
+                /**
+                 * authenticate as admin to post publishing
+                 */
+                HttpResponse<String> stringResponse = null;
+                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                        .header("accept", "application/json")
+                        .body("{\n" +
+                                "\"username\":\"coryqq\",\n" +
+                                "\"password\" : \"qqqqqq\"\n" +
+                                "}")
+                        .asString();
+                AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+                int ADMIN_UID = ao.getUserId();
+                String ADMIN_KEY = ao.getKey();
+
+                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
+                        .header("accept", "application/json")
+                        .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                        .body("{\n" +
+                                "\"categoryId\": \"" + category_id + "\",\n" +
+                                "\"action\": \"publish\"\n" +
+                                "}")
+                        .asString();
+
+                if(stringResponse.getBody().contains("published")){
+                    success3[0] = true;
+                }
+            } catch (Exception e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+
+            if(success2[0] && success3[0]){
                 context.getResponse().setStatus(HttpStatus.OK_200);
                 AddContentObject object = new AddContentObject();
                 object.setContentAdded(true);
-                Gson g = new Gson();
                 String json = g.toJson(object);
                 context.getResponse().getWriter().write(json);
             }
