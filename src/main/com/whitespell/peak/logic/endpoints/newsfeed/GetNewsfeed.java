@@ -12,9 +12,12 @@ import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.NewsfeedObject;
 import main.com.whitespell.peak.model.UserObject;
+import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Cory McAn(cmcan), Whitespell Inc.
@@ -26,6 +29,9 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String NEWSFEED_SIZE_LIMIT = "limit";
     private static final String NEWSFEED_OFFSET = "offset";
 
+    //Admin is the user that will generate the newsfeed.
+    private static int ADMIN_UID = -1;
+    private static String ADMIN_KEY;
 
     @Override
     protected void setUserInputs() {
@@ -45,12 +51,29 @@ public class GetNewsfeed extends EndpointHandler {
         int offset = GenericAPIActions.getOffset(context.getQueryString());
         boolean outputNewsfeed = false;
 
+        /**
+         * Authenticate as "admin" to create newsfeed and allow integrationTest
+         */
         try {
-            //todo(cmcan) make it so that trending is based on categories and content
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeCategories=1")
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                     .header("accept", "application/json")
-                    .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
+                    .body("{\n" +
+                            "\"username\":\"coryqq\",\n" +
+                            "\"password\" : \"qqqqqq\"\n" +
+                            "}")
                     .asString();
+            AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+            ADMIN_UID = ao.getUserId();
+            ADMIN_KEY = ao.getKey();
+
+            assertEquals(ao.getUserId() > -1, true);
+
+            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowing=1&includeCategories=1")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY)
+                    .asString();
+
+            System.out.println(stringResponse.getBody());
 
             UserObject userTrending = g.fromJson(stringResponse.getBody(), UserObject.class);
             if (userTrending.getCategoryFollowing() != null && userTrending.getCategoryFollowing().size() > 0) {
@@ -58,7 +81,7 @@ public class GetNewsfeed extends EndpointHandler {
 
                     stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + i)
                             .header("accept", "application/json")
-                            .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
+                            .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY)
                             .asString();
                     ContentObject[] content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
                     System.out.println("contentCategory: " + stringResponse.getBody());
@@ -67,7 +90,7 @@ public class GetNewsfeed extends EndpointHandler {
                         int contentUserId = c.getUserId();
                         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + contentUserId + "?includeFollowing=1&includeCategories=1")
                                 .header("accept", "application/json")
-                                .header("X-Authentication", "" + 134 + ",la7v7j7i5631q8u532uo9214hl")
+                                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY)
                                 .asString();
                         System.out.println("contentUser: " + stringResponse.getBody());
                         UserObject contentUser = g.fromJson(stringResponse.getBody(), UserObject.class);
@@ -83,7 +106,6 @@ public class GetNewsfeed extends EndpointHandler {
                     }
                 }
             }
-
 
             ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
             for (NewsfeedObject n : newsfeedObjects) {

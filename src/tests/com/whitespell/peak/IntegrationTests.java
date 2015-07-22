@@ -6,6 +6,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
+import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.users.CategoryFollowAction;
 import main.com.whitespell.peak.logic.endpoints.users.UserFollowAction;
@@ -48,11 +49,12 @@ public class IntegrationTests extends Server {
     static String TEST_KEY;
     static int TEST2_UID = -1;
     static String TEST2_KEY;
+    static int ADMIN_UID = -1;
+    static String ADMIN_KEY;
 
     static CategoryObject[] categories;
     static ContentTypeObject[] contentTypes;
     static ContentObject[] content;
-    static int[] emptyNewsfeedUserIds;
 
     static String SKYDIVER_USERNAME = "skydiver10";
     static String SKYDIVER_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -212,6 +214,17 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
 
+        /**
+         * Create a third "admin" account to test newsfeed
+         */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"username\":\"coryqq\",\n" +
+                        "\"password\" : \"qqqqqq\",\n" +
+                        "\"email\" : \"coryqq@qq.qq\"\n" +
+                        "}")
+                .asString();
 
         /**
          * Authenticate first user we just created
@@ -391,8 +404,7 @@ public class IntegrationTests extends Server {
 
         //todo(pim) authenticate as user
         //todo(pim) safeCall to publish in this category
-        System.out.println("SKY: " + SKYDIVER_UID);
-
+/*
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
@@ -403,8 +415,7 @@ public class IntegrationTests extends Server {
                 .asString();
         System.out.println(stringResponse.getBody());
         UserObject rollerskater = g.fromJson(stringResponse.getBody(), UserObject.class);
-        ROLLERSKATER_UID = rollerskater.getUserId();
-        System.out.println("ROLLER: " + ROLLERSKATER_UID);
+        ROLLERSKATER_UID = rollerskater.getUserId();*/
     }
 
     @Test
@@ -771,8 +782,8 @@ public class IntegrationTests extends Server {
 
         System.out.println(stringResponse.getBody());
         UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(userThatFollows.getCategoryFollowing().get(0).intValue(), 6);
-        assertEquals(userThatFollows.getCategoryFollowing().get(1).intValue(), 7);
+        assertEquals(userThatFollows.getCategoryFollowing().get(0).intValue(), categories[0].getCategoryId());
+        assertEquals(userThatFollows.getCategoryFollowing().get(1).intValue(), categories[1].getCategoryId());
     }
 
     @Test
@@ -785,6 +796,28 @@ public class IntegrationTests extends Server {
 
         UserObject[] a = g.fromJson(stringResponse.getBody(), UserObject[].class);
         System.out.println(stringResponse.getBody());
+    }
+
+    @Test
+    public void testK_getNewsfeed() throws UnirestException{
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        NewsfeedObject[] n = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
+        for(int i = 0; i < n.length; i++){
+            assertEquals(n[i].getNewsfeed_id(), i);
+            if(i == 0) {
+                assertEquals(n[i].getNewsfeedUser().getUserId(), TEST_UID);
+                assertEquals(n[i].getNewsfeedContent().getContentTitle(), "10-Minute No-Equipment Home Workout");
+            }else if(i == 1){
+                assertEquals(n[i].getNewsfeedUser().getUserId(), TEST2_UID);
+                assertEquals(n[i].getNewsfeedContent().getContentTitle(), "content2");
+            }
+        }
     }
 
     static String readFile(String path, Charset encoding)
