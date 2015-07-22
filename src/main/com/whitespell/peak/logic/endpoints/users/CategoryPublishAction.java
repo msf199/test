@@ -88,7 +88,7 @@ public class CategoryPublishAction extends EndpointHandler {
         final ActionResponse response = new ActionResponse();
 
         /**
-         * Check to see if the user is already following the followed_user_id.
+         * Check to see if the user is already publishing the publishing category id.
          */
 
         try {
@@ -111,7 +111,7 @@ public class CategoryPublishAction extends EndpointHandler {
             case "publish":
 
                 /**
-                 * If already following, throw error.
+                 * If already publishing, throw error.
                  */
 
                 if (response.isCurrentlyPublishing()) {
@@ -141,7 +141,7 @@ public class CategoryPublishAction extends EndpointHandler {
             case "unpublish":
 
                 /**
-                 * If not currently following, throw error.
+                 * If not currently publishing, throw error.
                  */
 
                 if (!response.isCurrentlyPublishing()) {
