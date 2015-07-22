@@ -26,9 +26,11 @@ public class GetUser extends EndpointHandler {
 
     private static final String QS_FOLLOWERS_KEY = "includeFollowing";
     private static final String QS_CATEGORIES_KEY = "includeCategories";
+    private static final String QS_PUBLISHING_KEY = "includePublishing";
 
     private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String FIND_CATEGORIES_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
+    private static final String FIND_PUBLISHING_QUERY = "SELECT `category_id` FROM `category_publishing` WHERE `user_id` = ?";
     private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` = ?";
     private static final String URL_USER_ID = "user_id";
     private static final String USERNAME_KEY = "username";
@@ -42,6 +44,8 @@ public class GetUser extends EndpointHandler {
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
         queryStringInput.put(QS_FOLLOWERS_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        queryStringInput.put(QS_CATEGORIES_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        queryStringInput.put(QS_PUBLISHING_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
 
     @Override
@@ -50,6 +54,7 @@ public class GetUser extends EndpointHandler {
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         boolean getFollowers = false;
         boolean getCategories = false;
+        boolean getPublishing = false;
 
         /**
          * Check if we want to see the users we are following
@@ -66,6 +71,15 @@ public class GetUser extends EndpointHandler {
         if(context.getQueryString().get(QS_CATEGORIES_KEY) != null){
             if(context.getQueryString().get(QS_CATEGORIES_KEY)[0].equals("1")){
                 getCategories = true;
+            }
+        }
+
+        /**
+         * Check if we want to see the categories we are publishing in
+         */
+        if(context.getQueryString().get(QS_PUBLISHING_KEY) != null){
+            if(context.getQueryString().get(QS_PUBLISHING_KEY)[0].equals("1")){
+                getPublishing = true;
             }
         }
 
@@ -116,6 +130,23 @@ public class GetUser extends EndpointHandler {
             }
         }
 
+        final ArrayList<Integer> initialPublishing = new ArrayList<>();
+        if(getPublishing){
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_PUBLISHING_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(user_id));
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialPublishing.add(results.getInt("category_id"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
+        }
+
         try {
             StatementExecutor executor = new StatementExecutor(GET_USER);
             final int finalUser_id = user_id;
@@ -130,7 +161,7 @@ public class GetUser extends EndpointHandler {
                     final ResultSet results = ps.executeQuery();
 
                     if (results.next()) {
-                        user = new UserObject(initialCategories, initialFollowing, results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                        user = new UserObject(initialCategories, initialFollowing, initialPublishing, results.getInt(URL_USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                                 results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY));
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);

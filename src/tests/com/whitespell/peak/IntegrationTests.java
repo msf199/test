@@ -458,7 +458,7 @@ public class IntegrationTests extends Server {
 
         UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
         System.out.println(stringResponse.getBody());
-        assertEquals(b.getActionTaken(),"followed");
+        assertEquals(b.getActionTaken(), "followed");
     }
 
     @Test
@@ -818,6 +818,28 @@ public class IntegrationTests extends Server {
                 assertEquals(n[i].getNewsfeedContent().getContentTitle(), "content2");
             }
         }
+    }
+
+    @Test
+    public void testL_ensureContentPostersAreCategoryPublishers() throws UnirestException{
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID+"?includePublishing=1")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        UserObject user = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(user.getCategoryPublishing().get(0).intValue(), categories[0].getCategoryId());
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID+"?includePublishing=1")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        UserObject user2 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(user2.getCategoryPublishing().get(0).intValue(), categories[1].getCategoryId());
     }
 
     static String readFile(String path, Charset encoding)
