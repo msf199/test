@@ -40,6 +40,7 @@ public class RequestContent extends EndpointHandler {
         queryStringInput.put(CONTENT_SIZE_LIMIT, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_USER_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
     @Override
@@ -99,8 +100,6 @@ public class RequestContent extends EndpointHandler {
             final int finalCategoryId = categoryId;
             StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
             final int finalUserId = userId;
-            System.out.println("CategoryId: " + categoryId);
-            System.out.println("Offset: " + finalOffset);
             executor.execute(ps -> {
                 ps.setInt(1, finalOffset);
                 int count = 2;

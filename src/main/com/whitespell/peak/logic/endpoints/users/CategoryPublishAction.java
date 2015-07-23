@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * @author Pim de Witte(wwadewitte), Pim de Witte, Whitespell Inc., Whitespell LLC
+ * @author Pim de Witte(wwadewitte), Cory McAn(cmcan), Whitespell LLC
  *         5/4/2015
  *         whitespell.model
  */
@@ -28,7 +28,7 @@ public class CategoryPublishAction extends EndpointHandler {
 
     private static final String ACTION_KEY = "action";
     private static final String CATEGORY_ID_KEY = "categoryId";
-    private static final String USER_ID_KEY = "user_id";
+    private static final String USER_ID_KEY = "userId";
 
     @Override
     protected void setUserInputs() {

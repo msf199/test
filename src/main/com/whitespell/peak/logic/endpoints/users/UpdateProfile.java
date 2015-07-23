@@ -17,13 +17,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-    /**
-     * @author Cory McAn(cmcan), Whitespell LLC
-     *         6/30/15
-     *         whitespell.model
-     */
-    public class UpdateProfile extends EndpointHandler {
-    private static final String URL_USER_ID = "user_id";
+/**
+ * @author Cory McAn(cmcan), Whitespell LLC
+ *         6/30/15
+ *         whitespell.model
+ */
+public class UpdateProfile extends EndpointHandler {
+    private static final String URL_USER_ID = "userId";
 
     private static final String PAYLOAD_USERNAME_KEY = "username";
     private static final String PAYLOAD_DISPLAYNAME_KEY = "displayname";
@@ -105,7 +105,7 @@ import java.util.ArrayList;
             if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
                 return;
-            }  else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
+            } else if (username.length() < StaticRules.MIN_USERNAME_LENGTH) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_SHORT);
                 return;
             }
@@ -163,7 +163,6 @@ import java.util.ArrayList;
         }
         setString.append("WHERE `user_id` = ?");
         final String UPDATE_USER = setString.toString();
-        System.out.println(UPDATE_USER);
 
         //try to update user
         try {

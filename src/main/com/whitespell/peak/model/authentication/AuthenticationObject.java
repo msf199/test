@@ -9,7 +9,7 @@ public class AuthenticationObject {
 
     String key;
 
-    int user_id;
+    int userId;
 
     long expires = -1;
 
@@ -22,11 +22,11 @@ public class AuthenticationObject {
     }
 
     public int getUserId() {
-        return this.user_id;
+        return this.userId;
     }
 
-    public void setUserId(int user_id) {
-        this.user_id = user_id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
 }
