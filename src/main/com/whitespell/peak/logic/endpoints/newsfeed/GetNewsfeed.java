@@ -73,8 +73,6 @@ public class GetNewsfeed extends EndpointHandler {
                     .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY)
                     .asString();
 
-            System.out.println(stringResponse.getBody());
-
             UserObject userTrending = g.fromJson(stringResponse.getBody(), UserObject.class);
             if (userTrending.getCategoryFollowing() != null && userTrending.getCategoryFollowing().size() > 0) {
                 for (int i : userTrending.getCategoryFollowing()) {
@@ -84,7 +82,6 @@ public class GetNewsfeed extends EndpointHandler {
                             .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY)
                             .asString();
                     ContentObject[] content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-                    System.out.println("contentCategory: " + stringResponse.getBody());
 
                     for (ContentObject c : content) {
                         int contentUserId = c.getUserId();
@@ -92,7 +89,6 @@ public class GetNewsfeed extends EndpointHandler {
                                 .header("accept", "application/json")
                                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY)
                                 .asString();
-                        System.out.println("contentUser: " + stringResponse.getBody());
                         UserObject contentUser = g.fromJson(stringResponse.getBody(), UserObject.class);
                         newsfeedObjects.add(new NewsfeedObject(newsfeedObjects.size(), contentUser, c));
 

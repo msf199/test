@@ -89,7 +89,6 @@ public class Search extends EndpointHandler {
                             ResultSet results = ps.executeQuery();
 
                             while(results.next()) {
-                                System.out.println(results.getString(USERNAME_KEY));
                                 tempUsers.add(new UserObject(
                                 results.getInt(USER_ID_KEY),
                                 results.getString((USERNAME_KEY)),
@@ -122,7 +121,6 @@ public class Search extends EndpointHandler {
                             ResultSet results = ps.executeQuery();
 
                             while(results.next()) {
-                                System.out.println(results.getString(CATEGORY_ID_KEY));
                                 tempCategories.add(results.getInt(CATEGORY_ID_KEY));
                             }
 

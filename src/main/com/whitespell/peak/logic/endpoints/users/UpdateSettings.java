@@ -22,10 +22,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
- * Created by cory on 7/07/15.
+ * @author Cory McAn(cmcan), Whitespell LLC
+ *         7/07/15
+ *         whitespell.model
  */
 public class UpdateSettings extends EndpointHandler {
-    private static final String URL_USER_ID = "user_id";
+    private static final String URL_USER_ID = "userId";
 
     private static final String PAYLOAD_EMAIL_KEY = "email";
 
@@ -154,7 +156,7 @@ public class UpdateSettings extends EndpointHandler {
                                 // initialize an authenticationobject and set the authentication key if verified
                                 final AuthenticationObject ao = new AuthenticationObject();
                                 ao.setKey(main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextSessionId());
-                                ao.setUserId(s.getInt(URL_USER_ID));
+                                ao.setUserId(s.getInt("user_id"));
                                 // insert the new authentication key into the database
                                 try {
                                     StatementExecutor executor = new StatementExecutor(UPDATE_AUTHENTICATION);
@@ -167,12 +169,6 @@ public class UpdateSettings extends EndpointHandler {
                                 } catch (SQLException e) {
                                     Logging.log("High", e);
                                 }
-                                // build a gson object based on the authentication object
-                                Gson g = new Gson();
-                                String jsonAo = g.toJson(ao);
-                                // write the authentication object and the session key and return.
-                                context.getResponse().getWriter().write(jsonAo);
-                                return;
                             } else {
                                 // if not verified, throw error
                                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
@@ -182,9 +178,6 @@ public class UpdateSettings extends EndpointHandler {
                             Logging.log("High", e);
                             return;
                         } catch (InvalidKeySpecException e) {
-                            Logging.log("High", e);
-                            return;
-                        } catch (IOException e) {
                             Logging.log("High", e);
                             return;
                         }
@@ -231,7 +224,6 @@ public class UpdateSettings extends EndpointHandler {
         }
         setString.append("WHERE `user_id` = ?");
         final String UPDATE_USER = setString.toString();
-        System.out.println(UPDATE_USER);
 
         /**
          * Try to update settings in database
@@ -263,8 +255,16 @@ public class UpdateSettings extends EndpointHandler {
                     final int update = ps.executeUpdate();
 
                     if (update > 0) {
-                        System.out.println("success");
+                        //only output the user_id and email
+                        UserObject updatedUser = new UserObject(user_id,null,null,finalEmail,null,null,null);
+                        Gson g = new Gson();
+                        String response = g.toJson(updatedUser);
                         context.getResponse().setStatus(200);
+                        try{
+                            context.getResponse().getWriter().write(response);
+                        }catch(IOException e){
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        }
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);
                         return;

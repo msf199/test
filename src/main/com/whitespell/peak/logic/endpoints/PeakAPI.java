@@ -51,28 +51,28 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateUser(), "/users");
 
         // Get a specific user based on their user ID
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "user_id"); //always have the variable first
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "userId"); //always have the variable first
 
 		// As a user, update your username, displayname, and slogan
-		dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateProfile(), "/users/$", "user_id");
+		dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateProfile(), "/users/$", "userId");
 
         // As a user, update your email or password
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateSettings(), "/users/$/settings", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateSettings(), "/users/$/settings", "userId");
 
 		// get all the users sorted by categories (also takes in same search criteria as /users)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUsersByCategory(), "/users/categories/");
 
         // Add new content as a user
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/users/$/content/", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/users/$/content/", "userId");
 
         // Follow a user
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/$/following", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/$/following", "userId");
 
         // Follow a category
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryFollowAction(), "/users/$/categories", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryFollowAction(), "/users/$/categories", "userId");
 
         // Publish in a category
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryPublishAction(), "/users/$/publishing", "user_id");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryPublishAction(), "/users/$/publishing", "userId");
 
         /**
          * STATISTICS
@@ -88,7 +88,6 @@ public class PeakAPI extends WhitespellAPI {
         //todo move auth under users
         //Authenticate a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AuthenticationRequest(), "/authentication");
-
 
         /**
          * CONTENT
@@ -125,6 +124,7 @@ public class PeakAPI extends WhitespellAPI {
         /**
          * NEWSFEED
          */
+        
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewsfeed(), "/newsfeed/$", "userId" );
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetNewsfeed(), "/newsfeed/$", "userId");
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetEmptyNewsfeed(), "/newsfeed/empty");

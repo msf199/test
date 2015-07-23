@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 import java.util.Date;
 
 /**
- * @author Pim de Witte(wwadewitte), Pim de Witte, Whitespell Inc., Whitespell LLC
+ * @author Pim de Witte(wwadewitte), Cory McAn(cmcan), Whitespell LLC
  *         5/4/2015
  *         whitespell.model
  */
@@ -38,7 +38,7 @@ public class CategoryFollowAction extends EndpointHandler {
 
     private static final String PAYLOAD_CATEGORY_ID_KEY = "categoryId";
     private static final String PAYLOAD_ACTION_KEY = "action";
-    private static final String URL_USER_ID = "user_id";
+    private static final String URL_USER_ID = "userId";
 
     @Override
     protected void setUserInputs() {
@@ -57,7 +57,7 @@ public class CategoryFollowAction extends EndpointHandler {
     @Override
     public void safeCall(RequestObject context) throws IOException {
 
-        String context_user_id = context.getUrlVariables().get("user_id");
+        String context_user_id = context.getUrlVariables().get(URL_USER_ID);
 
         /**
          * Check that the user id, following id, and action are valid.
