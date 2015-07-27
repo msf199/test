@@ -25,7 +25,7 @@ import java.util.ArrayList;
 public class UpdateProfile extends EndpointHandler {
     private static final String URL_USER_ID = "userId";
 
-    private static final String PAYLOAD_USERNAME_KEY = "username";
+    private static final String PAYLOAD_USERNAME_KEY = "userName";
     private static final String PAYLOAD_DISPLAYNAME_KEY = "displayname";
     private static final String PAYLOAD_THUMBNAIL_KEY = "thumbnail";
     private static final String PAYLOAD_COVER_PHOTO_KEY = "coverPhoto";

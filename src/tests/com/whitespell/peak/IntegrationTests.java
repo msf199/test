@@ -6,7 +6,6 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
-import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.users.CategoryFollowAction;
 import main.com.whitespell.peak.logic.endpoints.users.UserFollowAction;
@@ -173,7 +172,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/nosuchendpoint")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"testaccount1\",\n" +
+                        "\"userName\":\"testaccount1\",\n" +
                         "\"password\" : \"1234567\",\n" +
                         "\"email\" : \"test123\"\n" +
                         "}")
@@ -196,7 +195,7 @@ public class IntegrationTests extends Server {
         Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"" + TEST_USERNAME + "\",\n" +
+                        "\"userName\":\"" + TEST_USERNAME + "\",\n" +
                         "\"password\" : \"" + TEST_PASSWORD + "\",\n" +
                         "\"email\" : \"" + TEST_EMAIL + "\"\n" +
                         "}")
@@ -208,7 +207,7 @@ public class IntegrationTests extends Server {
         Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                        "\"userName\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
                         "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\",\n" +
                         "\"email\" : \"" + ROLLERSKATER_EMAIL + "\"\n" +
                         "}")
@@ -220,7 +219,7 @@ public class IntegrationTests extends Server {
         Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"coryqq\",\n" +
+                        "\"userName\":\"coryqq\",\n" +
                         "\"password\" : \"qqqqqq\",\n" +
                         "\"email\" : \"coryqq@qq.qq\"\n" +
                         "}")
@@ -233,7 +232,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"" + TEST_USERNAME + "\",\n" +
+                        "\"userName\":\"" + TEST_USERNAME + "\",\n" +
                         "\"password\" : \"" + TEST_PASSWORD + "\"\n" +
                         "}")
                 .asString();
@@ -252,7 +251,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"" + TEST_EMAIL + "\",\n" +
+                        "\"userName\":\"" + TEST_EMAIL + "\",\n" +
                         "\"password\" : \"" + TEST_PASSWORD + "\"\n" +
                         "}")
                 .asString();
@@ -271,7 +270,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                        "\"userName\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
                         "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\"\n" +
                         "}")
                 .asString();
@@ -290,7 +289,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"" + ROLLERSKATER_EMAIL + "\",\n" +
+                        "\"userName\":\"" + ROLLERSKATER_EMAIL + "\",\n" +
                         "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\"\n" +
                         "}")
                 .asString();
@@ -391,7 +390,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"username\":\"" + SKYDIVER_USERNAME + "\",\n" +
+                        "\"userName\":\"" + SKYDIVER_USERNAME + "\",\n" +
                         "\"password\" : \"" + SKYDIVER_PASSWORD + "\",\n" +
                         "\"email\" : \"" + SKYDIVER_EMAIL + "\"\n" +
                         "}")
@@ -582,7 +581,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"username\": \"p1mw1n\",\n" +
+                        "\"userName\": \"p1mw1n\",\n" +
                         "\"displayname\": \"new\",\n" +
                         "\"coverPhoto\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
                         "\"slogan\": \"slogan\"\n" +
@@ -600,7 +599,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n\"username\": \"evenneweruser\"\n}")
+                .body("{\n\"userName\": \"evenneweruser\"\n}")
                 .asString();
         UserObject userEdit4 = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(userEdit4.getUserId(), TEST_UID);
@@ -612,7 +611,7 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n\"username\": \"evenneweruser2\",\n" +
+                .body("{\n\"userName\": \"evenneweruser2\",\n" +
                         "\"slogan\": \"slogan\"\n" +
                         "}")
                 .asString();
@@ -780,7 +779,7 @@ public class IntegrationTests extends Server {
 
         NewsfeedObject[] n = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
         for(int i = 0; i < n.length; i++){
-            assertEquals(n[i].getNewsfeed_id(), i);
+            assertEquals(n[i].getNewsfeedId(), i);
             if(i == 0) {
                 assertEquals(n[i].getNewsfeedUser().getUserId(), TEST_UID);
                 assertEquals(n[i].getNewsfeedContent().getContentTitle(), "10-Minute No-Equipment Home Workout");

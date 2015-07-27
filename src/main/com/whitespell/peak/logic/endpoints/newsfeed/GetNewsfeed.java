@@ -105,7 +105,7 @@ public class GetNewsfeed extends EndpointHandler {
 
             ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
             for (NewsfeedObject n : newsfeedObjects) {
-                int currId = n.getNewsfeed_id();
+                int currId = n.getNewsfeedId();
                 if (currId >= offset) {
                     newsfeedResponse.add(n);
                 }
