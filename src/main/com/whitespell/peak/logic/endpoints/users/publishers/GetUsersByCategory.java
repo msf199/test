@@ -91,13 +91,13 @@ public class GetUsersByCategory extends EndpointHandler {
 
     class CategorizedUserObject {
         int userId;
-        String username;
+        String userName;
         String thumbnail;
         int categoryId;
 
-        public CategorizedUserObject(int userId, String username, String thumbnail, int categoryId) {
+        public CategorizedUserObject(int userId, String userName, String thumbnail, int categoryId) {
             this.userId = userId;
-            this.username = username;
+            this.userName = userName;
             this.thumbnail = thumbnail;
             this.categoryId = categoryId;
         }
