@@ -6,26 +6,26 @@ package main.com.whitespell.peak.model;
 public class NewsfeedObject {
 
 
-    public int newsfeed_id;
+    public int newsfeedId;
     public UserObject user;
     public ContentObject content;
 
     public NewsfeedObject() {
-        this.newsfeed_id = 0;
+        this.newsfeedId = 0;
     }
 
-    public NewsfeedObject(int newsfeed_id, UserObject following, ContentObject content){
-        this.newsfeed_id = newsfeed_id;
+    public NewsfeedObject(int newsfeedId, UserObject following, ContentObject content){
+        this.newsfeedId = newsfeedId;
         user = following;
         this.content = content;
     }
 
-    public int getNewsfeed_id() {
-        return newsfeed_id;
+    public int getNewsfeedId() {
+        return newsfeedId;
     }
 
-    public void setNewsfeed_id(int newsfeed_id) {
-        this.newsfeed_id = newsfeed_id;
+    public void setNewsfeedId(int newsfeedId) {
+        this.newsfeedId = newsfeedId;
     }
 
     public UserObject getNewsfeedUser(){
