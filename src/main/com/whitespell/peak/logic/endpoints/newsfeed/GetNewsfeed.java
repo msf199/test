@@ -58,7 +58,7 @@ public class GetNewsfeed extends EndpointHandler {
             stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                     .header("accept", "application/json")
                     .body("{\n" +
-                            "\"username\":\"coryqq\",\n" +
+                            "\"userName\":\"coryqq\",\n" +
                             "\"password\" : \"qqqqqq\"\n" +
                             "}")
                     .asString();
@@ -105,7 +105,7 @@ public class GetNewsfeed extends EndpointHandler {
 
             ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
             for (NewsfeedObject n : newsfeedObjects) {
-                int currId = n.getNewsfeed_id();
+                int currId = n.getNewsfeedId();
                 if (currId >= offset) {
                     newsfeedResponse.add(n);
                 }

@@ -25,7 +25,7 @@ import java.util.ArrayList;
  */
 public class AuthenticationRequest extends EndpointHandler {
 
-    private static final String PAYLOAD_USERNAME_KEY = "username";
+    private static final String PAYLOAD_USERNAME_KEY = "userName";
     private static final String PAYLOAD_PASSWORD_KEY = "password";
 
     @Override
@@ -47,7 +47,7 @@ public class AuthenticationRequest extends EndpointHandler {
         //Connection con;
         final String username;
         final String password;
-        String payloadUsername = payload.get("username").getAsString();
+        String payloadUsername = payload.get(PAYLOAD_USERNAME_KEY).getAsString();
         ArrayList<String> temp = new ArrayList<>();
 
         /**
@@ -61,7 +61,7 @@ public class AuthenticationRequest extends EndpointHandler {
                     ps.setString(1, payloadUsername);
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
-                       temp.add(s.getString("username"));
+                       temp.add(s.getString(PAYLOAD_USERNAME_KEY));
                     }
                 });
             } catch (SQLException e) {
@@ -78,7 +78,7 @@ public class AuthenticationRequest extends EndpointHandler {
             username = payloadUsername;
         }
 
-        password = payload.get("password").getAsString();
+        password = payload.get(PAYLOAD_PASSWORD_KEY).getAsString();
 
         // check against lengths for security and UX reasons.
         //check if values are too long
@@ -111,7 +111,7 @@ public class AuthenticationRequest extends EndpointHandler {
                     if (s.next()) {
                         try {
                             // with the result set, check if password is verified
-                            boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(password, s.getString("password"));
+                            boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(password, s.getString(PAYLOAD_PASSWORD_KEY));
 
                             if (isVerified) {
                                 // initialize an authenticationobject and set the authentication key if verified

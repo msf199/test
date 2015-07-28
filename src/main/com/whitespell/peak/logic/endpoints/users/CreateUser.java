@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         1/20/15
  *         whitespell.model
  *         https://docs.google.com/document/d/1j62zQ3AIfh7XW0nbftRy_hNXTAnhy5r48yBRHm7kYZA/edit
@@ -29,9 +29,10 @@ public class CreateUser extends EndpointHandler {
     private static final String INSERT_USER_QUERY = "INSERT INTO `user`(`password`, `email`, `username`, `publisher`) " +
             "VALUES (?,?,?,?)";
 
-    private static final String PAYLOAD_USERNAME_KEY = "username";
+    private static final String PAYLOAD_USERNAME_KEY = "userName";
     private static final String PAYLOAD_PASSWORD_KEY = "password";
     private static final String PAYLOAD_EMAIL_KEY = "email";
+    private static final String PAYLOAD_PUBLISHER_KEY = "publisher";
 
     @Override
     protected void setUserInputs() {
@@ -64,11 +65,11 @@ public class CreateUser extends EndpointHandler {
          * 400 Bad Request: Check if all data is valid
          */
 
-        username = payload.get("username").getAsString();
-        password = payload.get("password").getAsString();
-        email = payload.get("email").getAsString();
+        username = payload.get(PAYLOAD_USERNAME_KEY).getAsString();
+        password = payload.get(PAYLOAD_PASSWORD_KEY).getAsString();
+        email = payload.get(PAYLOAD_EMAIL_KEY).getAsString();
 
-        if (payload.get("publisher") != null && payload.get("publisher").getAsInt() == 1) {
+        if (payload.get(PAYLOAD_PUBLISHER_KEY) != null && payload.get(PAYLOAD_PUBLISHER_KEY).getAsInt() == 1) {
             publisher = 1;
         }
 

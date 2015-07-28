@@ -137,7 +137,7 @@ public class AddNewContent extends EndpointHandler {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                         .header("accept", "application/json")
                         .body("{\n" +
-                                "\"username\":\"coryqq\",\n" +
+                                "\"userName\":\"coryqq\",\n" +
                                 "\"password\" : \"qqqqqq\"\n" +
                                 "}")
                         .asString();
