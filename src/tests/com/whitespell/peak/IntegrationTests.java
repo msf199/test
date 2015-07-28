@@ -8,6 +8,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.users.CategoryFollowAction;
+import main.com.whitespell.peak.logic.endpoints.users.Trending;
 import main.com.whitespell.peak.logic.endpoints.users.UserFollowAction;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.Pool;
@@ -459,6 +460,19 @@ public class IntegrationTests extends Server {
                         "\n}")
                 .asString();
 
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[0].getContentTypeId()+"\",\n" +
+                        "\"contentDescription\": \"This one's hot!\",\n" +
+                        "\"contentTitle\": \"Another Video!\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"thumbnailUrl\": \"thumbguy.com\"" +
+                        "\n}")
+                .asString();
+
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
@@ -778,12 +792,16 @@ public class IntegrationTests extends Server {
                 .asString();
 
         NewsfeedObject[] n = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
-        for(int i = 0; i < n.length; i++){
+
+        for(int i = 0; i < 3; i++){
             assertEquals(n[i].getNewsfeedId(), i);
             if(i == 0) {
                 assertEquals(n[i].getNewsfeedUser().getUserId(), TEST_UID);
                 assertEquals(n[i].getNewsfeedContent().getContentTitle(), "10-Minute No-Equipment Home Workout");
             }else if(i == 1){
+                assertEquals(n[i].getNewsfeedUser().getUserId(), TEST_UID);
+                assertEquals(n[i].getNewsfeedContent().getContentTitle(), "Another Video!");
+            }else if(i == 2){
                 assertEquals(n[i].getNewsfeedUser().getUserId(), TEST2_UID);
                 assertEquals(n[i].getNewsfeedContent().getContentTitle(), "content2");
             }
@@ -808,6 +826,19 @@ public class IntegrationTests extends Server {
 
         UserObject user2 = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(user2.getCategoryPublishing().get(0).intValue(), categories[1].getCategoryId());
+    }
+
+    @Test
+    public void testM_TrendingPublishingUsers() throws UnirestException{
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/trending")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        Trending.TrendingResponse trending = g.fromJson(stringResponse.getBody(), Trending.TrendingResponse.class);
+        assertEquals(trending.users.get(0).getUserId(), TEST_UID);
+        assertEquals(trending.users.get(1).getUserId(), TEST2_UID);
     }
 
     static String readFile(String path, Charset encoding)
