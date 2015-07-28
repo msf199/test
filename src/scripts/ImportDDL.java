@@ -47,7 +47,7 @@ public class ImportDDL {
         tables.add("category_following");
         tables.add("category_publishing");
         tables.add("authentication");
-
+        tables.add("lists_workout");
 
         //build the DDL
 

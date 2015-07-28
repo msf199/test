@@ -7,9 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.config.Config;
-import main.com.whitespell.peak.logic.endpoints.users.CategoryFollowAction;
-import main.com.whitespell.peak.logic.endpoints.users.Trending;
-import main.com.whitespell.peak.logic.endpoints.users.UserFollowAction;
+import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -424,10 +422,11 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .asString();
+
         contentTypes = g.fromJson(stringResponse.getBody(), ContentTypeObject[].class);
         assertEquals(contentTypes.length, 2);
-        assertEquals(contentTypes[0].getContentTypeName(), "youtube");
-        assertEquals(contentTypes[1].getContentTypeName(), "instagram");
+        assertEquals(contentTypes[1].getContentTypeName(), "youtube");
+        assertEquals(contentTypes[0].getContentTypeName(), "instagram");
     }
 
     @Test
@@ -839,6 +838,30 @@ public class IntegrationTests extends Server {
         Trending.TrendingResponse trending = g.fromJson(stringResponse.getBody(), Trending.TrendingResponse.class);
         assertEquals(trending.users.get(0).getUserId(), TEST_UID);
         assertEquals(trending.users.get(1).getUserId(), TEST2_UID);
+    }
+
+    @Test
+    public void testN_AddAndGetMyWorkouts() throws UnirestException{
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workout")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"contentId\": \"" + content[0].getContentId() + "\"\n" +
+                        "}")
+                .asString();
+
+        AddToUserWorkout.AddToWorkoutResponse add = g.fromJson(stringResponse.getBody(), AddToUserWorkout.AddToWorkoutResponse.class);
+        assertEquals(add.getAddedContentId(), content[0].getContentId());
+
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workout")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        GetUserWorkout.GetWorkoutResponse get = g.fromJson(stringResponse.getBody(), GetUserWorkout.GetWorkoutResponse.class);
+        assertEquals(get.getUserWorkouts().get(0).getContentId(), content[0].getContentId());
     }
 
     static String readFile(String path, Charset encoding)
