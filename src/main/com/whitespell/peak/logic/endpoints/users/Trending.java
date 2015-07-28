@@ -1,9 +1,11 @@
 package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
+import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
@@ -11,7 +13,8 @@ import main.com.whitespell.peak.model.UserObject;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.stream.Stream;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -20,19 +23,20 @@ import java.util.ArrayList;
  */
 public class Trending extends EndpointHandler {
 
-    private static final String QS_SEARCH_QUERY_KEY = "q";
-
     /**
      * What we're getting from user
      */
+
     private static final String USER_ID_KEY = "user_id";
     private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
     private static final String THUMBNAIL_KEY = "thumbnail";
+    private static final String COUNT_KEY = "count";
 
     /**
      * What we're getting from categories
      */
+
     private static final String CATEGORY_ID_KEY = "category_id";
 
     /**
@@ -46,9 +50,6 @@ public class Trending extends EndpointHandler {
     private static final String CONTENT_TITLE_KEY = "content_title";
     private static final String CONTENT_THUMBNAIL_KEY = "thumbnail_url";
 
-
-
-
     @Override
     protected void setUserInputs() {
     }
@@ -57,8 +58,6 @@ public class Trending extends EndpointHandler {
     public void safeCall(final RequestObject context) throws IOException {
 
         int limit =  GenericAPIActions.getLimit(context.getQueryString());
-        int offset =  GenericAPIActions.getOffset(context.getQueryString());
-
 
         ArrayList<UserObject> tempUsers = new ArrayList<>();
         ArrayList<Integer> tempCategories = new ArrayList<>();
@@ -74,32 +73,54 @@ public class Trending extends EndpointHandler {
         final boolean[] contentThreadLockRemoved = {false};
 
         /**
-         * Get all the users that match the search query
+         * Get all the users that match the search query, now sorted by users with highest amount of content posted being shown first
          */
-
 
         new Thread(
                 () -> {
+                    final Map<UserObject, Integer> map = new HashMap<>();
+
                     try {
-                    StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"`, `"+THUMBNAIL_KEY+"` FROM `user` ORDER BY `user_id` DESC LIMIT "+limit+"");
+                        StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"`, `"+THUMBNAIL_KEY+"` FROM `user` ORDER BY `user_id` DESC LIMIT "+limit+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
-                            while(results.next()) {
-                                tempUsers.add(new UserObject(
-                                results.getInt(USER_ID_KEY),
-                                results.getString((USERNAME_KEY)),
-                                results.getString(DISPLAYNAME_KEY),
-                                null,
-                                results.getString(THUMBNAIL_KEY),
-                                null,
-                                null
-                                ));
-                            }
+                            while (results.next()) {
+                                try {
+                                    StatementExecutor executor2 = new StatementExecutor("SELECT COUNT(*) AS `count` FROM `content` WHERE `user_id` = ? LIMIT 1");
+                                    executor2.execute(ps2 -> {
 
+                                        ps2.setInt(1, results.getInt(USER_ID_KEY));
+                                        ResultSet results2 = ps2.executeQuery();
+
+                                        if (results2.next()) {
+                                            if (results2.getInt(COUNT_KEY) >= 0) {
+                                                map.put(new UserObject(
+                                                        results.getInt(USER_ID_KEY),
+                                                        results.getString((USERNAME_KEY)),
+                                                        results.getString(DISPLAYNAME_KEY),
+                                                        null,
+                                                        results.getString(THUMBNAIL_KEY),
+                                                        null,
+                                                        null
+                                                ), results2.getInt(COUNT_KEY));
+                                            }
+                                        }
+
+                                    });
+                                } catch (SQLException e) {
+                                    Logging.log("High", e);
+                                    return;
+                                }
+                            }
                         });
+                        final Map<UserObject, Integer> resultMap = sortByValues(map);
+                        for(Map.Entry e : resultMap.entrySet()){
+                            tempUsers.add((UserObject)e.getKey());
+                        }
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+                        return;
                     } finally {
                         userThreadLockRemoved[0] = true;
                     }
@@ -123,7 +144,8 @@ public class Trending extends EndpointHandler {
 
                         });
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+                        return;
                     } finally {
                         categoryThreadLockRemoved[0] = true;
                     }
@@ -149,7 +171,8 @@ public class Trending extends EndpointHandler {
 
                         });
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+                        return;
                     } finally {
                         contentThreadLockRemoved[0] = true;
                     }
@@ -160,7 +183,8 @@ public class Trending extends EndpointHandler {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Logging.log("High", e);
+                return;
             }
         }
 
@@ -178,15 +202,13 @@ public class Trending extends EndpointHandler {
         try {
             context.getResponse().getWriter().write(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.log("High", e);
+            return;
         }
-
-
     }
 
 
     public class TrendingResponse {
-
 
         public TrendingResponse(ArrayList<UserObject> users, ArrayList<Integer> categories, ArrayList<ContentObject> content) {
             this.users = users;
@@ -198,4 +220,21 @@ public class Trending extends EndpointHandler {
         public ArrayList<Integer> categories;
         public ArrayList<ContentObject> content;
     }
+
+    /**
+     * Comparator used to output highest posting users first in feed
+     */
+
+    public static <K, V extends Comparable> Map<K,V> sortByValues(Map<K,V> map){
+        List<Map.Entry<K,V>> entries = new LinkedList<>(map.entrySet());
+
+        Collections.sort(entries, (Map.Entry<K, V> o1, Map.Entry<K, V> o2) -> o2.getValue().compareTo(o1.getValue()));
+
+        Map<K,V> sortedMap = new LinkedHashMap<>();
+        for(Map.Entry<K,V> entry: entries){
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+        return sortedMap;
+    }
 }
+
