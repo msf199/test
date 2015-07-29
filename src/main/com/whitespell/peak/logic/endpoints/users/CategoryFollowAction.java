@@ -178,6 +178,7 @@ public class CategoryFollowAction extends EndpointHandler {
                         response.setActionTaken("unfollowed");
                     });
                 } catch (SQLException e) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                     Logging.log("High", e);
                 }
                 break;

@@ -84,7 +84,11 @@ public class GetUserWorkout extends EndpointHandler {
                         });
                     } catch (SQLException e) {
                         Logging.log("High", e);
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND_OR_IN_LIST);
+                        if (e.getMessage().contains("fk_lists_workout_content_id")) {
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                        }else if(e.getMessage().contains("fk_lists_workout_user_id")){
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                        }
                         return;
                     }
                 }
@@ -95,13 +99,13 @@ public class GetUserWorkout extends EndpointHandler {
                     context.getResponse().getWriter().write(response);
                 } catch (Exception e) {
                     Logging.log("High", e);
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND_OR_IN_LIST);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                     return;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND_OR_IN_LIST);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

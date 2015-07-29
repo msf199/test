@@ -1,6 +1,7 @@
 package main.com.whitespell.peak.logic.endpoints.content.categories;
 
 import com.google.gson.Gson;
+import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -46,10 +47,14 @@ public class RequestCategories extends EndpointHandler {
                     context.getResponse().getWriter().write(response);
                 } catch (Exception e) {
                     Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
     }
 

@@ -118,10 +118,13 @@ public class GetNewsfeed extends EndpointHandler {
                 context.getResponse().getWriter().write(response);
             } catch (Exception e) {
                 Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
     }
 }
