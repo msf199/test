@@ -79,8 +79,10 @@ public class AddCategory extends EndpointHandler {
             Logging.log("High", e);
             if (e.getMessage().contains("FK_user_content_content_type")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
+                return;
             } else if (e.getMessage().contains("Duplicate entry")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.DUPLICATE_CATEGORY);
+                return;
             }
         }
 

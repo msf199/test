@@ -48,11 +48,13 @@ public class GetEmptyNewsfeed extends EndpointHandler {
                         context.getResponse().getWriter().write(emptyNewsfeedUsers.toString());
                     } catch (Exception e) {
                         Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                         return;
                     }
                 });
             }catch (Exception e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

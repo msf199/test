@@ -51,8 +51,10 @@ public class AddContentType extends EndpointHandler {
             Logging.log("High", e);
             if (e.getMessage().contains("FK_user_content_content_type")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY); //todo check if this should be category or content ype
+                return;
             } else if (e.getMessage().contains("Duplicate entry")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.DUPLICATE_CONTENT_TYPE);
+                return;
             }
         }
 

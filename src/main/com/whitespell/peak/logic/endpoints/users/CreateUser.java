@@ -134,6 +134,7 @@ public class CreateUser extends EndpointHandler {
             }
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
 
@@ -198,6 +199,7 @@ public class CreateUser extends EndpointHandler {
                             context.getResponse().getWriter().write(json);
                         } catch (IOException e) {
                             Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
                             return;
                         }
                     } else {

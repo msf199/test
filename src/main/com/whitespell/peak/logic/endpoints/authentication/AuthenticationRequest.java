@@ -66,6 +66,8 @@ public class AuthenticationRequest extends EndpointHandler {
                 });
             } catch (SQLException e) {
                 Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
             }
             if(temp.size() > 0){
                 username = temp.get(0);
@@ -130,6 +132,8 @@ public class AuthenticationRequest extends EndpointHandler {
                                     });
                                 } catch (SQLException e) {
                                     Logging.log("High", e);
+                                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                                    return;
                                 }
                                 // build a gson object based on the authentication object
                                 Gson g = new Gson();
@@ -144,10 +148,16 @@ public class AuthenticationRequest extends EndpointHandler {
                             }
                         } catch (NoSuchAlgorithmException e) {
                             Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                            return;
                         } catch (InvalidKeySpecException e) {
                             Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                            return;
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                            return;
                         }
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
@@ -157,6 +167,8 @@ public class AuthenticationRequest extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
     }
 }
