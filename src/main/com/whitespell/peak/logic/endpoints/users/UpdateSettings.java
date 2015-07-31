@@ -115,6 +115,7 @@ public class UpdateSettings extends EndpointHandler {
                 }
             } catch (SQLException e) {
                 Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
         }
@@ -176,9 +177,11 @@ public class UpdateSettings extends EndpointHandler {
                             }
                         } catch (NoSuchAlgorithmException e) {
                             Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                             return;
                         } catch (InvalidKeySpecException e) {
                             Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                             return;
                         }
                     } else {
@@ -189,6 +192,7 @@ public class UpdateSettings extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
 
@@ -263,7 +267,9 @@ public class UpdateSettings extends EndpointHandler {
                         try{
                             context.getResponse().getWriter().write(response);
                         }catch(IOException e){
+                            Logging.log("High", e);
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                            return;
                         }
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);
@@ -273,6 +279,7 @@ public class UpdateSettings extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }//end update settings
     }

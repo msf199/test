@@ -72,7 +72,13 @@ public class AddToUserWorkout extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND_OR_IN_LIST);
+            if (e.getMessage().contains("fk_lists_workout_content_id")) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+            }else if(e.getMessage().contains("fk_lists_workout_user_id")){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+            }else{
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_LIST);
+            }
             return;
         }
     }

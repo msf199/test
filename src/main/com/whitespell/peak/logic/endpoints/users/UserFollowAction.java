@@ -101,6 +101,8 @@ public class UserFollowAction extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
         switch (action) {
@@ -129,6 +131,8 @@ public class UserFollowAction extends EndpointHandler {
                     });
                 } catch (SQLException e) {
                     Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
                 }
                 break;
 
@@ -155,6 +159,8 @@ public class UserFollowAction extends EndpointHandler {
                     });
                 } catch (SQLException e) {
                     Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
                 }
                 break;
         }

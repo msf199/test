@@ -132,11 +132,13 @@ public class RequestContent extends EndpointHandler {
                     context.getResponse().getWriter().write(response);
                 } catch (Exception e) {
                     Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                     return;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
             return;
         }
     }

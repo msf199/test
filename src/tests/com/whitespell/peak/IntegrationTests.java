@@ -182,7 +182,7 @@ public class IntegrationTests extends Server {
         assertEquals("There was no endpoint found on this path. Make sure you're using the right method (GET,POST,etc.)", e.getErrorMessage());
         assertEquals("EndpointDispatcher", e.getClassName());
         assertEquals(404, e.getHttpStatusCode());
-        assertEquals(124, e.getErrorId());
+        assertEquals(126, e.getErrorId());
     }
 
     @Test

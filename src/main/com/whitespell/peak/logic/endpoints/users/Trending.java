@@ -110,6 +110,7 @@ public class Trending extends EndpointHandler {
                                     });
                                 } catch (SQLException e) {
                                     Logging.log("High", e);
+                                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                                     return;
                                 }
                             }
@@ -120,6 +121,7 @@ public class Trending extends EndpointHandler {
                         }
                     } catch (SQLException e) {
                         Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                         return;
                     } finally {
                         userThreadLockRemoved[0] = true;
@@ -145,6 +147,7 @@ public class Trending extends EndpointHandler {
                         });
                     } catch (SQLException e) {
                         Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                         return;
                     } finally {
                         categoryThreadLockRemoved[0] = true;
@@ -172,6 +175,7 @@ public class Trending extends EndpointHandler {
                         });
                     } catch (SQLException e) {
                         Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                         return;
                     } finally {
                         contentThreadLockRemoved[0] = true;
@@ -184,6 +188,7 @@ public class Trending extends EndpointHandler {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
                 Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
         }
@@ -203,6 +208,7 @@ public class Trending extends EndpointHandler {
             context.getResponse().getWriter().write(response);
         } catch (Exception e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
     }

@@ -109,6 +109,8 @@ public class CategoryPublishAction extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
         switch (action) {
@@ -137,9 +139,13 @@ public class CategoryPublishAction extends EndpointHandler {
                     });
                 } catch (MySQLIntegrityConstraintViolationException e) {
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
+                    return;
                 } catch (SQLException e) {
-                    if (e.getMessage().contains(""))
-                        Logging.log("High", e);
+                    Logging.log("High", e);
+                    if (e.getMessage().contains("Duplicate")){
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.DUPLICATE_CATEGORY);
+                    }
+                    return;
                 }
                 break;
 
@@ -165,6 +171,7 @@ public class CategoryPublishAction extends EndpointHandler {
                         response.setActionTaken("unpublish");
                     });
                 } catch (SQLException e) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                     Logging.log("High", e);
                 }
                 break;

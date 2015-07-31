@@ -6,6 +6,7 @@ import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.Safety;
+import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
@@ -102,7 +103,9 @@ public class Search extends EndpointHandler {
 
                         });
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
                     } finally {
                         userThreadLockRemoved[0] = true;
                     }
@@ -126,7 +129,9 @@ public class Search extends EndpointHandler {
 
                         });
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
                     } finally {
                         categoryThreadLockRemoved[0] = true;
                     }
@@ -158,7 +163,9 @@ public class Search extends EndpointHandler {
 
                         });
                     } catch (SQLException e) {
-                        e.printStackTrace();
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
                     } finally {
                         contentThreadLockRemoved[0] = true;
                     }
@@ -169,7 +176,9 @@ public class Search extends EndpointHandler {
             try {
                 Thread.sleep(10);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
             }
         }
 
@@ -187,7 +196,9 @@ public class Search extends EndpointHandler {
         try {
             context.getResponse().getWriter().write(response);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
 
