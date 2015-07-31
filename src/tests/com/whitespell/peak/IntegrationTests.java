@@ -595,7 +595,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
                         "\"userName\": \"p1mw1n\",\n" +
-                        "\"displayname\": \"new\",\n" +
+                        "\"displayName\": \"new\",\n" +
                         "\"coverPhoto\": \"https://encrypted-tbn3.gstatic.com/images?q=tbn:ANd9GcSh0tZytkPcFHRPQrTjC9O6a1TFGi8_XvD0TWtRLARQGsra9LjO\",\n" +
                         "\"slogan\": \"slogan\"\n" +
                         "}")
