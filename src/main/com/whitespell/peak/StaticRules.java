@@ -33,7 +33,7 @@ public class StaticRules {
     public enum ErrorCodes {
 
         //0-10 are unknown issues
-        UNKNOWN_SERVER_ISSUE(100, "Sorry! We've encountered an unknown error.", HttpStatus.INTERNAL_SERVER_ERROR_500),
+        UNKNOWN_SERVER_ISSUE(0, "Sorry! We've encountered an unknown error.", HttpStatus.INTERNAL_SERVER_ERROR_500),
 
         // 100-110 is taken
         USERNAME_TAKEN(100, "Username is already taken", HttpStatus.UNAUTHORIZED_401),
