@@ -843,7 +843,7 @@ public class IntegrationTests extends Server {
     @Test
     public void testN_AddAndGetMyWorkouts() throws UnirestException{
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workout")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workouts")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
@@ -855,13 +855,40 @@ public class IntegrationTests extends Server {
         assertEquals(add.getAddedContentId(), content[0].getContentId());
 
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workout")
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workouts")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
         GetUserWorkout.GetWorkoutResponse get = g.fromJson(stringResponse.getBody(), GetUserWorkout.GetWorkoutResponse.class);
         assertEquals(get.getUserWorkouts().get(0).getContentId(), content[0].getContentId());
+    }
+
+    @Test
+    public void testO_AddAndGetUserList() throws UnirestException{
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/lists")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"contentId\": \"" + content[0].getContentId() + "\",\n" +
+                        "\"listId\": \"" + 1 + "\"\n" +
+                        "}")
+                .asString();
+
+        AddToUserList.AddToSavedListResponse add = g.fromJson(stringResponse.getBody(), AddToUserList.AddToSavedListResponse.class);
+        assertEquals(add.getAddedContentId(), content[0].getContentId());
+        assertEquals(add.getAddedToListId(), 1);
+
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/lists?listId=1")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        GetUserList.GetUserListResponse get = g.fromJson(stringResponse.getBody(), GetUserList.GetUserListResponse.class);
+        assertEquals(get.getUserList().get(0).getContentId(), content[0].getContentId());
+        assertEquals(get.getListId(), 1);
     }
 
     static String readFile(String path, Charset encoding)
