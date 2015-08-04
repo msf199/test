@@ -29,6 +29,7 @@ public class UserObject {
     public ArrayList<Integer> categoryPublishing = null;
 
     int userId;
+    int publisher;
     String userName;
     String displayName;
     String email;
@@ -44,9 +45,10 @@ public class UserObject {
         this.thumbnail = "";
         this.coverPhoto = "";
         this.slogan = "";
+        this.publisher = 0;
     }
 
-    public UserObject(ArrayList<Integer> categoryFollowing, ArrayList<Integer> userFollowing, ArrayList<Integer> categoryPublishing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
+    public UserObject(ArrayList<Integer> categoryFollowing, ArrayList<Integer> userFollowing, ArrayList<Integer> categoryPublishing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan, int publisher) {
         this.categoryFollowing = categoryFollowing;
         this.userFollowing = userFollowing;
         this.categoryPublishing = categoryPublishing;
@@ -57,9 +59,10 @@ public class UserObject {
         this.thumbnail = thumbnail;
         this.coverPhoto = cover_photo;
         this.slogan = slogan;
+        this.publisher = publisher;
     }
 
-    public UserObject(int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan) {
+    public UserObject(int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan, int publisher) {
         this.userId = userId;
         this.userName = userName;
         this.displayName = displayName;
@@ -67,6 +70,7 @@ public class UserObject {
         this.thumbnail = thumbnail;
         this.coverPhoto = cover_photo;
         this.slogan = slogan;
+        this.publisher = publisher;
     }
 
     public int getUserId() {
@@ -75,6 +79,11 @@ public class UserObject {
 
     public void setUserId(int userId) {
         this.userId = userId;
+    }
+
+
+    public int getPublisher() {
+        return publisher;
     }
 
     public String getUserName() {

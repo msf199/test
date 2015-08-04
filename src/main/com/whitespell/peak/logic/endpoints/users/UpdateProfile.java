@@ -209,7 +209,7 @@ public class UpdateProfile extends EndpointHandler {
                     if (update > 0) {
                         //outputs only the updated user fields, others will be ""
                         user = new UserObject(finalUser_id, finalUsername, finalDisplayname, "", finalThumbnail,
-                                finalCoverPhoto, finalSlogan);
+                                finalCoverPhoto, finalSlogan, -1);
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_EDITED);
                         return;

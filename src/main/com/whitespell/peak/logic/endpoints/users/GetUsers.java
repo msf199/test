@@ -24,8 +24,8 @@ import java.util.ArrayList;
  */
 public class GetUsers extends EndpointHandler {
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` > ? LIMIT ?";
-    private static final String GET_USERS_EXCLUDE_TEMP = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan` FROM `user` WHERE `user_id` > ?  AND `email` NOT LIKE '%temporary.email' LIMIT ?";
+    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ? LIMIT ?";
+    private static final String GET_USERS_EXCLUDE_TEMP = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ?  AND `email` NOT LIKE '%temporary.email' LIMIT ?";
 
 	private static final String USER_ID = "user_id";
 
@@ -35,7 +35,8 @@ public class GetUsers extends EndpointHandler {
 	private static final String THUMBNAIL_KEY = "thumbnail";
 	private static final String COVER_PHOTO_KEY = "cover_photo";
 	private static final String SLOGAN_KEY = "slogan";
-	private static final String EXCLUDE_TEMP_USERS = "excludeTempUsers";
+    private static final String PUBLISHER_KEY = "publisher";
+    private static final String EXCLUDE_TEMP_USERS = "excludeTempUsers";
 
 	@Override
 	protected void setUserInputs() {
@@ -66,7 +67,7 @@ public class GetUsers extends EndpointHandler {
 
                     UserObject d = new UserObject(results.getInt(USER_ID), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                             results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY),
-                            results.getString(SLOGAN_KEY));
+                            results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
 
                     users.add(d);
                 }
