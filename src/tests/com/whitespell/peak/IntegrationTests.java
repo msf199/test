@@ -675,7 +675,7 @@ public class IntegrationTests extends Server {
 
         /**
          * Change both email & password back to the previous values to ensure old values will work
-         */
+         **/
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/settings")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -686,6 +686,38 @@ public class IntegrationTests extends Server {
                 .asString();
         UserObject user3 = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(user3.getEmail(), "newtestemail@lol.com");
+
+        /**
+         * Test changing publisher value along with other fields.
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/settings")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"password\": \"" + TEST_PASSWORD + "\",\n" +
+                        "\"newPassword\": \"!@#$%^&*()~\",\n" +
+                        "\"email\": \"newtestemail2@lol.com\",\n" +
+                        "\"publisher\": " + 0 + "\n"+
+                        "}")
+                .asString();
+        UserObject user4 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(user4.getEmail(), "newtestemail2@lol.com");
+        assertEquals(user4.getPublisher(), 0);
+
+        /**
+         * Change publisher value back to ensure value can alternate.
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/settings")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n\"password\": \"!@#$%^&*()~\",\n" +
+                        "\"newPassword\": \"newestpass\",\n" +
+                        "\"email\": \"newestemail@email.com\",\n" +
+                        "\"publisher\": " + 1 + "\n"+
+                        "}")
+                .asString();
+        UserObject user5 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(user5.getEmail(), "newestemail@email.com");
+        assertEquals(user5.getPublisher(), 1);
     }
 
 
