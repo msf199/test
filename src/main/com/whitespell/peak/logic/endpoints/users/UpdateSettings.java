@@ -33,6 +33,7 @@ public class UpdateSettings extends EndpointHandler {
 
     private static final String PAYLOAD_CURRENT_PASSWORD_KEY = "password";
     private static final String PAYLOAD_NEW_PASSWORD_KEY = "newPassword";
+    private static final String PAYLOAD_NEW_PUBLISHER_VALUE = "publisher";
 
     @Override
     protected void setUserInputs() {
@@ -40,6 +41,7 @@ public class UpdateSettings extends EndpointHandler {
         payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(PAYLOAD_CURRENT_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_NEW_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(PAYLOAD_NEW_PUBLISHER_VALUE, StaticRules.InputTypes.REG_INT_OPTIONAL_ZERO);
     }
 
     private static final String CHECK_EMAIL_TAKEN_QUERY = "SELECT `user_id`, `email` FROM `user` WHERE `email` = ? AND `user_id` != ? LIMIT 1";
@@ -53,6 +55,7 @@ public class UpdateSettings extends EndpointHandler {
 
         JsonObject j = context.getPayload().getAsJsonObject();
         String temp = "", temp1 = "";
+        int tempPub = -1;
         final ArrayList<String> updateKeys = new ArrayList<>();
         final ArrayList<String> updateValues = new ArrayList<>();
 
@@ -67,9 +70,13 @@ public class UpdateSettings extends EndpointHandler {
             updateKeys.add(PAYLOAD_CURRENT_PASSWORD_KEY);
             updateValues.add(temp1);
         }
+        if(j.get(PAYLOAD_NEW_PUBLISHER_VALUE) != null){
+            tempPub = j.get(PAYLOAD_NEW_PUBLISHER_VALUE).getAsInt();
+        }
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         final String email = temp;
         final String new_pass = temp1;
+        final int publisher = tempPub;
         String passHash = "";
 
         /**
@@ -215,16 +222,26 @@ public class UpdateSettings extends EndpointHandler {
         StringBuilder setString = new StringBuilder();
         int count = 1;
         int size = updateKeys.size();
-        for (String s : updateKeys) {
-            if (count == 1) {
-                setString.append("UPDATE `user` SET ");
+        if(updateKeys.size() > 0) {
+            for (String s : updateKeys) {
+                if (count == 1) {
+                    setString.append("UPDATE `user` SET ");
+                    if (tempPub > -1) {
+                        setString.append("`publisher` = ?, ");
+                    }
+                }
+                if (count == size) {
+                    setString.append("`" + s + "` = ? ");
+                } else {
+                    setString.append("`" + s + "` = ?, ");
+                }
+                count++;
             }
-            if (count == size) {
-                setString.append("`" + s + "` = ? ");
-            } else {
-                setString.append("`" + s + "` = ?, ");
+        }else{
+            setString.append("UPDATE `user` SET ");
+            if (tempPub > -1) {
+                setString.append("`publisher` = ? ");
             }
-            count++;
         }
         setString.append("WHERE `user_id` = ?");
         final String UPDATE_USER = setString.toString();
@@ -235,6 +252,7 @@ public class UpdateSettings extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(UPDATE_USER);
             final int finalUser_id = user_id;
+            final int finalPublisher = publisher;
             final String finalEmail = email;
             final String finalPassword = passHash;
 
@@ -245,6 +263,10 @@ public class UpdateSettings extends EndpointHandler {
                     UserObject user = null;
                     int count = 1;
 
+                    if(publisher > -1){
+                        ps.setInt(count, finalPublisher);
+                        count++;
+                    }
                     if (updateValues.contains(finalEmail)) {
                         ps.setString(count, finalEmail);
                         count++;
@@ -260,7 +282,7 @@ public class UpdateSettings extends EndpointHandler {
 
                     if (update > 0) {
                         //only output the user_id and email
-                        UserObject updatedUser = new UserObject(user_id,null,null,finalEmail,null,null,null,-1);
+                        UserObject updatedUser = new UserObject(user_id,null,null,finalEmail,null,null,null,finalPublisher);
                         Gson g = new Gson();
                         String response = g.toJson(updatedUser);
                         context.getResponse().setStatus(200);
