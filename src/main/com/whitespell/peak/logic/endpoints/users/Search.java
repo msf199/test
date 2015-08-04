@@ -97,7 +97,7 @@ public class Search extends EndpointHandler {
                                 null,
                                 results.getString(THUMBNAIL_KEY),
                                 null,
-                                null
+                                null, -1
                                 ));
                             }
 

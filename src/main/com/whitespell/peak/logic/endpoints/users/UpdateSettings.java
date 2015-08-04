@@ -260,7 +260,7 @@ public class UpdateSettings extends EndpointHandler {
 
                     if (update > 0) {
                         //only output the user_id and email
-                        UserObject updatedUser = new UserObject(user_id,null,null,finalEmail,null,null,null);
+                        UserObject updatedUser = new UserObject(user_id,null,null,finalEmail,null,null,null,-1);
                         Gson g = new Gson();
                         String response = g.toJson(updatedUser);
                         context.getResponse().setStatus(200);
