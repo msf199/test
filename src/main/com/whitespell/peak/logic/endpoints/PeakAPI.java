@@ -3,7 +3,9 @@ package main.com.whitespell.peak.logic.endpoints;
 import main.com.whitespell.peak.logic.EndpointDispatcher;
 import main.com.whitespell.peak.logic.baseapi.WhitespellAPI;
 import main.com.whitespell.peak.logic.endpoints.authentication.AuthenticationRequest;
+import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
 import main.com.whitespell.peak.logic.endpoints.content.AddNewContent;
+import main.com.whitespell.peak.logic.endpoints.content.GetContentComments;
 import main.com.whitespell.peak.logic.endpoints.content.RequestContent;
 import main.com.whitespell.peak.logic.endpoints.content.categories.AddCategory;
 import main.com.whitespell.peak.logic.endpoints.content.categories.RequestCategories;
@@ -108,12 +110,17 @@ public class PeakAPI extends WhitespellAPI {
         // Get a list of all the content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContent(), "/content/");
 
-
         // Get a list of all the content types
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentTypes(), "/content/types");
 
         // Add a new content type
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
+
+        // Get a content comment
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetContentComments(), "/content/$/comments", "contentId");
+
+        // Add a content comment
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentComment(), "/content/$/comments", "contentId");
 
         /**
          * CATEGORIES

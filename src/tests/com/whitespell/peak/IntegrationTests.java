@@ -7,6 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.Pool;
@@ -921,6 +922,42 @@ public class IntegrationTests extends Server {
         GetUserList.GetUserListResponse get = g.fromJson(stringResponse.getBody(), GetUserList.GetUserListResponse.class);
         assertEquals(get.getUserList().get(0).getContentId(), content[0].getContentId());
         assertEquals(get.getListId(), 1);
+    }
+
+    @Test
+    public void testP_AddAndGetContentComments() throws UnirestException{
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"comment\": \"awesome video!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add.isCommentAdded(), true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"comment\": \"wow this is so cool! definitely going to try it :)!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add2.isCommentAdded(), true);
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        //for now just print, JSON has parsing errors on Date due to internal DateObject
+        System.out.println(stringResponse.getBody());
     }
 
     static String readFile(String path, Charset encoding)

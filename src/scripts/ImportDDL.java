@@ -49,6 +49,7 @@ public class ImportDDL {
         tables.add("authentication");
         tables.add("lists_workout");
         tables.add("lists_saved");
+        tables.add("content_comments");
 
         //build the DDL
 
@@ -71,7 +72,5 @@ public class ImportDDL {
         PrintWriter writer = new PrintWriter("ddl/"+Config.DB+".sql", "UTF-8");
         writer.println(s.toString());
         writer.close();
-
-
     }
 }
