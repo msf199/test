@@ -19,7 +19,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=11725 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=11727 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
@@ -95,7 +95,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`authentication_id`),
   KEY `FK_authentication_user_id` (`user_id`),
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=17480 DEFAULT CHARSET=utf8;CREATE TABLE `lists_workout` (
+) ENGINE=InnoDB AUTO_INCREMENT=17854 DEFAULT CHARSET=utf8;CREATE TABLE `lists_workout` (
   `content_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,
@@ -110,4 +110,12 @@ CREATE TABLE `user` (
   `timestamp` datetime DEFAULT NULL,
   KEY `fk_lists_saved_content_id_idx` (`content_id`),
   KEY `fk_lists_saved_user_id_idx` (`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `content_comments` (
+  `comment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `content_id` int(11) NOT NULL,
+  `comment_value` varchar(255) DEFAULT NULL,
+  `comment_datetime` datetime DEFAULT NULL,
+  PRIMARY KEY (`comment_id`),
+  UNIQUE KEY `comment_id_UNIQUE` (`comment_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=utf8;
