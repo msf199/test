@@ -21,6 +21,11 @@ public final class Config {
     public static int SERVER_VERSION = 1;
     public static String SERVER_TIMEZONE = "UTC";
 
+    //General mandrill mail information
+    public static String MANDRILL_API_KEY = "_nuIwbGbVG1bvkxZo7LoiQ";
+    public static String MANDRILL_API_VERSION = "1.0";
+    public static String MANDRILL_API_URL = "https://mandrillapp.com/api";
+
     //General mysql information
     public static String DB = "peak";
     public static String DB_HOST = "127.0.0.1";

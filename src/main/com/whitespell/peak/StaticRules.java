@@ -74,7 +74,8 @@ public class StaticRules {
         CONTENT_ALREADY_IN_LIST(135, "The content you are trying to add to your list is already in the list", HttpStatus.BAD_REQUEST_400),
         COMMENT_TOO_LONG(136, "The comment you are trying to post is too long", HttpStatus.BAD_REQUEST_400),
         COMMENT_NOT_POSTED(137, "The comment could not be posted", HttpStatus.NOT_FOUND_404),
-        COMMENTS_NOT_FOUND(138, "The comments for this video could not be loaded", HttpStatus.NOT_FOUND_404);
+        COMMENTS_NOT_FOUND(138, "The comments for this video could not be loaded", HttpStatus.NOT_FOUND_404),
+        EMAIL_IS_INVALID(139, "The provided email was formatted incorrectly.", HttpStatus.BAD_REQUEST_400);
 
         int errorId;
         String errorMessage;
