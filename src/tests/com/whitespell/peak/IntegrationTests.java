@@ -7,6 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.config.MandrillMailer;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -29,7 +30,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
+import static main.com.whitespell.peak.logic.config.MandrillMailer.sendEmail;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -959,6 +962,21 @@ public class IntegrationTests extends Server {
         //for now just print, JSON has parsing errors on Date due to internal DateObject
         System.out.println(stringResponse.getBody());
     }
+
+/*    @Test
+    public void testQ_testMandrillEmails() throws UnirestException{
+        boolean sent = false;
+        try{
+            sent =
+            sendEmail("pim@peakapp.me", "Pim, CEO @ Peak", "testMail!",
+                    "<html><body><h1>Congratulations cory!</h1><a href=\\\"http://www.peakapp.me\\\">Welcome to Peak!!</a></body></html>", "cory@.com");
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            fail(e.getMessage());
+        }
+        assertEquals(sent, true);
+    }*/
 
     static String readFile(String path, Charset encoding)
             throws IOException {

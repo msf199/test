@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.regex.Pattern;
+
+import static main.com.whitespell.peak.logic.config.MandrillMailer.sendEmail;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -41,7 +44,6 @@ public class CreateUser extends EndpointHandler {
         payloadInput.put(PAYLOAD_EMAIL_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
-
     private static final String CHECK_USERNAME_QUERY = "SELECT `user_id`, `username`, `email`, `publisher` FROM `user` WHERE `username` = ? LIMIT 1";
     private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email`, `publisher` FROM `user` WHERE `username` = ? OR `email` = ? LIMIT 1";
 
@@ -49,6 +51,7 @@ public class CreateUser extends EndpointHandler {
     public void safeCall(final RequestObject context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
+        boolean isValid;
 
         // common variables
         String username = null;
@@ -67,6 +70,7 @@ public class CreateUser extends EndpointHandler {
         username = payload.get(PAYLOAD_USERNAME_KEY).getAsString();
         password = payload.get(PAYLOAD_PASSWORD_KEY).getAsString();
         email = payload.get(PAYLOAD_EMAIL_KEY).getAsString();
+        isValid = Pattern.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", email);
 
         if (payload.get(PAYLOAD_PUBLISHER_KEY) != null && payload.get(PAYLOAD_PUBLISHER_KEY).getAsInt() == 1) {
             publisher = 1;
@@ -75,6 +79,7 @@ public class CreateUser extends EndpointHandler {
         /**
          * Check username and password requirements
          */
+
         if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TOO_LONG);
             return;
@@ -87,19 +92,13 @@ public class CreateUser extends EndpointHandler {
         } else if (password.length() < StaticRules.MIN_PASSWORD_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_SHORT);
             return;
+        } else if (!isValid){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_IS_INVALID);
         }
-
-
-
-
-        /**
-         * //todo(pim) set off email to a separate email checker thread that validates the email through mailserver checks and such.
-         */
 
         /**
          * 401 Unauthorized: Check if username exists
          */
-
 
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_OR_EMAIL_QUERY);
@@ -137,10 +136,21 @@ public class CreateUser extends EndpointHandler {
             return;
         }
 
+        /**
+         * We will use a verification email that sends a token in a link which the user will click to verify their email.
+         * Until they verify their email they will be unable to access certain features of the app.
+         */
+        if(isValid){
+            sendEmail("noreply@peakapp.me", "Pim, CEO of Peak", "Welcome to Peak!",
+                    "<html><body><h1>Congratulations " + username + "!</h1><a href=\\\"http://www.peakapp.me\\\">Click here to Get Started!</a></body></html>", email);
+        }
+        else{
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_IS_INVALID);
+            return;
+        }
 
         // Generate hash the user's password hash string (Which will result ITERATION:SALT:HASH). When we check against the password, we check it like this:
         // isValid({userpass}, databaseResult(ITERATION:SALT:HASH) and the function checks against the same salt and hash as in the database result.
-
         try {
             passHash = PasswordHash.createHash(password);
         } catch (Exception e) {
@@ -152,7 +162,6 @@ public class CreateUser extends EndpointHandler {
         /**
          * Insert the user in the database and return the user object on success, fail with 500 if it fails
          */
-
 
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_USER_QUERY);
