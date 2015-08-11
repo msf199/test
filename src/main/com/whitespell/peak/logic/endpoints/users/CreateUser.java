@@ -21,7 +21,6 @@ import java.sql.SQLException;
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         1/20/15
  *         whitespell.model
- *         https://docs.google.com/document/d/1j62zQ3AIfh7XW0nbftRy_hNXTAnhy5r48yBRHm7kYZA/edit
  */
 
 public class CreateUser extends EndpointHandler {
@@ -43,8 +42,8 @@ public class CreateUser extends EndpointHandler {
     }
 
 
-    private static final String CHECK_USERNAME_QUERY = "SELECT `user_id` FROM `user` WHERE `username` = ? LIMIT 1";
-    private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email` FROM `user` WHERE `username` = ? OR `email` = ? LIMIT 1";
+    private static final String CHECK_USERNAME_QUERY = "SELECT `user_id`, `username`, `email`, `publisher` FROM `user` WHERE `username` = ? LIMIT 1";
+    private static final String CHECK_USERNAME_OR_EMAIL_QUERY = "SELECT `username`, `email`, `publisher` FROM `user` WHERE `username` = ? OR `email` = ? LIMIT 1";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
@@ -181,7 +180,6 @@ public class CreateUser extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_QUERY);
             final String finalUsername = username;
-            final String finalEmail = email;
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
@@ -191,8 +189,9 @@ public class CreateUser extends EndpointHandler {
                         context.getResponse().setStatus(HttpStatus.OK_200);
                         UserObject uo = new UserObject();
                         uo.setUserId(s.getInt("user_id"));
-                        uo.setEmail(finalEmail);
-                        uo.setUserName(finalUsername);
+                        uo.setEmail(s.getString("email"));
+                        uo.setUserName(s.getString("username"));
+                        uo.setPublisher(s.getInt("publisher"));
                         Gson g = new Gson();
                         String json = g.toJson(uo);
                         try {

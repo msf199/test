@@ -81,9 +81,12 @@ public class UserObject {
         this.userId = userId;
     }
 
-
     public int getPublisher() {
         return publisher;
+    }
+
+    public void setPublisher(int publisher) {
+        this.publisher = publisher;
     }
 
     public String getUserName() {
