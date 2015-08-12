@@ -1,4 +1,4 @@
-package main.com.whitespell.peak.logic.config;
+package main.com.whitespell.peak.logic;
 
 import com.cribbstechnologies.clients.mandrill.exception.RequestFailedException;
 import com.cribbstechnologies.clients.mandrill.model.MandrillHtmlMessage;
@@ -9,6 +9,7 @@ import com.cribbstechnologies.clients.mandrill.request.MandrillMessagesRequest;
 import com.cribbstechnologies.clients.mandrill.request.MandrillRESTRequest;
 import com.cribbstechnologies.clients.mandrill.util.MandrillConfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import main.com.whitespell.peak.logic.config.Config;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 

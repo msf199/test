@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import static main.com.whitespell.peak.logic.config.MandrillMailer.sendEmail;
+import static main.com.whitespell.peak.logic.MandrillMailer.sendEmail;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
