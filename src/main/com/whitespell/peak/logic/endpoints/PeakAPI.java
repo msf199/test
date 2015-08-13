@@ -88,6 +88,12 @@ public class PeakAPI extends WhitespellAPI {
         // Publish in a category
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryPublishAction(), "/users/$/publishing", "userId");
 
+        // Update user's email verification status (intended for use in web front end)
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateEmailVerification(), "/users/$/email", "userId");
+
+        // Check user's email verification status
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetEmailVerification(), "/users/$/email", "userId");
+
         /**
          * STATISTICS
          */

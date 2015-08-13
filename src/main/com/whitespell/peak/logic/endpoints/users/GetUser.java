@@ -31,7 +31,7 @@ public class GetUser extends EndpointHandler {
     private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String FIND_CATEGORIES_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
     private static final String FIND_PUBLISHING_QUERY = "SELECT `category_id` FROM `category_publishing` WHERE `user_id` = ?";
-    private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` = ?";
+    private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher`, `email_verified` FROM `user` WHERE `user_id` = ?";
     private static final String URL_USER_ID = "userId";
     private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
@@ -170,6 +170,7 @@ public class GetUser extends EndpointHandler {
                     if (results.next()) {
                         user = new UserObject(initialCategories, initialFollowing, initialPublishing, results.getInt("user_id"), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                                 results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
+                        user.setEmailVerified(results.getInt("email_verified"));
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;

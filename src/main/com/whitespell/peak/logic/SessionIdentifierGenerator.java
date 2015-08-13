@@ -9,4 +9,8 @@ public final class SessionIdentifierGenerator {
     public static String nextSessionId() {
         return new BigInteger(130, random).toString(32);
     }
+
+    public static String nextEmailId() {
+        return new BigInteger(160, random).toString(32);
+    }
 }
