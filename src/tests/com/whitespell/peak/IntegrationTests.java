@@ -6,6 +6,7 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
+import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
 import main.com.whitespell.peak.logic.endpoints.users.*;
@@ -963,21 +964,34 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testQ_testMandrillEmails() throws UnirestException{
-        boolean sent = false;
-        try{
-            sent =
-            sendEmail("pim@peakapp.me",
-                    "Pim, CEO @ Peak",
-                    "testMail!",
-                    "<html><body><h1>Congratulations cory!</h1><a href=\\\"http://www.peakapp.me\\\">Welcome to Peak!!</a></body></html>",
-                    "cory@.com");
+    public void testQ_testMandrillEmailsAndTokens() throws UnirestException{
+
+        EmailSend.EmailTokenResponseObject et = EmailSend.updateDBandSendEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
+        if(et != null){
+            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/email")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                    .asString();
+
+            GetEmailVerification.GetEmailVerificationResponse evr = g.fromJson(stringResponse.getBody(), GetEmailVerification.GetEmailVerificationResponse.class);
+            if(evr.getEmailExpiration() == null || evr.getEmailVerified() == 1){
+                //force fail
+                assertEquals(false, true);
+            }
+            assertEquals(evr.getEmailVerified(), 0);
+
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/email")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                    .body("{\n" +
+                            "\"emailToken\": \"" + et.getEmailToken() + "\"\n" +
+                            "}")
+                    .asString();
+
+            UserObject userObject = g.fromJson(stringResponse.getBody(), UserObject.class);
+            assertEquals(userObject.getUserId(), TEST2_UID);
+            assertEquals(userObject.getEmailVerified(), 1);
         }
-        catch(Exception e){
-            e.printStackTrace();
-            fail(e.getMessage());
-        }
-        assertEquals(sent, true);
     }
 
 

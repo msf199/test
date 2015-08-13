@@ -30,6 +30,7 @@ public class UserObject {
 
     int userId;
     int publisher;
+    int emailVerified;
     String userName;
     String displayName;
     String email;
@@ -87,6 +88,14 @@ public class UserObject {
 
     public void setPublisher(int publisher) {
         this.publisher = publisher;
+    }
+
+    public int getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(int emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public String getUserName() {

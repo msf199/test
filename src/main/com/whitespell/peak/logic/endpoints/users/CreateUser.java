@@ -3,6 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -16,8 +17,10 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.regex.Pattern;
 
+import static main.com.whitespell.peak.logic.EmailSend.*;
 import static main.com.whitespell.peak.logic.MandrillMailer.sendEmail;
 
 /**
@@ -35,6 +38,7 @@ public class CreateUser extends EndpointHandler {
     private static final String PAYLOAD_PASSWORD_KEY = "password";
     private static final String PAYLOAD_EMAIL_KEY = "email";
     private static final String PAYLOAD_PUBLISHER_KEY = "publisher";
+
 
     @Override
     protected void setUserInputs() {
@@ -77,7 +81,7 @@ public class CreateUser extends EndpointHandler {
         }
 
         /**
-         * Check username and password requirements
+         * Check username, email and password requirements
          */
 
         if (username.length() > StaticRules.MAX_USERNAME_LENGTH) {
@@ -136,18 +140,7 @@ public class CreateUser extends EndpointHandler {
             return;
         }
 
-        /**
-         * We will use a verification email that sends a token in a link which the user will click to verify their email.
-         * Until they verify their email they will be unable to access certain features of the app.
-         */
-        if(isValid){
-            sendEmail("noreply@peakapp.me", "Pim, CEO of Peak", "Welcome to Peak!",
-                    "<html><body><h1>Congratulations " + username + "!</h1><a href=\\\"http://www.peakapp.me\\\">Click here to Get Started!</a></body></html>", email);
-        }
-        else{
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_IS_INVALID);
-            return;
-        }
+
 
         // Generate hash the user's password hash string (Which will result ITERATION:SALT:HASH). When we check against the password, we check it like this:
         // isValid({userpass}, databaseResult(ITERATION:SALT:HASH) and the function checks against the same salt and hash as in the database result.
@@ -221,6 +214,14 @@ public class CreateUser extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
-    }
 
+        /**
+         * We will use a verification email that sends a token in a link which the user will click to verify their email.
+         * Until they verify their email they will be unable to access certain features of the app.
+         */
+        /**
+         * Update the user's email verification status in the database.
+         */
+        updateDBandSendEmail(username, email);
+    }
 }

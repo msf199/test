@@ -75,7 +75,12 @@ public class StaticRules {
         COMMENT_TOO_LONG(136, "The comment you are trying to post is too long", HttpStatus.BAD_REQUEST_400),
         COMMENT_NOT_POSTED(137, "The comment could not be posted", HttpStatus.NOT_FOUND_404),
         COMMENTS_NOT_FOUND(138, "The comments for this video could not be loaded", HttpStatus.NOT_FOUND_404),
-        EMAIL_IS_INVALID(139, "The provided email was formatted incorrectly.", HttpStatus.BAD_REQUEST_400);
+        EMAIL_IS_INVALID(139, "The provided email was formatted incorrectly.", HttpStatus.BAD_REQUEST_400),
+        EMAIL_VERIFICATION_INVALID(140, "Email verification value must be 1 in payload", HttpStatus.BAD_REQUEST_400),
+        EMAIL_TOKEN_INVALID(141, "The email token you have provided is invalid", HttpStatus.BAD_REQUEST_400),
+        EMAIL_TOKEN_EXPIRED(142, "The email token you have provided is expired", HttpStatus.BAD_REQUEST_400),
+        EMAIL_ALREADY_VERIFIED(143, "The user account has already validated their email", HttpStatus.BAD_REQUEST_400),
+        EMAIL_VERIFICATION_NOT_SENT(144, "The email verification email needs to be resent", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;
