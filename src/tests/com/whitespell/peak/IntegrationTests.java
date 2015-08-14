@@ -762,7 +762,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testH_getUserFollowing() throws UnirestException{
+    public void testH_getUserFollowingAndFollowers() throws UnirestException{
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
                 .header("accept", "application/json")
@@ -776,8 +776,20 @@ public class IntegrationTests extends Server {
         UserFollowAction.FollowActionObject a = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
         assertEquals(a.getActionTaken(),"followed");
 
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + TEST_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+
+        UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(b.getActionTaken(),"followed");
+
         /**
-         * List followers for user that followed other users previously
+         * List following for user that followed other users previously
          */
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/?includeFollowing=1")
                 .header("accept", "application/json")
@@ -787,6 +799,17 @@ public class IntegrationTests extends Server {
         UserObject userThatFollows = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(userThatFollows.getUserFollowing().get(0).intValue(), TEST2_UID);
         assertEquals(userThatFollows.getUserFollowing().get(1).intValue(), SKYDIVER_UID);
+
+        /**
+         * List followers for user that has been followed by other users
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/?includeFollowers=1")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        UserObject userThatIsFollowed = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(userThatIsFollowed.getUserFollowers().get(0).intValue(), TEST2_UID);
     }
 
     @Test

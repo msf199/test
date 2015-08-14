@@ -16,7 +16,7 @@ public class UserObject {
     /**
      * A list of the users that are following this user
      */
-    public ArrayList<Integer> usersFollowed = null;
+    public ArrayList<Integer> userFollowers = null;
 
     /**
      * A list of the categories this user is following
@@ -49,8 +49,9 @@ public class UserObject {
         this.publisher = 0;
     }
 
-    public UserObject(ArrayList<Integer> categoryFollowing, ArrayList<Integer> userFollowing, ArrayList<Integer> categoryPublishing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan, int publisher) {
+    public UserObject(ArrayList<Integer> categoryFollowing, ArrayList<Integer> userFollowers, ArrayList<Integer> userFollowing, ArrayList<Integer> categoryPublishing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan, int publisher) {
         this.categoryFollowing = categoryFollowing;
+        this.userFollowers = userFollowers;
         this.userFollowing = userFollowing;
         this.categoryPublishing = categoryPublishing;
         this.userId = userId;
@@ -140,7 +141,7 @@ public class UserObject {
 
     public ArrayList<Integer> getUserFollowing() { return userFollowing; }
 
-    public ArrayList<Integer> getUsersFollowed() { return usersFollowed; }
+    public ArrayList<Integer> getUserFollowers() { return userFollowers; }
 
     public ArrayList<Integer> getCategoryFollowing() {
         return categoryFollowing;
