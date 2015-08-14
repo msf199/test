@@ -11,7 +11,6 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,10 +23,12 @@ import java.util.ArrayList;
  */
 public class GetUser extends EndpointHandler {
 
-    private static final String QS_FOLLOWERS_KEY = "includeFollowing";
+    private static final String QS_FOLLOWERS_KEY = "includeFollowers";
+    private static final String QS_FOLLOWING_KEY = "includeFollowing";
     private static final String QS_CATEGORIES_KEY = "includeCategories";
     private static final String QS_PUBLISHING_KEY = "includePublishing";
 
+    private static final String FIND_FOLLOWERS_QUERY = "SELECT `user_id` FROM `user_following` WHERE `following_id` = ?";
     private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String FIND_CATEGORIES_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
     private static final String FIND_PUBLISHING_QUERY = "SELECT `category_id` FROM `category_publishing` WHERE `user_id` = ?";
@@ -44,7 +45,7 @@ public class GetUser extends EndpointHandler {
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
-        queryStringInput.put(QS_FOLLOWERS_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        queryStringInput.put(QS_FOLLOWING_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         queryStringInput.put(QS_CATEGORIES_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         queryStringInput.put(QS_PUBLISHING_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
@@ -54,6 +55,7 @@ public class GetUser extends EndpointHandler {
 
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         boolean getFollowers = false;
+        boolean getFollowing = false;
         boolean getCategories = false;
         boolean getPublishing = false;
 
@@ -63,6 +65,15 @@ public class GetUser extends EndpointHandler {
         if(context.getQueryString().get(QS_FOLLOWERS_KEY) != null){
             if(context.getQueryString().get(QS_FOLLOWERS_KEY)[0].equals("1")){
                 getFollowers = true;
+            }
+        }
+
+        /**
+         * Check if we want to see the users we are following
+         */
+        if(context.getQueryString().get(QS_FOLLOWING_KEY) != null){
+            if(context.getQueryString().get(QS_FOLLOWING_KEY)[0].equals("1")){
+                getFollowing = true;
             }
         }
 
@@ -97,8 +108,28 @@ public class GetUser extends EndpointHandler {
             return;
         }
 
-        final ArrayList<Integer> initialFollowing = new ArrayList<>();
+        final ArrayList<Integer> initialFollowers = new ArrayList<>();
         if(getFollowers) {
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_FOLLOWERS_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(user_id));
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialFollowers.add(results.getInt("user_id"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+        }
+
+
+        final ArrayList<Integer> initialFollowing = new ArrayList<>();
+        if(getFollowing) {
             try {
                 StatementExecutor executor = new StatementExecutor(FIND_FOLLOWING_QUERY);
                 executor.execute(ps -> {
@@ -168,7 +199,7 @@ public class GetUser extends EndpointHandler {
                     final ResultSet results = ps.executeQuery();
 
                     if (results.next()) {
-                        user = new UserObject(initialCategories, initialFollowing, initialPublishing, results.getInt("user_id"), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                        user = new UserObject(initialCategories, initialFollowers, initialFollowing, initialPublishing, results.getInt("user_id"), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                                 results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
                         user.setEmailVerified(results.getInt("email_verified"));
                     } else {
