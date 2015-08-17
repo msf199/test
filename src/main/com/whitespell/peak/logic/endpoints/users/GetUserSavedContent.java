@@ -18,9 +18,9 @@ import java.util.ArrayList;
  * @author Cory McAn(cmcan), Whitespell LLC
  *         7/28/15
  */
-public class GetUserWorkout extends EndpointHandler {
+public class GetUserSavedContent extends EndpointHandler {
 
-    private static final String GET_USER_WORKOUT_CONTENT_ID_QUERY = "SELECT `content_id` FROM `lists_workout` WHERE `user_id` = ?";
+    private static final String GET_USER_SAVED_CONTENT_ID_QUERY = "SELECT `content_id` FROM `saved_content` WHERE `user_id` = ?";
     private static final String GET_CONTENT_OBJECT_QUERY = "SELECT * FROM `content` WHERE `content_id` = ?";
 
     private static final String URL_USER_ID = "userId";
@@ -58,7 +58,7 @@ public class GetUserWorkout extends EndpointHandler {
 
         final GetWorkoutResponse getWorkoutResponse = new GetWorkoutResponse();
         try {
-            StatementExecutor executor = new StatementExecutor(GET_USER_WORKOUT_CONTENT_ID_QUERY);
+            StatementExecutor executor = new StatementExecutor(GET_USER_SAVED_CONTENT_ID_QUERY);
             final int finalUser_id = user_id;
 
             executor.execute(ps -> {
@@ -113,18 +113,18 @@ public class GetUserWorkout extends EndpointHandler {
     public class GetWorkoutResponse {
 
         public GetWorkoutResponse() {
-            this.UserWorkouts = new ArrayList<>();
+            this.userWorkouts = new ArrayList<>();
         }
 
         public ArrayList<ContentObject> getUserWorkouts() {
-            return UserWorkouts;
+            return userWorkouts;
         }
 
         public void addUserWorkouts(ContentObject content) {
-            UserWorkouts.add(content);
+            userWorkouts.add(content);
         }
 
-        public ArrayList<ContentObject> UserWorkouts;
+        public ArrayList<ContentObject> userWorkouts;
     }
 }
 

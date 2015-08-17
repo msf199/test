@@ -20,7 +20,7 @@ public class ContentObject {
     String contentTitle;
     String contentUrl;
     String contentDescription;
-    int likes = 100;
+    int likes = 0;
     String thumbnailUrl;
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
@@ -77,6 +77,11 @@ public class ContentObject {
     public String getContentDescription() { return contentDescription; }
 
     public int getLikes() { return likes; }
+
+
+    public void setLikes(int likes) {
+        this.likes = likes;
+    }
 
     public String getThumbnailUrl() { return thumbnailUrl; }
 }
