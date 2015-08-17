@@ -9,6 +9,7 @@ import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
+import main.com.whitespell.peak.logic.endpoints.content.ContentLikeAction;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.Pool;
@@ -30,7 +31,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static main.com.whitespell.peak.logic.MandrillMailer.sendEmail;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -900,7 +900,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testN_AddAndGetMyWorkouts() throws UnirestException{
+    public void testN_AddAndGetSavedContent() throws UnirestException{
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workouts")
                 .header("accept", "application/json")
@@ -910,7 +910,7 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
 
-        AddToUserWorkout.AddToWorkoutResponse add = g.fromJson(stringResponse.getBody(), AddToUserWorkout.AddToWorkoutResponse.class);
+        AddToUserSavedContent.AddToWorkoutResponse add = g.fromJson(stringResponse.getBody(), AddToUserSavedContent.AddToWorkoutResponse.class);
         assertEquals(add.getAddedContentId(), content[0].getContentId());
 
 
@@ -919,11 +919,11 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
-        GetUserWorkout.GetWorkoutResponse get = g.fromJson(stringResponse.getBody(), GetUserWorkout.GetWorkoutResponse.class);
+        GetUserSavedContent.GetWorkoutResponse get = g.fromJson(stringResponse.getBody(), GetUserSavedContent.GetWorkoutResponse.class);
         assertEquals(get.getUserWorkouts().get(0).getContentId(), content[0].getContentId());
     }
 
-    @Test
+    /*@Test
     public void testO_AddAndGetUserList() throws UnirestException{
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/lists")
@@ -948,7 +948,7 @@ public class IntegrationTests extends Server {
         GetUserList.GetUserListResponse get = g.fromJson(stringResponse.getBody(), GetUserList.GetUserListResponse.class);
         assertEquals(get.getUserList().get(0).getContentId(), content[0].getContentId());
         assertEquals(get.getListId(), 1);
-    }
+    }*/
 
     @Test
     public void testP_AddAndGetContentComments() throws UnirestException{
@@ -1015,6 +1015,74 @@ public class IntegrationTests extends Server {
             assertEquals(userObject.getUserId(), TEST2_UID);
             assertEquals(userObject.getEmailVerified(), 1);
         }
+    }
+
+    @Test
+    public void testR_ContentLikeAction() throws UnirestException{
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        ContentObject c[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(c[2].getLikes(), 0);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la.getActionTaken(), "like");
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        ContentObject c2[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(c2[2].getLikes(), 1);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la2 = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la2.getActionTaken(), "like");
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        ContentObject c3[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(c3[2].getLikes(), 2);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"action\": \"unlike\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la3 = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la3.getActionTaken(), "unlike");
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        ContentObject c4[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(c4[2].getLikes(), 1);
     }
 
 

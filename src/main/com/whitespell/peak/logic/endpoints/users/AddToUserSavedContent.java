@@ -16,10 +16,10 @@ import java.sql.SQLException;
  * @author Cory McAn(cmcan), Whitespell LLC
  *         7/28/15
  */
-public class AddToUserWorkout extends EndpointHandler {
+public class AddToUserSavedContent extends EndpointHandler {
 
-    private static final String INSERT_USER_WORKOUT = "INSERT INTO `lists_workout` (`content_id`, `user_id`) VALUES(?,?)";
-    private static final String CHECK_DUPLICATE_CONTENT_IN_LIST = "SELECT `content_id` FROM `lists_workout` WHERE `user_id` = ?";
+    private static final String INSERT_USER_SAVED_CONTENT = "INSERT INTO `saved_content` (`content_id`, `user_id`) VALUES(?,?)";
+    private static final String CHECK_DUPLICATE_CONTENT_IN_LIST = "SELECT `content_id` FROM `saved_content` WHERE `user_id` = ?";
 
     private static final String URL_USER_ID = "userId";
     private static final String CONTENT_ID = "contentId";
@@ -77,7 +77,7 @@ public class AddToUserWorkout extends EndpointHandler {
          * Insert the new workout into the user's myWorkouts list
          */
         try {
-            StatementExecutor executor = new StatementExecutor(INSERT_USER_WORKOUT);
+            StatementExecutor executor = new StatementExecutor(INSERT_USER_SAVED_CONTENT);
             final int finalUser_id = user_id;
             final int finalContent_id = content_id;
             final AddToWorkoutResponse addToWorkoutResponse = new AddToWorkoutResponse();

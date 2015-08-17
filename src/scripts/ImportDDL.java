@@ -40,15 +40,16 @@ public class ImportDDL {
         tables.add("content_type");
         tables.add("content");
         tables.add("newsfeed");
-
+        tables.add("saved_content");
+        tables.add("bundles");
+        tables.add("content_likes");
 
         // add reference tables
         tables.add("user_following");
         tables.add("category_following");
         tables.add("category_publishing");
         tables.add("authentication");
-        tables.add("lists_workout");
-        tables.add("lists_saved");
+        tables.add("bundle_content");
         tables.add("content_comments");
 
         //build the DDL

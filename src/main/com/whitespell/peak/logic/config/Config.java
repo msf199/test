@@ -22,7 +22,7 @@ public final class Config {
     public static String SERVER_TIMEZONE = "UTC";
 
     //General mandrill mail information
-    public static String MANDRILL_API_KEY = "IcPC6mDRROKZ0hLZSwMgvQ";
+    public static String MANDRILL_API_KEY = "_nuIwbGbVG1bvkxZo7LoiQ";
     public static String MANDRILL_API_VERSION = "1.0";
     public static String MANDRILL_API_URL = "https://mandrillapp.com/api";
 

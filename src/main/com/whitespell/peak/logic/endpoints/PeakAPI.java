@@ -3,10 +3,7 @@ package main.com.whitespell.peak.logic.endpoints;
 import main.com.whitespell.peak.logic.EndpointDispatcher;
 import main.com.whitespell.peak.logic.baseapi.WhitespellAPI;
 import main.com.whitespell.peak.logic.endpoints.authentication.AuthenticationRequest;
-import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
-import main.com.whitespell.peak.logic.endpoints.content.AddNewContent;
-import main.com.whitespell.peak.logic.endpoints.content.GetContentComments;
-import main.com.whitespell.peak.logic.endpoints.content.RequestContent;
+import main.com.whitespell.peak.logic.endpoints.content.*;
 import main.com.whitespell.peak.logic.endpoints.content.categories.AddCategory;
 import main.com.whitespell.peak.logic.endpoints.content.categories.RequestCategories;
 import main.com.whitespell.peak.logic.endpoints.content.types.AddContentType;
@@ -56,10 +53,10 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "userId"); //always have the variable first
 
         // Get a specific user's workout based on their user ID
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserWorkout(), "/users/$/workouts", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSavedContent(), "/users/$/workouts", "userId");
 
         // Post a contentId to this endpoint to add to user's MyWorkouts
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserWorkout(), "/users/$/workouts", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserSavedContent(), "/users/$/workouts", "userId");
 
         // Post a contentId and listId to this endpoint to add to user's saved list
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserList(), "/users/$/lists", "userId");
@@ -127,6 +124,9 @@ public class PeakAPI extends WhitespellAPI {
 
         // Add a content comment
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentComment(), "/content/$/comments", "contentId");
+
+        //Add/delete a content like
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ContentLikeAction(), "/content/$/likes", "contentId");
 
         /**
          * CATEGORIES

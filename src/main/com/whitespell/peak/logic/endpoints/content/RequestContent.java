@@ -24,13 +24,15 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_CATEGORY_ID = "category_id";
     private static final String CONTENT_SIZE_LIMIT = "limit";
     private static final String CONTENT_OFFSET = "offset";
-    private static final String FOLLOWING_ID = "following_id";
     private static final String CONTENT_ID_KEY = "content_id";
     private static final String CONTENT_TYPE_ID = "content_type";
     private static final String CONTENT_TITLE = "content_title";
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
+    private static final String CONTENT_LIKES = "likes";
+
+    private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
 
     private static final String QS_USER_ID = "userId";
     private static final String QS_CATEGORY_ID = "categoryId";
@@ -90,6 +92,8 @@ public class RequestContent extends EndpointHandler {
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
 
+
+
         /**
          * Request the content based on query string
          */
@@ -116,12 +120,34 @@ public class RequestContent extends EndpointHandler {
                 ps.setInt(count, finalLimit);
 
                 ResultSet results = ps.executeQuery();
-
                 //display results
                 while (results.next()) {
+                    int[] contentLikes = {0};
+
+                    /**
+                     * Get the content likes
+                     */
+                    try {
+                        StatementExecutor executor1 = new StatementExecutor(GET_LIKES_QUERY);
+                        executor1.execute(ps2 -> {
+                            ps2.setInt(1, results.getInt(CONTENT_ID_KEY));
+
+                            ResultSet results1 = ps2.executeQuery();
+
+                            //display results
+                            while (results1.next()) {
+                                contentLikes[0]++;
+                            }
+                        });
+                    } catch (SQLException e) {
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                        return;
+                    }
 
                     ContentObject content = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                    content.setLikes(contentLikes[0]);
                     contents.add(content);
                 }
 
