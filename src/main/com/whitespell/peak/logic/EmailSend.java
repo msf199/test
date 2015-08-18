@@ -15,9 +15,12 @@ import static main.com.whitespell.peak.logic.MandrillMailer.sendEmail;
 public class EmailSend {
 
     private static final int EXPIRES_IN_24_HOURS = 86400000;
+
     private static final String UPDATE_EMAIL_TOKEN = "UPDATE `user` SET `email_token` = ?, `email_expiration` = ? WHERE `username` = ? LIMIT 1";
 
-    public static EmailTokenResponseObject updateDBandSendEmail(String username, String email){
+    private static final String UPDATE_RESET_TOKEN = "UPDATE `user` SET `reset_token` = ? WHERE `username` = ? LIMIT 1";
+
+    public static tokenResponseObject updateDBandSendWelcomeEmail(String username, String email){
         try {
             String emailToken = main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextEmailId();
 
@@ -50,7 +53,7 @@ public class EmailSend {
                                     "It expires in 24 hours so click <a href=\\\"http://www.peakapp.me\\\">here</a> to get started!</body></html>", email);
 
             if(sent){
-                EmailTokenResponseObject et = new EmailTokenResponseObject();
+                tokenResponseObject et = new tokenResponseObject();
                 et.setEmailToken(emailToken);
                 return et;
             }
@@ -62,11 +65,55 @@ public class EmailSend {
         return null;
     }
 
-    public static class EmailTokenResponseObject{
+    public static tokenResponseObject updateDBandSendResetEmail(String username, String email){
+        try {
+            String resetToken = main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextResetId();
+
+            /**
+             * Update the user's Forgot Password reset token in the database.
+             */
+            boolean sent[] = {false};
+            try {
+                StatementExecutor executor = new StatementExecutor(UPDATE_RESET_TOKEN);
+                final String finalUsername = username;
+                final String finalResetToken = resetToken;
+                executor.execute(ps -> {
+                    ps.setString(1, finalResetToken);
+                    ps.setString(2, finalUsername);
+
+                    int rows = ps.executeUpdate();
+                    if(rows>=0){
+                        sent[0] =
+                                sendEmail("noreply@peakapp.me", "Pim, CEO of Peak", "Welcome to Peak!",
+                                        "<html><body><h1>Congratulations " + username + "!" +
+                                                "</h1>" +
+                                                "<br>Here is your email token: " + resetToken + "<br>" +
+                                                "It expires in 24 hours so click <a href=\\\"http://www.peakapp.me\\\">here</a> to reset your password!</body></html>", email);
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                return null;
+            }
+
+            if(sent[0]){
+                tokenResponseObject et = new tokenResponseObject();
+                et.setEmailToken(resetToken);
+                return et;
+            }
+        }
+        catch(Exception e){
+            Logging.log("High", e);
+            return null;
+        }
+        return null;
+    }
+
+    public static class tokenResponseObject {
 
         String emailToken;
 
-        public EmailTokenResponseObject(){
+        public tokenResponseObject(){
             this.emailToken = null;
         }
 

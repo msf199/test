@@ -25,42 +25,29 @@ import java.sql.SQLException;
 
 public class UpdateEmailVerification extends EndpointHandler {
 
-    private static final String CHECK_EMAIL_TOKEN = "SELECT `email_verified`, `email_token`, `email_expiration` FROM `user` WHERE `user_id` = ? LIMIT 1";
-    private static final String UPDATE_EMAIL_VERIFICATION = "UPDATE `user` SET `email_verified` = ?, email_token = ?, email_expiration = ? WHERE `user_id` = ?";
-
-    private static final String URL_USER_ID = "userId";
+    private static final String CHECK_EMAIL_TOKEN = "SELECT `email_verified`, `email_token`, `email_expiration` FROM `user` WHERE `username` = ? LIMIT 1";
+    private static final String UPDATE_EMAIL_VERIFICATION = "UPDATE `user` SET `email_verified` = ?, `email_token` = ?, `email_expiration` = ? WHERE `username` = ?";
 
     private static final String PAYLOAD_EMAIL_TOKEN_KEY = "emailToken";
 
+    private static final String PAYLOAD_USERNAME_KEY = "userName";
+
     @Override
     protected void setUserInputs() {
-        urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_EMAIL_TOKEN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
-    private static final String ENSURE_VERIFIED_QUERY = "SELECT `username`, `email`, `email_verified` FROM `user` WHERE `user_id` = ? LIMIT 1";
+    private static final String ENSURE_VERIFIED_QUERY = "SELECT `username`, `email`, `email_verified` FROM `user` WHERE `username` = ? LIMIT 1";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
 
-        int userId = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         int emailVerification = 1;
+        String username = payload.get(PAYLOAD_USERNAME_KEY).getAsString();
         String emailToken = payload.get(PAYLOAD_EMAIL_TOKEN_KEY).getAsString();
-
-        /**
-         * Ensure that the user is authenticated properly
-         */
-
-        final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
-
-        boolean isMe = (userId == a.getUserId());
-
-        if (!a.isAuthenticated() || !isMe) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
-            return;
-        }
 
         /**
          * Ensure the email token matches the one stored in the database.
@@ -68,9 +55,9 @@ public class UpdateEmailVerification extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_EMAIL_TOKEN);
-            final int finalUserId = userId;
+            final String finalUsername = username;
             executor.execute(ps -> {
-                ps.setInt(1, finalUserId);
+                ps.setString(1, finalUsername);
 
                 ResultSet s = ps.executeQuery();
                 if(s.next()){
@@ -111,7 +98,7 @@ public class UpdateEmailVerification extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(UPDATE_EMAIL_VERIFICATION);
-            final int finalUserId = userId;
+            final String finalUsername = username;
             final int finalEmailVerification = emailVerification;
             final String finalEmailToken = null;
             final String finalEmailExpiration = null;
@@ -119,7 +106,7 @@ public class UpdateEmailVerification extends EndpointHandler {
                 ps.setInt(1, finalEmailVerification);
                 ps.setString(2, finalEmailToken);
                 ps.setString(3, finalEmailExpiration);
-                ps.setInt(4, finalUserId);
+                ps.setString(4, finalUsername);
 
                 ps.executeUpdate();
             });
@@ -135,16 +122,15 @@ public class UpdateEmailVerification extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(ENSURE_VERIFIED_QUERY);
-            final int finalUserId = userId;
+            final String finalUsername = username;
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
-                    ps.setInt(1, finalUserId);
+                    ps.setString(1, finalUsername);
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         context.getResponse().setStatus(HttpStatus.OK_200);
                         UserObject uo = new UserObject();
-                        uo.setUserId(finalUserId);
                         uo.setUserName(s.getString("username"));
                         uo.setEmail(s.getString("email"));
                         uo.setEmailVerified(s.getInt("email_verified"));

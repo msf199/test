@@ -13,4 +13,12 @@ public final class SessionIdentifierGenerator {
     public static String nextEmailId() {
         return new BigInteger(160, random).toString(32);
     }
+
+    public static String nextResetId() {
+        return new BigInteger(180, random).toString(32);
+    }
+
+    public static String nextTempPass(){
+        return new BigInteger(130, random).toString(6);
+    }
 }

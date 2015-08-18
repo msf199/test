@@ -30,7 +30,6 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
-    private static final String CONTENT_LIKES = "likes";
 
     private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
 

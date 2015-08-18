@@ -65,7 +65,7 @@ public class IntegrationTests extends Server {
 
     static String ROLLERSKATER_USERNAME = "rollerskater10";
     static String ROLLERSKATER_PASSWORD = "3#$$$$$494949($(%*__''";
-    static String ROLLERSKATER_EMAIL = "rollerskater10@gmail.com";
+    static String ROLLERSKATER_EMAIL = "3#$$$$$494949@notanemail.com";
     static int ROLLERSKATER_UID;
 
     static String API = null;
@@ -902,7 +902,7 @@ public class IntegrationTests extends Server {
     @Test
     public void testN_AddAndGetSavedContent() throws UnirestException{
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workouts")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/saved")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
@@ -914,7 +914,7 @@ public class IntegrationTests extends Server {
         assertEquals(add.getAddedContentId(), content[0].getContentId());
 
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/workouts")
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/saved")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
@@ -938,7 +938,6 @@ public class IntegrationTests extends Server {
         AddToUserList.AddToSavedListResponse add = g.fromJson(stringResponse.getBody(), AddToUserList.AddToSavedListResponse.class);
         assertEquals(add.getAddedContentId(), content[0].getContentId());
         assertEquals(add.getAddedToListId(), 1);
-
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/lists?listId=1")
                 .header("accept", "application/json")
@@ -989,11 +988,10 @@ public class IntegrationTests extends Server {
     @Test
     public void testQ_testMandrillEmailsAndTokens() throws UnirestException{
 
-        EmailSend.EmailTokenResponseObject et = EmailSend.updateDBandSendEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
+        EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
         if(et != null){
             stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/email")
                     .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                     .asString();
 
             GetEmailVerification.GetEmailVerificationResponse evr = g.fromJson(stringResponse.getBody(), GetEmailVerification.GetEmailVerificationResponse.class);
@@ -1003,17 +1001,45 @@ public class IntegrationTests extends Server {
             }
             assertEquals(evr.getEmailVerified(), 0);
 
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/email")
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/email")
                     .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                     .body("{\n" +
+                            "\"userName\": \"" + ROLLERSKATER_USERNAME + "\",\n" +
                             "\"emailToken\": \"" + et.getEmailToken() + "\"\n" +
                             "}")
                     .asString();
 
             UserObject userObject = g.fromJson(stringResponse.getBody(), UserObject.class);
-            assertEquals(userObject.getUserId(), TEST2_UID);
             assertEquals(userObject.getEmailVerified(), 1);
+        }
+
+        EmailSend.tokenResponseObject et2 = EmailSend.updateDBandSendResetEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
+        if (et2 != null) {
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/reset")
+                    .header("accept", "application/json")
+                    .body("{\n" +
+                            "\"userName\": \"" + ROLLERSKATER_USERNAME + "\",\n" +
+                            "\"newPassword\": \"qqqqqq\",\n" +
+                            "\"resetToken\": \"" + et2.getEmailToken() + "\"\n" +
+                            "}")
+                    .asString();
+            ResetPassword.resetSuccessObject rs2 = g.fromJson(stringResponse.getBody(), ResetPassword.resetSuccessObject.class);
+            assertEquals(rs2.isSuccess(), true);
+
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                    .header("accept", "application/json")
+                    .body("{\n" +
+                            "\"userName\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                            "\"password\" : \"qqqqqq\"\n" +
+                            "}")
+                    .asString();
+
+            AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+            int tempId = a.getUserId();
+            String tempKey = a.getKey();
+
+            assertEquals(tempId > -1, true);
+            assertEquals(tempKey != "", true);
         }
     }
 
@@ -1042,7 +1068,6 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-        System.out.println(stringResponse.getBody());
         ContentObject c2[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(c2[2].getLikes(), 1);
 
@@ -1061,7 +1086,6 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-        System.out.println(stringResponse.getBody());
         ContentObject c3[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(c3[2].getLikes(), 2);
 
@@ -1080,7 +1104,6 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-        System.out.println(stringResponse.getBody());
         ContentObject c4[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(c4[2].getLikes(), 1);
     }

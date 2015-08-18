@@ -53,10 +53,10 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "userId"); //always have the variable first
 
         // Get a specific user's workout based on their user ID
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSavedContent(), "/users/$/workouts", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSavedContent(), "/users/$/saved", "userId");
 
         // Post a contentId to this endpoint to add to user's MyWorkouts
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserSavedContent(), "/users/$/workouts", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserSavedContent(), "/users/$/saved", "userId");
 
         // Post a contentId and listId to this endpoint to add to user's saved list
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserList(), "/users/$/lists", "userId");
@@ -86,10 +86,16 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CategoryPublishAction(), "/users/$/publishing", "userId");
 
         // Update user's email verification status (intended for use in web front end)
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateEmailVerification(), "/users/$/email", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateEmailVerification(), "/users/email");
 
         // Check user's email verification status
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetEmailVerification(), "/users/$/email", "userId");
+
+        // Send out Forgot Password email
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SendForgotPasswordEmail(), "/users/forgot");
+
+        // Reset a user's password (Forgot Password)
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ResetPassword(), "/users/reset");
 
         /**
          * STATISTICS
