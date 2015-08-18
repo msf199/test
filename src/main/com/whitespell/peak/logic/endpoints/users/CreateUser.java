@@ -3,7 +3,6 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -17,11 +16,9 @@ import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.regex.Pattern;
 
 import static main.com.whitespell.peak.logic.EmailSend.*;
-import static main.com.whitespell.peak.logic.MandrillMailer.sendEmail;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -222,6 +219,6 @@ public class CreateUser extends EndpointHandler {
         /**
          * Update the user's email verification status in the database.
          */
-        updateDBandSendEmail(username, email);
+        //updateDBandSendWelcomeEmail(username, email);
     }
 }

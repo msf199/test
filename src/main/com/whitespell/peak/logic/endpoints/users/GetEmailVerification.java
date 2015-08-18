@@ -38,17 +38,6 @@ public class GetEmailVerification extends EndpointHandler {
         int userId = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
 
         /**
-         * Ensure that the user is authenticated properly
-         */
-
-        final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
-
-        if (!a.isAuthenticated()) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
-            return;
-        }
-
-        /**
          * Check user's email verification status and return the response.
          */
 

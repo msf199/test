@@ -81,7 +81,9 @@ public class StaticRules {
         EMAIL_TOKEN_EXPIRED(142, "The email token you have provided is expired", HttpStatus.BAD_REQUEST_400),
         EMAIL_ALREADY_VERIFIED(143, "The user account has already validated their email", HttpStatus.BAD_REQUEST_400),
         EMAIL_VERIFICATION_NOT_SENT(144, "The email verification email needs to be resent", HttpStatus.NOT_FOUND_404),
-        INVALID_ACTION(145, "The action you submitted in the payload is invalid", HttpStatus.BAD_REQUEST_400);
+        INVALID_ACTION(145, "The action you submitted in the payload is invalid", HttpStatus.BAD_REQUEST_400),
+        RESET_FAILED(146, "The password reset was unsuccessful, please try again", HttpStatus.NOT_FOUND_404),
+        RESET_TOKEN_INVALID(147, "The reset token provided was invalid.", HttpStatus.BAD_REQUEST_400);
 
         int errorId;
         String errorMessage;
