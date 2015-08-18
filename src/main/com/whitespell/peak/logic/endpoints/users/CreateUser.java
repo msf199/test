@@ -219,6 +219,6 @@ public class CreateUser extends EndpointHandler {
         /**
          * Update the user's email verification status in the database.
          */
-        //updateDBandSendWelcomeEmail(username, email);
+        updateDBandSendWelcomeEmail(username, email);
     }
 }
