@@ -58,11 +58,11 @@ public class PeakAPI extends WhitespellAPI {
         // Post a contentId to this endpoint to add to user's MyWorkouts
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserSavedContent(), "/users/$/saved", "userId");
 
-        // Post a contentId and listId to this endpoint to add to user's saved list
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserList(), "/users/$/lists", "userId");
+        // Post a contentId to this endpoint to add to user's bundle
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToBundle(), "/users/$/bundles", "userId");
 
-        // Get a specific user's saved list based on their user ID and listId
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserList(), "/users/$/lists", "userId");
+        // Get a specific user's saved list based on their user ID
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetBundle(), "/users/$/bundles", "userId");
 
 		// As a user, update your username, displayname, and slogan
 		dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateProfile(), "/users/$", "userId");

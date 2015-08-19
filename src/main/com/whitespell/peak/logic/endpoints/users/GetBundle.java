@@ -18,12 +18,12 @@ import java.util.ArrayList;
  * @author Cory McAn(cmcan), Whitespell LLC
  *         8/03/15
  */
-public class GetUserList extends EndpointHandler {
+public class GetBundle extends EndpointHandler {
 
-    private static final String GET_USER_SAVED_LIST_CONTENT_ID_QUERY = "SELECT `content_id` FROM `lists_saved` WHERE `user_id` = ? AND `list_id` = ?";
+    private static final String GET_BUNDLE_CONTENT_ID_QUERY = "SELECT `content_id` FROM `bundles` WHERE `user_id` = ? AND `bundle_name` = ?";
     private static final String GET_CONTENT_OBJECT_QUERY = "SELECT * FROM `content` WHERE `content_id` = ?";
 
-    private static final String QS_LIST_ID = "listId";
+    private static final String QS_BUNDLE_ID = "bundleId";
 
     private static final String URL_USER_ID = "userId";
 
@@ -37,7 +37,7 @@ public class GetUserList extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        queryStringInput.put(QS_LIST_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+        queryStringInput.put(QS_BUNDLE_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
@@ -45,7 +45,7 @@ public class GetUserList extends EndpointHandler {
     public void safeCall(final RequestObject context) throws IOException {
 
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
-        int list_id = Integer.parseInt(context.getQueryString().get(QS_LIST_ID)[0]);
+        int bundle_id = Integer.parseInt(context.getQueryString().get(QS_BUNDLE_ID)[0]);
 
         /**
          * Ensure that the user is authenticated properly
@@ -61,17 +61,17 @@ public class GetUserList extends EndpointHandler {
         }
 
         /**
-         * Get the user's saved list with the given listId
+         * Get the user's saved list with the given bundleId
          */
-        final GetUserListResponse getUserListResponse = new GetUserListResponse();
+        final GetBundleResponse getBundleResponse = new GetBundleResponse();
         try {
-            StatementExecutor executor = new StatementExecutor(GET_USER_SAVED_LIST_CONTENT_ID_QUERY);
+            StatementExecutor executor = new StatementExecutor(GET_BUNDLE_CONTENT_ID_QUERY);
             final int finalUser_id = user_id;
-            final int finalList_id = list_id;
+            final int finalBundle_id = bundle_id;
 
             executor.execute(ps -> {
                 ps.setInt(1, finalUser_id);
-                ps.setInt(2, finalList_id);
+                ps.setInt(2, finalBundle_id);
 
                 ResultSet results = ps.executeQuery();
 
@@ -88,8 +88,8 @@ public class GetUserList extends EndpointHandler {
                                 ContentObject c = new ContentObject(results2.getInt(CONTENT_CATEGORY_ID), results2.getInt("user_id"), results2.getInt(CONTENT_ID_KEY),
                                         results2.getInt(CONTENT_TYPE_ID), results2.getString(CONTENT_TITLE), results2.getString(CONTENT_URL), results2.getString(CONTENT_DESCRIPTION),
                                         results2.getString(CONTENT_THUMBNAIL));
-                                getUserListResponse.addToUserList(c);
-                                getUserListResponse.setListId(finalList_id);
+                                getBundleResponse.addToUserList(c);
+                                getBundleResponse.setBundleId(finalBundle_id);
                             }
                         });
                     } catch (SQLException e) {
@@ -103,7 +103,7 @@ public class GetUserList extends EndpointHandler {
                     }
                 }
                 Gson g = new Gson();
-                String response = g.toJson(getUserListResponse);
+                String response = g.toJson(getBundleResponse);
                 context.getResponse().setStatus(200);
                 try {
                     context.getResponse().getWriter().write(response);
@@ -120,31 +120,31 @@ public class GetUserList extends EndpointHandler {
         }
     }
 
-    public class GetUserListResponse {
+    public class GetBundleResponse {
 
-        public GetUserListResponse() {
-            this.userList = new ArrayList<>();
-            this.listId = 0;
+        public GetBundleResponse() {
+            this.bundle = new ArrayList<>();
+            this.bundleId = 0;
         }
 
-        public ArrayList<ContentObject> getUserList() {
-            return userList;
+        public ArrayList<ContentObject> getBundle() {
+            return bundle;
         }
 
         public void addToUserList(ContentObject content) {
-            userList.add(content);
+            bundle.add(content);
         }
 
-        public int getListId() {
-            return listId;
+        public int getBundleId() {
+            return bundleId;
         }
 
-        public void setListId(int listId) {
-            this.listId = listId;
+        public void setBundleId(int bundleId) {
+            this.bundleId = bundleId;
         }
 
-        public ArrayList<ContentObject> userList;
-        public int listId;
+        public ArrayList<ContentObject> bundle;
+        public int bundleId;
     }
 }
 

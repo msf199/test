@@ -71,7 +71,7 @@ public class StaticRules {
         USER_NOT_FOUND(132, "User was not found", HttpStatus.NOT_FOUND_404),
 		USER_NOT_EDITED(133, "User was not edited in profile edit", HttpStatus.BAD_REQUEST_400),
         CONTENT_NOT_FOUND(134, "The content you are trying to add to your list was not found", HttpStatus.NOT_FOUND_404),
-        CONTENT_ALREADY_IN_LIST(135, "The content you are trying to add to your list is already in the list", HttpStatus.BAD_REQUEST_400),
+        CONTENT_ALREADY_IN_BUNDLE(135, "The content you are trying to add to your list is already in the list", HttpStatus.BAD_REQUEST_400),
         COMMENT_TOO_LONG(136, "The comment you are trying to post is too long", HttpStatus.BAD_REQUEST_400),
         COMMENT_NOT_POSTED(137, "The comment could not be posted", HttpStatus.NOT_FOUND_404),
         COMMENTS_NOT_FOUND(138, "The comments for this video could not be loaded", HttpStatus.NOT_FOUND_404),
@@ -83,7 +83,8 @@ public class StaticRules {
         EMAIL_VERIFICATION_NOT_SENT(144, "The email verification email needs to be resent", HttpStatus.NOT_FOUND_404),
         INVALID_ACTION(145, "The action you submitted in the payload is invalid", HttpStatus.BAD_REQUEST_400),
         RESET_FAILED(146, "The password reset was unsuccessful, please try again", HttpStatus.NOT_FOUND_404),
-        RESET_TOKEN_INVALID(147, "The reset token provided was invalid.", HttpStatus.BAD_REQUEST_400);
+        RESET_TOKEN_INVALID(147, "The reset token provided was invalid.", HttpStatus.BAD_REQUEST_400),
+        COULD_NOT_COUNT_FOLLOWERS(148, "Unable to count category followers.", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;

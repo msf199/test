@@ -362,6 +362,15 @@ public class IntegrationTests extends Server {
 
     @Test
     public void test7_followCategoriesTest() throws UnirestException {
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/categories")
+                .header("accept", "application/json")
+                .asString();
+
+        categories = g.fromJson(stringResponse.getBody(), CategoryObject[].class);
+        assertEquals(categories[0].getCategoryFollowers(), 0);
+        assertEquals(categories[1].getCategoryFollowers(), 0);
+
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/categories")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -382,10 +391,15 @@ public class IntegrationTests extends Server {
                 .asString();
         CategoryFollowAction.FollowCategoryActionObject f = g.fromJson(stringResponse.getBody(), CategoryFollowAction.FollowCategoryActionObject.class);
 
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/categories")
+                .header("accept", "application/json")
+                .asString();
+
+        categories = g.fromJson(stringResponse.getBody(), CategoryObject[].class);
+        assertEquals(categories[0].getCategoryFollowers(), 1);
+        assertEquals(categories[1].getCategoryFollowers(), 1);
 
         //todo (pim) get categories_following from user object and test whether they are skydivign and rollerskating
-        assertEquals(h.getActionTaken(), "followed");
-        assertEquals(f.getActionTaken(), "followed");
     }
 
     @Test
@@ -924,29 +938,26 @@ public class IntegrationTests extends Server {
     }
 
     /*@Test
-    public void testO_AddAndGetUserList() throws UnirestException{
+    public void testO_AddAndGetBundle() throws UnirestException{
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/lists")
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/bundles")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"contentId\": \"" + content[0].getContentId() + "\",\n" +
-                        "\"listId\": \"" + 1 + "\"\n" +
+                        "\"contentId\": \"" + content[0].getContentId() + "\"\n" +
                         "}")
                 .asString();
 
-        AddToUserList.AddToSavedListResponse add = g.fromJson(stringResponse.getBody(), AddToUserList.AddToSavedListResponse.class);
+        AddToBundle.AddToBundleResponse add = g.fromJson(stringResponse.getBody(), AddToBundle.AddToBundleResponse.class);
         assertEquals(add.getAddedContentId(), content[0].getContentId());
-        assertEquals(add.getAddedToListId(), 1);
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/lists?listId=1")
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/bundles")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
-        GetUserList.GetUserListResponse get = g.fromJson(stringResponse.getBody(), GetUserList.GetUserListResponse.class);
-        assertEquals(get.getUserList().get(0).getContentId(), content[0].getContentId());
-        assertEquals(get.getListId(), 1);
+        GetBundle.GetBundleResponse get = g.fromJson(stringResponse.getBody(), GetBundle.GetBundleResponse.class);
+        assertEquals(get.getBundle().get(0).getContentId(), content[0].getContentId());
     }*/
 
     @Test

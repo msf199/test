@@ -62,7 +62,7 @@ public class AddToUserSavedContent extends EndpointHandler {
 
                 while (results.next()) {
                     if(results.getInt("content_id") == content_id) {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_LIST);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_BUNDLE);
                         return;
                     }
                 }
@@ -107,7 +107,7 @@ public class AddToUserSavedContent extends EndpointHandler {
             }else if(e.getMessage().contains("fk_lists_workout_user_id")){
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
             }else{
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_LIST);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_BUNDLE);
             }
             return;
         }
