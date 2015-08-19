@@ -76,6 +76,10 @@ public class PeakAPI extends WhitespellAPI {
         // Add new content as a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContent(), "/users/$/content/", "userId");
 
+        // Add new curated content as a user
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContentCuration(), "/users/$/contentcurated/", "userId");
+
+
         // Follow a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/$/following", "userId");
 
@@ -118,6 +122,9 @@ public class PeakAPI extends WhitespellAPI {
 
         // Get a list of all the content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContent(), "/content/");
+
+        // Get a list of all the curated content in the whole system based on certain search criteria
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentCuration(), "/contentcurated/");
 
         // Get a list of all the content types
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentTypes(), "/content/types");
