@@ -16,19 +16,17 @@ import java.sql.SQLException;
  * @author Cory McAn(cmcan), Whitespell LLC
  *         8/03/15
  */
-public class AddToUserList extends EndpointHandler {
+public class AddToBundle extends EndpointHandler {
 
-    private static final String INSERT_USER_SAVED_CONTENT = "INSERT INTO `lists_saved` (`content_id`, `user_id`, `list_id`) VALUES(?,?,?)";
-    private static final String CHECK_DUPLICATE_CONTENT_IN_LIST = "SELECT * FROM `lists_saved` WHERE `content_id` = ? AND `user_id` = ? AND `list_id` = ? LIMIT 1";
+    private static final String INSERT_BUNDLE_CONTENT = "INSERT INTO `bundles` (`content_id`, `user_id`) VALUES(?,?)";
+    private static final String CHECK_DUPLICATE_CONTENT_IN_BUNDLE = "SELECT * FROM `bundles` WHERE `content_id` = ? AND `user_id` = ? LIMIT 1";
     private static final String URL_USER_ID = "userId";
     private static final String CONTENT_ID = "contentId";
-    private static final String LIST_ID = "listId";
 
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(CONTENT_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(LIST_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
     @Override
@@ -36,7 +34,6 @@ public class AddToUserList extends EndpointHandler {
 
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         int content_id = Integer.parseInt(context.getPayload().getAsJsonObject().get(CONTENT_ID).getAsString());
-        int list_id = Integer.parseInt(context.getPayload().getAsJsonObject().get(LIST_ID).getAsString());
 
         /**
          * Ensure that the user is authenticated properly
@@ -52,22 +49,20 @@ public class AddToUserList extends EndpointHandler {
         }
 
         /**
-         * Check that the content is not already in the user's list with that listId
+         * Check that the content is not already in the user's list with that bundleId
          */
         try{
-            StatementExecutor executor = new StatementExecutor(CHECK_DUPLICATE_CONTENT_IN_LIST);
+            StatementExecutor executor = new StatementExecutor(CHECK_DUPLICATE_CONTENT_IN_BUNDLE);
             final int finalUser_id = user_id;
             final int finalContent_id = content_id;
-            final int finalList_id = list_id;
             executor.execute(ps -> {
                 ps.setInt(1, finalContent_id);
                 ps.setInt(2, finalUser_id);
-                ps.setInt(3, finalList_id);
 
                 ResultSet result = ps.executeQuery();
 
                 if (result.next()) {
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_LIST);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_BUNDLE);
                     return;
                 }
             });
@@ -79,26 +74,23 @@ public class AddToUserList extends EndpointHandler {
 
 
         /**
-         * Since the content has yet to be added to the user's list, add the content.
+         * Since the content has yet to be added to the user's bundle, add the content.
          */
         try {
-            StatementExecutor executor = new StatementExecutor(INSERT_USER_SAVED_CONTENT);
+            StatementExecutor executor = new StatementExecutor(INSERT_BUNDLE_CONTENT);
             final int finalUser_id = user_id;
             final int finalContent_id = content_id;
-            final int finalList_id = list_id;
-            final AddToSavedListResponse addToSavedListResponse = new AddToSavedListResponse();
+            final AddToBundleResponse addToBundleResponse = new AddToBundleResponse();
             executor.execute(ps -> {
                 ps.setInt(1, finalContent_id);
                 ps.setInt(2, finalUser_id);
-                ps.setInt(3, finalList_id);
 
                 int rows = ps.executeUpdate();
 
                 if (rows > 0) {
-                    addToSavedListResponse.setAddedContentId(finalContent_id);
-                    addToSavedListResponse.setAddedToListId(finalList_id);
+                    addToBundleResponse.setAddedContentId(finalContent_id);
                     Gson g = new Gson();
-                    String response = g.toJson(addToSavedListResponse);
+                    String response = g.toJson(addToBundleResponse);
                     context.getResponse().setStatus(200);
                     try {
                         context.getResponse().getWriter().write(response);
@@ -110,25 +102,25 @@ public class AddToUserList extends EndpointHandler {
             });
         } catch (SQLException e) {
             Logging.log("High", e);
-            if (e.getMessage().contains("fk_lists_saved_content_id")) {
+            if (e.getMessage().contains("fk_bundles_content_id")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-            }else if(e.getMessage().contains("fk_lists_saved_user_id")){
+            }else if(e.getMessage().contains("fk_bundles_user_id")){
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
             }else{
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_LIST);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_BUNDLE);
             }
             return;
         }
     }
 
 
-    public class AddToSavedListResponse {
+    public class AddToBundleResponse {
 
-        public AddToSavedListResponse(){
+        public AddToBundleResponse(){
             this.addedContentId = -1;
         }
 
-        public AddToSavedListResponse(int addedContentId, int addedToListId) {
+        public AddToBundleResponse(int addedContentId, int addedToBundleId) {
             this.addedContentId = addedContentId;
         }
 
@@ -140,16 +132,16 @@ public class AddToUserList extends EndpointHandler {
             this.addedContentId = addedContentId;
         }
 
-        public int getAddedToListId() {
-            return addedToListId;
+        public int getAddedToBundleId() {
+            return addedToBundleId;
         }
 
-        public void setAddedToListId(int addedToListId) {
-            this.addedToListId = addedToListId;
+        public void setAddedToBundleId(int addedToBundleId) {
+            this.addedToBundleId = addedToBundleId;
         }
 
         public int addedContentId;
-        public int addedToListId;
+        public int addedToBundleId;
     }
 }
 

@@ -32,6 +32,9 @@ public class CategoryFollowAction extends EndpointHandler {
     private static final String INSERT_FOLLOW_CATEGORY_QUERY = "INSERT INTO `category_following`(`user_id`, `category_id`, `timestamp`) VALUES (?,?,?)";
     private static final String DELETE_FOLLOW_CATEGORY_QUERY = "DELETE FROM `category_following` WHERE `user_id` = ? AND `category_id` = ?";
 
+    private static final String COUNT_FOLLOWERS_QUERY = "SELECT COUNT(*) AS `count` FROM `category_following` WHERE `category_id` = ?";
+    private static final String UPDATE_FOLLOWER_COUNT_QUERY = "UPDATE `category` SET `category_followers` = ? WHERE `category_id` = ?";
+
     /**
      * Define user input variables
      */
@@ -46,8 +49,6 @@ public class CategoryFollowAction extends EndpointHandler {
         payloadInput.put(PAYLOAD_CATEGORY_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(PAYLOAD_ACTION_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
-
-
 
     /**
      * Handling method for API request
@@ -182,6 +183,41 @@ public class CategoryFollowAction extends EndpointHandler {
                     Logging.log("High", e);
                 }
                 break;
+        }
+
+        /**
+         * Update number of followers in category table based on category_following
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(COUNT_FOLLOWERS_QUERY);
+            executor.execute(ps -> {
+                ps.setInt(1, category_id);
+
+                ResultSet results = ps.executeQuery();
+                if (results.next()) {
+                    try {
+                        StatementExecutor executor2 = new StatementExecutor(UPDATE_FOLLOWER_COUNT_QUERY);
+                        executor2.execute(ps2 -> {
+                            ps2.setInt(1, results.getInt("count"));
+                            ps2.setInt(2, category_id);
+
+                            int rows = ps2.executeUpdate();
+                            if (rows <= 0) {
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_COUNT_FOLLOWERS);
+                                return;
+                            }
+                        });
+                    } catch (SQLException e) {
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_COUNT_FOLLOWERS);
+                        return;
+                    }
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
 
