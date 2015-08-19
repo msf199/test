@@ -56,7 +56,7 @@ public class GetUserSavedContent extends EndpointHandler {
             return;
         }
 
-        final GetWorkoutResponse getWorkoutResponse = new GetWorkoutResponse();
+        final getSavedContent getSavedContent = new getSavedContent();
         try {
             StatementExecutor executor = new StatementExecutor(GET_USER_SAVED_CONTENT_ID_QUERY);
             final int finalUser_id = user_id;
@@ -79,7 +79,7 @@ public class GetUserSavedContent extends EndpointHandler {
                                 ContentObject c = new ContentObject(results2.getInt(CONTENT_CATEGORY_ID), results2.getInt("user_id"), results2.getInt(CONTENT_ID_KEY),
                                         results2.getInt(CONTENT_TYPE_ID), results2.getString(CONTENT_TITLE), results2.getString(CONTENT_URL), results2.getString(CONTENT_DESCRIPTION),
                                         results2.getString(CONTENT_THUMBNAIL));
-                                getWorkoutResponse.addUserWorkouts(c);
+                                getSavedContent.addToSavedContent(c);
                             }
                         });
                     } catch (SQLException e) {
@@ -93,7 +93,7 @@ public class GetUserSavedContent extends EndpointHandler {
                     }
                 }
                 Gson g = new Gson();
-                String response = g.toJson(getWorkoutResponse);
+                String response = g.toJson(getSavedContent);
                 context.getResponse().setStatus(200);
                 try {
                     context.getResponse().getWriter().write(response);
@@ -110,21 +110,21 @@ public class GetUserSavedContent extends EndpointHandler {
         }
     }
 
-    public class GetWorkoutResponse {
+    public class getSavedContent {
 
-        public GetWorkoutResponse() {
-            this.userWorkouts = new ArrayList<>();
+        public getSavedContent() {
+            this.savedContent = new ArrayList<>();
         }
 
-        public ArrayList<ContentObject> getUserWorkouts() {
-            return userWorkouts;
+        public ArrayList<ContentObject> getSavedContent() {
+            return savedContent;
         }
 
-        public void addUserWorkouts(ContentObject content) {
-            userWorkouts.add(content);
+        public void addToSavedContent(ContentObject content) {
+            savedContent.add(content);
         }
 
-        public ArrayList<ContentObject> userWorkouts;
+        public ArrayList<ContentObject> savedContent;
     }
 }
 

@@ -910,7 +910,7 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
 
-        AddToUserSavedContent.AddToWorkoutResponse add = g.fromJson(stringResponse.getBody(), AddToUserSavedContent.AddToWorkoutResponse.class);
+        AddToUserSavedContent.AddToSavedContentResponse add = g.fromJson(stringResponse.getBody(), AddToUserSavedContent.AddToSavedContentResponse.class);
         assertEquals(add.getAddedContentId(), content[0].getContentId());
 
 
@@ -919,8 +919,8 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
 
-        GetUserSavedContent.GetWorkoutResponse get = g.fromJson(stringResponse.getBody(), GetUserSavedContent.GetWorkoutResponse.class);
-        assertEquals(get.getUserWorkouts().get(0).getContentId(), content[0].getContentId());
+        GetUserSavedContent.getSavedContent get = g.fromJson(stringResponse.getBody(), GetUserSavedContent.getSavedContent.class);
+        assertEquals(get.getSavedContent().get(0).getContentId(), content[0].getContentId());
     }
 
     /*@Test

@@ -80,7 +80,7 @@ public class AddToUserSavedContent extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(INSERT_USER_SAVED_CONTENT);
             final int finalUser_id = user_id;
             final int finalContent_id = content_id;
-            final AddToWorkoutResponse addToWorkoutResponse = new AddToWorkoutResponse();
+            final AddToSavedContentResponse addToSavedContentResponse = new AddToSavedContentResponse();
             executor.execute(ps -> {
                 ps.setInt(1, finalContent_id);
                 ps.setInt(2, finalUser_id);
@@ -88,9 +88,9 @@ public class AddToUserSavedContent extends EndpointHandler {
                 int rows = ps.executeUpdate();
 
                 if (rows > 0) {
-                    addToWorkoutResponse.setAddedContentId(finalContent_id);
+                    addToSavedContentResponse.setAddedContentId(finalContent_id);
                     Gson g = new Gson();
-                    String response = g.toJson(addToWorkoutResponse);
+                    String response = g.toJson(addToSavedContentResponse);
                     context.getResponse().setStatus(200);
                     try {
                         context.getResponse().getWriter().write(response);
@@ -114,13 +114,13 @@ public class AddToUserSavedContent extends EndpointHandler {
     }
 
 
-    public class AddToWorkoutResponse {
+    public class AddToSavedContentResponse {
 
-        public AddToWorkoutResponse(){
+        public AddToSavedContentResponse(){
             this.addedContentId = -1;
         }
 
-        public AddToWorkoutResponse(int addedContentId) {
+        public AddToSavedContentResponse(int addedContentId) {
             this.addedContentId = addedContentId;
         }
 
