@@ -6,7 +6,7 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import static main.com.whitespell.peak.logic.MandrillMailer.sendEmail;
+import static main.com.whitespell.peak.logic.MandrillMailer.sendTemplatedMessage;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -46,11 +46,11 @@ public class EmailSend {
                 return null;
             }
             boolean sent =
-                    sendEmail("noreply@peakapp.me", "Pim, CEO of Peak", "Welcome to Peak!",
-                            "<html><body><h1>Congratulations " + username + "!" +
-                                    "</h1>" +
-                                    "<br>Here is your email token: " + emailToken + "<br>" +
-                                    "It expires in 24 hours so click <a href=\\\"http://www.peakapp.me\\\">here</a> to get started!</body></html>", email);
+                    sendTemplatedMessage("noreply@peakapp.me",
+                            "Pim, CEO of Peak",
+                            "Welcome to Peak!", "http://ws.kven.me",
+                            username, emailToken,
+                            "peak", "verify_email", email);
 
             if(sent){
                 tokenResponseObject et = new tokenResponseObject();
@@ -84,11 +84,12 @@ public class EmailSend {
                     int rows = ps.executeUpdate();
                     if(rows>=0){
                         sent[0] =
-                                sendEmail("noreply@peakapp.me", "Pim, CEO of Peak", "Welcome to Peak!",
-                                        "<html><body><h1>Congratulations " + username + "!" +
-                                                "</h1>" +
-                                                "<br>Here is your email token: " + resetToken + "<br>" +
-                                                "It expires in 24 hours so click <a href=\\\"http://www.peakapp.me\\\">here</a> to reset your password!</body></html>", email);
+                                sendTemplatedMessage("noreply@peakapp.me",
+                                        "Pim, CEO of Peak",
+                                        "Password Reset Confirmation", "http://ws.kven.me",
+                                        username, resetToken,
+                                        "peak-1", "forgot_password", email);
+                        System.out.println(resetToken);
                     }
                 });
             } catch (SQLException e) {
