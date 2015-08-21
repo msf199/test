@@ -74,10 +74,14 @@ public class ResetPassword extends EndpointHandler {
                 ResultSet s = ps.executeQuery();
                 if(s.next()){
                     if(s.getString("reset_token") != null) {
+                        System.out.println(s.getString("reset_token") + " token passed: " + resetToken);
                         if (!resetToken.equals(s.getString("reset_token"))) {
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
                             return;
                         }
+                    }else{
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
+                        return;
                     }
                 }
             });
