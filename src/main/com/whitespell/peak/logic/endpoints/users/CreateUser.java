@@ -36,10 +36,6 @@ public class CreateUser extends EndpointHandler {
     private static final String PAYLOAD_EMAIL_KEY = "email";
     private static final String PAYLOAD_PUBLISHER_KEY = "publisher";
 
-    private static final String EMAIL_REGEX_KEY = "publisher";
-
-
-
     @Override
     protected void setUserInputs() {
 
@@ -78,7 +74,7 @@ public class CreateUser extends EndpointHandler {
         /**
          * Catch all invalid emails
          */
-        isValid = Pattern.matches("([_A-Za-z0-9-_+%.]+)(\\\\[_A-Za-z0-9-_+%]+)*@([A-Za-z0-9-])+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})", email);
+        isValid = Pattern.matches("([_A-Za-z0-9-_+%.]+)(\\[_A-Za-z0-9-_+%]+)*@([A-Za-z0-9-])+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})", email);
 
         if (payload.get(PAYLOAD_PUBLISHER_KEY) != null && payload.get(PAYLOAD_PUBLISHER_KEY).getAsInt() == 1) {
             publisher = 1;
