@@ -65,7 +65,7 @@ public class IntegrationTests extends Server {
 
     static String ROLLERSKATER_USERNAME = "rollerskater10";
     static String ROLLERSKATER_PASSWORD = "3#$$$$$494949($(%*__''";
-    static String ROLLERSKATER_EMAIL = "3#$$$$$494949@notanemail.com";
+    static String ROLLERSKATER_EMAIL = "3%_4+-c.mafifCVDsig94949@notanemail.com";
     static int ROLLERSKATER_UID;
 
     static String API = null;
@@ -996,7 +996,7 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
     }
 
-    @Test
+    /*@Test
     public void testQ_testMandrillEmailsAndTokens() throws UnirestException{
 
         EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
@@ -1052,7 +1052,7 @@ public class IntegrationTests extends Server {
             assertEquals(tempId > -1, true);
             assertEquals(tempKey != "", true);
         }
-    }
+    }*/
 
     @Test
     public void testR_ContentLikeAction() throws UnirestException{
