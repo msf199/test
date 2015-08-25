@@ -36,6 +36,9 @@ public class CreateUser extends EndpointHandler {
     private static final String PAYLOAD_EMAIL_KEY = "email";
     private static final String PAYLOAD_PUBLISHER_KEY = "publisher";
 
+    private static final String EMAIL_REGEX_KEY = "publisher";
+
+
 
     @Override
     protected void setUserInputs() {
@@ -71,7 +74,11 @@ public class CreateUser extends EndpointHandler {
         username = payload.get(PAYLOAD_USERNAME_KEY).getAsString();
         password = payload.get(PAYLOAD_PASSWORD_KEY).getAsString();
         email = payload.get(PAYLOAD_EMAIL_KEY).getAsString();
-        isValid = Pattern.matches("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$", email);
+
+        /**
+         * Catch all invalid emails
+         */
+        isValid = Pattern.matches("([_A-Za-z0-9-_+%.]+)(\\\\[_A-Za-z0-9-_+%]+)*@([A-Za-z0-9-])+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})", email);
 
         if (payload.get(PAYLOAD_PUBLISHER_KEY) != null && payload.get(PAYLOAD_PUBLISHER_KEY).getAsInt() == 1) {
             publisher = 1;
@@ -95,6 +102,7 @@ public class CreateUser extends EndpointHandler {
             return;
         } else if (!isValid){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_IS_INVALID);
+            return;
         }
 
         /**
@@ -115,11 +123,12 @@ public class CreateUser extends EndpointHandler {
                     if (s.next()) {
                         if (s.getString("username").equalsIgnoreCase(finalUsername)) {
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TAKEN);
+                            return;
                         } else if (s.getString("email").equalsIgnoreCase(finalEmail)) {
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TAKEN);
+                            return;
                         }
                         returnCall[0] = true;
-                        return;
                     }
                 }
             });
@@ -219,6 +228,6 @@ public class CreateUser extends EndpointHandler {
         /**
          * Update the user's email verification status in the database.
          */
-        updateDBandSendWelcomeEmail(username, email);
+        //updateDBandSendWelcomeEmail(username, email);
     }
 }
