@@ -996,7 +996,7 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
     }
 
-    /*@Test
+    @Test
     public void testQ_testMandrillEmailsAndTokens() throws UnirestException{
 
         EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
@@ -1052,7 +1052,7 @@ public class IntegrationTests extends Server {
             assertEquals(tempId > -1, true);
             assertEquals(tempKey != "", true);
         }
-    }*/
+    }
 
     @Test
     public void testR_ContentLikeAction() throws UnirestException{
