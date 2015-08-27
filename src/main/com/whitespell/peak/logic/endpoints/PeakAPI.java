@@ -79,7 +79,6 @@ public class PeakAPI extends WhitespellAPI {
         // Add new curated content as a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewContentCuration(), "/users/$/contentcurated/", "userId");
 
-
         // Follow a user
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UserFollowAction(), "/users/$/following", "userId");
 
@@ -100,6 +99,12 @@ public class PeakAPI extends WhitespellAPI {
 
         // Reset a user's password (Forgot Password)
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ResetPassword(), "/users/reset");
+
+        // Create a user account/link to current user account based on Facebook credentials
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new LinkFB(), "/users/facebook");
+
+        // Check if the user's password is required based on the accessToken
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CheckFBLinkStatus(), "/users/checkfacebook");
 
         /**
          * STATISTICS

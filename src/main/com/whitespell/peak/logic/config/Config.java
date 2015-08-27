@@ -1,6 +1,8 @@
 package main.com.whitespell.peak.logic.config;
 
 
+import facebook4j.conf.ConfigurationBuilder;
+
 public final class Config {
 
     public static boolean TESTING = false;
@@ -25,6 +27,12 @@ public final class Config {
     public static String MANDRILL_API_KEY = "_nuIwbGbVG1bvkxZo7LoiQ";
     public static String MANDRILL_API_VERSION = "1.0";
     public static String MANDRILL_API_URL = "https://mandrillapp.com/api";
+
+    //Facebook API information
+    public static String FB_APP_ID = "452573284915725";
+    public static String FB_APP_SECRET = "f57760a7d12677fab8f8b99edc09bfba";
+    public static String FB_API_VERSION = "v2.4";
+
 
     //General mysql information
     public static String DB = "peak";
