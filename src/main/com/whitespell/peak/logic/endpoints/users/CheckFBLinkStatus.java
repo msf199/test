@@ -28,7 +28,7 @@ public class CheckFBLinkStatus extends EndpointHandler {
     private static final String ACCESS_TOKEN_KEY = "accessToken";
 
     private static final String RETRIEVE_FB_USER_QUERY = "SELECT `link_timestamp` FROM `fb_user` WHERE `user_id` = ?";
-    private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `username` = ? OR `email` = ?";
+    private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `email` = ?";
 
     @Override
     protected void setUserInputs() {
@@ -82,8 +82,7 @@ public class CheckFBLinkStatus extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
 
             executor.execute(ps -> {
-                ps.setString(1, username);
-                ps.setString(2, email);
+                ps.setString(1, email);
                 final ResultSet s = ps.executeQuery();
 
                 if (!s.next()) {
@@ -118,8 +117,8 @@ public class CheckFBLinkStatus extends EndpointHandler {
 
         FBLinkStatusResponse status = new FBLinkStatusResponse();
 
-        if(newPeakUser[0] && !newFbUser[0]){
-            //only peak user, type 1
+        if(!newPeakUser[0] && newFbUser[0]){
+            //Peak user only, type 1
             status.setPasswordRequired(true);
         }
         else if(newPeakUser[0] && newFbUser[0]){
