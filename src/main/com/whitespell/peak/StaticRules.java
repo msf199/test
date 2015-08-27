@@ -84,7 +84,8 @@ public class StaticRules {
         INVALID_ACTION(145, "The action you submitted in the payload is invalid", HttpStatus.BAD_REQUEST_400),
         RESET_FAILED(146, "The password reset was unsuccessful, please try again", HttpStatus.NOT_FOUND_404),
         RESET_TOKEN_INVALID(147, "The reset token provided was invalid.", HttpStatus.BAD_REQUEST_400),
-        COULD_NOT_COUNT_FOLLOWERS(148, "Unable to count category followers.", HttpStatus.NOT_FOUND_404);
+        COULD_NOT_COUNT_FOLLOWERS(148, "Unable to count category followers.", HttpStatus.NOT_FOUND_404),
+        COULD_NOT_RETRIEVE_FACEBOOK(149, "Unable to retrieve user's facebook information.", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;

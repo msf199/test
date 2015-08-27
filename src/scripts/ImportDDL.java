@@ -52,6 +52,7 @@ public class ImportDDL {
         tables.add("authentication");
         tables.add("bundle_content");
         tables.add("content_comments");
+        tables.add("fb_user");
 
         //build the DDL
 
