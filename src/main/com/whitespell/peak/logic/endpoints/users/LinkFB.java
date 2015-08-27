@@ -30,7 +30,7 @@ public class LinkFB extends EndpointHandler {
     private static final String PASSWORD_KEY = "password";
 
     private static final String RETRIEVE_FB_USER_QUERY = "SELECT `link_timestamp` FROM `fb_user` WHERE `user_id` = ?";
-    private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `username` = ? OR `email` = ?";
+    private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `email` = ?";
 
     private static final String UPDATE_FB_LINK_QUERY = "UPDATE `user` SET `fb_link` = ? WHERE `user_id` = ?";
 
@@ -52,6 +52,7 @@ public class LinkFB extends EndpointHandler {
         boolean[] newFbUser = {false};
 
         int[] userId = {0};
+        String[] authUsername ={null};
         String username;
         String email;
         String accessToken = payload.get(ACCESS_TOKEN_KEY).getAsString();
@@ -108,12 +109,12 @@ public class LinkFB extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
 
             executor.execute(ps -> {
-                ps.setString(1, username);
-                ps.setString(2, email);
+                ps.setString(1, email);
                 final ResultSet s = ps.executeQuery();
 
                 if (s.next()) {
                     userId[0] = s.getInt("user_id");
+                    authUsername[0] = s.getString("username");
                 } else {
                     /**
                      * Create new account
@@ -165,11 +166,11 @@ public class LinkFB extends EndpointHandler {
                 StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
 
                 executor.execute(ps -> {
-                    ps.setString(1, username);
-                    ps.setString(2, email);
+                    ps.setString(1, email);
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         userId[0] = s.getInt("user_id");
+                        authUsername[0] = s.getString("username");
                     }
                 });
             } catch (Exception e) {
@@ -254,18 +255,19 @@ public class LinkFB extends EndpointHandler {
         /**
          * Authenticate the user using the Fb access token
          */
-        if (newUser[0] && newFbUser[0] || !newUser[0] && !newFbUser[0]) {
+        if(payloadPass != null){
             try {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                         .header("accept", "application/json")
                         .body("{\n" +
-                                "\"userName\":\"" + username + "\",\n" +
-                                "\"password\" : \"" + accessToken + "\"\n" +
+                                "\"userName\":\"" + authUsername[0] + "\",\n" +
+                                "\"password\" : \"" + payloadPass + "\"\n" +
                                 "}")
                         .asString();
 
                 Gson g = new Gson();
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+
                 String json = g.toJson(a);
                 try {
                     context.getResponse().getWriter().write(json);
@@ -279,14 +281,14 @@ public class LinkFB extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
-        }
-        else if(payloadPass != null){
+        }else if ((newUser[0] && newFbUser[0]) || (!newUser[0] && !newFbUser[0])) {
+            //either a new or merged user, authenticate with fbToken
             try {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                         .header("accept", "application/json")
                         .body("{\n" +
-                                "\"userName\":\"" + username + "\",\n" +
-                                "\"password\" : \"" + payloadPass + "\"\n" +
+                                "\"userName\":\"" + authUsername[0] + "\",\n" +
+                                "\"password\" : \"" + accessToken + "\"\n" +
                                 "}")
                         .asString();
 
