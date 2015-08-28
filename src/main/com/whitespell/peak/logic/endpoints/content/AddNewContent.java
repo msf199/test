@@ -5,18 +5,20 @@ import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
+import main.com.whitespell.peak.model.UserObject;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 
 /**
@@ -164,6 +166,41 @@ public class AddNewContent extends EndpointHandler {
             }
 
             if(success2[0] && success3[0]){
+            /**
+             * Send all of my followers a notification that I have uploaded a new video
+             */
+            try {
+                HttpResponse<String> stringResponse = null;
+                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowers")
+                        .header("accept", "application/json")
+                        .asString();
+                UserObject me = g.fromJson(stringResponse.getBody(), UserObject.class);
+                ArrayList<Integer> followerIds = me.getUserFollowers();
+                String publisherUsername = me.getUserName();
+
+                if(followerIds.size() >= 1){
+                    for(int i : followerIds) {
+                        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + i)
+                                .header("accept", "application/json")
+                                .asString();
+                        UserObject follower = g.fromJson(stringResponse.getBody(), UserObject.class);
+
+                        boolean sent[] = {false};
+
+                        sent[0] = EmailSend.sendFollowerContentNotificationEmail(
+                                follower.getUserName(), follower.getEmail(), publisherUsername, content_title, content_url);
+
+                        if (!sent[0]) {
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_FOLLOWER_EMAIL_NOT_SENT);
+                            return;
+                        }
+                    }
+                }
+            }catch(Exception e){
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                return;
+            }
                 context.getResponse().setStatus(HttpStatus.OK_200);
                 AddContentObject object = new AddContentObject();
                 object.setContentAdded(true);
