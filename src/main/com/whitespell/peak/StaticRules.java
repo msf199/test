@@ -85,7 +85,10 @@ public class StaticRules {
         RESET_FAILED(146, "The password reset was unsuccessful, please try again", HttpStatus.NOT_FOUND_404),
         RESET_TOKEN_INVALID(147, "The reset token provided was invalid.", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_COUNT_FOLLOWERS(148, "Unable to count category followers.", HttpStatus.NOT_FOUND_404),
-        COULD_NOT_RETRIEVE_FACEBOOK(149, "Unable to retrieve user's facebook information.", HttpStatus.NOT_FOUND_404);
+        COULD_NOT_RETRIEVE_FACEBOOK(149, "Unable to retrieve user's facebook information.", HttpStatus.NOT_FOUND_404),
+        PEAK_PASSWORD_REQUIRED(150, "The user's Peak password is required, please provide it.", HttpStatus.BAD_REQUEST_400),
+        COULD_NOT_PROCESS_FB_LOGIN(151, "Unable to process Peak authentication using Facebook", HttpStatus.NOT_FOUND_404),
+        CONTENT_FOLLOWER_EMAIL_NOT_SENT(152, "Unable to send an email to the follower of the uploading user regarding new content.", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;

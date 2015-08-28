@@ -6,7 +6,8 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import static main.com.whitespell.peak.logic.MandrillMailer.sendTemplatedMessage;
+import static main.com.whitespell.peak.logic.MandrillMailer.sendContentNotificationTemplatedMessage;
+import static main.com.whitespell.peak.logic.MandrillMailer.sendTokenTemplatedMessage;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -46,7 +47,7 @@ public class EmailSend {
                 return null;
             }
             boolean sent =
-                    sendTemplatedMessage("noreply@peakapp.me",
+                    sendTokenTemplatedMessage("noreply@peakapp.me",
                             "Pim, CEO of Peak",
                             "Welcome to Peak!", "http://ws.kven.me",
                             username, emailToken,
@@ -84,7 +85,7 @@ public class EmailSend {
                     int rows = ps.executeUpdate();
                     if(rows>=0){
                         sent[0] =
-                                sendTemplatedMessage("noreply@peakapp.me",
+                                sendTokenTemplatedMessage("noreply@peakapp.me",
                                         "Pim, CEO of Peak",
                                         "Password Reset Confirmation", "http://ws.kven.me",
                                         username, resetToken,
@@ -108,6 +109,20 @@ public class EmailSend {
             return null;
         }
         return null;
+    }
+
+    public static boolean sendFollowerContentNotificationEmail(String username, String email, String publisherName, String contentName, String contentUrl){
+            /**
+             * Send a content upload notification email to the Follower
+             */
+            boolean sent[] = {false};
+
+            sent[0] =
+                    sendContentNotificationTemplatedMessage("noreply@peakapp.me",
+                            "Pim, CEO of Peak",
+                            publisherName + " uploaded a new video!", "http://ws.kven.me",
+                            username,  contentName, contentUrl, "peak-2", "content_notification", email);
+        return sent[0];
     }
 
     public static class tokenResponseObject {
