@@ -277,6 +277,11 @@ public class LinkFB extends EndpointHandler {
                 Gson g = new Gson();
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
 
+                if(a.getKey() == null){
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+                    return;
+                }
+
                 String json = g.toJson(a);
                 try {
                     context.getResponse().getWriter().write(json);
@@ -312,6 +317,12 @@ public class LinkFB extends EndpointHandler {
 
                 Gson g = new Gson();
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+
+                if(a.getKey() == null){
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+                    return;
+                }
+                
                 String json = g.toJson(a);
                 try {
                     context.getResponse().getWriter().write(json);
