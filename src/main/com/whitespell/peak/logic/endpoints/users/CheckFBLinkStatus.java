@@ -87,6 +87,8 @@ public class CheckFBLinkStatus extends EndpointHandler {
 
                 if (!s.next()) {
                     newPeakUser[0] = true;
+                }else{
+                    userId[0] = s.getInt("user_id");
                 }
             });
         } catch (SQLException e) {
