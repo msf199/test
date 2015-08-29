@@ -34,6 +34,7 @@ public class LinkFB extends EndpointHandler {
     private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `email` = ?";
 
     private static final String UPDATE_FB_LINK_QUERY = "UPDATE `user` SET `fb_link` = ? WHERE `user_id` = ?";
+    private static final String UPDATE_USER_PASS_QUERY = "UPDATE `user` SET `password` = ? WHERE `user_id` = ?";
 
     private static final String INSERT_USER_QUERY = "INSERT INTO `user`(`username`,`password`,`email`) VALUES (?,?,?)";
     private static final String INSERT_FB_USER_QUERY = "INSERT INTO `fb_user`(`user_id`,`link_timestamp`) VALUES (?,?)";
@@ -230,6 +231,34 @@ public class LinkFB extends EndpointHandler {
                     }
                 });
             } catch (SQLException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+        }
+
+        /**
+         * Ensure that any user that has already linked their account to FB can log in with 1 click
+         */
+        if(!newFbUser[0] && !newPeakUser[0]){
+            try {
+                final String finalPassword = passHash;
+                StatementExecutor executor = new StatementExecutor(UPDATE_USER_PASS_QUERY);
+
+                executor.execute(ps -> {
+                    ps.setString(1, finalPassword);
+                    ps.setInt(2, userId[0]);
+                    int rows = ps.executeUpdate();
+
+                    /**
+                     * User password updated to accessToken because they are a merged account
+                     */
+                    if (rows <= 0) {
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
+                    }
+                });
+            } catch (Exception e) {
                 Logging.log("High", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
