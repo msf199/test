@@ -5,7 +5,10 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import facebook4j.*;
+import facebook4j.conf.ConfigurationBuilder;
 import main.com.whitespell.peak.Server;
+import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
@@ -928,7 +931,7 @@ public class IntegrationTests extends Server {
         assertEquals(add.getAddedContentId(), content[0].getContentId());
 
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/saved")
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/saved")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
@@ -1001,6 +1004,9 @@ public class IntegrationTests extends Server {
 
         EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
         if(et != null){
+            /**
+             * Check that the email expiration and verification got updated after sending the email.
+             */
             stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/email")
                     .header("accept", "application/json")
                     .asString();
@@ -1012,6 +1018,9 @@ public class IntegrationTests extends Server {
             }
             assertEquals(evr.getEmailVerified(), 0);
 
+            /**
+             * User verifies their email
+             */
             stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/email")
                     .header("accept", "application/json")
                     .body("{\n" +
@@ -1022,6 +1031,31 @@ public class IntegrationTests extends Server {
 
             UserObject userObject = g.fromJson(stringResponse.getBody(), UserObject.class);
             assertEquals(userObject.getEmailVerified(), 1);
+
+            /**
+             * Email is not yet verified, resend the email verification to the user (requested through the app)
+             */
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/resendemail")
+                    .header("accept", "application/json")
+                    .body("{\n" +
+                            "\"email\": \"" + ROLLERSKATER_EMAIL + "\"\n" + "}")
+                    .asString();
+            ResendEmailVerification.EmailVerificationSentStatus status = g.fromJson(stringResponse.getBody(), ResendEmailVerification.EmailVerificationSentStatus.class);
+            assertEquals(status.isSent(), true);
+
+            /**
+             * Check that the email expiration and verification got updated after resending the email.
+             */
+            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/email")
+                    .header("accept", "application/json")
+                    .asString();
+
+            GetEmailVerification.GetEmailVerificationResponse evr2 = g.fromJson(stringResponse.getBody(), GetEmailVerification.GetEmailVerificationResponse.class);
+            if(evr2.getEmailExpiration() == null || evr2.getEmailVerified() == 1){
+                //force fail
+                assertEquals(false, true);
+            }
+            assertEquals(evr2.getEmailVerified(), 0);
         }
 
         EmailSend.tokenResponseObject et2 = EmailSend.updateDBandSendResetEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
@@ -1044,13 +1078,12 @@ public class IntegrationTests extends Server {
                             "\"password\" : \"qqqqqq\"\n" +
                             "}")
                     .asString();
-
             AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
             int tempId = a.getUserId();
             String tempKey = a.getKey();
 
             assertEquals(tempId > -1, true);
-            assertEquals(tempKey != "", true);
+            assertEquals(tempKey != null, true);
         }
     }
 
@@ -1120,7 +1153,8 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testS_contentCurationTest() throws UnirestException {
+    public void testS_ContentCurationTest() throws UnirestException {
+
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/contentcurated")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1213,7 +1247,56 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getUserId(), TEST2_UID);
     }
 
+    @Test
+    public void testT_FacebookLoginTest() throws UnirestException {
+        TestUser user;
+        TestUser user2;
+        /**
+         * Authenticate FB API and create our testUsers
+         */
+        try {
+            //version v2.4
+            ConfigurationBuilder cb = new ConfigurationBuilder();
+            cb.setDebugEnabled(true)
+                    .setOAuthAppId(Config.FB_APP_ID)
+                    .setOAuthAppSecret(Config.FB_APP_SECRET)
+                    .setOAuthAccessToken(Config.FB_APP_ACCESS_TOKEN)
+                    .setOAuthPermissions("email,public_profile");
+            FacebookFactory ff = new FacebookFactory(cb.build());
+            Facebook facebook = ff.getInstance();
 
+            user = facebook.createTestUser(Config.FB_APP_ID);
+            user2 = facebook.createTestUser(Config.FB_APP_ID);
+        } catch (Exception e) {
+            Logging.log("High", e);
+            return;
+        }
+
+        /**
+         * Test login with two different test users using the test accessTokens
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/facebook")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\"accessToken\":\"" + user.getAccessToken() + "\"}")
+                .asString();
+        AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        Integer testId = a.getUserId();
+        String testKey = a.getKey();
+        assertEquals(testId > 0, true);
+        assertEquals(testKey != null, true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/facebook")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\"accessToken\":\"" + user2.getAccessToken() + "\"}")
+                .asString();
+        AuthenticationObject a2 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        Integer testId2 = a2.getUserId();
+        String testKey2 = a2.getKey();
+        assertEquals(testId2 > 0, true);
+        assertEquals(testKey2 != null, true);
+    }
 
     static String readFile(String path, Charset encoding)
             throws IOException {

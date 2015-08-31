@@ -53,6 +53,7 @@ public class ResetPassword extends EndpointHandler {
         /**
          * Check if newPass restrictions are violated
          */
+
         if (newPass.length() > StaticRules.MAX_PASSWORD_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PASSWORD_TOO_LONG);
             return;
@@ -74,7 +75,6 @@ public class ResetPassword extends EndpointHandler {
                 ResultSet s = ps.executeQuery();
                 if(s.next()){
                     if(s.getString("reset_token") != null) {
-                        System.out.println(s.getString("reset_token") + " token passed: " + resetToken);
                         if (!resetToken.equals(s.getString("reset_token"))) {
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
                             return;
@@ -94,6 +94,7 @@ public class ResetPassword extends EndpointHandler {
         /**
          * Replace the current password and set reset token to null
          */
+
         try {
             passHash = PasswordHash.createHash(newPass);
         } catch (Exception e) {

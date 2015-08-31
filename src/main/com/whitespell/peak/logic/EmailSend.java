@@ -17,7 +17,7 @@ public class EmailSend {
 
     private static final int EXPIRES_IN_24_HOURS = 86400000;
 
-    private static final String UPDATE_EMAIL_TOKEN = "UPDATE `user` SET `email_token` = ?, `email_expiration` = ? WHERE `username` = ? LIMIT 1";
+    private static final String UPDATE_EMAIL_TOKEN = "UPDATE `user` SET `email_token` = ?, `email_expiration` = ?, `email_verified` = ? WHERE `username` = ? LIMIT 1";
 
     private static final String UPDATE_RESET_TOKEN = "UPDATE `user` SET `reset_token` = ? WHERE `username` = ? LIMIT 1";
 
@@ -38,7 +38,8 @@ public class EmailSend {
                 executor.execute(ps -> {
                     ps.setString(1, finalEmailToken);
                     ps.setTimestamp(2, finalEmailExpiration);
-                    ps.setString(3, finalUsername);
+                    ps.setInt(3, 0);
+                    ps.setString(4, finalUsername);
 
                     ps.executeUpdate();
                 });
@@ -73,6 +74,7 @@ public class EmailSend {
             /**
              * Update the user's Forgot Password reset token in the database.
              */
+
             boolean sent[] = {false};
             try {
                 StatementExecutor executor = new StatementExecutor(UPDATE_RESET_TOKEN);
@@ -90,7 +92,6 @@ public class EmailSend {
                                         "Password Reset Confirmation", "http://ws.kven.me",
                                         username, resetToken,
                                         "peak-1", "forgot_password", email);
-                        System.out.println(resetToken);
                     }
                 });
             } catch (SQLException e) {
@@ -115,6 +116,7 @@ public class EmailSend {
             /**
              * Send a content upload notification email to the Follower
              */
+
             boolean sent[] = {false};
 
             sent[0] =

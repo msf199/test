@@ -55,8 +55,8 @@ public class LinkFB extends EndpointHandler {
 
         int[] userId = {0};
         String[] authUsername ={null};
-        String username;
-        String email;
+        String username = "testuser";
+        String email = "test@thisisatestemail101.com";
         String accessToken = payload.get(ACCESS_TOKEN_KEY).getAsString();
         String payloadPass = null;
         if(payload.get(PASSWORD_KEY) != null){
@@ -94,10 +94,11 @@ public class LinkFB extends EndpointHandler {
             Facebook facebook = ff.getInstance();
 
             User user = facebook.getUser(facebook.getId(), new Reading().fields("email"));
-            email = user.getEmail();
-
-            String split[] = email.split("@");
-            username = split[0];
+            if(user.getEmail() != null) {
+                email = user.getEmail();
+                String split[] = email.split("@");
+                username = split[0];
+            }
         } catch (Exception e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_RETRIEVE_FACEBOOK);
@@ -109,9 +110,9 @@ public class LinkFB extends EndpointHandler {
              * Check for user, create one if it doesn't exist
              */
             StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
-
+            final String finalEmail = email;
             executor.execute(ps -> {
-                ps.setString(1, email);
+                ps.setString(1, finalEmail);
                 final ResultSet s = ps.executeQuery();
 
                 if (s.next()) {
@@ -166,9 +167,9 @@ public class LinkFB extends EndpointHandler {
              */
             try {
                 StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
-
+                final String finalEmail = email;
                 executor.execute(ps -> {
-                    ps.setString(1, email);
+                    ps.setString(1, finalEmail);
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         userId[0] = s.getInt("user_id");

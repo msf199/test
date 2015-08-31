@@ -32,6 +32,7 @@ public final class Config {
     public static String FB_APP_ID = "452573284915725";
     public static String FB_APP_SECRET = "f57760a7d12677fab8f8b99edc09bfba";
     public static String FB_API_VERSION = "v2.4";
+    public static String FB_APP_ACCESS_TOKEN = FB_APP_ID + "|" + FB_APP_SECRET;
 
 
     //General mysql information
