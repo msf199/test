@@ -334,7 +334,7 @@ public class LinkFB extends EndpointHandler {
              * If completely new user, send a welcome email
              */
             if((newPeakUser[0] && newFbUser[0])){
-                //EmailSend.updateDBandSendWelcomeEmail(authUsername[0], email);
+                EmailSend.updateDBandSendWelcomeEmail(authUsername[0], email);
             }
             try {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
