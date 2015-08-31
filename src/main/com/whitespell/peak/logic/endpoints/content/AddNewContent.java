@@ -178,24 +178,27 @@ public class AddNewContent extends EndpointHandler {
                 ArrayList<Integer> followerIds = me.getUserFollowers();
                 String publisherUsername = me.getUserName();
 
-                if(followerIds.size() >= 1){
-                    for(int i : followerIds) {
-                        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + i)
-                                .header("accept", "application/json")
-                                .asString();
-                        UserObject follower = g.fromJson(stringResponse.getBody(), UserObject.class);
+                if(followerIds != null) {
+                    if (followerIds.size() >= 1) {
+                        for (int i : followerIds) {
+                            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + i)
+                                    .header("accept", "application/json")
+                                    .asString();
+                            UserObject follower = g.fromJson(stringResponse.getBody(), UserObject.class);
 
-                        boolean sent[] = {false};
+                            boolean sent[] = {false};
 
-                        sent[0] = EmailSend.sendFollowerContentNotificationEmail(
-                                follower.getUserName(), follower.getEmail(), publisherUsername, content_title, content_url);
+                            sent[0] = EmailSend.sendFollowerContentNotificationEmail(
+                                    follower.getUserName(), follower.getEmail(), publisherUsername, content_title, content_url);
 
-                        if (!sent[0]) {
-                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_FOLLOWER_EMAIL_NOT_SENT);
-                            return;
+                            if (!sent[0]) {
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_FOLLOWER_EMAIL_NOT_SENT);
+                                return;
+                            }
                         }
                     }
                 }
+
             }catch(Exception e){
                 Logging.log("High", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
