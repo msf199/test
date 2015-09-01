@@ -206,7 +206,7 @@ public class LinkFB extends EndpointHandler {
         /**
          * Ensure a Peak only user linking to FB uses their Peak password.
          */
-        if(!newPeakUser[0] && newFbUser[0]){
+        if(!newPeakUser[0] && newFbUser[0] && payloadPass == null){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PEAK_PASSWORD_REQUIRED);
             return;
         }
