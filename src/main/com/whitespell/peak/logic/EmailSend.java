@@ -112,18 +112,20 @@ public class EmailSend {
         return null;
     }
 
-    public static boolean sendFollowerContentNotificationEmail(String username, String email, String publisherName, String contentName, String contentUrl){
-            /**
-             * Send a content upload notification email to the Follower
-             */
+    public static boolean sendFollowerContentNotificationEmail(String username, String userThumb, String email, String publisherName, String contentName, String contentUrl){
+        /**
+         * Send a content upload notification email to the Follower
+         */
 
-            boolean sent[] = {false};
+        boolean sent[] = {false};
 
-            sent[0] =
-                    sendContentNotificationTemplatedMessage("noreply@peakapp.me",
-                            "Pim, CEO of Peak",
-                            publisherName + " uploaded a new video!", "http://ws.kven.me",
-                            username,  contentName, contentUrl, "peak-2", "content_notification", email);
+        sent[0] =
+                sendContentNotificationTemplatedMessage("noreply@peakapp.me",
+                        "Pim, CEO of Peak",
+                        publisherName + " uploaded a new video!", "http://ws.kven.me",
+                        username,  contentName, contentUrl,
+                        "content-follower-notification", userThumb, email);
+
         return sent[0];
     }
 
