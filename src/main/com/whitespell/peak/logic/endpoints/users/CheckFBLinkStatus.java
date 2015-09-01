@@ -32,7 +32,7 @@ public class CheckFBLinkStatus extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        payloadInput.put(ACCESS_TOKEN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(ACCESS_TOKEN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED_UNLIMITED);
     }
 
     @Override

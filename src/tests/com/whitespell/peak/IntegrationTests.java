@@ -8,7 +8,6 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
 import main.com.whitespell.peak.Server;
-import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
@@ -49,7 +48,7 @@ public class IntegrationTests extends Server {
 
     static String TEST_USERNAME = "pimdewitte";
     static String TEST_PASSWORD = "3#$$$$$494949($(%*__''";
-    static String TEST_EMAIL = "pimdewitte95@gmail.com";
+    static String TEST_EMAIL = "testytest@testy.com";
     static int TEST_UID = -1;
     static String TEST_KEY;
     static int TEST2_UID = -1;
@@ -63,12 +62,12 @@ public class IntegrationTests extends Server {
 
     static String SKYDIVER_USERNAME = "skydiver10";
     static String SKYDIVER_PASSWORD = "3#$$$$$494949($(%*__''";
-    static String SKYDIVER_EMAIL = "skydiver10@gmail.com";
+    static String SKYDIVER_EMAIL = "skydiver10@testy.com";
     static int SKYDIVER_UID;
 
     static String ROLLERSKATER_USERNAME = "rollerskater10";
     static String ROLLERSKATER_PASSWORD = "3#$$$$$494949($(%*__''";
-    static String ROLLERSKATER_EMAIL = "3%_4+-c.mafifCVDsig94949@notanemail.com";
+    static String ROLLERSKATER_EMAIL = "cory@whitespell.com";
     static int ROLLERSKATER_UID;
 
     static String API = null;
@@ -463,6 +462,18 @@ public class IntegrationTests extends Server {
 
         UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
         assertEquals(b.getActionTaken(), "followed");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + TEST_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+
+        UserFollowAction.FollowActionObject c = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(c.getActionTaken(), "followed");
     }
 
     @Test
@@ -531,7 +542,6 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
         assertEquals(content[0].getUserId(), TEST_UID);
 
-        //todo(make sure this works)
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[0].getCategoryId() )
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -792,18 +802,6 @@ public class IntegrationTests extends Server {
 
         UserFollowAction.FollowActionObject a = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
         assertEquals(a.getActionTaken(),"followed");
-
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                .body("{\n" +
-                        "\"followingId\": \"" + TEST_UID + "\",\n" +
-                        "\"action\": \"follow\"\n" +
-                        "}")
-                .asString();
-
-        UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
-        assertEquals(b.getActionTaken(),"followed");
 
         /**
          * List following for user that followed other users previously
@@ -1085,6 +1083,11 @@ public class IntegrationTests extends Server {
             assertEquals(tempId > -1, true);
             assertEquals(tempKey != null, true);
         }
+
+        /**
+         * Test for the content follower notification email... since it does not affect the DB, I used mandrill to ensure
+         * the emails were sent properly.
+         */
     }
 
     @Test

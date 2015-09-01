@@ -116,6 +116,7 @@ public class StaticRules {
     public enum InputTypes {
         REG_INT_REQUIRED("int", true, 1,Integer.MAX_VALUE),
         REG_STRING_REQUIRED("string", true, 1,255),
+        REG_STRING_REQUIRED_UNLIMITED("string", true, 1,Integer.MAX_VALUE),
         REG_INT_OPTIONAL("int", false, 1,Integer.MAX_VALUE),
         REG_INT_OPTIONAL_ZERO("int", false, 0, Integer.MAX_VALUE),
         REG_STRING_OPTIONAL("string", false, 1,255),

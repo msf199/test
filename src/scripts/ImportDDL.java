@@ -42,17 +42,19 @@ public class ImportDDL {
         tables.add("content_curation");
         tables.add("newsfeed");
         tables.add("saved_content");
-        tables.add("bundles");
         tables.add("content_likes");
+        tables.add("reporting");
+        tables.add("feedback");
 
         // add reference tables
         tables.add("user_following");
         tables.add("category_following");
         tables.add("category_publishing");
         tables.add("authentication");
-        tables.add("bundle_content");
+        tables.add("bundle_match");
         tables.add("content_comments");
         tables.add("fb_user");
+        tables.add("reporting_type");
 
         //build the DDL
 

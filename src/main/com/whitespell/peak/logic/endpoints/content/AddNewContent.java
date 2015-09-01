@@ -64,6 +64,9 @@ public class AddNewContent extends EndpointHandler {
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
 
+
+        int ADMIN_UID;
+        String ADMIN_KEY;
         //todo(pim) content_likes
         //todo(pim) last_comment
         //todo(pim) content_category
@@ -78,9 +81,6 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
-        final boolean[] success = {false};
-        final boolean[] success2 = {false};
-        final boolean[] success3 = {false};
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
             executor.execute(ps -> {
@@ -94,10 +94,8 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(8, now.toString());
 
                 int rows = ps.executeUpdate();
-                if (rows > 0) {
-                    success[0] = true;
-                } else {
-                    System.out.println("Failed to insert content");
+                if (rows <= 0){
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
                     return;
                 }
             });
@@ -109,87 +107,92 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
-        if (success[0]) {
-            try {
-                StatementExecutor executor = new StatementExecutor(UPDATE_USER_AS_PUBLISHER_QUERY);
-                executor.execute(ps -> {
-                    ps.setInt(1, 1);
-                    ps.setInt(2, user_id);
+        /**
+         * Update user as publisher in database
+         */
 
-                    int rows = ps.executeUpdate();
-                    if (rows > 0) {
-                        success2[0] = true;
-                    } else {
-                        System.out.println("Failed to update user as publisher");
-                        return;
-                    }
-                });
-            } catch (SQLException e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                return;
-            }
+        try {
+            StatementExecutor executor = new StatementExecutor(UPDATE_USER_AS_PUBLISHER_QUERY);
+            executor.execute(ps -> {
+                ps.setInt(1, 1);
+                ps.setInt(2, user_id);
 
-            Gson g = new Gson();
-            try{
-                /**
-                 * authenticate as admin to post publishing
-                 */
-                HttpResponse<String> stringResponse = null;
-                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
-                        .header("accept", "application/json")
-                        .body("{\n" +
-                                "\"userName\":\"coryqq\",\n" +
-                                "\"password\" : \"qqqqqq\"\n" +
-                                "}")
-                        .asString();
-                AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-                int ADMIN_UID = ao.getUserId();
-                String ADMIN_KEY = ao.getKey();
-
-                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
-                        .header("accept", "application/json")
-                        .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                        .body("{\n" +
-                                "\"categoryId\": \"" + category_id + "\",\n" +
-                                "\"action\": \"publish\"\n" +
-                                "}")
-                        .asString();
-
-                if(stringResponse.getBody().contains("published")){
-                    success3[0] = true;
+                int rows = ps.executeUpdate();
+                if (rows <= 0) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_PUBLISHING_CATEGORY);
+                    return;
                 }
-            } catch (Exception e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        Gson g = new Gson();
+        try{
+            /**
+             * authenticate as admin to post publishing
+             */
+
+            HttpResponse<String> stringResponse = null;
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                    .header("accept", "application/json")
+                    .body("{\n" +
+                            "\"userName\":\"coryqq\",\n" +
+                            "\"password\" : \"qqqqqq\"\n" +
+                            "}")
+                    .asString();
+            AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+            ADMIN_UID = ao.getUserId();
+            ADMIN_KEY = ao.getKey();
+
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                    .body("{\n" +
+                            "\"categoryId\": \"" + category_id + "\",\n" +
+                            "\"action\": \"publish\"\n" +
+                            "}")
+                    .asString();
+
+            if(!(stringResponse.getBody().contains("published") || stringResponse.getBody().contains("already publishing"))){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_PUBLISHING_CATEGORY);
                 return;
             }
+        } catch (Exception e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
 
-            if(success2[0] && success3[0]){
-            /**
-             * Send all of my followers a notification that I have uploaded a new video
-             */
-            try {
-                HttpResponse<String> stringResponse = null;
-                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowers")
-                        .header("accept", "application/json")
-                        .asString();
-                UserObject me = g.fromJson(stringResponse.getBody(), UserObject.class);
+        /**
+         * Send all of my followers a notification that I have uploaded a new video
+         */
+
+        try {
+            HttpResponse<String> stringResponse = null;
+            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowers=1")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                    .asString();
+            UserObject me = g.fromJson(stringResponse.getBody(), UserObject.class);
+
+            if(me != null) {
                 ArrayList<Integer> followerIds = me.getUserFollowers();
                 String publisherUsername = me.getUserName();
 
-                if(followerIds != null) {
-                    if (followerIds.size() >= 1) {
+                if (followerIds != null && followerIds.size() >= 1) {
                         for (int i : followerIds) {
                             stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + i)
                                     .header("accept", "application/json")
+                                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                                     .asString();
                             UserObject follower = g.fromJson(stringResponse.getBody(), UserObject.class);
-
                             boolean sent[] = {false};
 
                             sent[0] = EmailSend.sendFollowerContentNotificationEmail(
-                                    follower.getUserName(), follower.getEmail(), publisherUsername, content_title, content_url);
+                                    follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, content_title, content_url);
 
                             if (!sent[0]) {
                                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_FOLLOWER_EMAIL_NOT_SENT);
@@ -198,22 +201,17 @@ public class AddNewContent extends EndpointHandler {
                         }
                     }
                 }
-
-            }catch(Exception e){
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                return;
-            }
-                context.getResponse().setStatus(HttpStatus.OK_200);
-                AddContentObject object = new AddContentObject();
-                object.setContentAdded(true);
-                String json = g.toJson(object);
-                context.getResponse().getWriter().write(json);
-            }
-        } else {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+        }catch(Exception e){
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
             return;
         }
+
+        context.getResponse().setStatus(HttpStatus.OK_200);
+        AddContentObject object = new AddContentObject();
+        object.setContentAdded(true);
+        String json = g.toJson(object);
+        context.getResponse().getWriter().write(json);
     }
 
     public class AddContentObject {
@@ -229,6 +227,4 @@ public class AddNewContent extends EndpointHandler {
         }
 
     }
-
-
 }

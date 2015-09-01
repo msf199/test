@@ -23,7 +23,6 @@ import java.sql.Timestamp;
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
  *         8/26/2015
- *         whitespell.model
  */
 public class LinkFB extends EndpointHandler {
 
@@ -41,7 +40,7 @@ public class LinkFB extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        payloadInput.put(ACCESS_TOKEN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(ACCESS_TOKEN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED_UNLIMITED);
         payloadInput.put(PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
 
