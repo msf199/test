@@ -1222,7 +1222,6 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
         assertEquals(content[0].getUserId(), TEST_UID);
 
-        //todo(make sure this works)
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/contentcurated?categoryId=" + categories[0].getCategoryId() )
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1300,6 +1299,36 @@ public class IntegrationTests extends Server {
         assertEquals(testId2 > 0, true);
         assertEquals(testKey2 != null, true);
     }
+
+    @Test
+    public void testU_FeedbackUploadTest() throws UnirestException {
+        /**
+         * Test feedback with different users
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/feedback")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"email\": \""+TEST_EMAIL+"\",\n" +
+                        "\"message\": \"Peak is so awesome! Use it every day during my workout :)\"" +
+                        "\n}")
+                .asString();
+        SendFeedback.feedbackSuccessObject a = g.fromJson(stringResponse.getBody(), SendFeedback.feedbackSuccessObject.class);
+        assertEquals(a.isSuccess(), true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/feedback")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"email\": \""+ROLLERSKATER_EMAIL+"\",\n" +
+                        "\"message\": \"I like the app, but the content needs improvement.\"" +
+                        "\n}")
+                .asString();
+        SendFeedback.feedbackSuccessObject b = g.fromJson(stringResponse.getBody(), SendFeedback.feedbackSuccessObject.class);
+        assertEquals(b.isSuccess(), true);
+    }
+
+
 
     static String readFile(String path, Charset encoding)
             throws IOException {

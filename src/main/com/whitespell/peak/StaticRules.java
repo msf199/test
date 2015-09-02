@@ -88,7 +88,8 @@ public class StaticRules {
         COULD_NOT_RETRIEVE_FACEBOOK(149, "Unable to retrieve user's facebook information.", HttpStatus.NOT_FOUND_404),
         PEAK_PASSWORD_REQUIRED(150, "The user's Peak password is required, please provide it.", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_PROCESS_FB_LOGIN(151, "Unable to process Peak authentication using Facebook", HttpStatus.NOT_FOUND_404),
-        CONTENT_FOLLOWER_EMAIL_NOT_SENT(152, "Unable to send an email to the follower of the uploading user regarding new content.", HttpStatus.NOT_FOUND_404);
+        CONTENT_FOLLOWER_EMAIL_NOT_SENT(152, "Unable to send an email to the follower of the uploading user regarding new content.", HttpStatus.NOT_FOUND_404),
+        COULD_NOT_INSERT_FEEDBACK(153, "Unable to insert feedback for this user", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;
