@@ -109,6 +109,12 @@ public class PeakAPI extends WhitespellAPI {
         // Check if the user's password is required based on the accessToken
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CheckFBLinkStatus(), "/users/checkfacebook");
 
+        // User can send feedback about Peak and the endpoint will update Uservoice
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SendFeedback(), "/users/$/feedback", "userId");
+
+        // User can report another user for a specific reason and endpoint will update Uservoice
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ReportUser(), "/users/$/reporting", "userId");
+
         /**
          * STATISTICS
          */

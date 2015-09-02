@@ -1,16 +1,9 @@
 package main.com.whitespell.peak.logic.endpoints.users;
 
-import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.*;
-import main.com.whitespell.peak.logic.logging.Logging;
-import main.com.whitespell.peak.logic.sql.StatementExecutor;
-import main.com.whitespell.peak.model.ContentObject;
 
 import java.io.IOException;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -22,7 +15,7 @@ public class ReportUser extends EndpointHandler {
     private static final String REPORT_TYPE_ID = "typeId";
     private static final String REPORT_MESSAGE = "message";
 
-    private static final String INSERT_REPORT = "INSERT INTO `reporting`(`submitter_id`,`user_id`,`type_id`,`message`) VALUES(?,?,?)";
+    private static final String INSERT_REPORT = "INSERT INTO `reporting`(`user_id`,`type_id`,`message`) VALUES(?,?,?)";
 
     @Override
     protected void setUserInputs() {
