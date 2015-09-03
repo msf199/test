@@ -34,11 +34,6 @@ public final class Config {
     public static String FB_API_VERSION = "v2.4";
     public static String FB_APP_ACCESS_TOKEN = FB_APP_ID + "|" + FB_APP_SECRET;
 
-    //UserVoice API information
-    public static String USERVOICE_APP_KEY = "Ohq3c8Tf9q5iTuIq2DAfw";
-    public static String USERVOICE_APP_SECRET = "H8eCCnciY7kw8Hofww1QBHuX7iS3VQjlYD3C3XYsUWI";
-    public static String USERVOICE_SUBDOMAIN = "peakapp";
-
     //General mysql information
     public static String DB = "peak";
     public static String DB_HOST = "127.0.0.1";

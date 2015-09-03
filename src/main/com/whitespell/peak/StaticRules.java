@@ -89,7 +89,10 @@ public class StaticRules {
         PEAK_PASSWORD_REQUIRED(150, "The user's Peak password is required, please provide it.", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_PROCESS_FB_LOGIN(151, "Unable to process Peak authentication using Facebook", HttpStatus.NOT_FOUND_404),
         CONTENT_FOLLOWER_EMAIL_NOT_SENT(152, "Unable to send an email to the follower of the uploading user regarding new content.", HttpStatus.NOT_FOUND_404),
-        COULD_NOT_INSERT_FEEDBACK(153, "Unable to insert feedback for this user", HttpStatus.NOT_FOUND_404);
+        COULD_NOT_INSERT_FEEDBACK(153, "Unable to insert feedback for this user", HttpStatus.NOT_FOUND_404),
+        COULD_NOT_ADD_REPORTING_TYPE(154, "Unable to add new reporting type", HttpStatus.NOT_FOUND_404),
+        DUPLICATE_REPORTING_TYPE(155, "This reporting type already exists", HttpStatus.NOT_FOUND_404),
+        COULD_NOT_REPORT_USER(154, "Unable to insert report on this user", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;

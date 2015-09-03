@@ -2,19 +2,16 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.uservoice.Client;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
-import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
-import net.sf.json.JSONObject;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.HashMap;
+import java.sql.Timestamp;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -81,39 +78,6 @@ public class SendFeedback extends EndpointHandler {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
-        }
-
-        /**
-         * Authenticate into UserVoice API, post the suggestion to Peak Feedback forum
-         */
-        try {
-            Client client = new Client(Config.USERVOICE_SUBDOMAIN,
-                    Config.USERVOICE_APP_KEY, Config.USERVOICE_APP_SECRET);
-
-            Client accessToken = client.loginAs(email);
-
-            /**
-             * Get forumId of most recently created forum.
-             */
-            Integer forumId = accessToken.getCollection("/api/v1/forums", 1).get(0).getInt("id");
-
-            /**
-             * Post the feedback as a "suggestion" to the forum
-             */
-            JSONObject suggestion = accessToken.post("/api/v1/forums/" + forumId + "/suggestions",
-                    new HashMap<String, Object>() {
-                        {
-                            put("suggestion", new HashMap<String, Object>() {
-                                {
-                                    put("title", message);
-                                }
-                            });
-                        }
-                    }).getJSONObject("suggestion");
-            }catch(Exception e){
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_INSERT_FEEDBACK);
-                return;
         }
 
         feedbackSuccessObject f = new feedbackSuccessObject();
