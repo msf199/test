@@ -103,20 +103,24 @@ CREATE TABLE `user` (
   KEY `FK_content_likes_content_id_idx` (`content_id`),
   CONSTRAINT `FK_content_likes_content_id` FOREIGN KEY (`content_id`) REFERENCES `content` (`content_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_content_likes_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `reporting` (
-  `reporting_id` int(11) NOT NULL,
-  `reported_user_id` int(11) NOT NULL,
-  `reporting_type_id` int(11) NOT NULL,
-  `message` varchar(255) NOT NULL,
-  KEY `fk_reporting_user_id_idx` (`reported_user_id`),
-  CONSTRAINT `fk_reporting_user_id` FOREIGN KEY (`reported_user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_reporting_submitter_id` FOREIGN KEY (`reported_user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `feedback` (
   `feedback_id` int(11) NOT NULL AUTO_INCREMENT,
   `feedback_message` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
+  `feedback_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`feedback_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;CREATE TABLE `reporting` (
+  `reporting_id` int(11) NOT NULL AUTO_INCREMENT,
+  `submitter_user_id` int(11) DEFAULT NULL,
+  `reported_user_id` int(11) DEFAULT NULL,
+  `reporting_type_id` int(11) DEFAULT NULL,
+  `message` varchar(255) DEFAULT NULL,
+  `reporting_timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`reporting_id`),
+  KEY `fk_reporting_user_id_idx` (`reported_user_id`),
+  KEY `fk_reporting_submitter_id_idx` (`submitter_user_id`),
+  CONSTRAINT `FK_user_reporting_user_id` FOREIGN KEY (`reported_user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
   `user_id` int(11) NOT NULL,
   `following_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,
@@ -151,7 +155,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`authentication_id`),
   KEY `FK_authentication_user_id` (`user_id`),
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20650 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
+) ENGINE=InnoDB AUTO_INCREMENT=20653 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
   `parent_content_id` int(11) NOT NULL,
   `child_content_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,
@@ -175,7 +179,7 @@ CREATE TABLE `user` (
   CONSTRAINT `fk_fb_user_1` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `reporting_type` (
   `reporting_type_id` int(11) NOT NULL AUTO_INCREMENT,
-  `type_name` varchar(45) DEFAULT NULL,
+  `reporting_type_name` varchar(255) NOT NULL,
   PRIMARY KEY (`reporting_type_id`),
-  UNIQUE KEY `reporting_type_name` (`type_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  UNIQUE KEY `reporting_type_name` (`reporting_type_name`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;

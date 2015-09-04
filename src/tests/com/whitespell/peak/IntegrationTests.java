@@ -12,6 +12,7 @@ import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
 import main.com.whitespell.peak.logic.endpoints.content.ContentLikeAction;
+import main.com.whitespell.peak.logic.endpoints.content.types.AddReportingType;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.Pool;
@@ -1301,15 +1302,17 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testU_FeedbackUploadTest() throws UnirestException {
+    public void testU_FeedbackAndReportingTest() throws UnirestException {
+
         /**
          * Test feedback with different users
          */
+
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/feedback")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
-                        "\"email\": \""+TEST_EMAIL+"\",\n" +
+                        "\"email\": \"" + TEST_EMAIL + "\",\n" +
                         "\"message\": \"Peak is so awesome! Use it every day during my workout :)\"" +
                         "\n}")
                 .asString();
@@ -1320,12 +1323,76 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
-                        "\"email\": \""+ROLLERSKATER_EMAIL+"\",\n" +
+                        "\"email\": \"" + ROLLERSKATER_EMAIL + "\",\n" +
                         "\"message\": \"I like the app, but the content needs improvement.\"" +
                         "\n}")
                 .asString();
         SendFeedback.feedbackSuccessObject b = g.fromJson(stringResponse.getBody(), SendFeedback.feedbackSuccessObject.class);
         assertEquals(b.isSuccess(), true);
+
+        /**
+         * Add new reporting types
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/reporting/types")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"reportingTypeName\": \"Fake profile picture\"\n" +
+                        "\n}")
+                .asString();
+        AddReportingType.AddReportingTypeObject success = g.fromJson(stringResponse.getBody(), AddReportingType.AddReportingTypeObject.class);
+        assertEquals(success.isReportingTypeAdded(), true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/reporting/types")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"reportingTypeName\": \"Offensive comments\"\n" +
+                        "\n}")
+                .asString();
+        success = g.fromJson(stringResponse.getBody(), AddReportingType.AddReportingTypeObject.class);
+        assertEquals(success.isReportingTypeAdded(), true);
+
+        /**
+         * Ensure reporting types exist and can be retrieved
+         */
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/reporting/types")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        ReportingTypeObject types[] = g.fromJson(stringResponse.getBody(), ReportingTypeObject[].class);
+        assertEquals(types[0].getReportingTypeName() != null, true);
+        assertEquals(types[1].getReportingTypeName() != null, true);
+
+        /**
+         * Test reporting with different users
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/reporting")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"reportedUserId\": \""+TEST2_UID+"\",\n" +
+                        "\"typeId\": " + types[0].getReportingTypeId() + "," +
+                        "\"message\": \"fake profile pic...\"" +
+                        "\n}")
+                .asString();
+        ReportUser.reportUserSuccessObject c = g.fromJson(stringResponse.getBody(), ReportUser.reportUserSuccessObject.class);
+        assertEquals(c.isSuccess(), true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/reporting")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"reportedUserId\": \""+TEST_UID+"\",\n" +
+                        "\"typeId\": " + types[1].getReportingTypeId() + "," +
+                        "\"message\": \"Being offensive in comments on Lebron's video\"" +
+                        "\n}")
+                .asString();
+        ReportUser.reportUserSuccessObject d = g.fromJson(stringResponse.getBody(), ReportUser.reportUserSuccessObject.class);
+        assertEquals(d.isSuccess(), true);
     }
 
 

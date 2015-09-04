@@ -43,8 +43,8 @@ public class ImportDDL {
         tables.add("newsfeed");
         tables.add("saved_content");
         tables.add("content_likes");
-        tables.add("reporting");
         tables.add("feedback");
+        tables.add("reporting");
 
         // add reference tables
         tables.add("user_following");

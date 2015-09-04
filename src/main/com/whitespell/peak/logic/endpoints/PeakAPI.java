@@ -7,7 +7,9 @@ import main.com.whitespell.peak.logic.endpoints.content.*;
 import main.com.whitespell.peak.logic.endpoints.content.categories.AddCategory;
 import main.com.whitespell.peak.logic.endpoints.content.categories.RequestCategories;
 import main.com.whitespell.peak.logic.endpoints.content.types.AddContentType;
+import main.com.whitespell.peak.logic.endpoints.content.types.AddReportingType;
 import main.com.whitespell.peak.logic.endpoints.content.types.RequestContentTypes;
+import main.com.whitespell.peak.logic.endpoints.content.types.RequestReportingTypes;
 import main.com.whitespell.peak.logic.endpoints.monitoring.Ping;
 import main.com.whitespell.peak.logic.endpoints.newsfeed.GetEmptyNewsfeed;
 import main.com.whitespell.peak.logic.endpoints.newsfeed.AddNewsfeed;
@@ -109,10 +111,16 @@ public class PeakAPI extends WhitespellAPI {
         // Check if the user's password is required based on the accessToken
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CheckFBLinkStatus(), "/users/checkfacebook");
 
-        // User can send feedback about Peak and the endpoint will update Uservoice
+        // User sends feedback about Peak
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SendFeedback(), "/users/$/feedback", "userId");
 
-        // User can report another user for a specific reason and endpoint will update Uservoice
+        // Get all of the reporting types for the ReportUser endpoint
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestReportingTypes(), "users/reporting/types");
+
+        // Add a reporting type to the database
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddReportingType(), "users/reporting/types");
+
+        // User reports another user for a specific reason
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ReportUser(), "/users/$/reporting", "userId");
 
         /**
