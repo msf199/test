@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -17,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -27,27 +29,68 @@ public class AuthenticationRequest extends EndpointHandler {
 
     private static final String PAYLOAD_USERNAME_KEY = "userName";
     private static final String PAYLOAD_PASSWORD_KEY = "password";
+    private static final String PAYLOAD_DEVICE_NAME_KEY = "deviceName";
+    private static final String PAYLOAD_DEVICE_TYPE_KEY = "deviceType";
+    private static final String PAYLOAD_DEVICE_UUID_KEY = "deviceUUID";
 
     @Override
     protected void setUserInputs() {
         payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_DEVICE_NAME_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(PAYLOAD_DEVICE_UUID_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(PAYLOAD_DEVICE_TYPE_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL_ZERO);
     }
 
     private static final String RETRIEVE_USERNAME = "SELECT `username` FROM `user` WHERE `email` = ? LIMIT 1";
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
 
-    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`) " +
-            "VALUES (?,?)";
+    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`) " +
+            "VALUES (?,?,?)";
+
+    private static final String INSERT_DEVICE_DETAILS = "INSERT INTO `device`(`device_uuid`, `device_name`, `device_type`) " +
+            "VALUES (?,?,?)";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
         //Connection con;
+        ;
         final String username;
         final String password;
+        String[] deviceName = {null};
+        String[] deviceUUID = {"unknown" + System.currentTimeMillis()};
+        int[] deviceType = {-1};
+        boolean device1 = false, device2 = false, device3 = false;
+
         String payloadUsername = payload.get(PAYLOAD_USERNAME_KEY).getAsString();
+
+        if(payload.get(PAYLOAD_DEVICE_NAME_KEY) != null) {
+            deviceName[0] = payload.get(PAYLOAD_DEVICE_NAME_KEY).getAsString();
+            device1 = true;
+        }
+
+        if(payload.get(PAYLOAD_DEVICE_UUID_KEY) != null) {
+            deviceUUID[0] = payload.get(PAYLOAD_DEVICE_UUID_KEY).getAsString();
+            device2 = true;
+        }
+
+        if(payload.get(PAYLOAD_DEVICE_TYPE_KEY) != null){
+            deviceType[0] = payload.get(PAYLOAD_DEVICE_TYPE_KEY).getAsInt();
+            device3 = true;
+        }
+
+        /**
+         * Ensure all device details are provided
+         */
+        if(device1 || device2 || device3){
+            if(!device1 || !device2 || !device3){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PROVIDE_DEVICE_DETAILS);
+                return;
+            }
+        }
+
         ArrayList<String> temp = new ArrayList<>();
 
         /**
@@ -122,12 +165,36 @@ public class AuthenticationRequest extends EndpointHandler {
                                 ao.setUserId(s.getInt("user_id"));
                                 // insert the new authentication key into the database
                                 try {
+                                    final String finalDeviceUUID = deviceUUID[0];
+                                    final String finalDeviceName = deviceName[0];
+                                    final int finalDeviceType = deviceType[0];
                                     StatementExecutor executor = new StatementExecutor(INSERT_AUTHENTICATION);
 
                                     executor.execute(ps1 -> {
                                         ps1.setInt(1, ao.getUserId());
                                         ps1.setString(2, ao.getKey());
+                                        ps1.setString(3, finalDeviceUUID);
+
                                         ps1.executeUpdate();
+
+                                        /**
+                                         * Update device details in database
+                                         */
+                                        try {
+                                            StatementExecutor executor2 = new StatementExecutor(INSERT_DEVICE_DETAILS);
+
+                                            executor2.execute(ps2 -> {
+                                                ps2.setString(1, finalDeviceUUID);
+                                                ps2.setString(2, finalDeviceName);
+                                                ps2.setInt(3, finalDeviceType);
+
+                                                ps2.executeUpdate();
+                                            });
+                                        } catch (SQLException e) {
+                                            Logging.log("High", e);
+                                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                                            return;
+                                        }
 
                                     });
                                 } catch (SQLException e) {

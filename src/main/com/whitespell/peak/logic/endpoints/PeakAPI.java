@@ -3,6 +3,7 @@ package main.com.whitespell.peak.logic.endpoints;
 import main.com.whitespell.peak.logic.EndpointDispatcher;
 import main.com.whitespell.peak.logic.baseapi.WhitespellAPI;
 import main.com.whitespell.peak.logic.endpoints.authentication.AuthenticationRequest;
+import main.com.whitespell.peak.logic.endpoints.authentication.GetDeviceDetails;
 import main.com.whitespell.peak.logic.endpoints.content.*;
 import main.com.whitespell.peak.logic.endpoints.content.categories.AddCategory;
 import main.com.whitespell.peak.logic.endpoints.content.categories.RequestCategories;
@@ -122,6 +123,9 @@ public class PeakAPI extends WhitespellAPI {
 
         // User reports another user for a specific reason
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ReportUser(), "/users/$/reporting", "userId");
+
+        //Get user device details
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetDeviceDetails(), "users/$/device", "userId");
 
         /**
          * STATISTICS

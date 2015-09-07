@@ -50,6 +50,7 @@ public class ImportDDL {
         tables.add("user_following");
         tables.add("category_following");
         tables.add("category_publishing");
+        tables.add("device");
         tables.add("authentication");
         tables.add("bundle_match");
         tables.add("content_comments");
