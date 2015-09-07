@@ -5,16 +5,21 @@ import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.endpoints.authentication.GetDeviceDetails;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.UserObject;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
+import org.apache.log4j.BasicConfigurator;
 import org.eclipse.jetty.http.HttpStatus;
+import javapns.Push;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -71,6 +76,18 @@ public class AddNewContent extends EndpointHandler {
         //todo(pim) last_comment
         //todo(pim) content_category
 
+        /**
+         * Ensure that the user is authenticated properly
+         */
+
+        final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
+
+        boolean isMe = (a.getUserId() == user_id);
+
+        if (!a.isAuthenticated() || !isMe) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            return;
+        }
 
         if (content_type.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
@@ -189,10 +206,57 @@ public class AddNewContent extends EndpointHandler {
                                     .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                                     .asString();
                             UserObject follower = g.fromJson(stringResponse.getBody(), UserObject.class);
+
+                            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + i + "/device")
+                                    .header("accept", "application/json")
+                                    .asString();
+                            GetDeviceDetails.DeviceInfo followerDevice = g.fromJson(stringResponse.getBody(), GetDeviceDetails.DeviceInfo.class);
+
                             boolean sent[] = {false};
 
+                            /**
+                             * Send email notification to follower when uploading new content
+                             */
                             sent[0] = EmailSend.sendFollowerContentNotificationEmail(
                                     follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, content_title, content_url);
+
+                            /**
+                             * Handle device notifications
+                             */
+                            if(followerDevice != null) {
+                                boolean iOSDevice = followerDevice.getDeviceType() == 0;
+                                boolean androidDevice = followerDevice.getDeviceType() == 1;
+                                try {
+                                    if (androidDevice) {
+                                        /**
+                                         * Use Google Cloud to send push notification to Android
+                                         * */
+                                        String googleMessagingApiKey = Config.GOOGLE_MESSAGING_API_KEY;
+                                        Unirest.post("https://gcm-http.googleapis.com/gcm/send")
+                                                .header("accept", "application/json")
+                                                .header("Content-Type", "application/json")
+                                                .header("Authorization", "key=" + googleMessagingApiKey)
+                                                .body("\"data\":{\n" +
+                                                        "\"title\": \"" + publisherUsername + " uploaded a new video!\"" +
+                                                        "\"message\": \"" + publisherUsername + " uploaded " + content_title + "!\"" +
+                                                        "\n},\n" +
+                                                        "\"to\": \"" + followerDevice.getDeviceUUID() + "\"")
+                                                .asString();
+                                    } else if (iOSDevice) {
+                                        /**
+                                         * Use JavaPNS API to send push notification to iOS
+                                         */
+                                        BasicConfigurator.configure();
+                                        Push.alert(publisherUsername + "uploaded a new video!", Config.APNS_CERTIFICATE_LOCATION,
+                                                Config.APNS_PASSWORD_KEY, false, followerDevice.getDeviceUUID());
+                                    }
+                                }
+                                catch(Exception e){
+                                    Logging.log("High", e);
+                                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_SEND_DEVICE_NOTIFICATION);
+                                    return;
+                                }
+                            }
 
                             if (!sent[0]) {
                                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_FOLLOWER_EMAIL_NOT_SENT);

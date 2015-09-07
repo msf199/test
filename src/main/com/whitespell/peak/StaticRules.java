@@ -92,7 +92,10 @@ public class StaticRules {
         COULD_NOT_INSERT_FEEDBACK(153, "Unable to insert feedback for this user", HttpStatus.NOT_FOUND_404),
         COULD_NOT_ADD_REPORTING_TYPE(154, "Unable to add new reporting type", HttpStatus.NOT_FOUND_404),
         DUPLICATE_REPORTING_TYPE(155, "This reporting type already exists", HttpStatus.NOT_FOUND_404),
-        COULD_NOT_REPORT_USER(154, "Unable to insert report on this user", HttpStatus.NOT_FOUND_404);
+        COULD_NOT_REPORT_USER(154, "Unable to insert report on this user", HttpStatus.NOT_FOUND_404),
+        PROVIDE_DEVICE_DETAILS(155, "Unable to authenticate, please provide device details", HttpStatus.BAD_REQUEST_400),
+        COULD_NOT_RETRIEVE_DEVICE_DETAILS(156, "Unable to retrieve details about user's device", HttpStatus.NOT_FOUND_404),
+        COULD_NOT_SEND_DEVICE_NOTIFICATION(157, "Unable to send push notification to user's device", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;
