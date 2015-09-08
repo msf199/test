@@ -24,7 +24,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=11825 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=11829 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
@@ -50,6 +50,7 @@ CREATE TABLE `user` (
   `content_displays` bigint(15) DEFAULT '0',
   `content_comments` int(10) DEFAULT '0',
   `category_id` int(2) DEFAULT '1',
+  `curation_accepted` int(2) DEFAULT '0',
   PRIMARY KEY (`content_id`),
   UNIQUE KEY `content_id_UNIQUE` (`content_id`),
   KEY `user_id_idx` (`user_id`),
@@ -58,7 +59,7 @@ CREATE TABLE `user` (
   KEY `FK_content_category_id_idx` (`category_id`),
   CONSTRAINT `FK_content_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_user_content_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13965 DEFAULT CHARSET=utf8;CREATE TABLE `content_curation` (
+) ENGINE=InnoDB AUTO_INCREMENT=13983 DEFAULT CHARSET=utf8;CREATE TABLE `content_curation` (
   `content_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `content_type` int(2) DEFAULT '0',
@@ -153,7 +154,7 @@ CREATE TABLE `user` (
   `authentication_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `key` varchar(45) DEFAULT NULL,
-  `device_uuid` varchar(255) DEFAULT NULL,
+  `device_uuid` varchar(255) NOT NULL DEFAULT 'unknown',
   `ip_address` varchar(45) DEFAULT NULL,
   `mac_address` varchar(45) DEFAULT NULL,
   `geolocation` varchar(45) DEFAULT NULL,
@@ -162,8 +163,9 @@ CREATE TABLE `user` (
   PRIMARY KEY (`authentication_id`),
   KEY `FK_authentication_user_id` (`user_id`),
   KEY `FK_authentication_device_uuid_idx` (`device_uuid`),
+  CONSTRAINT `FK_authentication_device_uuid` FOREIGN KEY (`device_uuid`) REFERENCES `device` (`device_uuid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20718 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
+) ENGINE=InnoDB AUTO_INCREMENT=21037 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
   `parent_content_id` int(11) NOT NULL,
   `child_content_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,

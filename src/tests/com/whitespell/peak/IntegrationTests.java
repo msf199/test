@@ -1137,12 +1137,17 @@ public class IntegrationTests extends Server {
         ContentLikeAction.LikeActionObject la2 = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
         assertEquals(la2.getActionTaken(), "like");
 
+        /**
+         * Test for userLiked AND contentCurationAccepted
+         */
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         ContentObject c3[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(c3[2].getLikes(), 2);
+        assertEquals(c3[2].getUserLiked(), 1);
+        assertEquals(c3[2].getCurationAccepted(), 0);
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/likes")
                 .header("accept", "application/json")

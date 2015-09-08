@@ -27,6 +27,8 @@ public class AddNewContentCuration extends EndpointHandler{
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_curation`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
 
+    private static final String UPDATE_CURATION_ACCEPTED_QUERY = "UPDATE `content` SET `curation_accepted` = ? WHERE `content_url` = ?";
+
     private static final String PAYLOAD_CATEGORY_ID = "categoryId";
     private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
     private static final String PAYLOAD_CONTENT_TITLE = "contentTitle";
@@ -132,12 +134,16 @@ public class AddNewContentCuration extends EndpointHandler{
                 /**
                  * authenticate as admin to post publishing
                  */
+
                 HttpResponse<String> stringResponse = null;
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                         .header("accept", "application/json")
                         .body("{\n" +
                                 "\"userName\":\"coryqq\",\n" +
-                                "\"password\" : \"qqqqqq\"\n" +
+                                "\"password\" : \"qqqqqq\",\n" +
+                                "\"deviceName\":\"coryadmin\",\n" +
+                                "\"deviceUUID\":\"internal"+System.currentTimeMillis()+"\",\n" +
+                                "\"deviceType\":-1\n" +
                                 "}")
                         .asString();
                 AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
@@ -157,6 +163,24 @@ public class AddNewContentCuration extends EndpointHandler{
                     success3[0] = true;
                 }
             } catch (Exception e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+
+            try {
+                StatementExecutor executor = new StatementExecutor(UPDATE_CURATION_ACCEPTED_QUERY);
+                executor.execute(ps -> {
+                    ps.setInt(1, 1);
+                    ps.setString(2, content_url);
+
+                    int rows = ps.executeUpdate();
+                    if (rows <= 0) {
+                        System.out.println("Failed to update curation acceptance status");
+                        return;
+                    }
+                });
+            } catch (SQLException e) {
                 Logging.log("High", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
