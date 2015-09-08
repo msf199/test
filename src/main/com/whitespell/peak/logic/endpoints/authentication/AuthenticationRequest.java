@@ -168,34 +168,37 @@ public class AuthenticationRequest extends EndpointHandler {
                                     final String finalDeviceUUID = deviceUUID[0];
                                     final String finalDeviceName = deviceName[0];
                                     final int finalDeviceType = deviceType[0];
+
+                                    /**
+                                     * Update device details in database
+                                     */
+                                    try {
+                                        StatementExecutor executor = new StatementExecutor(INSERT_DEVICE_DETAILS);
+
+                                        executor.execute(ps1 -> {
+                                            ps1.setString(1, finalDeviceUUID);
+                                            ps1.setString(2, finalDeviceName);
+                                            ps1.setInt(3, finalDeviceType);
+
+                                            ps1.executeUpdate();
+                                        });
+                                    } catch (SQLException e) {
+                                        Logging.log("High", e);
+                                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                                        return;
+                                    }
+
+                                    /**
+                                     * Update authentication in database
+                                     */
                                     StatementExecutor executor = new StatementExecutor(INSERT_AUTHENTICATION);
 
-                                    executor.execute(ps1 -> {
-                                        ps1.setInt(1, ao.getUserId());
-                                        ps1.setString(2, ao.getKey());
-                                        ps1.setString(3, finalDeviceUUID);
+                                    executor.execute(ps2 -> {
+                                        ps2.setInt(1, ao.getUserId());
+                                        ps2.setString(2, ao.getKey());
+                                        ps2.setString(3, finalDeviceUUID);
 
-                                        ps1.executeUpdate();
-
-                                        /**
-                                         * Update device details in database
-                                         */
-                                        try {
-                                            StatementExecutor executor2 = new StatementExecutor(INSERT_DEVICE_DETAILS);
-
-                                            executor2.execute(ps2 -> {
-                                                ps2.setString(1, finalDeviceUUID);
-                                                ps2.setString(2, finalDeviceName);
-                                                ps2.setInt(3, finalDeviceType);
-
-                                                ps2.executeUpdate();
-                                            });
-                                        } catch (SQLException e) {
-                                            Logging.log("High", e);
-                                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                                            return;
-                                        }
-
+                                        ps2.executeUpdate();
                                     });
                                 } catch (SQLException e) {
                                     Logging.log("High", e);
