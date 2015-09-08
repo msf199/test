@@ -22,6 +22,8 @@ public class ContentObject {
     String contentDescription;
     int likes = 0;
     String thumbnailUrl;
+    int curationAccepted = 0;
+    int userLiked = 0;
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
                          String contentUrl, String contentDescription, String thumbnailUrl){
@@ -78,10 +80,25 @@ public class ContentObject {
 
     public int getLikes() { return likes; }
 
-
     public void setLikes(int likes) {
         this.likes = likes;
     }
 
     public String getThumbnailUrl() { return thumbnailUrl; }
+
+    public int getCurationAccepted() {
+        return curationAccepted;
+    }
+
+    public void setCurationAccepted(int curationAccepted) {
+        this.curationAccepted = curationAccepted;
+    }
+
+    public int getUserLiked() {
+        return userLiked;
+    }
+
+    public void setUserLiked(int userLiked) {
+        this.userLiked = userLiked;
+    }
 }

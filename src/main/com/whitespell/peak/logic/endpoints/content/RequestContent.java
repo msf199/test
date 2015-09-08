@@ -1,7 +1,6 @@
 package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -9,7 +8,6 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -30,8 +28,11 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
+    private static final String CONTENT_CURATION_ACCEPTED = "curation_accepted";
 
     private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
+    private static final String GET_USER_LIKED_QUERY = "SELECT `like_datetime` from `content_likes` WHERE `user_id` = ? AND `content_id` = ?";
+
 
     private static final String QS_USER_ID = "userId";
     private static final String QS_CATEGORY_ID = "categoryId";
@@ -68,12 +69,14 @@ public class RequestContent extends EndpointHandler {
         }
         int userId = temp;
         int categoryId = temp2;
+        int[] userLiked = {0};
 
         /**
          * Ensure that the user is authenticated properly
          */
 
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
+        int currentUser = a.getUserId();
 
         if (!a.isAuthenticated()) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
@@ -90,8 +93,6 @@ public class RequestContent extends EndpointHandler {
         }
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
-
-
 
         /**
          * Request the content based on query string
@@ -144,9 +145,36 @@ public class RequestContent extends EndpointHandler {
                         return;
                     }
 
+                    /**
+                     * Check if the user has liked this content
+                     */
+                    try {
+                        StatementExecutor executor1 = new StatementExecutor(GET_USER_LIKED_QUERY);
+                        executor1.execute(ps2 -> {
+                            ps2.setInt(1, currentUser);
+                            ps2.setInt(2, results.getInt(CONTENT_ID_KEY));
+
+                            ResultSet results1 = ps2.executeQuery();
+
+                            //display results
+                            if (results1.next()) {
+                                userLiked[0] = 1;
+                            }
+                            else{
+                                userLiked[0] = 0;
+                            }
+                        });
+                    } catch (SQLException e) {
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                        return;
+                    }
+
                     ContentObject content = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
                     content.setLikes(contentLikes[0]);
+                    content.setCurationAccepted(results.getInt(CONTENT_CURATION_ACCEPTED));
+                    content.setUserLiked(userLiked[0]);
                     contents.add(content);
                 }
 

@@ -217,8 +217,8 @@ public class AddNewContent extends EndpointHandler {
                             /**
                              * Send email notification to follower when uploading new content
                              */
-                            sent[0] = EmailSend.sendFollowerContentNotificationEmail(
-                                    follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, content_title, content_url);
+                            /*sent[0] = EmailSend.sendFollowerContentNotificationEmail(
+                                    follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, content_title, content_url);*/
 
                             /**
                              * Handle device notifications
