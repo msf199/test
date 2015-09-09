@@ -69,7 +69,7 @@ public class RequestContent extends EndpointHandler {
             }
         }
         if (urlQueryString.get(QS_NOT_CURATED) != null) {
-            if(Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]) == 1) {
+            if(Integer.parseInt(urlQueryString.get(QS_NOT_CURATED)[0]) == 1) {
                 queryKeys.add("curation_accepted");
             }
         }
