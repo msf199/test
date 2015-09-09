@@ -66,85 +66,86 @@ public class AddNewContentCuration extends EndpointHandler{
         final Timestamp now = new Timestamp(new Date().getTime());
         final int accepted = payload.get(PAYLOAD_CONTENT_ACCEPTED).getAsInt();
 
-
-        try {
-            StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
-            executor.execute(ps -> {
-                ps.setString(1, String.valueOf(user_id));
-                ps.setInt(2, category_id);
-                ps.setInt(3, Integer.parseInt(content_type));
-                ps.setString(4, content_url);
-                ps.setString(5, content_title);
-                ps.setString(6, content_description);
-                ps.setString(7, thumbnail_url);
-                ps.setString(8, now.toString());
-
-                int rows = ps.executeUpdate();
-                if (rows <= 0) {
-                    System.out.println("Failed to insert content");
-                    return;
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            if (e.getMessage().contains("FK_user_content_content_type")) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
-            }
-            return;
-        }
-
-        try {
-            StatementExecutor executor = new StatementExecutor(UPDATE_USER_AS_PUBLISHER_QUERY);
-            executor.execute(ps -> {
-                ps.setInt(1, 1);
-                ps.setInt(2, user_id);
-
-                int rows = ps.executeUpdate();
-                if (rows > 0) {
-                } else {
-                    System.out.println("Failed to update user as publisher");
-                    return;
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
-        }
-
         Gson g = new Gson();
-        try {
-            /**
-             * authenticate as admin to post publishing
-             */
+        if(accepted == 1) {
+            try {
+                StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(user_id));
+                    ps.setInt(2, category_id);
+                    ps.setInt(3, Integer.parseInt(content_type));
+                    ps.setString(4, content_url);
+                    ps.setString(5, content_title);
+                    ps.setString(6, content_description);
+                    ps.setString(7, thumbnail_url);
+                    ps.setString(8, now.toString());
 
-            HttpResponse<String> stringResponse = null;
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"userName\":\"coryqq\",\n" +
-                            "\"password\" : \"qqqqqq\",\n" +
-                            "\"deviceName\":\"coryadmin\",\n" +
-                            "\"deviceUUID\":\"internal" + System.currentTimeMillis() + "\",\n" +
-                            "\"deviceType\":-1\n" +
-                            "}")
-                    .asString();
-            AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-            int ADMIN_UID = ao.getUserId();
-            String ADMIN_KEY = ao.getKey();
+                    int rows = ps.executeUpdate();
+                    if (rows <= 0) {
+                        System.out.println("Failed to insert content");
+                        return;
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                if (e.getMessage().contains("FK_user_content_content_type")) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
+                }
+                return;
+            }
 
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                    .body("{\n" +
-                            "\"categoryId\": \"" + category_id + "\",\n" +
-                            "\"action\": \"publish\"\n" +
-                            "}")
-                    .asString();
-        } catch (Exception e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
+            try {
+                StatementExecutor executor = new StatementExecutor(UPDATE_USER_AS_PUBLISHER_QUERY);
+                executor.execute(ps -> {
+                    ps.setInt(1, 1);
+                    ps.setInt(2, user_id);
+
+                    int rows = ps.executeUpdate();
+                    if (rows > 0) {
+                    } else {
+                        System.out.println("Failed to update user as publisher");
+                        return;
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+
+            try {
+                /**
+                 * authenticate as admin to post publishing
+                 */
+
+                HttpResponse<String> stringResponse = null;
+                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                        .header("accept", "application/json")
+                        .body("{\n" +
+                                "\"userName\":\"coryqq\",\n" +
+                                "\"password\" : \"qqqqqq\",\n" +
+                                "\"deviceName\":\"coryadmin\",\n" +
+                                "\"deviceUUID\":\"internal" + System.currentTimeMillis() + "\",\n" +
+                                "\"deviceType\":-1\n" +
+                                "}")
+                        .asString();
+                AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+                int ADMIN_UID = ao.getUserId();
+                String ADMIN_KEY = ao.getKey();
+
+                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
+                        .header("accept", "application/json")
+                        .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                        .body("{\n" +
+                                "\"categoryId\": \"" + category_id + "\",\n" +
+                                "\"action\": \"publish\"\n" +
+                                "}")
+                        .asString();
+            } catch (Exception e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
         }
 
         try {
