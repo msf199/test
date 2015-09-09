@@ -7,7 +7,6 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
-import javapns.Push;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
@@ -25,7 +24,6 @@ import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -36,10 +34,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import static javapns.Push.*;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-import org.apache.log4j.*;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -563,7 +558,10 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
         assertEquals(content[0].getUserId(), TEST_UID);
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[1].getCategoryId() )
+        /**
+         * Test for getting only notCurated content
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[1].getCategoryId() + "&notCurated=1" )
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
@@ -575,6 +573,7 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentDescription(), "content2");
         assertEquals(content[0].getThumbnailUrl(), "thumb.com");
         assertEquals(content[0].getUserId(), TEST2_UID);
+        assertEquals(content[0].getCurationAccepted(), 0);
     }
 
     @Test

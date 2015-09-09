@@ -33,9 +33,9 @@ public class RequestContent extends EndpointHandler {
     private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
     private static final String GET_USER_LIKED_QUERY = "SELECT `like_datetime` from `content_likes` WHERE `user_id` = ? AND `content_id` = ?";
 
-
     private static final String QS_USER_ID = "userId";
     private static final String QS_CATEGORY_ID = "categoryId";
+    private static final String QS_NOT_CURATED = "notCurated";
 
     @Override
     protected void setUserInputs() {
@@ -43,6 +43,7 @@ public class RequestContent extends EndpointHandler {
         queryStringInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_USER_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_NOT_CURATED, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
     @Override
@@ -67,6 +68,11 @@ public class RequestContent extends EndpointHandler {
                 queryValues.add(temp2);
             }
         }
+        if (urlQueryString.get(QS_NOT_CURATED) != null) {
+            if(Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]) == 1) {
+                queryKeys.add("curation_accepted");
+            }
+        }
         int userId = temp;
         int categoryId = temp2;
         int[] userLiked = {0};
@@ -89,7 +95,11 @@ public class RequestContent extends EndpointHandler {
         StringBuilder selectString = new StringBuilder();
         selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
         for (String s : queryKeys) {
-            selectString.append("AND `" + s + "` = ? ");
+            if(s.contains("curation_accepted")){
+                selectString.append("AND `" + s + "` != ? ");
+            }else{
+                selectString.append("AND `" + s + "` = ? ");
+            }
         }
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
@@ -114,6 +124,10 @@ public class RequestContent extends EndpointHandler {
                 }
                 if (queryValues.contains(finalCategoryId)) {
                     ps.setInt(count, finalCategoryId);
+                    count++;
+                }
+                if (queryKeys.contains("curation_accepted")) {
+                    ps.setInt(count, 1);
                     count++;
                 }
 
@@ -159,8 +173,7 @@ public class RequestContent extends EndpointHandler {
                             //display results
                             if (results1.next()) {
                                 userLiked[0] = 1;
-                            }
-                            else{
+                            } else {
                                 userLiked[0] = 0;
                             }
                         });
