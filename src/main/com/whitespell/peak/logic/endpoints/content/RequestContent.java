@@ -96,7 +96,7 @@ public class RequestContent extends EndpointHandler {
         selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
         for (String s : queryKeys) {
             if(s.contains("curation_accepted")){
-                selectString.append("AND `" + s + "` != ? ");
+                selectString.append("AND `" + s + "` = ? ");
             }else{
                 selectString.append("AND `" + s + "` = ? ");
             }
@@ -127,7 +127,7 @@ public class RequestContent extends EndpointHandler {
                     count++;
                 }
                 if (queryKeys.contains("curation_accepted")) {
-                    ps.setInt(count, 1);
+                    ps.setInt(count, 0);
                     count++;
                 }
 
