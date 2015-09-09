@@ -19,9 +19,13 @@ import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.*;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
+import org.apache.log4j.Level;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.junit.FixMethodOrder;
 import org.junit.runners.MethodSorters;
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Collections;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -88,6 +93,13 @@ public class IntegrationTests extends Server {
         Server.start();
 
         API = "http://localhost:" + Config.API_PORT;
+
+        //configure log4j debug output
+        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
+        loggers.add(LogManager.getRootLogger());
+        for ( Logger logger : loggers ) {
+            logger.setLevel(Level.OFF);
+        }
     }
 
     @Test
@@ -258,7 +270,7 @@ public class IntegrationTests extends Server {
                 .body("{\n" +
                         "\"userName\":\"" + TEST_EMAIL + "\",\n" +
                         "\"password\" : \"" + TEST_PASSWORD + "\",\n" +
-                        "\"deviceUUID\" : \"99000252430689\",\n" +
+                        "\"deviceUUID\" : \"unknown\",\n" +
                         "\"deviceName\" : \"test device\",\n" +
                         "\"deviceType\" : " + 1 + "\n" +
                         "}")
@@ -991,7 +1003,6 @@ public class IntegrationTests extends Server {
                         "\"comment\": \"wow this is so cool! definitely going to try it :)!\"\n" +
                         "}")
                 .asString();
-
         AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
         assertEquals(add2.isCommentAdded(), true);
 
@@ -999,9 +1010,10 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-
-        //for now just print, JSON has parsing errors on Date due to internal DateObject
-        System.out.println(stringResponse.getBody());
+        CommentObject[] comments = g.fromJson(stringResponse.getBody(), CommentObject[].class);
+        assertEquals(comments[0].getComment(), "awesome video!");
+        assertEquals(comments[1].getComment(), "wow this is so cool! definitely going to try it :)!");
+        assertEquals(comments[0].getTimestamp().before(comments[1].getTimestamp()), true);
     }
 
     @Test
@@ -1179,7 +1191,8 @@ public class IntegrationTests extends Server {
                         "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=I6t0quh8Ick\"," +
-                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\"thumbnailUrl\": \"thumburl.com\"," +
+                        "\"accepted\": 1"+
                         "\n}")
                 .asString();
 
@@ -1192,7 +1205,8 @@ public class IntegrationTests extends Server {
                         "\"contentDescription\": \"This one's hot!\",\n" +
                         "\"contentTitle\": \"Another Video!\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
-                        "\"thumbnailUrl\": \"thumbguy.com\"" +
+                        "\"thumbnailUrl\": \"thumbguy.com\"," +
+                        "\"accepted\": 1"+
                         "\n}")
                 .asString();
 
@@ -1205,7 +1219,8 @@ public class IntegrationTests extends Server {
                         "\"contentDescription\": \"content2\",\n" +
                         "\"contentTitle\": \"content2\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=content2\"," +
-                        "\"thumbnailUrl\": \"thumb.com\"" +
+                        "\"thumbnailUrl\": \"thumb.com\"," +
+                        "\"accepted\": 1"+
                         "\n}")
                 .asString();
 
