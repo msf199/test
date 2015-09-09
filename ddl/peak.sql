@@ -24,7 +24,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=11829 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=11830 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
@@ -75,13 +75,14 @@ CREATE TABLE `user` (
   `category_id` int(2) DEFAULT '1',
   PRIMARY KEY (`content_id`),
   UNIQUE KEY `content_id_UNIQUE` (`content_id`),
+  UNIQUE KEY `content_url_UNIQUE` (`content_url`),
   KEY `user_id_idx` (`user_id`),
   KEY `content_curation_title_idx` (`content_title`),
   KEY `FK_user_content_curation_content_type_idx` (`content_type`),
   KEY `FK_content_curation_category_id_idx` (`category_id`),
   CONSTRAINT `FK_content_curation_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_user_content_curation_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `newsfeed` (
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;CREATE TABLE `newsfeed` (
   `user_id` int(11) NOT NULL,
   `newsfeed_object` longtext NOT NULL,
   `last_generated` varchar(45) DEFAULT NULL,
@@ -110,7 +111,7 @@ CREATE TABLE `user` (
   `email` varchar(255) NOT NULL,
   `feedback_timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`feedback_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;CREATE TABLE `reporting` (
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;CREATE TABLE `reporting` (
   `reporting_id` int(11) NOT NULL AUTO_INCREMENT,
   `submitter_user_id` int(11) DEFAULT NULL,
   `reported_user_id` int(11) DEFAULT NULL,
@@ -121,7 +122,7 @@ CREATE TABLE `user` (
   KEY `fk_reporting_user_id_idx` (`reported_user_id`),
   KEY `fk_reporting_submitter_id_idx` (`submitter_user_id`),
   CONSTRAINT `FK_user_reporting_user_id` FOREIGN KEY (`reported_user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
   `user_id` int(11) NOT NULL,
   `following_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,
@@ -163,9 +164,9 @@ CREATE TABLE `user` (
   PRIMARY KEY (`authentication_id`),
   KEY `FK_authentication_user_id` (`user_id`),
   KEY `FK_authentication_device_uuid_idx` (`device_uuid`),
-  CONSTRAINT `FK_authentication_device_uuid` FOREIGN KEY (`device_uuid`) REFERENCES `device` (`device_uuid`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK_authentication_device_uuid` FOREIGN KEY (`device_uuid`) REFERENCES `device` (`device_uuid`) ON DELETE NO ACTION ON UPDATE CASCADE,
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21037 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
+) ENGINE=InnoDB AUTO_INCREMENT=21237 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
   `parent_content_id` int(11) NOT NULL,
   `child_content_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,
@@ -178,10 +179,10 @@ CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
   `content_id` int(11) NOT NULL,
   `comment_value` varchar(255) DEFAULT NULL,
-  `comment_datetime` datetime DEFAULT NULL,
+  `comment_timestamp` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`comment_id`),
   UNIQUE KEY `comment_id_UNIQUE` (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8;CREATE TABLE `fb_user` (
+) ENGINE=InnoDB AUTO_INCREMENT=60 DEFAULT CHARSET=utf8;CREATE TABLE `fb_user` (
   `user_id` int(11) NOT NULL,
   `link_timestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`user_id`),

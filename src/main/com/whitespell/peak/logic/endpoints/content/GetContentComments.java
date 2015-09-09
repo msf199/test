@@ -7,10 +7,12 @@ import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.CommentObject;
 import main.com.whitespell.peak.model.DateObject;
+import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.*;
 
 /**
@@ -24,7 +26,9 @@ public class GetContentComments extends EndpointHandler {
     private static final String CONTENT_ID = "content_id";
     private static final String COMMENT_USER_ID = "user_id";
     private static final String COMMENT_VALUE = "comment_value";
-    private static final String COMMENT_DATETIME = "comment_datetime";
+    private static final String COMMENT_TIMESTAMP = "comment_timestamp";
+
+    private static final String USER_OBJECT_QUERY = "SELECT * FROM `user` WHERE `user_id` = ?";
 
     @Override
     protected void setUserInputs() {
@@ -69,13 +73,36 @@ public class GetContentComments extends EndpointHandler {
 
                 //display results
                 while (results.next()) {
-                    DateObject dateTime = new DateObject(results.getDate(COMMENT_DATETIME), results.getTime(COMMENT_DATETIME));
-                    CommentObject comment = new CommentObject(results.getInt(CONTENT_ID), results.getInt(COMMENT_USER_ID), results.getString(COMMENT_VALUE), dateTime);
+                    UserObject commentUser = new UserObject();
+                    try {
+                        StatementExecutor executor1 = new StatementExecutor(USER_OBJECT_QUERY);
+                        executor1.execute(ps1 -> {
+                            final int posterUserId = results.getInt(COMMENT_USER_ID);
+                            ps1.setInt(1, posterUserId);
+
+                            ResultSet results2 = ps1.executeQuery();
+                            if (results2.next()) {
+                                commentUser.setUserId(posterUserId);
+                                commentUser.setUserName(results2.getString("username"));
+                                commentUser.setThumbnail(results2.getString("thumbnail"));
+                            } else {
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                                return;
+                            }
+                        });
+                    } catch (SQLException e) {
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                        return;
+                    }
+
+                    CommentObject comment = new CommentObject(results.getInt(CONTENT_ID), results.getString(COMMENT_VALUE), results.getTimestamp(COMMENT_TIMESTAMP));
+                    comment.setPoster(commentUser);
                     comments.add(comment);
                 }
 
                 /**
-                 * Sort comments by dateTime
+                 * Sort comments by timestamp
                  */
                 Collections.sort(comments);
 

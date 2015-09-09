@@ -40,12 +40,12 @@ public class UserObject {
 
     public UserObject() {
         this.userId = -1;
-        this.userName = "";
-        this.displayName = "";
-        this.email = "";
-        this.thumbnail = "";
-        this.coverPhoto = "";
-        this.slogan = "";
+        this.userName = null;
+        this.displayName = null;
+        this.email = null;
+        this.thumbnail = null;
+        this.coverPhoto = null;
+        this.slogan = null;
         this.publisher = 0;
     }
 

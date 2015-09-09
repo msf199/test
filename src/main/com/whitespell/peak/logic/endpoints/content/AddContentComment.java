@@ -26,7 +26,7 @@ import java.util.Date;
  */
 public class AddContentComment extends EndpointHandler {
 
-    private static final String INSERT_CONTENT_COMMENT_QUERY = "INSERT INTO `content_comments`(`user_id`, `content_id`, `comment_value`, `comment_datetime`) VALUES (?,?,?,?)";
+    private static final String INSERT_CONTENT_COMMENT_QUERY = "INSERT INTO `content_comments`(`user_id`, `content_id`, `comment_value`) VALUES (?,?,?)";
 
     private static final String PAYLOAD_USER_ID_KEY = "userId";
     private static final String URL_CONTENT_ID = "contentId";
@@ -47,12 +47,6 @@ public class AddContentComment extends EndpointHandler {
 
         final int user_id = payload.get(PAYLOAD_USER_ID_KEY).getAsInt();
         final String comment = payload.get(PAYLOAD_COMMENT).getAsString();
-        final Timestamp now = new Timestamp(new Date().getTime());
-
-        if (comment.length() > StaticRules.MAX_COMMENT_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENT_TOO_LONG);
-            return;
-        }
 
         /**
          * Ensure that the user is authenticated properly
@@ -77,7 +71,6 @@ public class AddContentComment extends EndpointHandler {
                 ps.setString(1, String.valueOf(user_id));
                 ps.setInt(2, content_id);
                 ps.setString(3, comment);
-                ps.setString(4, now.toString());
 
                 int rows = ps.executeUpdate();
                 if (rows > 0) {

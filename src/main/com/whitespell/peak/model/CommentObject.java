@@ -2,6 +2,8 @@ package main.com.whitespell.peak.model;
 
 import main.com.whitespell.peak.logic.logging.Logging;
 
+import java.sql.Timestamp;
+
 /**
  * @author  Cory McAn for Whitespell
  *          8/5/2015
@@ -10,25 +12,23 @@ import main.com.whitespell.peak.logic.logging.Logging;
 public class CommentObject implements Comparable<CommentObject>{
 
     public CommentObject(){
-        this.userId = -1;
         this.contentId = -1;
         this.likes = 0;
         this.comment = "";
-        this.date = null;
+        this.timestamp = null;
     }
 
-    public CommentObject(int contentId, int userId, String comment, DateObject date){
+    public CommentObject(int contentId, String comment, Timestamp timestamp){
         this.contentId = contentId;
-        this.userId = userId;
         this.comment = comment;
-        this.date = date;
+        this.timestamp = timestamp;
     }
 
     int contentId;
-    int userId;
     int likes;
     String comment;
-    DateObject date;
+    Timestamp timestamp;
+    UserObject poster;
 
     public int getContentId() {
         return contentId;
@@ -36,14 +36,6 @@ public class CommentObject implements Comparable<CommentObject>{
 
     public void setContentId(int contentId) {
         this.contentId = contentId;
-    }
-
-    public int getUserId() {
-        return userId;
-    }
-
-    public void setUserId(int userId) {
-        this.userId = userId;
     }
 
     public int getLikes() {
@@ -62,25 +54,34 @@ public class CommentObject implements Comparable<CommentObject>{
         this.comment = comment;
     }
 
-    public DateObject getDate() {
-        return date;
+    public Timestamp getTimestamp() {
+        return timestamp;
     }
 
-    public void setDate(DateObject date) {
-        this.date = date;
+    public void setTimestamp(Timestamp timestamp) {
+        this.timestamp = timestamp;
     }
+
+    public UserObject getPoster() {
+        return poster;
+    }
+
+    public void setPoster(UserObject poster) {
+        this.poster = poster;
+    }
+
 
     /**
-     * Comparator for dates to allow the comments list to be sorted by date and time posted.
+     * Comparator for dates to allow the comments list to be sorted by timestamp and time posted.
      */
     public int compareTo(CommentObject o) {
 
         CommentObject other = o;
-        DateObject date1 = null;
-        DateObject date2 = null;
+        Timestamp date1 = null;
+        Timestamp date2 = null;
         try {
-            date1 = this.getDate();
-            date2 = other.getDate();
+            date1 = this.getTimestamp();
+            date2 = other.getTimestamp();
         }
         catch(Exception e){
             Logging.log("High", e);

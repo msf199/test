@@ -19,7 +19,6 @@ import org.apache.log4j.BasicConfigurator;
 import org.eclipse.jetty.http.HttpStatus;
 import javapns.Push;
 
-import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -55,7 +54,6 @@ public class AddNewContent extends EndpointHandler {
         payloadInput.put(PAYLOAD_CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_REQUIRED);
     }
 
-
     @Override
     public void safeCall(RequestObject context) throws IOException {
         JsonObject payload = context.getPayload().getAsJsonObject();
@@ -69,12 +67,9 @@ public class AddNewContent extends EndpointHandler {
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
 
-
         int ADMIN_UID;
         String ADMIN_KEY;
-        //todo(pim) content_likes
         //todo(pim) last_comment
-        //todo(pim) content_category
 
         /**
          * Ensure that the user is authenticated properly
@@ -89,14 +84,9 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
-        if (content_type.length() > StaticRules.MAX_CONTENT_TYPE_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_TOO_LONG);
-            return;
-        }
-        if (content_description.length() > StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_DESCRIPTION_TOO_LONG);
-            return;
-        }
+        /**
+         * Insert the content into the database
+         */
 
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
@@ -188,7 +178,7 @@ public class AddNewContent extends EndpointHandler {
          */
 
         try {
-            HttpResponse<String> stringResponse = null;
+            HttpResponse<String> stringResponse;
             stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + user_id + "?includeFollowers=1")
                     .header("accept", "application/json")
                     .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
@@ -217,20 +207,24 @@ public class AddNewContent extends EndpointHandler {
                             /**
                              * Send email notification to follower when uploading new content
                              */
-                            /*sent[0] = EmailSend.sendFollowerContentNotificationEmail(
-                                    follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, content_title, content_url);*/
+
+                            sent[0] = EmailSend.sendFollowerContentNotificationEmail(
+                                    follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, content_title, content_url);
 
                             /**
                              * Handle device notifications
                              */
+
                             if(followerDevice != null) {
                                 boolean iOSDevice = followerDevice.getDeviceType() == 0;
                                 boolean androidDevice = followerDevice.getDeviceType() == 1;
                                 try {
                                     if (androidDevice) {
+
                                         /**
                                          * Use Google Cloud to send push notification to Android
-                                         * */
+                                         */
+
                                         String googleMessagingApiKey = Config.GOOGLE_MESSAGING_API_KEY;
                                         Unirest.post("https://gcm-http.googleapis.com/gcm/send")
                                                 .header("accept", "application/json")
@@ -242,10 +236,13 @@ public class AddNewContent extends EndpointHandler {
                                                         "\n},\n" +
                                                         "\"to\": \"" + followerDevice.getDeviceUUID() + "\"")
                                                 .asString();
+
                                     } else if (iOSDevice) {
+
                                         /**
                                          * Use JavaPNS API to send push notification to iOS
                                          */
+
                                         BasicConfigurator.configure();
                                         Push.alert(publisherUsername + "uploaded a new video!", Config.APNS_CERTIFICATE_LOCATION,
                                                 Config.APNS_PASSWORD_KEY, false, followerDevice.getDeviceUUID());
