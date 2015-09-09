@@ -47,12 +47,6 @@ public class AddContentComment extends EndpointHandler {
 
         final int user_id = payload.get(PAYLOAD_USER_ID_KEY).getAsInt();
         final String comment = payload.get(PAYLOAD_COMMENT).getAsString();
-       // final Timestamp now = new Timestamp(new Date().getTime());
-
-        if (comment.length() > StaticRules.MAX_COMMENT_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENT_TOO_LONG);
-            return;
-        }
 
         /**
          * Ensure that the user is authenticated properly
