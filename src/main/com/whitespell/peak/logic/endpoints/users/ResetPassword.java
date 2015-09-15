@@ -142,6 +142,7 @@ public class ResetPassword extends EndpointHandler {
                             context.getResponse().setStatus(HttpStatus.OK_200);
                             resetSuccessObject rs = new resetSuccessObject();
                             rs.setSuccess(true);
+                            rs.setEmail(s.getString("email"));
                             Gson g = new Gson();
                             String json = g.toJson(rs);
                             try {
@@ -171,6 +172,7 @@ public class ResetPassword extends EndpointHandler {
     public static class resetSuccessObject {
 
         boolean success;
+        String email;
 
         resetSuccessObject(){
             this.success = false;
@@ -182,6 +184,14 @@ public class ResetPassword extends EndpointHandler {
 
         public void setSuccess(boolean success) {
             this.success = success;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
         }
 
     }
