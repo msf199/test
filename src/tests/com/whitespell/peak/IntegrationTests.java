@@ -1006,6 +1006,17 @@ public class IntegrationTests extends Server {
         AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
         assertEquals(add2.isCommentAdded(), true);
 
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"comment\": \"wow another comment!\"\n" +
+                        "}")
+                .asString();
+        AddContentComment.AddContentCommentObject add3 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add3.isCommentAdded(), true);
+
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1013,7 +1024,7 @@ public class IntegrationTests extends Server {
         CommentObject[] comments = g.fromJson(stringResponse.getBody(), CommentObject[].class);
         assertEquals(comments[0].getComment(), "awesome video!");
         assertEquals(comments[1].getComment(), "wow this is so cool! definitely going to try it :)!");
-        assertEquals(comments[0].getTimestamp().before(comments[1].getTimestamp()), true);
+        assertEquals(comments[0].getTimestamp().before(comments[2].getTimestamp()), true);
     }
 
     @Test

@@ -6,6 +6,7 @@ import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
+import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -32,6 +33,7 @@ public class RequestContent extends EndpointHandler {
 
     private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
     private static final String GET_USER_LIKED_QUERY = "SELECT `like_datetime` from `content_likes` WHERE `user_id` = ? AND `content_id` = ?";
+    private static final String USER_OBJECT_QUERY = "SELECT * FROM `user` WHERE `user_id` = ?";
 
     private static final String QS_USER_ID = "userId";
     private static final String QS_CATEGORY_ID = "categoryId";
@@ -183,8 +185,32 @@ public class RequestContent extends EndpointHandler {
                         return;
                     }
 
+                    UserObject contentPoster = new UserObject();
+                    try {
+                        StatementExecutor executor1 = new StatementExecutor(USER_OBJECT_QUERY);
+                        executor1.execute(ps1 -> {
+                            final int posterUserId = results.getInt("user_id");
+                            ps1.setInt(1, posterUserId);
+
+                            ResultSet results2 = ps1.executeQuery();
+                            if (results2.next()) {
+                                contentPoster.setUserId(posterUserId);
+                                contentPoster.setUserName(results2.getString("username"));
+                                contentPoster.setThumbnail(results2.getString("thumbnail"));
+                            } else {
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                                return;
+                            }
+                        });
+                    } catch (SQLException e) {
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                        return;
+                    }
+
                     ContentObject content = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                    content.setPoster(contentPoster);
                     content.setLikes(contentLikes[0]);
                     content.setCurationAccepted(results.getInt(CONTENT_CURATION_ACCEPTED));
                     content.setUserLiked(userLiked[0]);
