@@ -101,6 +101,7 @@ public class EmailSend {
 
             if(sent[0]){
                 tokenResponseObject et = new tokenResponseObject();
+                et.
                 et.setEmailToken(resetToken);
                 return et;
             }

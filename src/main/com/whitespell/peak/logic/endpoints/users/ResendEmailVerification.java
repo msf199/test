@@ -73,6 +73,7 @@ public class ResendEmailVerification extends EndpointHandler {
         EmailVerificationSentStatus status = new EmailVerificationSentStatus();
         if(sent.getEmailToken() != null){
             status.setSent(true);
+            status.setEmail(email);
         }else{
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_VERIFICATION_NOT_SENT);
         }
@@ -95,6 +96,13 @@ public class ResendEmailVerification extends EndpointHandler {
 
     public class EmailVerificationSentStatus {
 
+        boolean success;
+        String email;
+
+        public EmailVerificationSentStatus(){
+            this.success = false;
+        }
+
         public void setSent(boolean sent) {
             this.success = sent;
         }
@@ -103,10 +111,13 @@ public class ResendEmailVerification extends EndpointHandler {
             return success;
         }
 
-        boolean success;
 
-        public EmailVerificationSentStatus(){
-            this.success = false;
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
         }
     }
 }

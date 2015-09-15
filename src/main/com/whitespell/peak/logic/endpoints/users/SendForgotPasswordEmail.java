@@ -147,6 +147,7 @@ public class SendForgotPasswordEmail extends EndpointHandler {
 
                         resetSuccessObject rs = new resetSuccessObject();
                         rs.setSuccess(true);
+                        rs.setEmail(email);
 
                         Gson g = new Gson();
                         String json = g.toJson(rs);
@@ -173,6 +174,7 @@ public class SendForgotPasswordEmail extends EndpointHandler {
     public static class resetSuccessObject {
 
         boolean success;
+        String email;
 
         resetSuccessObject(){
             this.success = false;
@@ -186,5 +188,12 @@ public class SendForgotPasswordEmail extends EndpointHandler {
             this.success = success;
         }
 
+        public String getEmail() {
+            return email;
+        }
+
+        public void setEmail(String email) {
+            this.email = email;
+        }
     }
 }
