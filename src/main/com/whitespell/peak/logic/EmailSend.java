@@ -50,7 +50,7 @@ public class EmailSend {
             boolean sent =
                     sendTokenTemplatedMessage("noreply@peakapp.me",
                             "Pim, CEO of Peak",
-                            "Welcome to Peak!", "http://ws.kven.me",
+                            "Welcome to Peak!", "http://peakapp.me",
                             username, emailToken,
                             "peak", "verify_email", email);
 
