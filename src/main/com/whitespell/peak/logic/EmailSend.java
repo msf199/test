@@ -89,7 +89,7 @@ public class EmailSend {
                         sent[0] =
                                 sendTokenTemplatedMessage("noreply@peakapp.me",
                                         "Pim, CEO of Peak",
-                                        "Password Reset Confirmation", "http://ws.kven.me",
+                                        "Password Reset Confirmation", "http://peakapp.me",
                                         username, resetToken,
                                         "peak-1", "forgot_password", email);
                     }
@@ -122,7 +122,7 @@ public class EmailSend {
         sent[0] =
                 sendContentNotificationTemplatedMessage("noreply@peakapp.me",
                         "Pim, CEO of Peak",
-                        publisherName + " uploaded a new video!", "http://ws.kven.me",
+                        publisherName + " uploaded a new video!", "http://peakapp.me",
                         username,  contentName, contentUrl,
                         "content-follower-notification", userThumb, email);
 

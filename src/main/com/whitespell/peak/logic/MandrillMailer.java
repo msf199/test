@@ -61,7 +61,8 @@ public class MandrillMailer {
         List<MergeVar> globalMergeVars = new ArrayList<>();
         globalMergeVars.add(new MergeVar("NAME", username));
         globalMergeVars.add(new MergeVar("HOST", host));
-        globalMergeVars.add(new MergeVar("URL", "http://ws.kven.me/email/" + htmlName + ".html?token=" + token + "&username=" + username));
+        globalMergeVars.add(new MergeVar("TOKEN", token));
+        globalMergeVars.add(new MergeVar("URL", "http://peakapp.me/email/" + htmlName + ".html?token=" + token + "&username=" + username));
         message.setGlobal_merge_vars(globalMergeVars);
 
         try {
