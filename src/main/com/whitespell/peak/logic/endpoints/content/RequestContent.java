@@ -29,7 +29,6 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
-    private static final String CONTENT_CURATION_ACCEPTED = "curation_accepted";
 
     private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
     private static final String GET_USER_LIKED_QUERY = "SELECT `like_datetime` from `content_likes` WHERE `user_id` = ? AND `content_id` = ?";
@@ -70,11 +69,7 @@ public class RequestContent extends EndpointHandler {
                 queryValues.add(temp2);
             }
         }
-        if (urlQueryString.get(QS_NOT_CURATED) != null) {
-            if(Integer.parseInt(urlQueryString.get(QS_NOT_CURATED)[0]) == 1) {
-                queryKeys.add("curation_accepted");
-            }
-        }
+
         int userId = temp;
         int categoryId = temp2;
         int[] userLiked = {0};
@@ -97,11 +92,8 @@ public class RequestContent extends EndpointHandler {
         StringBuilder selectString = new StringBuilder();
         selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
         for (String s : queryKeys) {
-            if(s.contains("curation_accepted")){
-                selectString.append("AND `" + s + "` = ? ");
-            }else{
-                selectString.append("AND `" + s + "` = ? ");
-            }
+            selectString.append("AND `" + s + "` = ? ");
+
         }
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
@@ -126,10 +118,6 @@ public class RequestContent extends EndpointHandler {
                 }
                 if (queryValues.contains(finalCategoryId)) {
                     ps.setInt(count, finalCategoryId);
-                    count++;
-                }
-                if (queryKeys.contains("curation_accepted")) {
-                    ps.setInt(count, 0);
                     count++;
                 }
 
@@ -212,7 +200,6 @@ public class RequestContent extends EndpointHandler {
                             results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
                     content.setPoster(contentPoster);
                     content.setLikes(contentLikes[0]);
-                    content.setCurationAccepted(results.getInt(CONTENT_CURATION_ACCEPTED));
                     content.setUserLiked(userLiked[0]);
                     contents.add(content);
                 }

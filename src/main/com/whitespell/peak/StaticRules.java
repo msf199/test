@@ -29,6 +29,8 @@ public class StaticRules {
     public static final int DEFAULT_MIN_OFFSET = 0;
     public static final int MAX_COMMENT_LENGTH = 255;
 
+    public static final int BUNDLE_CONTENT_TYPE = 6;
+
 
 
 
@@ -44,6 +46,7 @@ public class StaticRules {
         ACCOUNT_NOT_FOUND(103, "Account not found", HttpStatus.UNAUTHORIZED_401),
         INVALID_USERNAME_OR_PASS(104, "Invalid username or Password", HttpStatus.UNAUTHORIZED_401),
         NOT_AUTHENTICATED(105, "User is not authenticated", HttpStatus.UNAUTHORIZED_401),
+        NOT_AUTHORIZED(106, "Action is not authorized", HttpStatus.UNAUTHORIZED_401),
 
         //110-120 is style error
         USERNAME_TOO_LONG(110, "Username is too long (" + StaticRules.MAX_USERNAME_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),

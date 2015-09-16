@@ -16,7 +16,6 @@ public class ContentObject {
     String contentDescription;
     int likes = 0;
     String thumbnailUrl;
-    int curationAccepted = 0;
     int userLiked = 0;
     UserObject poster;
 
@@ -70,14 +69,6 @@ public class ContentObject {
     }
 
     public String getThumbnailUrl() { return thumbnailUrl; }
-
-    public int getCurationAccepted() {
-        return curationAccepted;
-    }
-
-    public void setCurationAccepted(int curationAccepted) {
-        this.curationAccepted = curationAccepted;
-    }
 
     public int getUserLiked() {
         return userLiked;

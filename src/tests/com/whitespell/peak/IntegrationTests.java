@@ -585,7 +585,6 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentDescription(), "content2");
         assertEquals(content[0].getThumbnailUrl(), "thumb.com");
         assertEquals(content[0].getUserId(), TEST2_UID);
-        assertEquals(content[0].getCurationAccepted(), 0);
     }
 
     @Test
@@ -1160,7 +1159,7 @@ public class IntegrationTests extends Server {
         assertEquals(la2.getActionTaken(), "like");
 
         /**
-         * Test for userLiked AND contentCurationAccepted
+         * Test for userLiked
          */
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
                 .header("accept", "application/json")
@@ -1169,7 +1168,6 @@ public class IntegrationTests extends Server {
         ContentObject c3[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(c3[2].getLikes(), 2);
         assertEquals(c3[2].getUserLiked(), 1);
-        assertEquals(c3[2].getCurationAccepted(), 0);
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/likes")
                 .header("accept", "application/json")
