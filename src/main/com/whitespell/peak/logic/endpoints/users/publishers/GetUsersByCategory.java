@@ -2,8 +2,8 @@ package main.com.whitespell.peak.logic.endpoints.users.publishers;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.Safety;
 import main.com.whitespell.peak.logic.logging.Logging;

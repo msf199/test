@@ -1,38 +1,54 @@
 package main.com.whitespell.peak.model;
 
 /**
- * Created by cory on 15/07/15.
+ * Created by pim on 7/15/15.
  */
-public class NewsfeedObject {
+public class NewsfeedObject implements Comparable<NewsfeedObject> {
 
+    public NewsfeedObject(long newsfeedId, UserObject user, ContentObject content) {
+        this.newsfeedId = newsfeedId;
+        this.user = user;
+        this.content= content;
+    }
 
-    public int newsfeedId;
+    public long newsfeedId;
     public UserObject user;
     public ContentObject content;
 
-    public NewsfeedObject() {
-        this.newsfeedId = 0;
-    }
+    final static int TIMESTAMP_LENGTH = 13;
 
-    public NewsfeedObject(int newsfeedId, UserObject following, ContentObject content){
-        this.newsfeedId = newsfeedId;
-        user = following;
-        this.content = content;
+    public ContentObject getNewsfeedContent() {
+        return content;
     }
-
-    public int getNewsfeedId() {
-        return newsfeedId;
-    }
-
-    public void setNewsfeedId(int newsfeedId) {
-        this.newsfeedId = newsfeedId;
-    }
-
-    public UserObject getNewsfeedUser(){
+    public UserObject getNewsfeedUser() {
         return user;
     }
 
-    public ContentObject getNewsfeedContent(){
-        return content;
+    public long getNewsfeedId() {
+        return newsfeedId;
+    }
+
+    public void setNewsfeedId(long newsfeedId) {
+        this.newsfeedId = newsfeedId;
+    }
+
+    public boolean hasContent(long contentId){
+        String stringNewsfeedId = String.valueOf(newsfeedId);
+        String currContentId = String.valueOf(contentId);
+
+        String newsfeedContentId = stringNewsfeedId.substring(TIMESTAMP_LENGTH);
+
+        if(newsfeedContentId.equals(currContentId)){
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Comparator for newsfeedids.
+     */
+    public int compareTo(NewsfeedObject o) {
+        return this.getNewsfeedId() > o.getNewsfeedId() ? 1 : -1;
     }
 }
+

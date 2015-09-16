@@ -9,7 +9,6 @@ import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
-import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;

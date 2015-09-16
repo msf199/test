@@ -44,7 +44,7 @@ public class StaticRules {
         EMAIL_TAKEN(101, "Email is already taken", HttpStatus.UNAUTHORIZED_401),
         USERNAME_AND_EMAIL_TAKEN(102, "Username and email are already taken", HttpStatus.UNAUTHORIZED_401),
         ACCOUNT_NOT_FOUND(103, "Account not found", HttpStatus.UNAUTHORIZED_401),
-        INVALID_USERNAME_OR_PASS(104, "Invalid username or Password", HttpStatus.UNAUTHORIZED_401),
+        INVALID_USERNAME_OR_PASS(104, "Invalid username or password", HttpStatus.UNAUTHORIZED_401),
         NOT_AUTHENTICATED(105, "User is not authenticated", HttpStatus.UNAUTHORIZED_401),
         NOT_AUTHORIZED(106, "Action is not authorized", HttpStatus.UNAUTHORIZED_401),
 
