@@ -1,5 +1,9 @@
 package main.com.whitespell.peak.model;
 
+import main.com.whitespell.peak.StaticRules;
+
+import java.util.ArrayList;
+
 /**
  * @author  Cory McAn for Whitespell
  *          6/23/2015
@@ -18,6 +22,18 @@ public class ContentObject {
     String thumbnailUrl;
     int userLiked = 0;
     UserObject poster;
+    ArrayList<ContentObject> children = new ArrayList<>();
+
+    public boolean hasEmptyBundleChildren() {
+        for(ContentObject c : children) {
+            if(c.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                if(c.getChildren() == null) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
                          String contentUrl, String contentDescription, String thumbnailUrl){
@@ -40,6 +56,13 @@ public class ContentObject {
         this.contentUrl = contentUrl;
         this.contentDescription = contentDescription;
         this.thumbnailUrl = thumbnailUrl;
+    }
+
+    public void setChildren(ArrayList<ContentObject> children) {
+        this.children = children;
+    }
+    public ArrayList<ContentObject> getChildren() {
+        return this.children;
     }
 
     public int getUserId() {
@@ -84,5 +107,9 @@ public class ContentObject {
 
     public void setPoster(UserObject poster) {
         this.poster = poster;
+    }
+
+    public void addChild(ContentObject child) {
+        this.children.add(child);
     }
 }

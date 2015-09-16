@@ -29,7 +29,7 @@ public class StaticRules {
     public static final int DEFAULT_MIN_OFFSET = 0;
     public static final int MAX_COMMENT_LENGTH = 255;
 
-    public static final int BUNDLE_CONTENT_TYPE = 6;
+    public static int BUNDLE_CONTENT_TYPE = 6;
 
 
 

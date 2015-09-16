@@ -115,6 +115,27 @@ public class AddContentToBundle extends EndpointHandler{
                     Gson g = new Gson();
                     String json = g.toJson(new AddContentToBundleModel(true));
                     try {
+
+                        /** if all is sucessful, update content id of content being added to child to true, which will put it only insides bundles */
+
+                        try {
+                            StatementExecutor executor_childupdate = new StatementExecutor(UPDATE_TO_CHILD);
+                            executor_childupdate.execute(ps_childupdate -> {
+                                ps_childupdate.setInt(1, CHILD_CONTENT_ID);
+
+                                int rows_childupdate = ps_childupdate.executeUpdate();
+                                if (rows_childupdate <= 0) {
+                                    System.out.println("Failed to set childness");
+                                }
+                            });
+
+                        } catch (SQLException e) {
+                            Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                            return;
+                        }
+
+
                         context.getResponse().getWriter().write(json);
                     } catch (IOException e) {
                         Logging.log("High", e);

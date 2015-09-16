@@ -158,6 +158,8 @@ public class PeakAPI extends WhitespellAPI {
         // Add a new content type
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
 
+
+
         // Get a content comment
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetContentComments(), "/content/$/comments", "contentId");
 
@@ -166,6 +168,11 @@ public class PeakAPI extends WhitespellAPI {
 
         //Add/delete a content like
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ContentLikeAction(), "/content/$/likes", "contentId");
+
+
+        // ad a child to a bundle
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentToBundle(), "/content/$/add_child", "contentId");
+
 
         /**
          * CATEGORIES

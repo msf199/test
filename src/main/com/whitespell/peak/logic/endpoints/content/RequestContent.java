@@ -30,11 +30,14 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
 
+    private static final String GET_BUNDLE_CHILDREN = "SELECT * FROM bundle_match INNER JOIN `content` ON content.content_id=bundle_match.child_content_id where parent_content_id = ?";
+
     private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
     private static final String GET_USER_LIKED_QUERY = "SELECT `like_datetime` from `content_likes` WHERE `user_id` = ? AND `content_id` = ?";
     private static final String USER_OBJECT_QUERY = "SELECT * FROM `user` WHERE `user_id` = ?";
 
     private static final String QS_USER_ID = "userId";
+    private static final String QS_CONTENT_ID = "contentId";
     private static final String QS_CATEGORY_ID = "categoryId";
     private static final String QS_NOT_CURATED = "notCurated";
 
@@ -43,6 +46,7 @@ public class RequestContent extends EndpointHandler {
         queryStringInput.put(CONTENT_SIZE_LIMIT, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_USER_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_CONTENT_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_NOT_CURATED, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
@@ -50,28 +54,37 @@ public class RequestContent extends EndpointHandler {
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
-        int temp = 0, temp2 = 0;
+        int temp_user_id = 0, temp_content_id = 0, temp_category_id = 0;
         ArrayList<String> queryKeys = new ArrayList<>();
         ArrayList<Integer> queryValues = new ArrayList<>();
         Map<String, String[]> urlQueryString = context.getQueryString();
 
+
         if (urlQueryString.get(QS_USER_ID) != null) {
             if (Safety.isInteger(urlQueryString.get(QS_USER_ID)[0])) {
-                temp = Integer.parseInt(urlQueryString.get(QS_USER_ID)[0]);
+                temp_user_id = Integer.parseInt(urlQueryString.get(QS_USER_ID)[0]);
                 queryKeys.add("user_id");
-                queryValues.add(temp);
+                queryValues.add(temp_user_id);
+            }
+        }
+        if (urlQueryString.get(QS_CONTENT_ID) != null) {
+            if (Safety.isInteger(urlQueryString.get(QS_CONTENT_ID)[0])) {
+                temp_content_id = Integer.parseInt(urlQueryString.get(QS_CONTENT_ID)[0]);
+                queryKeys.add("content_id");
+                queryValues.add(temp_content_id);
             }
         }
         if (urlQueryString.get(QS_CATEGORY_ID) != null) {
             if (Safety.isInteger(urlQueryString.get(QS_CATEGORY_ID)[0])) {
-                temp2 = Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]);
+                temp_category_id = Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]);
                 queryKeys.add("category_id");
-                queryValues.add(temp2);
+                queryValues.add(temp_category_id);
             }
         }
 
-        int userId = temp;
-        int categoryId = temp2;
+        int userId = temp_user_id;
+        int contentId = temp_content_id;
+        int categoryId = temp_category_id;
         int[] userLiked = {0};
 
         /**
@@ -108,6 +121,7 @@ public class RequestContent extends EndpointHandler {
             final int finalCategoryId = categoryId;
             StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
             final int finalUserId = userId;
+            final int finalContentId = contentId;
             executor.execute(ps -> {
                 ps.setInt(1, finalOffset);
                 int count = 2;
@@ -116,6 +130,13 @@ public class RequestContent extends EndpointHandler {
                     ps.setInt(count, finalUserId);
                     count++;
                 }
+
+
+                if (queryValues.contains(finalContentId)) {
+                    ps.setInt(count, finalContentId);
+                    count++;
+                }
+
                 if (queryValues.contains(finalCategoryId)) {
                     ps.setInt(count, finalCategoryId);
                     count++;
@@ -198,6 +219,11 @@ public class RequestContent extends EndpointHandler {
 
                     ContentObject content = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+
+                    if(content.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                        // we are entering a nested recursiveGetChildren loop
+                          content.setChildren(recursiveGetChildren(content, context));
+                    }
                     content.setPoster(contentPoster);
                     content.setLikes(contentLikes[0]);
                     content.setUserLiked(userLiked[0]);
@@ -221,4 +247,31 @@ public class RequestContent extends EndpointHandler {
             return;
         }
     }
+
+    public ArrayList<ContentObject> recursiveGetChildren(ContentObject root, RequestObject context) {
+        try {
+            StatementExecutor executor1 = new StatementExecutor(GET_BUNDLE_CHILDREN);
+            executor1.execute(ps -> {
+
+                ps.setInt(1, root.getContentId());
+
+                ResultSet results = ps.executeQuery();
+                while (results.next()) {
+                    ContentObject child = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
+                            results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+
+                        if(child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                            child.setChildren(recursiveGetChildren(child, context));
+                        }
+                    root.addChild(child);
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+            return null;
+        }
+        return root.getChildren();
+    }
+
 }

@@ -8,6 +8,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
 import main.com.whitespell.peak.Server;
+import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
@@ -450,7 +451,7 @@ public class IntegrationTests extends Server {
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
                 .body("{\n" +
-                        "\"contentTypeName\": \"instagram\"\n"
+                        "\"contentTypeName\": \"bundle\"\n"
                         + "}")
                 .asString();
 
@@ -461,7 +462,9 @@ public class IntegrationTests extends Server {
         contentTypes = g.fromJson(stringResponse.getBody(), ContentTypeObject[].class);
         assertEquals(contentTypes.length, 2);
         assertEquals(contentTypes[1].getContentTypeName(), "youtube");
-        assertEquals(contentTypes[0].getContentTypeName(), "instagram");
+        assertEquals(contentTypes[0].getContentTypeName(), "bundle");
+
+        StaticRules.BUNDLE_CONTENT_TYPE = contentTypes[0].getContentTypeId();
     }
 
     @Test
@@ -1161,6 +1164,7 @@ public class IntegrationTests extends Server {
         /**
          * Test for userLiked
          */
+
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1429,6 +1433,174 @@ public class IntegrationTests extends Server {
         ReportUser.reportUserSuccessObject d = g.fromJson(stringResponse.getBody(), ReportUser.reportUserSuccessObject.class);
         assertEquals(d.isSuccess(), true);
     }
+
+
+
+    @Test
+    public void testV_makeBundleTest() throws UnirestException {
+
+
+        // create the root bundle
+            Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                    .body("{\n" +
+                            "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
+                            "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +//contentypes[0] is alwasy bundle
+                            "\"contentDescription\": \"This is the root bundle.\",\n" +
+                            "\"contentTitle\": \"Root bundle\",\n" +
+                            "\"contentUrl\": \"doesnt matter\"," +
+                            "\"thumbnailUrl\": \"thumburl.com\"" +
+                            "\n}")
+                    .asString();
+
+        // test youtube video to be added into the bundle
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Child 1 of root bundle (yt video)\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
+
+
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +//contentypes[0] is alwasy bundle
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Child 2 of root bundle (yt video)\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
+
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[0].getContentTypeId()+"\",\n" +//contentypes[0] is alwasy bundle
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Child bundle\",\n" +
+                        "\"contentUrl\": \"doesnt matter\"," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
+
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[0].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +//contentypes[0] is alwasy bundle
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Video of Child bundle\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
+
+
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[0].getContentTypeId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        // index 0 should be the root bundle, 1 should be the child bundle
+        ContentObject bundles[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+
+        // add the child bundle as a child to the root bundle
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \""+bundles[1].getContentId()+"\"" +
+                        "\n}")
+                .asString();
+
+
+
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[1].getContentTypeId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        // get 3 random uyt videos to place inside the bundles
+        ContentObject videos[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+
+        // add 2 videos to root bundle, and 1 to child bundle
+
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \""+videos[0].getContentId()+"\"" +
+                        "\n}")
+                .asString();
+
+
+
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \""+videos[1].getContentId()+"\"" +
+                        "\n}")
+                .asString();
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \""+bundles[1].getContentId()+"\"" +
+                        "\n}")
+                .asString();
+
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[1].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \""+videos[2].getContentId()+"\"" +
+                        "\n}")
+                .asString();
+
+
+        // grab /content/bundles[0].getContentId() and check if it has 3 children, check child with content id bundles[1].getContentId() for 1 child
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + bundles[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        // get 3 random uyt videos to place inside the bundles
+        ContentObject[] finalBundleResponseArray = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+
+        ContentObject finalBundleResponse = finalBundleResponseArray[0]; // always the first index bc we're sorting based on content id, and thats unique
+
+        for(ContentObject c: finalBundleResponse.getChildren()) {
+            System.out.println(c.getContentId() + "---" + c.getContentDescription());
+        }
+        assertEquals(finalBundleResponse.getChildren().size(), 3);
+
+    }
+
 
 
 
