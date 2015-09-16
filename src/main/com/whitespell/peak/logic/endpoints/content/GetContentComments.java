@@ -2,18 +2,19 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.*;
+import main.com.whitespell.peak.logic.Authentication;
+import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.CommentObject;
-import main.com.whitespell.peak.model.DateObject;
 import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * @author Cory McAn(cmcan), Whitespell Inc.

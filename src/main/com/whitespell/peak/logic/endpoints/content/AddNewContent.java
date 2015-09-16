@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import javapns.Push;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EmailSend;
@@ -17,9 +18,9 @@ import main.com.whitespell.peak.model.UserObject;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 import org.apache.log4j.BasicConfigurator;
 import org.eclipse.jetty.http.HttpStatus;
-import javapns.Push;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -33,6 +34,9 @@ public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
+    private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ? AND `timestamp` = ?";
+
+    private static final String DELETE_FROM_CURATION = "DELETE FROM `content_curation` WHERE `content_url` = ?";
 
     private static final String PAYLOAD_CATEGORY_ID = "categoryId";
     private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
@@ -67,6 +71,7 @@ public class AddNewContent extends EndpointHandler {
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
 
+        int[] contentId = {0};
         int ADMIN_UID;
         String ADMIN_KEY;
         //todo(pim) last_comment
@@ -111,6 +116,27 @@ public class AddNewContent extends EndpointHandler {
             if (e.getMessage().contains("FK_user_content_content_type")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
             }
+            return;
+        }
+
+        /**
+         * Get the contentId so that the content can be added to a bundle
+         */
+
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_CONTENT_ID_QUERY);
+            executor.execute(ps -> {
+                ps.setString(1, content_url);
+                ps.setString(2, now.toString());
+
+                ResultSet r = ps.executeQuery();
+                if (r.next()){
+                    contentId[0] = r.getInt("content_id");
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
 
@@ -171,6 +197,24 @@ public class AddNewContent extends EndpointHandler {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
+        }
+
+        /**
+         * Delete from content_curated table if exists
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(DELETE_FROM_CURATION);
+            executor.execute(ps -> {
+                ps.setString(1, content_url);
+
+                int rows = ps.executeUpdate();
+                if (rows <= 0) {
+                    System.out.println("Failed to delete from curation table");
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
         }
 
         /**
@@ -270,6 +314,7 @@ public class AddNewContent extends EndpointHandler {
 
         context.getResponse().setStatus(HttpStatus.OK_200);
         AddContentObject object = new AddContentObject();
+        object.setContentId(contentId[0]);
         object.setContentAdded(true);
         String json = g.toJson(object);
         context.getResponse().getWriter().write(json);
@@ -277,14 +322,23 @@ public class AddNewContent extends EndpointHandler {
 
     public class AddContentObject {
 
-        private boolean content_added;
+        private boolean contentAdded;
+        private int contentId;
 
-        public boolean isContentAdded() {
-            return content_added;
+        public int getContentId() {
+            return contentId;
         }
 
-        public void setContentAdded(boolean content_added) {
-            this.content_added = content_added;
+        public void setContentId(int contentId) {
+            this.contentId = contentId;
+        }
+
+        public boolean isContentAdded() {
+            return contentAdded;
+        }
+
+        public void setContentAdded(boolean contentAdded) {
+            this.contentAdded = contentAdded;
         }
 
     }

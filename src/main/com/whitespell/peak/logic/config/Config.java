@@ -1,8 +1,6 @@
 package main.com.whitespell.peak.logic.config;
 
 
-import facebook4j.conf.ConfigurationBuilder;
-
 public final class Config {
 
     public static boolean TESTING = false;

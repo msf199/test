@@ -27,7 +27,6 @@ public class AddNewContentCuration extends EndpointHandler{
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_curation`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
 
-    private static final String DELETE_FROM_CURATION = "DELETE FROM `content_curation` WHERE `content_url` = ?";
 
     private static final String PAYLOAD_CATEGORY_ID = "categoryId";
     private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
@@ -35,7 +34,6 @@ public class AddNewContentCuration extends EndpointHandler{
     private static final String PAYLOAD_CONTENT_URL = "contentUrl";
     private static final String PAYLOAD_CONTENT_DESCRIPTION = "contentDescription";
     private static final String PAYLOAD_CONTENT_THUMBNAIL = "thumbnailUrl";
-    private static final String PAYLOAD_CONTENT_ACCEPTED = "accepted";
 
     private static final String URL_USER_ID_KEY = "userId";
 
@@ -48,9 +46,7 @@ public class AddNewContentCuration extends EndpointHandler{
         payloadInput.put(PAYLOAD_CONTENT_URL, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_REQUIRED);
-        payloadInput.put(PAYLOAD_CONTENT_ACCEPTED, StaticRules.InputTypes.REG_INT_REQUIRED_ZERO);
     }
-
 
     @Override
     public void safeCall(RequestObject context) throws IOException {
@@ -64,10 +60,8 @@ public class AddNewContentCuration extends EndpointHandler{
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
         final Timestamp now = new Timestamp(new Date().getTime());
-        final int accepted = payload.get(PAYLOAD_CONTENT_ACCEPTED).getAsInt();
 
         Gson g = new Gson();
-        if(accepted == 1) {
             try {
                 StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
                 executor.execute(ps -> {
@@ -146,24 +140,6 @@ public class AddNewContentCuration extends EndpointHandler{
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
-        }
-
-        try {
-            StatementExecutor executor = new StatementExecutor(DELETE_FROM_CURATION);
-            executor.execute(ps -> {
-                ps.setString(1, content_url);
-
-                int rows = ps.executeUpdate();
-                if (rows <= 0) {
-                    System.out.println("Failed to update curation acceptance status");
-                    return;
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
-        }
 
         context.getResponse().setStatus(HttpStatus.OK_200);
         AddContentObject object = new AddContentObject();

@@ -18,7 +18,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.regex.Pattern;
 
-import static main.com.whitespell.peak.logic.EmailSend.*;
+import static main.com.whitespell.peak.logic.EmailSend.updateDBandSendWelcomeEmail;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC

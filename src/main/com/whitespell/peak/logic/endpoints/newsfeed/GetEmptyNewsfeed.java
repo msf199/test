@@ -1,19 +1,13 @@
 package main.com.whitespell.peak.logic.endpoints.newsfeed;
 
-import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
-import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
-import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
@@ -22,7 +16,7 @@ import java.util.ArrayList;
 public class GetEmptyNewsfeed extends EndpointHandler {
 
     private static final String USER_ID_KEY = "user_id";
-    private static String EMPTY_NEWSFEED_QUERY = "SELECT `user_id` FROM `user` WHERE `user`.`user_id` NOT IN (SELECT `user_id` FROM (`newsfeed`)) AND `email` NOT LIKE '%temporary.email'";
+    private static String EMPTY_NEWSFEED_QUERY = "SELECT `user_id` FROM `user` WHERE `user`.`user_id` NOT IN (SELECT `user_id` FROM (`newsfeed`)) AND `email` NOT LIKE '%test.email'";
 
 
     @Override

@@ -3,7 +3,6 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -13,10 +12,10 @@ import main.com.whitespell.peak.model.UserObject;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC

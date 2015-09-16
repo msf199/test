@@ -9,13 +9,17 @@ import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.NewsfeedObject;
 import main.com.whitespell.peak.model.UserObject;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 
+import javax.json.Json;
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +32,8 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String PROCESSING_URL_USER_ID = "userId";
     private static final String NEWSFEED_SIZE_LIMIT = "limit";
     private static final String NEWSFEED_OFFSET = "offset";
+
+    private static final String GET_CURRENT_NEWSFEED_QUERY = "SELECT `newsfeed_object` FROM `newsfeed` WHERE `user_id` = ?";
 
     //Admin is the user that will generate the newsfeed.
     private static int ADMIN_UID = -1;
@@ -42,7 +48,7 @@ public class GetNewsfeed extends EndpointHandler {
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
-        int user_id = Integer.parseInt(context.getUrlVariables().get(PROCESSING_URL_USER_ID));
+        final int user_id = Integer.parseInt(context.getUrlVariables().get(PROCESSING_URL_USER_ID));
 
         com.mashape.unirest.http.HttpResponse<String> stringResponse;
         Gson g = new Gson();
@@ -50,6 +56,12 @@ public class GetNewsfeed extends EndpointHandler {
         int limit = GenericAPIActions.getLimit(context.getQueryString());
         int offset = GenericAPIActions.getOffset(context.getQueryString());
         boolean outputNewsfeed = false;
+
+        //todo(cory) CALL NEWSFEED GENERATOR TO GET NEWSFEED FOR THIS USER
+
+
+
+        //HANDLE IF NEWSFEED IS EMPTY IN DB
 
         /**
          * Authenticate as "admin" to create newsfeed and allow integrationTest
@@ -105,7 +117,7 @@ public class GetNewsfeed extends EndpointHandler {
 
             ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
             for (NewsfeedObject n : newsfeedObjects) {
-                int currId = n.getNewsfeedId();
+                long currId = n.getNewsfeedId();
                 if (currId >= offset) {
                     newsfeedResponse.add(n);
                 }
