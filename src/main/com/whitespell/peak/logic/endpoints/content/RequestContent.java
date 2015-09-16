@@ -248,12 +248,12 @@ public class RequestContent extends EndpointHandler {
         }
     }
 
-    public ArrayList<ContentObject> recursiveGetChildren(ContentObject root, RequestObject context) {
+    public ArrayList<ContentObject> recursiveGetChildren(ContentObject parent, RequestObject context) {
         try {
             StatementExecutor executor1 = new StatementExecutor(GET_BUNDLE_CHILDREN);
             executor1.execute(ps -> {
 
-                ps.setInt(1, root.getContentId());
+                ps.setInt(1, parent.getContentId());
 
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
@@ -263,7 +263,7 @@ public class RequestContent extends EndpointHandler {
                         if(child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                             child.setChildren(recursiveGetChildren(child, context));
                         }
-                    root.addChild(child);
+                    parent.addChild(child);
                 }
             });
         } catch (SQLException e) {
@@ -271,7 +271,7 @@ public class RequestContent extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
             return null;
         }
-        return root.getChildren();
+        return parent.getChildren();
     }
 
 }

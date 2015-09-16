@@ -1485,6 +1485,7 @@ public class IntegrationTests extends Server {
                 .asString();
 
 
+        // add a child bundle
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1531,8 +1532,6 @@ public class IntegrationTests extends Server {
                         "\"childId\": \""+bundles[1].getContentId()+"\"" +
                         "\n}")
                 .asString();
-
-
 
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[1].getContentTypeId())

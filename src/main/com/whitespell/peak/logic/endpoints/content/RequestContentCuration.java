@@ -81,7 +81,7 @@ public class RequestContentCuration extends EndpointHandler{
          * Construct the SELECT FROM CONTENT query based on the the desired query output.
          */
         StringBuilder selectString = new StringBuilder();
-        selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
+        selectString.append("SELECT * FROM `content_curation` WHERE `content_id` > ? ");
         for (String s : queryKeys) {
             selectString.append("AND `" + s + "` = ? ");
         }
