@@ -27,12 +27,9 @@ public class StaticRules {
     public static final int MAX_AUTHENTICATION_HEADER_LENGTH = 255;
     public static final int DEFAULT_MAX_LIMIT = 50;
     public static final int DEFAULT_MIN_OFFSET = 0;
-    public static final int MAX_COMMENT_LENGTH = 255;
+    public static final int DEFAULT_MAX_CEIL = -1;
 
     public static int BUNDLE_CONTENT_TYPE = 6;
-
-
-
 
     public enum ErrorCodes {
 

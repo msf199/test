@@ -260,9 +260,9 @@ public class RequestContent extends EndpointHandler {
                     ContentObject child = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
 
-                        if(child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                            child.setChildren(recursiveGetChildren(child, context));
-                        }
+                    if(child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                        child.setChildren(recursiveGetChildren(child, context));
+                    }
                     parent.addChild(child);
                 }
             });

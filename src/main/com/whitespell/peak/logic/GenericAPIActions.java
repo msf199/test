@@ -44,4 +44,17 @@ public class GenericAPIActions {
 
         return offset;
     }
+
+    public static int getCeil(Map<String, String[]> queryString) {
+
+        int ceil = StaticRules.DEFAULT_MAX_CEIL;
+
+        if (queryString.get("ceil") != null) {
+            String ceilString = queryString.get("ceil")[0];
+            if (Safety.isInteger(ceilString)) {
+                ceil = Integer.parseInt(ceilString);
+            }
+        }
+        return ceil;
+    }
 }
