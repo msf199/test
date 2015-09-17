@@ -39,7 +39,7 @@ public class Pool {
         cpds.setPassword(Config.DB_PASS);
         SharedPoolDataSource tds = new SharedPoolDataSource();
         tds.setConnectionPoolDataSource(cpds);
-        tds.setMaxTotal(20);
+        tds.setMaxTotal(12);
         tds.setDefaultMaxWaitMillis(-1);
         tds.setValidationQuery("SELECT 1");
         tds.setDefaultMaxIdle(10);
