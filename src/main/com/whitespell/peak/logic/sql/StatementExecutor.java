@@ -23,6 +23,7 @@ public class StatementExecutor {
         } catch (CommunicationsException e) {
             Pool.initializePool();
             Logging.log("HIGH", e);
+            throw new SQLException(e);
         } finally {
             if (this.connection != null) {
                 this.connection.close();
