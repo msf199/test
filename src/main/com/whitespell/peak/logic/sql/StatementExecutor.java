@@ -1,6 +1,7 @@
 package main.com.whitespell.peak.logic.sql;
 
 import com.mysql.jdbc.exceptions.jdbc4.CommunicationsException;
+import main.com.whitespell.peak.logic.logging.Logging;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -21,6 +22,7 @@ public class StatementExecutor {
             block.process(this.statement);
         } catch (CommunicationsException e) {
             Pool.initializePool();
+            Logging.log("HIGH", e);
         } finally {
             if (this.connection != null) {
                 this.connection.close();
