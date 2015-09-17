@@ -31,7 +31,7 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String PROCESSING_URL_USER_ID = "userId";
     private static final String NEWSFEED_SIZE_LIMIT = "limit";
     private static final String NEWSFEED_OFFSET_KEY = "offset";
-    private static final String NEWSFEED_CEIL_KEY = "ciel";
+    private static final String NEWSFEED_CEIL_KEY = "ceil";
 
     private static final String FIND_USER_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String FIND_CATEGORY_FOLLOWING_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
