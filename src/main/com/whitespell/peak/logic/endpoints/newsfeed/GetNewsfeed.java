@@ -178,7 +178,6 @@ public class GetNewsfeed extends EndpointHandler {
          * If newsfeed size returned is smaller than limit, populate remaining space with category following
          */
         if(newsfeedResponse.size() < limit){
-            System.out.println("newsfeedsize after following: " +newsfeedResponse.size());
             int remaining = limit - newsfeedResponse.size();
 
             /**
@@ -192,8 +191,6 @@ public class GetNewsfeed extends EndpointHandler {
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
                         categoryIds.add(results.getInt("category_id"));
-                        System.out.println("category_id: " + results.getInt("category_id"));
-
                     }
                 });
             } catch (SQLException e) {
