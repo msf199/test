@@ -294,14 +294,14 @@ public class AddNewContent extends EndpointHandler {
                                 }
                                 catch(Exception e){
                                     Logging.log("High", e);
-                                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_SEND_DEVICE_NOTIFICATION);
-                                    return;
+                                    //context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_SEND_DEVICE_NOTIFICATION);
+                                    //return;
                                 }
                             }
 
                             if (!sent[0]) {
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_FOLLOWER_EMAIL_NOT_SENT);
-                                return;
+                               // context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_FOLLOWER_EMAIL_NOT_SENT);
+                                //return;
                             }
                         }
                     }
