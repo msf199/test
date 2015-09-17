@@ -125,15 +125,16 @@ public class GetNewsfeed extends EndpointHandler {
         for (Integer s : followerIds) {
             String ceilString = "";
             if(ceil > 0) {
-                ceilString = " AND ct.`content_id` < " + ceil;
+                ceilString = "AND ct.`content_id` < " + ceil;
             }
-            selectString.append("ct.`content_id` > " + offset + ""+ceilString+" AND ut.`user_id` = " + s +" ");
+            selectString.append("ct.`content_id` > " + offset + " "+ceilString+" AND ut.`user_id` = " + s +" ");
             if(count < followerIds.size()){
                 selectString.append(" OR ");
                 count++;
             }
         }
         selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
+
         final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
 
         /**
