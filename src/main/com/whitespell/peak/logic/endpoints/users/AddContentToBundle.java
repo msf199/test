@@ -60,6 +60,7 @@ public class AddContentToBundle extends EndpointHandler{
 
 
 
+
         /** Check if content type is bundle, and if bundle is owned by the user **/
 
         try {
@@ -71,10 +72,7 @@ public class AddContentToBundle extends EndpointHandler{
                     ps.setInt(1, FINAL_PARENT_CONTENT_ID);
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
-                        if(s.getInt("user_id") != a.getUserId()) {
-                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
-                            return;
-                        } else if(s.getInt("content_type") != StaticRules.BUNDLE_CONTENT_TYPE) {
+                        if(s.getInt("content_type") != StaticRules.BUNDLE_CONTENT_TYPE) {
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED, "Object you are accessing is not a bundle");
                             return;
                         }
