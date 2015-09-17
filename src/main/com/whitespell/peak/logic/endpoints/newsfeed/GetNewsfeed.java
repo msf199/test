@@ -78,8 +78,24 @@ public class GetNewsfeed extends EndpointHandler {
         ArrayList<Integer> categoryIds = new ArrayList<>();
         ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
 
+        /**
+         * Get the userIds current user is following.
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(FIND_USER_FOLLOWING_QUERY);
+            executor.execute(ps -> {
+                ps.setInt(1, user_id);
 
-        long startTime = System.currentTimeMillis();
+                ResultSet results = ps.executeQuery();
+                while (results.next()) {
+                    followerIds.add(results.getInt("following_id"));
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
 
         /**
          * Get the userIds current user is following.
@@ -92,7 +108,6 @@ public class GetNewsfeed extends EndpointHandler {
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
                     followerIds.add(results.getInt("following_id"));
-                    System.out.println("following: " +results.getInt("following_id"));
                 }
             });
         } catch (SQLException e) {
@@ -101,35 +116,6 @@ public class GetNewsfeed extends EndpointHandler {
             return;
         }
 
-        long endtime = System.currentTimeMillis();
-        System.out.println("find user following: " + (endtime - startTime) + "ms");
-
-        long startTime1 = System.currentTimeMillis();
-
-        /**
-         * Get the userIds current user is following.
-         */
-        try {
-            StatementExecutor executor = new StatementExecutor(FIND_USER_FOLLOWING_QUERY);
-            executor.execute(ps -> {
-                ps.setInt(1, user_id);
-
-                ResultSet results = ps.executeQuery();
-                while (results.next()) {
-                    followerIds.add(results.getInt("following_id"));
-                    System.out.println("following: " +results.getInt("following_id"));
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
-        }
-
-        long endtime1 = System.currentTimeMillis();
-        System.out.println("find user following: " + (endtime1 - startTime1) + "ms");
-
-        startTime = System.currentTimeMillis();
         /**
          * Construct the SELECT FROM CONTENT query based on the the desired query output.
          */
@@ -150,13 +136,6 @@ public class GetNewsfeed extends EndpointHandler {
         selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
         final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
 
-        System.out.println(GET_FOLLOWERS_CONTENT_QUERY);
-
-        endtime = System.currentTimeMillis();
-        System.out.println("select from content user following: " + (endtime - startTime) + "ms");
-
-
-        startTime = System.currentTimeMillis();
         /**
          * Get content based on users you are following and construct newsfeed
          */
@@ -195,11 +174,6 @@ public class GetNewsfeed extends EndpointHandler {
             return;
         }
 
-        endtime = System.currentTimeMillis();
-        System.out.println("get following content query: " + (endtime - startTime) + "ms");
-
-
-        startTime = System.currentTimeMillis();
         /**
          * If newsfeed size returned is smaller than limit, populate remaining space with category following
          */
@@ -227,10 +201,7 @@ public class GetNewsfeed extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
-            endtime = System.currentTimeMillis();
-            System.out.println("find category following: " + (endtime - startTime) + "ms");
 
-            startTime = System.currentTimeMillis();
             /**
              * Construct the SELECT FROM CONTENT query based on the the desired query output.
              */
@@ -252,13 +223,7 @@ public class GetNewsfeed extends EndpointHandler {
             }
             selectString1.append("ORDER BY ct.`content_id` DESC LIMIT " + remaining);
             final String GET_CATEGORY_FOLLOWING_CONTENT_QUERY = selectString1.toString();
-            System.out.println(GET_CATEGORY_FOLLOWING_CONTENT_QUERY);
 
-            endtime = System.currentTimeMillis();
-            System.out.println("construct select cat following: " + (endtime - startTime) + "ms");
-
-
-            startTime = System.currentTimeMillis();
             /**
              * Get content based on categories you are following and append to newsfeed
              */
@@ -296,8 +261,6 @@ public class GetNewsfeed extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
-            endtime = System.currentTimeMillis();
-            System.out.println("get cat following content query: " + (endtime - startTime) + "ms");
         }
 
         final Gson f = new Gson();
