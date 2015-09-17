@@ -35,6 +35,10 @@ public class ContentObject {
         return false;
     }
 
+    public ContentObject(){
+
+    }
+
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
                          String contentUrl, String contentDescription, String thumbnailUrl){
         this.userId = userId;
