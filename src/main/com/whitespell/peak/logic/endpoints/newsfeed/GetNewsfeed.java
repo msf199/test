@@ -120,7 +120,8 @@ public class GetNewsfeed extends EndpointHandler {
          * Construct the SELECT FROM CONTENT query based on the the desired query output.
          */
         StringBuilder selectString = new StringBuilder();
-            selectString.append("SELECT DISTINCT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
+            selectString.append("SELECT DISTINCT * FROM `content` as ct " +
+                    "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
         int count = 1;
         for (Integer s : followerIds) {
             String ceilString = "";
@@ -136,7 +137,6 @@ public class GetNewsfeed extends EndpointHandler {
         selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
 
         final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
-        System.out.println(GET_FOLLOWERS_CONTENT_QUERY);
 
         /**
          * Get content based on users you are following and construct newsfeed
@@ -221,7 +221,6 @@ public class GetNewsfeed extends EndpointHandler {
             }
             selectString1.append("ORDER BY ct.`content_id` DESC LIMIT " + remaining);
             final String GET_CATEGORY_FOLLOWING_CONTENT_QUERY = selectString1.toString();
-            System.out.println(GET_CATEGORY_FOLLOWING_CONTENT_QUERY);
 
             /**
              * Get content based on categories you are following and append to newsfeed
