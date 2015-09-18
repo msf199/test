@@ -117,69 +117,74 @@ public class GetNewsfeed extends EndpointHandler {
         }
 
         /**
-         * Construct the SELECT FROM CONTENT query based on the the desired query output.
+         * Ensure user is following another user
          */
-        StringBuilder selectString = new StringBuilder();
+        if(followerIds!= null && followerIds.size() > 0) {
+            /**
+             * Construct the SELECT FROM CONTENT query based on the the desired query output.
+             */
+            StringBuilder selectString = new StringBuilder();
             selectString.append("SELECT DISTINCT * FROM `content` as ct " +
                     "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
-        int count = 1;
-        for (Integer s : followerIds) {
-            String ceilString = "";
-            if(ceil > 0) {
-                ceilString = "AND ct.`content_id` < " + ceil;
-            }
-            selectString.append("ct.`content_id` > " + offset + " "+ceilString+" AND ut.`user_id` = " + s +" ");
-            if(count < followerIds.size()){
-                selectString.append(" OR ");
-                count++;
-            }
-        }
-        selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
-
-        final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
-
-        /**
-         * Get content based on users you are following and construct newsfeed
-         */
-        try {
-            StatementExecutor executor = new StatementExecutor(GET_FOLLOWERS_CONTENT_QUERY);
-            executor.execute(ps -> {
-                UserObject followedUser;
-                ContentObject newsfeedContent;
-
-                ResultSet results = ps.executeQuery();
-                while (results.next()) {
-                    if(results.getInt("is_child") == 1){
-                        continue;
-                    }
-
-                    followedUser = new UserObject(results.getInt(USER_ID_KEY), results.getString(USERNAME_KEY),
-                            results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
-                            results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
-
-                    newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
-                            results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                            results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(THUMBNAIL_KEY));
-
-                    if(newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                        // we are entering a nested recursiveGetChildren loop
-                        newsfeedContent.setChildren(recursiveGetChildren(newsfeedContent, context));
-                    }
-
-                    contentIdSet.add(results.getInt(CONTENT_ID_KEY));
-                    newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
+            int count = 1;
+            for (Integer s : followerIds) {
+                String ceilString = "";
+                if (ceil > 0) {
+                    ceilString = "AND ct.`content_id` < " + ceil;
                 }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
+                selectString.append("ct.`content_id` > " + offset + " " + ceilString + " AND ut.`user_id` = " + s + " ");
+                if (count < followerIds.size()) {
+                    selectString.append(" OR ");
+                    count++;
+                }
+            }
+            selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
+
+            final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
+
+            /**
+             * Get content based on users you are following and construct newsfeed
+             */
+            try {
+                StatementExecutor executor = new StatementExecutor(GET_FOLLOWERS_CONTENT_QUERY);
+                executor.execute(ps -> {
+                    UserObject followedUser;
+                    ContentObject newsfeedContent;
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        if (results.getInt("is_child") == 1) {
+                            continue;
+                        }
+
+                        followedUser = new UserObject(results.getInt(USER_ID_KEY), results.getString(USERNAME_KEY),
+                                results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
+                                results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
+
+                        newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
+                                results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
+                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(THUMBNAIL_KEY));
+
+                        if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                            // we are entering a nested recursiveGetChildren loop
+                            newsfeedContent.setChildren(recursiveGetChildren(newsfeedContent, context));
+                        }
+
+                        contentIdSet.add(results.getInt(CONTENT_ID_KEY));
+                        newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
         }
 
         /**
          * If newsfeed size returned is smaller than limit, populate remaining space with category following
          */
-        if(newsfeedResponse.size() < limit){
+        if(newsfeedResponse.size() < limit) {
             int remaining = limit - newsfeedResponse.size();
 
             /**
@@ -201,64 +206,71 @@ public class GetNewsfeed extends EndpointHandler {
                 return;
             }
 
-            /**
-             * Construct the SELECT FROM CONTENT query based on the the desired query output.
-             */
-            StringBuilder selectString1 = new StringBuilder();
-            selectString1.append("SELECT DISTINCT * FROM `content` as ct " +
-                    "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
-            int count1 = 1;
-            for (Integer s : categoryIds) {
-                String ceilString = "";
-                if(ceil > 0) {
-                    ceilString = " AND ct.`content_id` < " + ceil;
-                }
-                selectString1.append("ct.`content_id` > " + offset + " "+ceilString+" AND ct.`category_id` = " + s + " ");
-                if(count1 < categoryIds.size()){
-                    selectString1.append(" OR ");
-                    count1++;
-                }
-            }
-            selectString1.append("ORDER BY ct.`content_id` DESC LIMIT " + remaining);
-            final String GET_CATEGORY_FOLLOWING_CONTENT_QUERY = selectString1.toString();
-
-            /**
-             * Get content based on categories you are following and append to newsfeed
-             */
-            try {
-                StatementExecutor executor = new StatementExecutor(GET_CATEGORY_FOLLOWING_CONTENT_QUERY);
-                executor.execute(ps -> {
-                    UserObject followedUser;
-                    ContentObject newsfeedContent;
-
-                    ResultSet results = ps.executeQuery();
-                    while (results.next()) {
-                        if (results.getInt("is_child") == 1 || contentIdSet.contains(results.getInt(CONTENT_ID_KEY))) {
-                            continue;
-                        }
-
-                        followedUser = new UserObject(results.getInt(USER_ID_KEY), results.getString(USERNAME_KEY),
-                                results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
-                                results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
-
-                        newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
-                                results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), "(Recommended) " + results.getString(CONTENT_TITLE),
-                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-
-                        if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                            // we are entering a nested recursiveGetChildren loop
-                            newsfeedContent.setChildren(recursiveGetChildren(newsfeedContent, context));
-                        }
-
-                        contentIdSet.add(results.getInt(CONTENT_ID_KEY));
-                        newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
+            if (categoryIds != null && categoryIds.size() > 0) {
+                /**
+                 * Construct the SELECT FROM CONTENT query based on the the desired query output.
+                 */
+                StringBuilder selectString1 = new StringBuilder();
+                selectString1.append("SELECT DISTINCT * FROM `content` as ct " +
+                        "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
+                int count1 = 1;
+                for (Integer s : categoryIds) {
+                    String ceilString = "";
+                    if (ceil > 0) {
+                        ceilString = " AND ct.`content_id` < " + ceil;
                     }
-                });
-            } catch (SQLException e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                return;
+                    selectString1.append("(ct.`content_id` > " + offset + " " + ceilString + " AND ct.`category_id` = " + s + ") ");
+                    if (count1 < categoryIds.size()) {
+                        selectString1.append(" OR ");
+                        count1++;
+                    }
+                }
+                selectString1.append("ORDER BY ct.`content_id` DESC LIMIT " + remaining);
+                final String GET_CATEGORY_FOLLOWING_CONTENT_QUERY = selectString1.toString();
+
+                /**
+                 * Get content based on categories you are following and append to newsfeed
+                 */
+                try {
+                    StatementExecutor executor = new StatementExecutor(GET_CATEGORY_FOLLOWING_CONTENT_QUERY);
+                    executor.execute(ps -> {
+                        UserObject followedUser;
+                        ContentObject newsfeedContent;
+
+                        ResultSet results = ps.executeQuery();
+                        while (results.next()) {
+                            if (results.getInt("is_child") == 1 || contentIdSet.contains(results.getInt(CONTENT_ID_KEY))) {
+                                continue;
+                            }
+
+                            followedUser = new UserObject(results.getInt(USER_ID_KEY), results.getString(USERNAME_KEY),
+                                    results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
+                                    results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
+
+                            newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
+                                    results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), "(Recommended) " + results.getString(CONTENT_TITLE),
+                                    results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+
+                            if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                                // we are entering a nested recursiveGetChildren loop
+                                newsfeedContent.setChildren(recursiveGetChildren(newsfeedContent, context));
+                            }
+
+                            contentIdSet.add(results.getInt(CONTENT_ID_KEY));
+                            newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
+                        }
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
             }
+        }
+
+        if(newsfeedResponse.size() == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMPTY_NEWSFEED);
+            return;
         }
 
         final Gson f = new Gson();
