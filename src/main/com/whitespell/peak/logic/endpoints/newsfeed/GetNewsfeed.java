@@ -57,9 +57,6 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
 
-    static Set<Integer> contentIdSet = new HashSet<>();
-
-
     @Override
     protected void setUserInputs() {
         urlInput.put(PROCESSING_URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
@@ -77,6 +74,7 @@ public class GetNewsfeed extends EndpointHandler {
         ArrayList<Integer> followerIds = new ArrayList<>();
         ArrayList<Integer> categoryIds = new ArrayList<>();
         ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
+        Set<Integer> contentIdSet = new HashSet<>();
 
         /**
          * Get the userIds current user is following.
@@ -119,7 +117,7 @@ public class GetNewsfeed extends EndpointHandler {
         /**
          * Ensure user is following another user
          */
-        if(followerIds!= null && followerIds.size() > 0) {
+        if(followerIds != null && followerIds.size() > 0) {
             /**
              * Construct the SELECT FROM CONTENT query based on the the desired query output.
              */
