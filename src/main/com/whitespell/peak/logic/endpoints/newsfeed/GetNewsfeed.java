@@ -120,7 +120,8 @@ public class GetNewsfeed extends EndpointHandler {
          * Construct the SELECT FROM CONTENT query based on the the desired query output.
          */
         StringBuilder selectString = new StringBuilder();
-            selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
+            selectString.append("SELECT DISTINCT * FROM `content` as ct " +
+                    "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
         int count = 1;
         for (Integer s : followerIds) {
             String ceilString = "";
@@ -204,16 +205,15 @@ public class GetNewsfeed extends EndpointHandler {
              * Construct the SELECT FROM CONTENT query based on the the desired query output.
              */
             StringBuilder selectString1 = new StringBuilder();
-            selectString1.append("SELECT * FROM `content` as ct INNER JOIN `category_following` as cf ON ct.`user_id` = cf.`user_id` ");
-            selectString1.append("INNER JOIN `user` as ut ON cf.`user_id` = ut.`user_id` WHERE ");
-
+            selectString1.append("SELECT DISTINCT * FROM `content` as ct " +
+                    "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
             int count1 = 1;
             for (Integer s : categoryIds) {
                 String ceilString = "";
                 if(ceil > 0) {
                     ceilString = " AND ct.`content_id` < " + ceil;
                 }
-                selectString1.append("ct.`content_id` > " + offset + ""+ceilString+" AND ct.`category_id` = " + s + " ");
+                selectString1.append("ct.`content_id` > " + offset + " "+ceilString+" AND ct.`category_id` = " + s + " ");
                 if(count1 < categoryIds.size()){
                     selectString1.append(" OR ");
                     count1++;
