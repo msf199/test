@@ -164,7 +164,21 @@ public class AddNewContent extends EndpointHandler {
 
         Gson g = new Gson();
         try{
+            /**
+             * authenticate as admin to get user followers
+             */
+
             HttpResponse<String> stringResponse = null;
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                    .header("accept", "application/json")
+                    .body("{\n" +
+                            "\"userName\":\"coryqq\",\n" +
+                            "\"password\" : \"qqqqqq\"\n" +
+                            "}")
+                    .asString();
+            AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+            ADMIN_UID = ao.getUserId();
+            ADMIN_KEY = ao.getKey();
 
             stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
                     .header("accept", "application/json")
