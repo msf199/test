@@ -37,6 +37,7 @@ public class LinkFB extends EndpointHandler {
 
     private static final String UPDATE_FB_LINK_QUERY = "UPDATE `user` SET `fb_link` = ? WHERE `user_id` = ?";
     private static final String UPDATE_USER_PASS_QUERY = "UPDATE `user` SET `password` = ? WHERE `user_id` = ?";
+    private static final String UPDATE_EMAIL_VERIFICATION = "UPDATE `user` SET `email_verified` = ?, `email_token` = ?, `email_expiration` = ? WHERE `username` = ?";
 
     private static final String INSERT_USER_QUERY = "INSERT INTO `user`(`username`,`password`,`email`) VALUES (?,?,?)";
     private static final String INSERT_FB_USER_QUERY = "INSERT INTO `fb_user`(`user_id`,`link_timestamp`) VALUES (?,?)";
@@ -336,8 +337,32 @@ public class LinkFB extends EndpointHandler {
              * If completely new user, send a welcome email
              */
             if((newPeakUser[0] && newFbUser[0])){
-                EmailSend.updateDBandSendWelcomeEmail(authUsername[0], email);
+                /**
+                 * Update the user's email verification status in the database, reset email expiration and token to null.
+                 */
+                try {
+                    StatementExecutor executor = new StatementExecutor(UPDATE_EMAIL_VERIFICATION);
+                    final String finalUsername = username;
+                    final int finalEmailVerification = 1;
+                    final String finalEmailToken = null;
+                    final String finalEmailExpiration = null;
+                    executor.execute(ps -> {
+                        ps.setInt(1, finalEmailVerification);
+                        ps.setString(2, finalEmailToken);
+                        ps.setString(3, finalEmailExpiration);
+                        ps.setString(4, finalUsername);
+
+                        ps.executeUpdate();
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
             }
+            /**
+             * Authenticate the user using FB Access Token
+             */
             try {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                         .header("accept", "application/json")
