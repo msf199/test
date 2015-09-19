@@ -49,7 +49,7 @@ public class EmailSend {
             }
             boolean sent =
                     sendTokenTemplatedMessage("noreply@peakapp.me",
-                            "Pim, CEO of Peak",
+                            "Peak Fitness",
                             "Welcome to Peak!", "http://peakapp.me",
                             username, emailToken,
                             "peak", "verify_email", email);
@@ -88,7 +88,7 @@ public class EmailSend {
                     if(rows>=0){
                         sent[0] =
                                 sendTokenTemplatedMessage("noreply@peakapp.me",
-                                        "Pim, CEO of Peak",
+                                        "Peak Fitness",
                                         "Password Reset Confirmation", "http://peakapp.me",
                                         username, resetToken,
                                         "peak-1", "forgot_password", email);
@@ -121,7 +121,7 @@ public class EmailSend {
 
         sent[0] =
                 sendContentNotificationTemplatedMessage("noreply@peakapp.me",
-                        "Pim, CEO of Peak",
+                        "Peak Fitness",
                         publisherName + " uploaded a new video!", "http://peakapp.me",
                         username,  contentName, contentUrl,
                         "content-follower-notification", userThumb, email);
