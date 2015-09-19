@@ -70,22 +70,6 @@ public class CategoryPublishAction extends EndpointHandler {
         }
 
         /**
-         * Ensure that the user is authenticated properly
-         */
-
-        final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
-
-        /**
-         * currently "admin" will updated category_publishing table
-         */
-        boolean isMe = a.getUserId() == user_id;
-
-        if (!a.isAuthenticated()) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
-            return;
-        }
-
-        /**
          * Create the {@link CategoryPublishAction.ActionResponse}.
          */
         final ActionResponse response = new ActionResponse();

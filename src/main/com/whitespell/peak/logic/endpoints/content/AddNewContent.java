@@ -165,7 +165,7 @@ public class AddNewContent extends EndpointHandler {
         Gson g = new Gson();
         try{
             /**
-             * authenticate as admin to post publishing
+             * authenticate as admin to get user followers
              */
 
             HttpResponse<String> stringResponse = null;
@@ -182,7 +182,6 @@ public class AddNewContent extends EndpointHandler {
 
             stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
                     .header("accept", "application/json")
-                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                     .body("{\n" +
                             "\"categoryId\": \"" + category_id + "\",\n" +
                             "\"action\": \"publish\"\n" +
