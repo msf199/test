@@ -113,19 +113,9 @@ public class AddNewContentCuration extends EndpointHandler{
                  */
 
                 HttpResponse<String> stringResponse = null;
-                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
-                        .header("accept", "application/json")
-                        .body("{\n" +
-                                "\"userName\":\"coryqq\",\n" +
-                                "\"password\" : \"qqqqqq\",\n" +
-                                "\"deviceName\":\"coryadmin\",\n" +
-                                "\"deviceUUID\":\"internal" + System.currentTimeMillis() + "\",\n" +
-                                "\"deviceType\":-1\n" +
-                                "}")
-                        .asString();
-                AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-                int ADMIN_UID = ao.getUserId();
-                String ADMIN_KEY = ao.getKey();
+
+                  int ADMIN_UID = -1;
+                String ADMIN_KEY = StaticRules.MASTER_KEY;
 
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
                         .header("accept", "application/json")

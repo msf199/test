@@ -4,6 +4,8 @@ import main.com.whitespell.peak.logic.ApiThread;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.config.ServerProperties;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
+import main.com.whitespell.peak.logic.notifications.NotificationThread;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -24,7 +26,8 @@ public class Server {
         return calendar;
     }
 
-    public static final ApiThread apiThread = new ApiThread();
+    private static final ApiThread apiThread = new ApiThread();
+    protected static final NotificationThread notificationThread = new NotificationThread();
 
     public static void main(String[] args) throws Exception {
        start();
@@ -33,10 +36,20 @@ public class Server {
     public static void start() {
         readConfigs();
         startApi();
+        startNotifications();
     }
 
     public static void startApi() {
         apiThread.start();
+    }
+    public static void startNotifications() {
+        notificationThread.start();
+    }
+
+    public static class NotificationService {
+        public static void offerNotification(NotificationImplementation n) {
+            notificationThread.offerNotification(n);
+        }
     }
 
 

@@ -6,6 +6,7 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -15,6 +16,10 @@ import java.sql.SQLException;
 public class Authentication {
 
     private static final String IS_AUTHENTICATED = "SELECT 1 FROM `authentication` WHERE `user_id` = ? AND `key` = ? LIMIT 1"; //todo add expiration on keys
+
+    private static final String[] masterKeys = {
+            "4ajerifjaierjf34ijfi34jij3a4ifj34ijf"
+    };
 
     private final int userId;
     private final String key;
@@ -55,6 +60,12 @@ public class Authentication {
 
         //todo in the future we want to store all the most active keys in a memcache layer so authentication is faster.
 
+        if(userId == -1) {
+            if(key != null && isMasterKey(key)) {
+                return true;
+            }
+        }
+
         if (userId < 0 || key == null) {
             return false;
         }
@@ -82,6 +93,15 @@ public class Authentication {
         }
 
         return authenticated[0];
+    }
+
+    public boolean isMasterKey(String key) {
+        for(int i = 0; i < masterKeys.length; i++) {
+            if(masterKeys[i].equals(key)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getUserId() {

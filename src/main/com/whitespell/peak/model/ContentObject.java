@@ -35,9 +35,6 @@ public class ContentObject {
         return false;
     }
 
-    public ContentObject(){
-
-    }
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
                          String contentUrl, String contentDescription, String thumbnailUrl){
@@ -61,6 +58,7 @@ public class ContentObject {
         this.contentDescription = contentDescription;
         this.thumbnailUrl = thumbnailUrl;
     }
+
 
     public void setChildren(ArrayList<ContentObject> children) {
         this.children = children;
