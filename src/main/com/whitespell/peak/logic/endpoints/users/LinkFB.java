@@ -410,7 +410,6 @@ public class LinkFB extends EndpointHandler {
                                 "\"deviceType\":\"" + deviceType[0] + "\"\n" +
                                 "}")
                         .asString();
-                System.out.println("in linkFB: "+stringResponse.getBody());
 
                 Gson g = new Gson();
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
