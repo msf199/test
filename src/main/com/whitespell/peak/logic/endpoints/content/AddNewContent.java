@@ -144,6 +144,29 @@ public class AddNewContent extends EndpointHandler {
         }
 
         /**
+         * Delete from content_curated table if exists: used for contentCuration.
+         * The contentCurated endpoint adds content to the content_curation table
+         * and the content endpoint deletes it from the curation table in order to "accept" it into the content table.
+        */
+        try {
+            StatementExecutor executor = new StatementExecutor(DELETE_FROM_CURATION);
+            executor.execute(ps -> {
+                ps.setString(1, content_url);
+
+                int rows = ps.executeUpdate();
+                if (rows <= 0) {
+                    /**
+                     * Continue execution if no matching content in curation table to allow content to be added normally.
+                     */
+                    System.out.println("Failed to delete from curation table");
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+        }
+
+        /**
          * Update user as publisher in database
          */
 
@@ -167,10 +190,10 @@ public class AddNewContent extends EndpointHandler {
 
         Gson g = new Gson();
         try{
-            /**
-             * authenticate as admin to get user followers
-             */
 
+            /**
+             * Update category publishing based on content uploaded
+             */
             HttpResponse<String> stringResponse = null;
 
             stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + user_id + "/publishing")
@@ -191,8 +214,9 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
-
-
+        /**
+         * Send notifications to users for the ContentUpload
+         */
         Server.NotificationService.offerNotification(new ContentUploadedNotification(user_id, new ContentObject(
                 category_id,
                 user_id,
@@ -202,10 +226,7 @@ public class AddNewContent extends EndpointHandler {
                 content_url,
                 content_description,
                 thumbnail_url
-
-
         )));
-
 
         context.getResponse().setStatus(HttpStatus.OK_200);
         AddContentObject object = new AddContentObject();
