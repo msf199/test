@@ -86,9 +86,6 @@ public class GetContentComments extends EndpointHandler {
                                 commentUser.setUserId(posterUserId);
                                 commentUser.setUserName(results2.getString("username"));
                                 commentUser.setThumbnail(results2.getString("thumbnail"));
-                            } else {
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                                return;
                             }
                         });
                     } catch (SQLException e) {

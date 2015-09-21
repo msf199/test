@@ -31,6 +31,9 @@ public class LinkFB extends EndpointHandler {
 
     private static final String ACCESS_TOKEN_KEY = "accessToken";
     private static final String PASSWORD_KEY = "password";
+    private static final String PAYLOAD_DEVICE_NAME_KEY = "deviceName";
+    private static final String PAYLOAD_DEVICE_TYPE_KEY = "deviceType";
+    private static final String PAYLOAD_DEVICE_UUID_KEY = "deviceUUID";
 
     private static final String RETRIEVE_FB_USER_QUERY = "SELECT `link_timestamp` FROM `fb_user` WHERE `user_id` = ?";
     private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `email` = ?";
@@ -46,6 +49,9 @@ public class LinkFB extends EndpointHandler {
     protected void setUserInputs() {
         payloadInput.put(ACCESS_TOKEN_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED_UNLIMITED);
         payloadInput.put(PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(PAYLOAD_DEVICE_NAME_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(PAYLOAD_DEVICE_UUID_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(PAYLOAD_DEVICE_TYPE_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL_ZERO);
     }
 
     @Override
@@ -62,11 +68,41 @@ public class LinkFB extends EndpointHandler {
         String email = "test@thisisatestemail101.com";
         String accessToken = payload.get(ACCESS_TOKEN_KEY).getAsString();
         String payloadPass = null;
+        String[] deviceName = {"unknown"};
+        String[] deviceUUID = {"unknown" + System.currentTimeMillis()};
+        int[] deviceType = {-1};
+        boolean device1 = false, device2 = false, device3 = false;
+
         if(payload.get(PASSWORD_KEY) != null){
             payloadPass = payload.get(PASSWORD_KEY).getAsString();
         }
 
+        if(payload.get(PAYLOAD_DEVICE_NAME_KEY) != null) {
+            deviceName[0] = payload.get(PAYLOAD_DEVICE_NAME_KEY).getAsString();
+            device1 = true;
+        }
+
+        if(payload.get(PAYLOAD_DEVICE_UUID_KEY) != null) {
+            deviceUUID[0] = payload.get(PAYLOAD_DEVICE_UUID_KEY).getAsString();
+            device2 = true;
+        }
+
+        if(payload.get(PAYLOAD_DEVICE_TYPE_KEY) != null){
+            deviceType[0] = payload.get(PAYLOAD_DEVICE_TYPE_KEY).getAsInt();
+            device3 = true;
+        }
+
         String passHash;
+
+        /**
+         * Ensure all device details are provided
+         */
+        if(device1 || device2 || device3){
+            if(!device1 || !device2 || !device3){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PROVIDE_DEVICE_DETAILS);
+                return;
+            }
+        }
 
         /**
          * Get the temp password for the fb user
@@ -303,7 +339,10 @@ public class LinkFB extends EndpointHandler {
                         .header("accept", "application/json")
                         .body("{\n" +
                                 "\"userName\":\"" + authUsername[0] + "\",\n" +
-                                "\"password\" : \"" + payloadPass + "\"\n" +
+                                "\"password\" : \"" + payloadPass + "\",\n" +
+                                "\"deviceName\":\"" + deviceName[0] + "\",\n" +
+                                "\"deviceUUID\":\"" + deviceUUID[0] + "\",\n" +
+                                "\"deviceType\":\"" + deviceType[0] + "\"\n" +
                                 "}")
                         .asString();
 
@@ -332,9 +371,6 @@ public class LinkFB extends EndpointHandler {
             /**
              * If user is either completely new to Peak or already has merged their account with FB
              * authenticate using the FB access token.
-             */
-            /**
-             * If completely new user, send a welcome email
              */
             if((newPeakUser[0] && newFbUser[0])){
                 /**
@@ -368,9 +404,13 @@ public class LinkFB extends EndpointHandler {
                         .header("accept", "application/json")
                         .body("{\n" +
                                 "\"userName\":\"" + authUsername[0] + "\",\n" +
-                                "\"password\" : \"" + accessToken + "\"\n" +
+                                "\"password\" : \"" + accessToken + "\",\n" +
+                                "\"deviceName\":\"" + deviceName[0] + "\",\n" +
+                                "\"deviceUUID\":\"" + deviceUUID[0] + "\",\n" +
+                                "\"deviceType\":\"" + deviceType[0] + "\"\n" +
                                 "}")
                         .asString();
+                System.out.println("in linkFB: "+stringResponse.getBody());
 
                 Gson g = new Gson();
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);

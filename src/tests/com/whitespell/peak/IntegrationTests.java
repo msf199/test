@@ -998,6 +998,15 @@ public class IntegrationTests extends Server {
         AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
         assertEquals(add2.isCommentAdded(), true);
 
+        /**
+         * Ensure last comment is posted after the first 2
+         */
+        try {
+            Thread.currentThread().sleep(1000);
+        }catch(Exception e){
+            System.out.println("caught");
+        }
+
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
@@ -1281,8 +1290,7 @@ public class IntegrationTests extends Server {
 
     @Test
     public void testT_FacebookLoginTest() throws UnirestException {
-        TestUser user;
-        TestUser user2;
+        TestUser user, user2, user3;
         /**
          * Authenticate FB API and create our testUsers
          */
@@ -1299,18 +1307,27 @@ public class IntegrationTests extends Server {
 
             user = facebook.createTestUser(Config.FB_APP_ID);
             user2 = facebook.createTestUser(Config.FB_APP_ID);
+            user3 = facebook.createTestUser(Config.FB_APP_ID);
         } catch (Exception e) {
             Logging.log("High", e);
             return;
         }
 
         /**
-         * Test login with two different test users using the test accessTokens
+         * Test login with three different test users using the test accessTokens
+         */
+
+        /**
+         * iOS device
          */
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/facebook")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\"accessToken\":\"" + user.getAccessToken() + "\"}")
+                .body("{\"accessToken\":\"" + user.getAccessToken() + "\"," +
+                        "\"deviceName\":\"iPhone 6\",\n" +
+                        "\"deviceUUID\":\"99d82470564059f9c2e1918ffdb4a86a1869b5bf2fa7cffbadf897f553ef9c96\",\n" +
+                        "\"deviceType\":0\n" +
+                        "}")
                 .asString();
         AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
         Integer testId = a.getUserId();
@@ -1318,16 +1335,42 @@ public class IntegrationTests extends Server {
         assertEquals(testId > 0, true);
         assertEquals(testKey != null, true);
 
+        /**
+         * Android device
+         */
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/facebook")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\"accessToken\":\"" + user2.getAccessToken() + "\"}")
+                .body("{\"accessToken\":\"" + user2.getAccessToken() + "\"," +
+                        "\"deviceName\":\"Galaxy 6\",\n" +
+                        "\"deviceUUID\":\"CAAGbnO3h2g0BAGDu2NPSNNZA3shcsZCWJGgr" +
+                        "aC74mM29DXQfRUSxzCGPbZA94udKkWdUBOXKvWHrAycEAtbMTmXAt9td" +
+                        "0ZAM8qkP5kXCsiQbycWpj0JI7FVYeeLaUKxZAFCLT1SIDQ6YCJZ" +
+                        "AUP0RKj8CZAXoa6ekYEX8gh1Xp5Ng0bdSvsUeuq48zRteNDwWWi" +
+                        "xFSLhe6f4f7iqK4Ko4fQCrihuMtT99ITpLeXsALiLKwZDZD\",\n" +
+                        "\"deviceType\":\"1\"\n" +
+                        "}")
                 .asString();
         AuthenticationObject a2 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
         Integer testId2 = a2.getUserId();
         String testKey2 = a2.getKey();
         assertEquals(testId2 > 0, true);
         assertEquals(testKey2 != null, true);
+
+        /**
+         * No device information provided
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/facebook")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\"accessToken\":\"" + user3.getAccessToken() + "\"" +
+                        "}")
+                .asString();
+        AuthenticationObject a3 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        Integer testId3 = a3.getUserId();
+        String testKey3 = a3.getKey();
+        assertEquals(testId3 > 0, true);
+        assertEquals(testKey3 != null, true);
     }
 
     @Test

@@ -2,6 +2,7 @@ package main.com.whitespell.peak.logic.endpoints.authentication;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
@@ -57,7 +58,7 @@ public class AuthenticationRequest extends EndpointHandler {
         ;
         final String username;
         final String password;
-        String[] deviceName = {null};
+        String[] deviceName = {"unknown"};
         String[] deviceUUID = {"unknown" + System.currentTimeMillis()};
         int[] deviceType = {-1};
         boolean device1 = false, device2 = false, device3 = false;
@@ -180,6 +181,8 @@ public class AuthenticationRequest extends EndpointHandler {
 
                                             ps1.executeUpdate();
                                         });
+                                    }catch (MySQLIntegrityConstraintViolationException e){
+                                        System.out.println("duplicate device uuid");
                                     } catch (SQLException e) {
                                         Logging.log("High", e);
                                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
