@@ -1,5 +1,7 @@
 package main.com.whitespell.peak.logic.notifications;
 
+import main.com.whitespell.peak.logic.logging.Logging;
+
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -14,13 +16,17 @@ public class NotificationThread extends Thread {
 
     @Override
     public void run() {
-        while(!notifications.isEmpty()) {
-            NotificationImplementation notification = notifications.remove();
-            notification.send();
+        try {
+            while (!notifications.isEmpty()) {
+                NotificationImplementation notification = notifications.take();
+                notification.send();
+            }
+        }catch(Exception e){
+            Logging.log("High", e);
         }
     }
 
     public void offerNotification(NotificationImplementation n) {
-        notifications.offer(n);
+        notifications.add(n);
     }
 }
