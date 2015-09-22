@@ -115,6 +115,8 @@ public class ContentUploadedNotification implements NotificationImplementation {
                             catch(Exception e){
                                 Logging.log("High", e);
                             }
+                        } else {
+                            System.out.println("Couldn't find device information for user id: " + i);
                         }
                     }
                 }
