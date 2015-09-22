@@ -93,10 +93,10 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                             .header("Content-Type", "application/json")
                                             .header("Authorization", "key=" + Config.GOOGLE_MESSAGING_API_KEY)
                                             .body("{\"data\":{\n" +
-                                                    "\"title\": \"" + 1 + " uploaded a new video!\"" +
-                                                    "\"message\": \"" + 1 + " uploaded " + 2 + "!\"" +
+                                                    "\"title\": \"" + publisherUsername + " uploaded a new video!\"" +
+                                                    "\"message\": \"" + publisherUsername + " uploaded " + contentObject.getContentTitle() + "!\"" +
                                                     "\n},\n" +
-                                                    "\"to\": \"dxrStfyjzJI:APA91bFULn4RMTawNQr8Sg91LqKbog4AHxVtHbu-ZvcTgfCpfIujMtvob3AVPNKgDpcNQMdaZ4mr7Zma9tvzYq6Bcetpsx4YsDBMiERqeZ4cP7lxLUYaVcwBPtHoUDRqdoL27dRN84Ev\"}")
+                                                    "\"to\": \""+followerDevice.getDeviceUUID()+"\"}")
                                             .asString();
 
                                 } else if (iOSDevice) {
