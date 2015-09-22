@@ -63,6 +63,7 @@ public class AddNewContent extends EndpointHandler {
 
     @Override
     public void safeCall(RequestObject context) throws IOException {
+        System.out.println("Received content call");
         JsonObject payload = context.getPayload().getAsJsonObject();
 
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID_KEY));
@@ -143,6 +144,7 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
+        System.out.println("Removing from content cutarted");
         /**
          * Delete from content_curated table if exists: used for contentCuration.
          * The contentCurated endpoint adds content to the content_curation table
@@ -188,6 +190,7 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
+        System.out.println("adding category publishing");
         Gson g = new Gson();
         try{
 
@@ -217,6 +220,8 @@ public class AddNewContent extends EndpointHandler {
         /**
          * Send notifications to users for the ContentUpload
          */
+
+        System.out.println("Adding to notification service");
         Server.NotificationService.offerNotification(new ContentUploadedNotification(user_id, new ContentObject(
                 category_id,
                 user_id,

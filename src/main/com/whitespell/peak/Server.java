@@ -34,8 +34,11 @@ public class Server {
     }
 
     public static void start() {
+        System.out.println("Reading out configs....");
         readConfigs();
+        System.out.println("Starting API");
         startApi();
+        System.out.println("Starting notification thread");
         startNotifications();
     }
 
