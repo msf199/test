@@ -12,7 +12,7 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class NotificationThread extends Thread {
 
-    private static BlockingQueue<NotificationImplementation> notifications = new LinkedBlockingQueue<NotificationImplementation>();
+    private static BlockingQueue<NotificationImplementation> notifications = new LinkedBlockingQueue<>();
 
     private boolean running = false;
 
@@ -21,7 +21,7 @@ public class NotificationThread extends Thread {
 
         do {
             try {
-                if (notifications.isEmpty()) {
+                if (!notifications.isEmpty()) {
                     NotificationImplementation notification = notifications.take();
                     notification.send();
                 }
