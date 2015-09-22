@@ -10,4 +10,5 @@ import java.util.HashMap;
 public interface NotificationImplementation {
 
     public abstract void send();
+
 }

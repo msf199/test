@@ -12,11 +12,11 @@ public class NotificationThread extends Thread {
 
     private static BlockingQueue<NotificationImplementation> notifications = new LinkedBlockingQueue<NotificationImplementation>();
 
-    @Override
     public void run() {
         while(!notifications.isEmpty()) {
             NotificationImplementation notification = notifications.remove();
             notification.send();
+            System.out.println("Sent out notification " + notification.getClass().getSimpleName());
         }
     }
 
