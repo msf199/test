@@ -38,6 +38,7 @@ public class RequestContent extends EndpointHandler {
 
     private static final String QS_USER_ID = "userId";
     private static final String QS_CONTENT_ID = "contentId";
+    private static final String QS_CONTENT_TYPE_ID = "contentType";
     private static final String QS_CATEGORY_ID = "categoryId";
     private static final String QS_NOT_CURATED = "notCurated";
 
@@ -47,6 +48,7 @@ public class RequestContent extends EndpointHandler {
         queryStringInput.put(CONTENT_OFFSET, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_USER_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CONTENT_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_CONTENT_TYPE_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_NOT_CURATED, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
@@ -54,36 +56,43 @@ public class RequestContent extends EndpointHandler {
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
-        int temp_user_id = 0, temp_content_id = 0, temp_category_id = 0;
+        int temp_user_id = 0, temp_content_id = 0, temp_content_type_id = 0, temp_category_id = 0;
         ArrayList<String> queryKeys = new ArrayList<>();
-        ArrayList<Integer> queryValues = new ArrayList<>();
         Map<String, String[]> urlQueryString = context.getQueryString();
 
 
         if (urlQueryString.get(QS_USER_ID) != null) {
-            if (Safety.isInteger(urlQueryString.get(QS_USER_ID)[0])) {
+            if (Safety.isInteger(urlQueryString.get(QS_USER_ID)[0])
+                    && Integer.parseInt(urlQueryString.get(QS_USER_ID)[0]) > 0) {
                 temp_user_id = Integer.parseInt(urlQueryString.get(QS_USER_ID)[0]);
                 queryKeys.add("user_id");
-                queryValues.add(temp_user_id);
             }
         }
         if (urlQueryString.get(QS_CONTENT_ID) != null) {
-            if (Safety.isInteger(urlQueryString.get(QS_CONTENT_ID)[0])) {
+            if (Safety.isInteger(urlQueryString.get(QS_CONTENT_ID)[0])
+                    && Integer.parseInt(urlQueryString.get(QS_CONTENT_ID)[0]) > 0) {
                 temp_content_id = Integer.parseInt(urlQueryString.get(QS_CONTENT_ID)[0]);
                 queryKeys.add("content_id");
-                queryValues.add(temp_content_id);
+            }
+        }
+        if (urlQueryString.get(QS_CONTENT_TYPE_ID) != null) {
+            if (Safety.isInteger(urlQueryString.get(QS_CONTENT_TYPE_ID)[0])
+                    && Integer.parseInt(urlQueryString.get(QS_CONTENT_TYPE_ID)[0]) > 0) {
+                temp_content_type_id = Integer.parseInt(urlQueryString.get(QS_CONTENT_TYPE_ID)[0]);
+                queryKeys.add("content_type");
             }
         }
         if (urlQueryString.get(QS_CATEGORY_ID) != null) {
-            if (Safety.isInteger(urlQueryString.get(QS_CATEGORY_ID)[0])) {
+            if (Safety.isInteger(urlQueryString.get(QS_CATEGORY_ID)[0])
+                    && Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]) > 0) {
                 temp_category_id = Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]);
                 queryKeys.add("category_id");
-                queryValues.add(temp_category_id);
             }
         }
 
         int userId = temp_user_id;
         int contentId = temp_content_id;
+        int contentType = temp_content_type_id;
         int categoryId = temp_category_id;
         int[] userLiked = {0};
 
@@ -106,7 +115,6 @@ public class RequestContent extends EndpointHandler {
         selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
         for (String s : queryKeys) {
             selectString.append("AND `" + s + "` = ? ");
-
         }
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
@@ -119,25 +127,32 @@ public class RequestContent extends EndpointHandler {
             final int finalLimit = GenericAPIActions.getLimit(context.getQueryString());
             final int finalOffset = GenericAPIActions.getOffset(context.getQueryString());
             final int finalCategoryId = categoryId;
-            StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
             final int finalUserId = userId;
             final int finalContentId = contentId;
+            final int finalContentType = contentType;
+
+            StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
+
             executor.execute(ps -> {
                 ps.setInt(1, finalOffset);
                 int count = 2;
 
-                if (queryValues.contains(finalUserId)) {
+                if (queryKeys.contains("user_id")) {
                     ps.setInt(count, finalUserId);
                     count++;
                 }
 
-
-                if (queryValues.contains(finalContentId)) {
+                if (queryKeys.contains("content_id")) {
                     ps.setInt(count, finalContentId);
                     count++;
                 }
 
-                if (queryValues.contains(finalCategoryId)) {
+                if (queryKeys.contains("content_type")) {
+                    ps.setInt(count, finalContentType);
+                    count++;
+                }
+
+                if (queryKeys.contains("category_id")) {
                     ps.setInt(count, finalCategoryId);
                     count++;
                 }

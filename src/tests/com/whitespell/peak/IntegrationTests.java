@@ -550,6 +550,33 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
         assertEquals(content[0].getUserId(), TEST_UID);
 
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getContentId(), content[0].getContentId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
+        assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
+        assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
+        assertEquals(content[0].getUserId(), TEST_UID);
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[1].getContentTypeId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getCategoryId(), categories[1].getCategoryId());
+        assertEquals(content[0].getContentTitle(), "content2");
+        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=content2");
+        assertEquals(content[0].getContentDescription(), "content2");
+        assertEquals(content[0].getThumbnailUrl(), "thumb.com");
+        assertEquals(content[0].getUserId(), TEST2_UID);
+
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?categoryId=" + categories[0].getCategoryId() )
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -876,7 +903,7 @@ public class IntegrationTests extends Server {
 
         for(int i = 0; i < 3; i++){
             System.out.println(content[i].getContentId());
-            /*if(i == 0) {
+            if(i == 0) {
                 assertEquals(n[i].getNewsfeedId(), content[2].getContentId());
                 assertEquals(n[i].getNewsfeedUser().getUserId(), TEST2_UID);
                 assertEquals(n[i].getNewsfeedContent().getContentTitle(), "content2");
@@ -888,7 +915,7 @@ public class IntegrationTests extends Server {
                 assertEquals(n[i].getNewsfeedId(), content[0].getContentId());
                 assertEquals(n[i].getNewsfeedUser().getUserId(), TEST_UID);
                 assertEquals(n[i].getNewsfeedContent().getContentTitle(), "(Recommended) " + content[0].getContentTitle());
-            }*/
+            }
         }
     }
 
@@ -1472,7 +1499,6 @@ public class IntegrationTests extends Server {
     @Test
     public void testV_makeBundleTest() throws UnirestException {
 
-
         // create the root bundle
             Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
                     .header("accept", "application/json")
@@ -1502,8 +1528,6 @@ public class IntegrationTests extends Server {
                         "\n}")
                 .asString();
 
-
-
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1516,7 +1540,6 @@ public class IntegrationTests extends Server {
                         "\"thumbnailUrl\": \"thumburl.com\"" +
                         "\n}")
                 .asString();
-
 
         // add a child bundle
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
@@ -1532,7 +1555,6 @@ public class IntegrationTests extends Server {
                         "\n}")
                 .asString();
 
-
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1545,8 +1567,6 @@ public class IntegrationTests extends Server {
                         "\"thumbnailUrl\": \"thumburl.com\"" +
                         "\n}")
                 .asString();
-
-
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[0].getContentTypeId())
                 .header("accept", "application/json")
@@ -1585,9 +1605,6 @@ public class IntegrationTests extends Server {
                         "\"childId\": \""+videos[0].getContentId()+"\"" +
                         "\n}")
                 .asString();
-
-
-
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
                 .header("accept", "application/json")
@@ -1629,8 +1646,7 @@ public class IntegrationTests extends Server {
         for(ContentObject c: finalBundleResponse.getChildren()) {
             System.out.println(c.getContentId() + "---" + c.getContentDescription());
         }
-        assertEquals(finalBundleResponse.getChildren().size(), 3);
-
+        assertEquals(finalBundleResponse.getChildren().size(), 4);
     }
 
 
