@@ -33,10 +33,9 @@ public final class Config {
     public static String FB_APP_ACCESS_TOKEN = FB_APP_ID + "|" + FB_APP_SECRET;
 
     //Google Cloud Messaging API information
-    public static String GOOGLE_MESSAGING_API_KEY = "AIzaSyCYfV4xUlILSVetlKpmb_UTZVCVlUClCw4";
+    public static String GOOGLE_MESSAGING_API_KEY = "AIzaSyDTv7nfVlKXo73ykx-PYpecPWMMR9iIBXA";
 
     //APNS Push API information
-    public static String APNS_MESSAGING_API_KEY = "99d82470564059f9c2e1918ffdb4a86a1869b5bf2fa7cffbadf897f553ef9c96";
     public static String APNS_CERTIFICATE_LOCATION = "certificates/iosPushCertificate.p12";
     public static String APNS_PASSWORD_KEY = "Halo2";
 

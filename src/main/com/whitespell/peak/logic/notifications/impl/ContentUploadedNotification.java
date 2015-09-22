@@ -89,16 +89,14 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                      * Use Google Cloud to send push notification to Android
                                      */
 
-                                    String googleMessagingApiKey = Config.GOOGLE_MESSAGING_API_KEY;
                                     Unirest.post("https://gcm-http.googleapis.com/gcm/send")
-                                            .header("accept", "application/json")
                                             .header("Content-Type", "application/json")
-                                            .header("Authorization", "key=" + googleMessagingApiKey)
-                                            .body("\"data\":{\n" +
-                                                    "\"title\": \"" + publisherUsername + " uploaded a new video!\"" +
-                                                    "\"message\": \"" + publisherUsername + " uploaded " + contentObject.getContentTitle() + "!\"" +
+                                            .header("Authorization", "key=" + Config.GOOGLE_MESSAGING_API_KEY)
+                                            .body("{\"data\":{\n" +
+                                                    "\"title\": \"" + 1 + " uploaded a new video!\"" +
+                                                    "\"message\": \"" + 1 + " uploaded " + 2 + "!\"" +
                                                     "\n},\n" +
-                                                    "\"to\": \"" + followerDevice.getDeviceUUID() + "\"")
+                                                    "\"to\": \"dxrStfyjzJI:APA91bFULn4RMTawNQr8Sg91LqKbog4AHxVtHbu-ZvcTgfCpfIujMtvob3AVPNKgDpcNQMdaZ4mr7Zma9tvzYq6Bcetpsx4YsDBMiERqeZ4cP7lxLUYaVcwBPtHoUDRqdoL27dRN84Ev\"}")
                                             .asString();
 
                                 } else if (iOSDevice) {
