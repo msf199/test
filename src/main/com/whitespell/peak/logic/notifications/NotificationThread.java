@@ -14,16 +14,23 @@ public class NotificationThread extends Thread {
 
     private static BlockingQueue<NotificationImplementation> notifications = new LinkedBlockingQueue<NotificationImplementation>();
 
-    @Override
+    private boolean running = false;
+
     public void run() {
-        try {
-            while (!notifications.isEmpty()) {
-                NotificationImplementation notification = notifications.take();
-                notification.send();
+        running = true;
+
+        do {
+            try {
+                if (notifications.isEmpty()) {
+                    NotificationImplementation notification = notifications.take();
+                    notification.send();
+                }
+            } catch(Exception e) {
+                Logging.log("HIGH", e);
             }
-        }catch(Exception e){
-            Logging.log("High", e);
-        }
+
+        } while (running);
+
     }
 
     public void offerNotification(NotificationImplementation n) {
