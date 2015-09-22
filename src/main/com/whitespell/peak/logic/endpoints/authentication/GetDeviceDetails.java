@@ -21,7 +21,7 @@ public class GetDeviceDetails extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        payloadInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        urlInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
     private static final String RETRIEVE_DEVICE_DETAILS = "SELECT `device_uuid`, `device_name`, `device_type` FROM `authentication` WHERE `user_id` = ? ORDER BY `authentication_id` DESC LIMIT 1";
