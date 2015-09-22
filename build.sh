@@ -35,5 +35,5 @@ mkdir -p $OUTDIR/errors $OUTDIR/install
   cp config.prop $OUTDIR/config.prop
   cp tests.prop $OUTDIR/tests.prop
   cp certificates $OUTDIR/certificates
-  cp certificates/iosPushCertificate.p12 $OUTDIR/iosPushCertificate.p12
+  cp certificates/iosPushCertificate.p12 $OUTDIR/certificates/iosPushCertificate.p12
 
