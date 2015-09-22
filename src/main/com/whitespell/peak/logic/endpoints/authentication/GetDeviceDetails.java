@@ -24,7 +24,7 @@ public class GetDeviceDetails extends EndpointHandler {
         payloadInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
-    private static final String RETRIEVE_DEVICE_DETAILS = "SELECT `device_uuid`, `device_name`, `device_type` FROM `authentication` WHERE `user_id` = ? LIMIT 1";
+    private static final String RETRIEVE_DEVICE_DETAILS = "SELECT `device_uuid`, `device_name`, `device_type` FROM `authentication` WHERE `user_id` = ? ORDER BY `authentication_id` DESC LIMIT 1";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
