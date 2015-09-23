@@ -124,6 +124,7 @@ public class EmailSend {
                 sendContentNotificationTemplatedMessage("noreply@peakapp.me",
                         "Peak Fitness",
                         publisherName + " uploaded a new video!", "https://peakapp.me",
+
                         publisherName,  contentName, contentUrl,
                         "content-follower-notification", userThumb, email);
 

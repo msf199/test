@@ -46,8 +46,8 @@ public class AuthenticationRequest extends EndpointHandler {
     private static final String RETRIEVE_USERNAME = "SELECT `username` FROM `user` WHERE `email` = ? LIMIT 1";
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
 
-    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`, `expires`) " +
-            "VALUES (?,?,?,?)";
+    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`, `created`, `expires`, `last_activity`) " +
+            "VALUES (?,?,?,?,?,?)";
 
     private static final String INSERT_DEVICE_DETAILS = "INSERT INTO `device`(`device_uuid`, `device_name`, `device_type`) " +
             "VALUES (?,?,?)";
@@ -201,7 +201,9 @@ public class AuthenticationRequest extends EndpointHandler {
                                         ps2.setInt(1, ao.getUserId());
                                         ps2.setString(2, ao.getKey());
                                         ps2.setString(3, finalDeviceUUID);
-                                        ps2.setTimestamp(4, new Timestamp(Server.getCalendar().getTimeInMillis() + (86400000 * 365 * 1)));
+                                        ps2.setTimestamp(4, new Timestamp(Server.getCalendar().getTimeInMillis()));
+                                        ps2.setTimestamp(5, new Timestamp(Server.getCalendar().getTimeInMillis() + (86400000 * 365 * 1)));
+                                        ps2.setTimestamp(6, new Timestamp(Server.getCalendar().getTimeInMillis()));
 
                                         ps2.executeUpdate();
                                     });

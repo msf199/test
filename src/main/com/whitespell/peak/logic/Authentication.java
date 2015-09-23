@@ -17,7 +17,7 @@ import java.util.HashMap;
  */
 public class Authentication {
 
-    private static final String IS_AUTHENTICATED = "SELECT `expires` FROM `authentication` WHERE `user_id` = ? AND `key` = ? AND `expires` AFTER ? LIMIT 1"; //todo add expiration on keys
+    private static final String IS_AUTHENTICATED = "SELECT `expires` FROM `authentication` WHERE `user_id` = ? AND `key` = ? AND `expires` > ? LIMIT 1"; //todo add expiration on keys
     private static final String UPDATE_ACTIVITY = "UPDATE `authentication` SET `last_activity` = ? , `expires` = ? WHERE `user_id` = ? AND `key` = ? LIMIT 1";
     private static final String[] masterKeys = {
             "4ajerifjaierjf34ijfi34jij3a4ifj34ijf"

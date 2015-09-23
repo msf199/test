@@ -21,10 +21,11 @@ public class GetDeviceDetails extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
-        payloadInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        urlInput.put(URL_USER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
-    private static final String RETRIEVE_DEVICE_DETAILS = "SELECT `device_uuid`, `device_name`, `device_type` FROM `authentication` WHERE `user_id` = ? ORDER BY `authentication_id` DESC LIMIT 1";
+    private static final String RETRIEVE_DEVICE_DETAILS = "SELECT au.`device_uuid`, de.`device_type` FROM `authentication` as au INNER JOIN" +
+            " `device` as de ON au.`device_uuid`=de.`device_uuid` WHERE au.`user_id` = ? ORDER BY au.`authentication_id` DESC LIMIT 1";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
@@ -43,7 +44,6 @@ public class GetDeviceDetails extends EndpointHandler {
                 DeviceInfo d = new DeviceInfo();
                 if (r.next()){
                     d.setDeviceUUID(r.getString("device_uuid"));
-                    d.setDeviceName(r.getString("device_name"));
                     d.setDeviceType(r.getInt("device_type"));
                 }else{
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_RETRIEVE_DEVICE_DETAILS);
