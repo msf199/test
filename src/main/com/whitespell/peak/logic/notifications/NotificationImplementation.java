@@ -30,7 +30,7 @@ public interface NotificationImplementation {
                     ps1.setString(2, n.getNotificationText());
                     ps1.setString(3, n.getNotificationAction());
                     ps1.setInt(4, n.getNotificationBadge());
-                    ps1.setInt(5, n.getNotificationBadge());
+                    ps1.setInt(5, n.getNotificationSound());
 
                     ps1.executeUpdate();
                 });

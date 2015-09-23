@@ -34,9 +34,9 @@ public class UserNotification {
     private int userId;
     private String notificationText;
     private String notificationAction;
-    private int notificationBadge;
-    private int notificationSound;
-    private int notificationStatus;
+    private int notificationBadge = 0;
+    private int notificationSound = 0;
+    private int notificationStatus = 0;
 
     public UserNotification(int userId, String notificationText, String notificationAction) {
         this.userId = userId;
