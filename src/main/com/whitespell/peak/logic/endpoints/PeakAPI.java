@@ -19,6 +19,7 @@ import main.com.whitespell.peak.logic.endpoints.newsfeed.GetNewsfeed;
 import main.com.whitespell.peak.logic.endpoints.statistics.GetUserSignups;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
+import main.com.whitespell.peak.logic.notifications.GetUserNotifications;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -130,6 +131,9 @@ public class PeakAPI extends WhitespellAPI {
 
         //Get user device details
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetDeviceDetails(), "users/$/device", "userId");
+
+        //Get user notifications
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserNotifications(), "users/$/notifications", "userId");
 
         /**
          * STATISTICS

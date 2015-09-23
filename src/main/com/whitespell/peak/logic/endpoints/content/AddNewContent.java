@@ -37,7 +37,7 @@ public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
-    private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ? AND `timestamp` = ?";
+    private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ?";
 
     private static final String DELETE_FROM_CURATION = "DELETE FROM `content_curation` WHERE `content_url` = ?";
 
@@ -73,7 +73,7 @@ public class AddNewContent extends EndpointHandler {
         final String content_title = payload.get(PAYLOAD_CONTENT_TITLE).getAsString();
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
-        final Timestamp now = new Timestamp(new Date().getTime());
+        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
 
         int[] contentId = {0};
         int ADMIN_UID = -1;
@@ -107,7 +107,7 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(5, content_title);
                 ps.setString(6, content_description);
                 ps.setString(7, thumbnail_url);
-                ps.setString(8, now.toString());
+                ps.setTimestamp(8, now);
 
                 int rows = ps.executeUpdate();
                 if (rows <= 0){
@@ -131,7 +131,6 @@ public class AddNewContent extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_ID_QUERY);
             executor.execute(ps -> {
                 ps.setString(1, content_url);
-                ps.setString(2, now.toString());
 
                 ResultSet r = ps.executeQuery();
                 if (r.next()){
@@ -144,7 +143,7 @@ public class AddNewContent extends EndpointHandler {
             return;
         }
 
-        System.out.println("Removing from content cutarted");
+        System.out.println("Removing from content curated");
         /**
          * Delete from content_curated table if exists: used for contentCuration.
          * The contentCurated endpoint adds content to the content_curation table

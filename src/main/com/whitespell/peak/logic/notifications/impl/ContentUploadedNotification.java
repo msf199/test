@@ -19,7 +19,7 @@ import org.apache.log4j.BasicConfigurator;
 import java.util.ArrayList;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
  *         9/18/15
  *         main.com.whitespell.peak.logic.notifications
  */
@@ -75,9 +75,9 @@ public class ContentUploadedNotification implements NotificationImplementation {
                          * Send email notification to follower when uploading new content
                          */
 
-                    UserNotification n = new UserNotification(follower.getUserId(), publisherUsername + " uploaded a new video!", "open-content:"+contentObject.getContentId());
+                        UserNotification n = new UserNotification(follower.getUserId(), publisherUsername + " uploaded a new video!", "open-content:"+contentObject.getContentId());
 
-                    insertNotification(n);
+                        insertNotification(n);
 
                         sent[0] = EmailSend.sendFollowerContentNotificationEmail(
                                 follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, contentObject.getContentTitle(), contentObject.getContentUrl());
@@ -107,9 +107,9 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                                     "\"to\": \""+followerDevice.getDeviceUUID()+"\"}")
                                             .asString();
 
-                                    Logging.log("Low", stringResponse.getBody());
-                                    System.out.println(stringResponse.getBody());
-
+                                    if(!stringResponse.getBody().contains("INVALID")){
+                                        successfulNotification(n);
+                                    }
                                 } else if (iOSDevice) {
 
                                     /**
@@ -120,7 +120,7 @@ public class ContentUploadedNotification implements NotificationImplementation {
 
                                     PushNotificationPayload payload = PushNotificationPayload.complex();
 
-                                    payload.addAlert(publisherUsername + "uploaded a new video!");
+                                    payload.addAlert(publisherUsername + " uploaded a new video!");
                                     payload.addCustomDictionary("action", n.getNotificationAction());
 
 
@@ -132,6 +132,7 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                         continue;
                                     } finally {
                                         //success
+                                        successfulNotification(n);
                                     }
                                 }
                             }

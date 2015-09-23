@@ -31,6 +31,18 @@ public class UserNotification {
         return notificationStatus;
     }
 
+    public void setNotificationBadge(int notificationBadge) {
+        this.notificationBadge = notificationBadge;
+    }
+
+    public void setNotificationSound(int notificationSound) {
+        this.notificationSound = notificationSound;
+    }
+
+    public void setNotificationStatus(int notificationStatus) {
+        this.notificationStatus = notificationStatus;
+    }
+
     private int userId;
     private String notificationText;
     private String notificationAction;
