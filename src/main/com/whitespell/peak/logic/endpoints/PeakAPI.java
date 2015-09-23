@@ -3,6 +3,7 @@ package main.com.whitespell.peak.logic.endpoints;
 import main.com.whitespell.peak.logic.EndpointDispatcher;
 import main.com.whitespell.peak.logic.baseapi.WhitespellAPI;
 import main.com.whitespell.peak.logic.endpoints.authentication.AuthenticationRequest;
+import main.com.whitespell.peak.logic.endpoints.authentication.ExpireAuthentication;
 import main.com.whitespell.peak.logic.endpoints.authentication.GetDeviceDetails;
 import main.com.whitespell.peak.logic.endpoints.content.*;
 import main.com.whitespell.peak.logic.endpoints.content.categories.AddCategory;
@@ -54,6 +55,9 @@ public class PeakAPI extends WhitespellAPI {
 
         // Get a specific user based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "userId"); //always have the variable first
+
+       // Get a specific user based on their user ID
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new ExpireAuthentication(), "/users/$/logout", "userId"); //always have the variable first
 
         // Get a specific user's workout based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSavedContent(), "/users/$/saved", "userId");

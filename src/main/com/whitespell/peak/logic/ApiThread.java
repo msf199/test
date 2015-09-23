@@ -32,7 +32,7 @@ public class ApiThread extends Thread {
 
 
     public void performThreadActions() {
-        //System.out.println("backing up  at " + System.currentTimeMillis());
+        //System.out.println("backing up  at " + Server.getCalendar().getTimeInMillis());
     }
 
 }

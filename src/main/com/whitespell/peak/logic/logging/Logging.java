@@ -15,7 +15,7 @@ public class Logging {
     public static int errorsNotWrittenCount;
 
     public static void writeSampleErrors(int amount) {
-        long start = System.currentTimeMillis();
+        long start = Server.getCalendar().getTimeInMillis();
         for (int i = 0; i < amount; i++) {
             try {
                 throw new Exception();
@@ -23,14 +23,14 @@ public class Logging {
                 log("CRUCIAL", e);
             }
         }
-        long end = System.currentTimeMillis();
+        long end = Server.getCalendar().getTimeInMillis();
         System.out.println("Write sample errors took: " + (end - start) + " ms");
     }
 
     public static boolean canLogToDisk(Object err) {
         long folderSize = 0;
         try {
-            long start = System.currentTimeMillis();
+            long start = Server.getCalendar().getTimeInMillis();
             folderSize = FileChecks.folderSize(new File(Config.ERROR_PATH)) / 1000000;
             if (folderSize > Config.MAX_ERROR_FOLDER_SIZE_MB) {
                 errorsNotWrittenCount++;
@@ -43,7 +43,7 @@ public class Logging {
                 }
                 return false;
             }
-            long end = System.currentTimeMillis();
+            long end = Server.getCalendar().getTimeInMillis();
             System.out.println("Checking log files took: " + (end - start) + " ms");
         } catch (Exception e) {
             System.out.println("Error in checking file of error folder");

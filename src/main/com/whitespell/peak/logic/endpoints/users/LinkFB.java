@@ -8,6 +8,7 @@ import facebook4j.FacebookFactory;
 import facebook4j.Reading;
 import facebook4j.User;
 import facebook4j.conf.ConfigurationBuilder;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.EndpointHandler;
@@ -69,7 +70,7 @@ public class LinkFB extends EndpointHandler {
         String accessToken = payload.get(ACCESS_TOKEN_KEY).getAsString();
         String payloadPass = null;
         String[] deviceName = {"unknown"};
-        String[] deviceUUID = {"unknown" + System.currentTimeMillis()};
+        String[] deviceUUID = {"unknown" + Server.getCalendar().getTimeInMillis()};
         int[] deviceType = {-1};
         boolean device1 = false, device2 = false, device3 = false;
 
@@ -259,7 +260,7 @@ public class LinkFB extends EndpointHandler {
 
                 executor.execute(ps -> {
                     ps.setInt(1, userId[0]);
-                    ps.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+                    ps.setTimestamp(2, new Timestamp(Server.getCalendar().getTimeInMillis()));
                     int rows = ps.executeUpdate();
 
                     /**

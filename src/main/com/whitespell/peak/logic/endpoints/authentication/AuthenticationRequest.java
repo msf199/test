@@ -3,6 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.authentication;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
@@ -17,6 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 /**
@@ -44,8 +46,8 @@ public class AuthenticationRequest extends EndpointHandler {
     private static final String RETRIEVE_USERNAME = "SELECT `username` FROM `user` WHERE `email` = ? LIMIT 1";
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
 
-    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`) " +
-            "VALUES (?,?,?)";
+    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`, `expires`) " +
+            "VALUES (?,?,?,?)";
 
     private static final String INSERT_DEVICE_DETAILS = "INSERT INTO `device`(`device_uuid`, `device_name`, `device_type`) " +
             "VALUES (?,?,?)";
@@ -59,7 +61,7 @@ public class AuthenticationRequest extends EndpointHandler {
         final String username;
         final String password;
         String[] deviceName = {"unknown"};
-        String[] deviceUUID = {"unknown" + System.currentTimeMillis()};
+        String[] deviceUUID = {"unknown" + Server.getCalendar().getTimeInMillis()};
         int[] deviceType = {-1};
         boolean device1 = false, device2 = false, device3 = false;
 
@@ -162,6 +164,7 @@ public class AuthenticationRequest extends EndpointHandler {
                                 final AuthenticationObject ao = new AuthenticationObject();
                                 ao.setKey(main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextSessionId());
                                 ao.setUserId(s.getInt("user_id"));
+
                                 // insert the new authentication key into the database
                                 try {
                                     final String finalDeviceUUID = deviceUUID[0];
@@ -198,6 +201,7 @@ public class AuthenticationRequest extends EndpointHandler {
                                         ps2.setInt(1, ao.getUserId());
                                         ps2.setString(2, ao.getKey());
                                         ps2.setString(3, finalDeviceUUID);
+                                        ps2.setTimestamp(4, new Timestamp(Server.getCalendar().getTimeInMillis() + (86400000 * 365 * 1)));
 
                                         ps2.executeUpdate();
                                     });

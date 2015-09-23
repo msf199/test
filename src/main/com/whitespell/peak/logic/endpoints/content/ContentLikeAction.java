@@ -2,6 +2,7 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
@@ -48,7 +49,7 @@ public class ContentLikeAction extends EndpointHandler {
         //local variables
         final int user_id = payload.get(PAYLOAD_USER_ID_KEY).getAsInt();
         final String action = payload.get(PAYLOAD_ACTION_KEY).getAsString();
-        final Timestamp now = new Timestamp(System.currentTimeMillis());
+        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
 
         /**
          * Check that the action being performed is valid.
