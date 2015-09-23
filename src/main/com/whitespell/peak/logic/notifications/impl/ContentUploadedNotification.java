@@ -96,7 +96,7 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                      * Use Google Cloud to send push notification to Android
                                      */
 
-                                    Unirest.post("https://gcm-http.googleapis.com/gcm/send")
+                                    stringResponse = Unirest.post("https://gcm-http.googleapis.com/gcm/send")
                                             .header("Content-Type", "application/json")
                                             .header("Authorization", "key=" + Config.GOOGLE_MESSAGING_API_KEY)
                                             .body("{\"data\":{\n" +
@@ -106,6 +106,9 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                                     "\n},\n" +
                                                     "\"to\": \""+followerDevice.getDeviceUUID()+"\"}")
                                             .asString();
+
+                                    Logging.log("Low", stringResponse.getBody());
+                                    System.out.println(stringResponse.getBody());
 
                                 } else if (iOSDevice) {
 
@@ -121,8 +124,15 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                     payload.addCustomDictionary("action", n.getNotificationAction());
 
 
-                                    Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
-                                            Config.APNS_PASSWORD_KEY, false, followerDevice.getDeviceUUID());
+                                    try {
+                                        Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
+                                                Config.APNS_PASSWORD_KEY, false, followerDevice.getDeviceUUID());
+                                    } catch(Exception e) {
+                                        Logging.log("High", e);
+                                        continue;
+                                    } finally {
+                                        //success
+                                    }
                                 }
                             }
                             catch(Exception e){
