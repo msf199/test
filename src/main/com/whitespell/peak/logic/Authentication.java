@@ -1,11 +1,13 @@
 package main.com.whitespell.peak.logic;
 
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 
 /**
@@ -15,8 +17,8 @@ import java.util.HashMap;
  */
 public class Authentication {
 
-    private static final String IS_AUTHENTICATED = "SELECT 1 FROM `authentication` WHERE `user_id` = ? AND `key` = ? LIMIT 1"; //todo add expiration on keys
-
+    private static final String IS_AUTHENTICATED = "SELECT `expires` FROM `authentication` WHERE `user_id` = ? AND `key` = ? AND `expires` > ? LIMIT 1"; //todo add expiration on keys
+    private static final String UPDATE_ACTIVITY = "UPDATE `authentication` SET `last_activity` = ? , `expires` = ? WHERE `user_id` = ? AND `key` = ? LIMIT 1";
     private static final String[] masterKeys = {
             "4ajerifjaierjf34ijfi34jij3a4ifj34ijf"
     };
@@ -81,11 +83,13 @@ public class Authentication {
             executor.execute(ps -> {
                 ps.setInt(1, userId);
                 ps.setString(2, key);
+                ps.setTimestamp(3, new Timestamp(Server.getCalendar().getTimeInMillis()));
                 final ResultSet s = ps.executeQuery();
 
-                // if we do find a result, we have been authenticated
+                // if we do find a result and it hasn't expired, we have been authenticated
                 if (s.next()) {
-                    authenticated[0] = true;
+                        authenticated[0] = true;
+                        this.updateActivity(userId, key);
                 }
             });
         } catch (SQLException e) {
@@ -93,6 +97,23 @@ public class Authentication {
         }
 
         return authenticated[0];
+    }
+
+    private void updateActivity(int userId, String key) {
+        try {
+            StatementExecutor executor = new StatementExecutor(UPDATE_ACTIVITY);
+
+            executor.execute(ps -> {
+
+                ps.setTimestamp(1, new Timestamp(Server.getCalendar().getTimeInMillis())); // set last activity to now
+                ps.setTimestamp(2, new Timestamp(Server.getCalendar().getTimeInMillis() + 86400000 * 60)); // set expires to 2 months from last auth
+                ps.setInt(3, userId);
+                ps.setString(4, key);
+                ps.executeUpdate();
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+        }
     }
 
     public boolean isMasterKey(String key) {
@@ -106,5 +127,8 @@ public class Authentication {
 
     public int getUserId() {
         return userId;
+    }
+    public String getKey() {
+        return key;
     }
 }

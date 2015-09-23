@@ -2,6 +2,7 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
@@ -60,7 +61,7 @@ public class UpdateEmailVerification extends EndpointHandler {
 
                 ResultSet s = ps.executeQuery();
                 if(s.next()){
-                    Timestamp now = new Timestamp(System.currentTimeMillis());
+                    Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
                     if(s.getInt("email_verified") == 1){
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_ALREADY_VERIFIED);
                         return;

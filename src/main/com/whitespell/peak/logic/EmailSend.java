@@ -1,5 +1,6 @@
 package main.com.whitespell.peak.logic;
 
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
@@ -31,7 +32,7 @@ public class EmailSend {
 
             try {
                 StatementExecutor executor = new StatementExecutor(UPDATE_EMAIL_TOKEN);
-                Timestamp ts = new Timestamp(System.currentTimeMillis() + EXPIRES_IN_24_HOURS);
+                Timestamp ts = new Timestamp(Server.getCalendar().getTimeInMillis() + EXPIRES_IN_24_HOURS);
                 final String finalUsername = username;
                 final String finalEmailToken = emailToken;
                 final Timestamp finalEmailExpiration = ts;
@@ -122,7 +123,8 @@ public class EmailSend {
         sent[0] =
                 sendContentNotificationTemplatedMessage("noreply@peakapp.me",
                         "Peak Fitness",
-                        publisherName + " uploaded a new video!", "http://peakapp.me",
+                        publisherName + " uploaded a new video!", "https://peakapp.me",
+
                         publisherName,  contentName, contentUrl,
                         "content-follower-notification", userThumb, email);
 

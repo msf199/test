@@ -43,6 +43,7 @@ public class ImportDDL {
         tables.add("content_likes");
         tables.add("feedback");
         tables.add("reporting");
+        tables.add("notification");
 
         // add reference tables
         tables.add("user_following");

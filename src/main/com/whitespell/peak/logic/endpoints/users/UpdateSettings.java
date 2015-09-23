@@ -160,24 +160,7 @@ public class UpdateSettings extends EndpointHandler {
                             // with the result set, check if current_pass is verified
                             boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(current_pass, s.getString(PAYLOAD_CURRENT_PASSWORD_KEY));
 
-                            if (isVerified) {
-                                // initialize an authenticationobject and set the authentication key if verified
-                                final AuthenticationObject ao = new AuthenticationObject();
-                                ao.setKey(main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextSessionId());
-                                ao.setUserId(s.getInt("user_id"));
-                                // insert the new authentication key into the database
-                                try {
-                                    StatementExecutor executor = new StatementExecutor(UPDATE_AUTHENTICATION);
-
-                                    executor.execute(ps1 -> {
-                                        ps1.setInt(1, ao.getUserId());
-                                        ps1.setString(2, ao.getKey());
-                                        ps1.executeUpdate();
-                                    });
-                                } catch (SQLException e) {
-                                    Logging.log("High", e);
-                                }
-                            } else {
+                            if (!isVerified) {
                                 // if not verified, throw error
                                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
                                 return;

@@ -1,5 +1,7 @@
 package main.com.whitespell.peak.logic.sql;
 
+import main.com.whitespell.peak.Server;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,11 +25,11 @@ public class PoolTest {
             Connection con = null;
             try {
 
-                long start = System.currentTimeMillis();
+                long start = Server.getCalendar().getTimeInMillis();
 
                 con = Pool.getConnection();
 
-                PreparedStatement p = con.prepareStatement("SELECT * from `user` WHERE `user_id` = ?;");
+                PreparedStatement p = con.prepareStatement("SELECT * from `user` WHERE `user_id` = ?");
 
                 p.setInt(1, 1);
 
@@ -37,7 +39,7 @@ public class PoolTest {
                     System.out.println(s.getString("username"));
                 }
 
-                long end = System.currentTimeMillis();
+                long end = Server.getCalendar().getTimeInMillis();
 
                 tests[i] = main.com.whitespell.peak.logic.Safety.safeLongToInt(end - start);
 

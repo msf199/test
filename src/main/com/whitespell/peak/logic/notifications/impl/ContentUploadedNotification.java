@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import javapns.Push;
+import javapns.notification.PushNotificationPayload;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.authentication.GetDeviceDetails;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
+import main.com.whitespell.peak.logic.notifications.UserNotification;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
 import org.apache.log4j.BasicConfigurator;
@@ -28,6 +30,7 @@ public class ContentUploadedNotification implements NotificationImplementation {
     private int owner_user_id;
 
     private ContentObject contentObject;
+
 
     public ContentUploadedNotification(int owner_user_id, ContentObject contentObject) {
         this.owner_user_id = owner_user_id;
@@ -72,6 +75,10 @@ public class ContentUploadedNotification implements NotificationImplementation {
                          * Send email notification to follower when uploading new content
                          */
 
+                    UserNotification n = new UserNotification(follower.getUserId(), publisherUsername + " uploaded a new video!", "open-content:"+contentObject.getContentId());
+
+                    insertNotification(n);
+
                         sent[0] = EmailSend.sendFollowerContentNotificationEmail(
                                 follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, contentObject.getContentTitle(), contentObject.getContentUrl());
 
@@ -94,7 +101,8 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                             .header("Authorization", "key=" + Config.GOOGLE_MESSAGING_API_KEY)
                                             .body("{\"data\":{\n" +
                                                     "\"title\": \"" + publisherUsername + " uploaded a new video!\"" +
-                                                    "\"message\": \"" + publisherUsername + " uploaded " + contentObject.getContentTitle() + "!\"" +
+                                                    "\"message\": \"" + publisherUsername + " uploaded " + contentObject.getContentTitle() + "!\"," +
+                                                    "\"action\": \""+ n.getNotificationAction() +"\"" +
                                                     "\n},\n" +
                                                     "\"to\": \""+followerDevice.getDeviceUUID()+"\"}")
                                             .asString();
@@ -106,13 +114,22 @@ public class ContentUploadedNotification implements NotificationImplementation {
                                      */
 
                                     BasicConfigurator.configure();
-                                    Push.alert(publisherUsername + "uploaded a new video!", Config.APNS_CERTIFICATE_LOCATION,
+
+                                    PushNotificationPayload payload = PushNotificationPayload.complex();
+
+                                    payload.addAlert(publisherUsername + "uploaded a new video!");
+                                    payload.addCustomDictionary("action", n.getNotificationAction());
+
+
+                                    Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
                                             Config.APNS_PASSWORD_KEY, false, followerDevice.getDeviceUUID());
                                 }
                             }
                             catch(Exception e){
                                 Logging.log("High", e);
                             }
+                        } else {
+                            System.out.println("Couldn't find device information for user id: " + i);
                         }
                     }
                 }

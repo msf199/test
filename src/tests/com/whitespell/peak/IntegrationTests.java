@@ -13,6 +13,7 @@ import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.endpoints.authentication.ExpireAuthentication;
 import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
 import main.com.whitespell.peak.logic.endpoints.content.ContentLikeAction;
 import main.com.whitespell.peak.logic.endpoints.content.types.AddReportingType;
@@ -52,7 +53,7 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTests extends Server {
 
-    static String TEST_DB_NAME = "test_" + (System.currentTimeMillis() / 1000);
+    static String TEST_DB_NAME = "test_" + (Server.getCalendar().getTimeInMillis() / 1000);
 
     static String TEST_USERNAME = "pimdewitte";
     static String TEST_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -1647,6 +1648,34 @@ public class IntegrationTests extends Server {
             System.out.println(c.getContentId() + "---" + c.getContentDescription());
         }
         assertEquals(finalBundleResponse.getChildren().size(), 4);
+    }
+
+
+    /**
+     * DO NOT COPY SHOULD BE LAST TEST
+     */
+
+    @Test
+    public void testZ_UserLogoutTest() throws UnirestException {
+
+        /**
+         * Test feedback with different users
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/logout")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+        ExpireAuthentication.LogoutObject d = g.fromJson(stringResponse.getBody(), ExpireAuthentication.LogoutObject.class);
+        assertEquals(d.isLoggedOut(), true);
+
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        assertEquals(stringResponse.getStatus(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
     }
 
 
