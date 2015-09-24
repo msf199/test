@@ -63,7 +63,9 @@ public class SendFeedback extends EndpointHandler {
                     .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
                     .asString();
         } catch (UnirestException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
 
@@ -106,7 +108,9 @@ public class SendFeedback extends EndpointHandler {
                     .asString();
 
         } catch (UnirestException e) {
-            e.printStackTrace();
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
         feedbackSuccessObject f = new feedbackSuccessObject();
