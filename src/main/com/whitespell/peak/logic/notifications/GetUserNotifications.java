@@ -24,9 +24,14 @@ public class GetUserNotifications extends EndpointHandler {
 
     private static final String URL_USER_ID = "userId";
 
+    private static final String QS_LIMIT_KEY = "limit";
+    private static final String QS_OFFSET_KEY = "offset";
+
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+        queryStringInput.put(QS_LIMIT_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_OFFSET_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
     @Override
