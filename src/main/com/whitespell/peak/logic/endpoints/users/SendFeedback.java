@@ -68,7 +68,7 @@ public class SendFeedback extends EndpointHandler {
 
 
         /**
-         * Change only email
+         * Get as much info about the user as possible that we can use in our ticket
          */
 
         UserObject user = g.fromJson(stringResponse.getBody(), UserObject.class);
@@ -86,7 +86,7 @@ public class SendFeedback extends EndpointHandler {
 
         boolean isMe = (a.getUserId() == userId);
 
-        if (!a.isAuthenticated()) {
+        if (!a.isAuthenticated() || !isMe) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
