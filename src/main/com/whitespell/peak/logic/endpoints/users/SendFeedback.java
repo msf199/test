@@ -46,7 +46,7 @@ public class SendFeedback extends EndpointHandler {
         String message = json.get(FEEDBACK_MESSAGE_KEY).getAsString();
 
         if(message.length() < StaticRules.MIN_FEEDBACK_LENGTH) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED, "Please enter at least 1 characters :-) ");
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED, "Please enter at least "+StaticRules.MIN_FEEDBACK_LENGTH+" characters :-) ");
             return;
         }
 
