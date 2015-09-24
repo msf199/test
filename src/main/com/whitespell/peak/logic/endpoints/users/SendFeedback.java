@@ -125,6 +125,7 @@ public class SendFeedback extends EndpointHandler {
         } else {
             Logging.log("High", stringResponse.getBody());
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
         String response = g.toJson(f);
