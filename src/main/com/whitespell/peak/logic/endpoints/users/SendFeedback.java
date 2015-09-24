@@ -93,7 +93,7 @@ public class SendFeedback extends EndpointHandler {
             return;
         }
 
-        if(message.length() < 1) {
+        if(message.length() < StaticRules.MIN_FEEDBACK_LENGTH) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED, "Please enter at least 1 characters :-) ");
             return;
         }
@@ -122,6 +122,9 @@ public class SendFeedback extends EndpointHandler {
 
         if(stringResponse.getStatus() == 201) {
             f.setSuccess(true);
+        } else {
+            Logging.log("High", stringResponse.getBody());
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
         }
 
         String response = g.toJson(f);
