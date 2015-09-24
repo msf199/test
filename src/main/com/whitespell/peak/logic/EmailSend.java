@@ -49,7 +49,7 @@ public class EmailSend {
                 return null;
             }
             boolean sent =
-                    sendTokenTemplatedMessage("noreply@peakapp.me",
+                    sendTokenTemplatedMessage("peak@whitespell.com",
                             "Peak Fitness",
                             "Welcome to Peak!", "http://peakapp.me",
                             username, emailToken,
@@ -88,7 +88,7 @@ public class EmailSend {
                     int rows = ps.executeUpdate();
                     if(rows>=0){
                         sent[0] =
-                                sendTokenTemplatedMessage("noreply@peakapp.me",
+                                sendTokenTemplatedMessage("peak@whitespell.com",
                                         "Peak Fitness",
                                         "Password Reset Confirmation", "http://peakapp.me",
                                         username, resetToken,
@@ -121,7 +121,7 @@ public class EmailSend {
         boolean sent[] = {false};
 
         sent[0] =
-                sendContentNotificationTemplatedMessage("noreply@peakapp.me",
+                sendContentNotificationTemplatedMessage("peak@whitespell.com",
                         "Peak Fitness",
                         publisherName + " uploaded a new video!", "https://peakapp.me",
 
