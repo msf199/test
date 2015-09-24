@@ -93,6 +93,11 @@ public class SendFeedback extends EndpointHandler {
             return;
         }
 
+        if(message.length() < 11) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED, "Please enter at least 11 characters :-) ");
+            return;
+        }
+
 
         /**
          * curl https://{subdomain}.zendesk.com/api/v2/tickets.json \
