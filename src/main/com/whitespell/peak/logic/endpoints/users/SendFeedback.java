@@ -93,8 +93,8 @@ public class SendFeedback extends EndpointHandler {
             return;
         }
 
-        if(message.length() < 11) {
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED, "Please enter at least 11 characters :-) ");
+        if(message.length() < 1) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED, "Please enter at least 1 characters :-) ");
             return;
         }
 
@@ -109,7 +109,7 @@ public class SendFeedback extends EndpointHandler {
             stringResponse = Unirest.post("https://whitespell.zendesk.com/api/v2/tickets.json")
                     .header("Content-Type", "application/json")
                     .basicAuth("pim@whitespell.com", "XyK6bwhP")
-                    .body("{\"ticket\": {\"requester\": {\"name\": \""+user.getDisplayName()+"\", \"email\": \""+user.getEmail()+"\"}, \"subject\": \"[PEAK]: "+user.getUserName()+"("+userId+"), "+(user.getPublisher() == 1 ? "PUB" : "USR") + " : " + message.substring(0,10) + "\", \"comment\": { \"body\": \""+message+"\" }}}")
+                    .body("{\"ticket\": {\"requester\": {\"name\": \""+user.getDisplayName()+"\", \"email\": \""+user.getEmail()+"\"}, \"subject\": \"[PEAK]: "+user.getUserName()+"("+userId+"), "+(user.getPublisher() == 1 ? "PUB" : "USR") + " : " + message.substring(0,message.length() > 10 ? 10 : message.length()) + "\", \"comment\": { \"body\": \""+message+"\" }}}")
                     .asString();
 
         } catch (UnirestException e) {
