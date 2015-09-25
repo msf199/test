@@ -56,7 +56,7 @@ public class ContentLikeNotification implements NotificationImplementation {
             /**
              * Notification that someone has commented on your published video (publisher)
              */
-            if (publisher != null) {
+            if (publisher != null && like_user_id != publisher.getUserId()) {
 
                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + publisher.getUserId() + "/device")
                         .header("accept", "application/json")
