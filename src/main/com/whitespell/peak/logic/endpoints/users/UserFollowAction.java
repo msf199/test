@@ -174,7 +174,9 @@ public class UserFollowAction extends EndpointHandler {
             /**
              * Send user you are following a "new follower" notification
              */
-            Server.NotificationService.offerNotification(new NewFollowerNotification(following_user_id, user_id));
+            if(action.equalsIgnoreCase("follow")) {
+                Server.NotificationService.offerNotification(new NewFollowerNotification(following_user_id, user_id));
+            }
 
             context.getResponse().setStatus(HttpStatus.OK_200);
             FollowActionObject followObject = new FollowActionObject();
