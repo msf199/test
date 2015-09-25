@@ -64,7 +64,7 @@ public class ContentCommentNotification implements NotificationImplementation {
             /**
              * Notification that someone has commented on your published video (publisher)
              */
-            if(publisher != null) {
+            if(publisher != null && publisher.getUserId() != commenter_user_id) {
 
                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + publisher.getUserId() + "/device")
                         .header("accept", "application/json")
