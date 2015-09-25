@@ -95,7 +95,7 @@ public class ContentCommentNotification implements NotificationImplementation {
              */
             if(comments != null){
                for(int i = 0; i< comments.length; i++) {
-                   if (comments[i].getPoster().getUserId() != commenter_user_id) {
+                   if (comments[i].getPoster().getUserId() != commenter_user_id  && commenter_user_id != publisher.getUserId()) {
                        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + comments[i].getPoster().getUserId() + "/device")
                                .header("accept", "application/json")
                                .asString();
