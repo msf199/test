@@ -38,7 +38,6 @@ public class ContentCommentNotification implements NotificationImplementation {
         /**
          * Send a notification that a comment was added to your video (publisher) and send a notification to other commenters on the video (users)
          */
-        System.out.println("try contentcommentnotification");
 
         try {
             HttpResponse<String> stringResponse;

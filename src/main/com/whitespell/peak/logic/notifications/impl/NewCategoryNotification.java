@@ -31,8 +31,6 @@ public class NewCategoryNotification implements NotificationImplementation {
     @Override
     public void send() {
 
-        System.out.println("try new category notification");
-
         /**
          * Send a notification that a new category has been added
          */

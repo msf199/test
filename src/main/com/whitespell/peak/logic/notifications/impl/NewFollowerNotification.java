@@ -36,7 +36,6 @@ public class NewFollowerNotification implements NotificationImplementation {
         /**
          * Send a notification that I have a new follower
          */
-        System.out.println("try userfollower notification");
 
         try {
             HttpResponse<String> stringResponse;

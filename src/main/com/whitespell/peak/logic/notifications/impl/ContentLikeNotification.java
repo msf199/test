@@ -37,7 +37,7 @@ public class ContentLikeNotification implements NotificationImplementation {
         /**
          * Send a notification that a user liked your video (publisher)
          */
-        System.out.println("try contentlikenotification");
+
         try {
             HttpResponse<String> stringResponse;
 
