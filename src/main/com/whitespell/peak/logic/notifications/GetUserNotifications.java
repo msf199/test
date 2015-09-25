@@ -20,7 +20,7 @@ import java.util.ArrayList;
  */
 public class GetUserNotifications extends EndpointHandler {
 
-    private static final String GET_USER_NOTIFICATIONS_QUERY = "SELECT * FROM `notification` WHERE `user_id` = ? AND `notification_id` > ? LIMIT ?";
+    private static final String GET_USER_NOTIFICATIONS_QUERY = "SELECT * FROM `notification` WHERE `user_id` = ? AND `notification_id` > ? ORDER BY `notification_id` DESC LIMIT ?";
 
     private static final String URL_USER_ID = "userId";
 
@@ -69,6 +69,7 @@ public class GetUserNotifications extends EndpointHandler {
                     n.setNotificationBadge(results.getInt("notification_badge"));
                     n.setNotificationSound(results.getInt("notification_sound"));
                     n.setNotificationStatus(results.getInt("notification_status"));
+                    n.setNotificationTimestamp(results.getTimestamp("notification_timestamp"));
 
                     userNotifications.addToUserNotifications(n);
                 }

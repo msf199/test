@@ -47,7 +47,7 @@ public final class Config {
     public static int DB_PORT = 3306;
 
     //External Functionality Toggles
-
+    public static boolean NOTIFICATION_TOGGLE = true;
 
     //server.Server Ports
     public static int API_PORT = 8000;

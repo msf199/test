@@ -2,7 +2,6 @@ package main.com.whitespell.peak.logic.endpoints.newsfeed;
 
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
@@ -19,8 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Cory McAn(cmcan), Whitespell Inc.

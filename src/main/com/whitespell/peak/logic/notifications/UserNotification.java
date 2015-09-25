@@ -1,5 +1,7 @@
 package main.com.whitespell.peak.logic.notifications;
 
+import java.sql.Timestamp;
+
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
  *         9/22/15
@@ -43,12 +45,21 @@ public class UserNotification {
         this.notificationStatus = notificationStatus;
     }
 
+    public Timestamp getNotificationTimestamp() {
+        return notificationTimestamp;
+    }
+
+    public void setNotificationTimestamp(Timestamp notificationTimestamp) {
+        this.notificationTimestamp = notificationTimestamp;
+    }
+
     private int userId;
     private String notificationText;
     private String notificationAction;
     private int notificationBadge = 0;
     private int notificationSound = 0;
     private int notificationStatus = 0;
+    private Timestamp notificationTimestamp;
 
     public UserNotification(int userId, String notificationText, String notificationAction) {
         this.userId = userId;

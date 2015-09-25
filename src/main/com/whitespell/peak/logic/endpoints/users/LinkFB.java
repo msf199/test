@@ -10,7 +10,6 @@ import facebook4j.User;
 import facebook4j.conf.ConfigurationBuilder;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;

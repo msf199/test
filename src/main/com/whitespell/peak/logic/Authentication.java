@@ -8,7 +8,6 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.HashMap;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC

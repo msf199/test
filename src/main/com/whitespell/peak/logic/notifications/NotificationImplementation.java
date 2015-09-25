@@ -1,7 +1,14 @@
 package main.com.whitespell.peak.logic.notifications;
 
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import javapns.Push;
+import javapns.notification.PushNotificationPayload;
+import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.endpoints.authentication.GetDeviceDetails;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
+import org.apache.log4j.BasicConfigurator;
 
 import java.sql.SQLException;
 
@@ -56,6 +63,62 @@ public interface NotificationImplementation {
                 ps1.executeUpdate();
             });
         }catch (SQLException e) {
+            Logging.log("High", e);
+        }
+    }
+
+    public default void handleDeviceNotifications(GetDeviceDetails.DeviceInfo deviceInfo, UserNotification notification, String message){
+        boolean iOSDevice = deviceInfo.getDeviceType() == 0;
+        boolean androidDevice = deviceInfo.getDeviceType() == 1;
+        try {
+            if (androidDevice) {
+
+                /**
+                 * Use Google Cloud to send push notification to Android
+                 */
+
+                HttpResponse<String> stringResponse = Unirest.post("https://gcm-http.googleapis.com/gcm/send")
+                        .header("Content-Type", "application/json")
+                        .header("Authorization", "key=" + Config.GOOGLE_MESSAGING_API_KEY)
+                        .body("{\"data\":{\n" +
+                                "\"title\": \"" + message + "\"" +
+                                "\"message\": \"" + message + "\"," +
+                                "\"action\": \"" + notification.getNotificationAction() + "\"" +
+                                "\n},\n" +
+                                "\"to\": \"" + deviceInfo.getDeviceUUID() + "\"}")
+                        .asString();
+
+                if (!stringResponse.getBody().contains("INVALID")) {
+                    successfulNotification(notification);
+                }else{
+                    System.out.println("notificationFailed: " + stringResponse.getBody() + " deviceUUID: " + deviceInfo.getDeviceUUID());
+                }
+            } else if (iOSDevice) {
+
+                /**
+                 * Use JavaPNS API to send push notification to iOS
+                 */
+
+                BasicConfigurator.configure();
+
+                PushNotificationPayload payload = PushNotificationPayload.complex();
+
+                payload.addAlert(message);
+                payload.addCustomDictionary("action", notification.getNotificationAction());
+
+
+                try {
+                    Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
+                            Config.APNS_PASSWORD_KEY, false, deviceInfo.getDeviceUUID());
+                } catch (Exception e) {
+                    Logging.log("High", e);
+                    e.printStackTrace();
+                } finally {
+                    //success
+                    successfulNotification(notification);
+                }
+            }
+        } catch (Exception e) {
             Logging.log("High", e);
         }
     }

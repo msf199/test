@@ -10,13 +10,10 @@ import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
-import main.com.whitespell.peak.logic.endpoints.authentication.ExpireAuthentication;
 import main.com.whitespell.peak.logic.logging.Logging;
-import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
-import java.sql.SQLException;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC

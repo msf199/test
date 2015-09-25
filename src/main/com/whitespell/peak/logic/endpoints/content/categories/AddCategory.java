@@ -2,10 +2,12 @@ package main.com.whitespell.peak.logic.endpoints.content.categories;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.NewCategoryNotification;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import org.eclipse.jetty.http.HttpStatus;
@@ -86,7 +88,14 @@ public class AddCategory extends EndpointHandler {
             }
         }
 
+        /**
+         * Send a new category notification to all Peak users
+         */
+        Server.NotificationService.offerNotification(new NewCategoryNotification(category_name));
+
         if (success[0]) {
+
+
             context.getResponse().setStatus(HttpStatus.OK_200);
             AddCategoryObject object = new AddCategoryObject();
             object.setCategoryAdded(true);

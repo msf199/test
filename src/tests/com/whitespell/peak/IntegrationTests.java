@@ -5,7 +5,6 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
 import facebook4j.Facebook;
 import facebook4j.FacebookFactory;
 import facebook4j.TestUser;
@@ -117,6 +116,8 @@ public class IntegrationTests extends Server {
         for ( Logger logger : loggers ) {
             logger.setLevel(Level.OFF);
         }
+
+        Config.NOTIFICATION_TOGGLE = false;
     }
 
     @Test
@@ -1344,8 +1345,8 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\"accessToken\":\"" + user.getAccessToken() + "\"," +
-                        "\"deviceName\":\"iPhone 6\",\n" +
-                        "\"deviceUUID\":\"99d82470564059f9c2e1918ffdb4a86a1869b5bf2fa7cffbadf897f553ef9c96\",\n" +
+                        "\"deviceName\":\"iPhone 5s\",\n" +
+                        "\"deviceUUID\":\"eeaaa8d930919a6fc7675447ebacd0355dff2cd10f8b3b40aed1b7ac87383c10\",\n" +
                         "\"deviceType\":0\n" +
                         "}")
                 .asString();
@@ -1488,7 +1489,7 @@ public class IntegrationTests extends Server {
     }
 
 
-
+/*
     @Test
     public void test0030_makeBundleTest() throws UnirestException {
 
@@ -1640,10 +1641,12 @@ public class IntegrationTests extends Server {
             System.out.println(c.getContentId() + "---" + c.getContentDescription());
         }
         assertEquals(finalBundleResponse.getChildren().size(), 4);
-    }
+    }*/
 
     @Test
     public void test0031_PushNotificationTest() throws UnirestException {
+
+        Config.NOTIFICATION_TOGGLE = true;
 
         /**
          * Test that notifications are updated in DB
@@ -1690,7 +1693,10 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .body("{\n" +
                         "\"userName\":\"" + ADMIN_USERNAME + "\",\n" +
-                        "\"password\" : \"" + ADMIN_PASSWORD + "\"\n" +
+                        "\"password\" : \"" + ADMIN_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"" + ADMIN_DEVICE_UUID + "\",\n" +
+                        "\"deviceName\" : \"" + ADMIN_DEVICE_NAME + "\",\n" +
+                        "\"deviceType\" : " + ADMIN_DEVICE_TYPE + "\n" +
                         "}")
                 .asString();
         AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
@@ -1706,9 +1712,10 @@ public class IntegrationTests extends Server {
                 .body("{\n" +
                         "\"userName\":\"" + TEST_USERNAME + "\",\n" +
                         "\"password\" : \"" + TEST_PASSWORD + "\",\n" +
-                        "\"deviceUUID\" : \"" + ADMIN_DEVICE_UUID + "\",\n" +
-                        "\"deviceName\" : \"" + ADMIN_DEVICE_NAME + "\",\n" +
-                        "\"deviceType\" : " + ADMIN_DEVICE_TYPE + "\n" +
+                        "\"deviceUUID\" : \"cz-HvHQ2oX8:APA91bGbM8F4HT0BOXdORmmu0xVYVM0RMhRGXOciUmG5V92H5v-1VuWY7Svj" +
+                        "HHpOFOUeqATafD3CxPuqyzB_yg1TLAS2DlLoEGcUnsgBLW2knL-o1Q9e199hFu6eluexO8HainFRYTbW\",\n" +
+                        "\"deviceName\" : \"otheruser2\",\n" +
+                        "\"deviceType\" : "+1+"\n" +
                         "}")
                 .asString();
         AuthenticationObject a2 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
@@ -1728,6 +1735,17 @@ public class IntegrationTests extends Server {
         AuthenticationObject a3 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
         TEST2_UID = a3.getUserId();
         TEST2_KEY = a3.getKey();
+
+        /**
+         * Upload a new category, all users get a notification
+         */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"categoryName\": \"yoga\",\n" +
+                        "\"categoryThumbnail\": \"http://upperlimits.com/west-county/wp-content/uploads/2014/05/yoga.jpg\"\n" +
+                        "}")
+                .asString();
 
         /**
          * Have some users follow the admin
@@ -1779,27 +1797,93 @@ public class IntegrationTests extends Server {
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         int contentId = content[0].getContentId();
 
+        /**
+         * Have both followers like the uploaded content
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la.getActionTaken(), "like");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la1 = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la1.getActionTaken(), "like");
+
+        /**
+         * Have both followers comment on the uploaded content
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"comment\": \"awesome video!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add.isCommentAdded(), true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"comment\": \"wow this is so cool!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add2.isCommentAdded(), true);
+
+        /**
+         * Sleep to let the notifications go through (There are a lot of notifications...)
+         */
         try {
-            Thread.sleep(8000);
+            Thread.sleep(90000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
 
         /**
-         * Check for notifications on both following users
+         * Check admin user for follower notifications
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        GetUserNotifications.getUserNotificationsResponse notifications =
+                g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
+        ArrayList<UserNotification> notif = notifications.getUserNotifications();
+        for(UserNotification n : notif){
+            assertEquals(n.getNotificationStatus(), 1);
+        }
+
+        /**
+         * Check for notifications on both following users for uploaded content
          */
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/notifications")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-        GetUserNotifications.getUserNotificationsResponse notifications =
+        GetUserNotifications.getUserNotificationsResponse notifications1 =
                 g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
-        ArrayList<UserNotification> notif = notifications.getUserNotifications();
-        for(UserNotification un : notif){
-            assertEquals(un.getUserId(), TEST_UID);
-            assertEquals(un.getNotificationStatus(), 1);
-            assertEquals(un.getNotificationText(), "cory uploaded a new video!");
-            assertEquals(un.getNotificationAction(), "open-content:"+contentId);
+        ArrayList<UserNotification> notif2 = notifications.getUserNotifications();
+        for(UserNotification n : notif2){
+            assertEquals(n.getNotificationStatus(), 1);
         }
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/notifications")
@@ -1808,12 +1892,9 @@ public class IntegrationTests extends Server {
                 .asString();
         GetUserNotifications.getUserNotificationsResponse notifications2 =
                 g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
-        ArrayList<UserNotification> notif2 = notifications2.getUserNotifications();
-        for(UserNotification un : notif2){
-            assertEquals(un.getUserId(), TEST2_UID);
-            assertEquals(un.getNotificationStatus(), 1);
-            assertEquals(un.getNotificationText(), "cory uploaded a new video!");
-            assertEquals(un.getNotificationAction(), "open-content:"+contentId);
+        ArrayList<UserNotification> notif3 = notifications.getUserNotifications();
+        for(UserNotification n : notif3){
+            assertEquals(n.getNotificationStatus(), 1);
         }
     }
 
@@ -1836,6 +1917,14 @@ public class IntegrationTests extends Server {
         ExpireAuthentication.LogoutObject d = g.fromJson(stringResponse.getBody(), ExpireAuthentication.LogoutObject.class);
         assertEquals(d.isLoggedOut(), true);
 
+        /**
+         * Wait a moment to allow authentication to be deleted
+         */
+        try {
+            Thread.sleep(5000);
+        }catch(Exception e){
+            Logging.log("Low", e);
+        }
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID)
                 .header("accept", "application/json")

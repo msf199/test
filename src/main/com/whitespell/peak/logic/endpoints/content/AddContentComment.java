@@ -2,11 +2,13 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.ContentCommentNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
 import java.io.IOException;
@@ -66,6 +68,12 @@ public class AddContentComment extends EndpointHandler {
 
                 int rows = ps.executeUpdate();
                 if (rows > 0) {
+
+                    /**
+                     * Send comment notifications to other users that have commented AND to content publisher
+                     */
+                    Server.NotificationService.offerNotification(new ContentCommentNotification(user_id, content_id));
+
                     commentAdded.setCommentAdded(true);
                     Gson g = new Gson();
                     String response = g.toJson(commentAdded);

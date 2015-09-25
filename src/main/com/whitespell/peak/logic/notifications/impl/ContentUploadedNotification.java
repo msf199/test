@@ -3,8 +3,6 @@ package main.com.whitespell.peak.logic.notifications.impl;
 import com.google.gson.Gson;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import javapns.Push;
-import javapns.notification.PushNotificationPayload;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
@@ -14,7 +12,6 @@ import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
 import main.com.whitespell.peak.logic.notifications.UserNotification;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
-import org.apache.log4j.BasicConfigurator;
 
 import java.util.ArrayList;
 
@@ -74,71 +71,19 @@ public class ContentUploadedNotification implements NotificationImplementation {
                         /**
                          * Send email notification to follower when uploading new content
                          */
+                        String message = "A user you're following uploaded a video!";
 
-                        UserNotification n = new UserNotification(follower.getUserId(), publisherUsername + " uploaded a new video!", "open-content:"+contentObject.getContentId());
+                        UserNotification n = new UserNotification(follower.getUserId(), message, "open-content:"+contentObject.getContentId());
 
                         insertNotification(n);
-
                         sent[0] = EmailSend.sendFollowerContentNotificationEmail(
                                 follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, contentObject.getContentTitle(), contentObject.getContentUrl());
 
                         /**
                          * Handle device notifications
                          */
-
                         if(followerDevice != null) {
-                            boolean iOSDevice = followerDevice.getDeviceType() == 0;
-                            boolean androidDevice = followerDevice.getDeviceType() == 1;
-                            try {
-                                if (androidDevice) {
-
-                                    /**
-                                     * Use Google Cloud to send push notification to Android
-                                     */
-
-                                    stringResponse = Unirest.post("https://gcm-http.googleapis.com/gcm/send")
-                                            .header("Content-Type", "application/json")
-                                            .header("Authorization", "key=" + Config.GOOGLE_MESSAGING_API_KEY)
-                                            .body("{\"data\":{\n" +
-                                                    "\"title\": \"" + publisherUsername + " uploaded a new video!\"" +
-                                                    "\"message\": \"" + publisherUsername + " uploaded " + contentObject.getContentTitle() + "!\"," +
-                                                    "\"action\": \""+ n.getNotificationAction() +"\"" +
-                                                    "\n},\n" +
-                                                    "\"to\": \""+followerDevice.getDeviceUUID()+"\"}")
-                                            .asString();
-
-                                    if(!stringResponse.getBody().contains("INVALID")){
-                                        successfulNotification(n);
-                                    }
-                                } else if (iOSDevice) {
-
-                                    /**
-                                     * Use JavaPNS API to send push notification to iOS
-                                     */
-
-                                    BasicConfigurator.configure();
-
-                                    PushNotificationPayload payload = PushNotificationPayload.complex();
-
-                                    payload.addAlert(publisherUsername + " uploaded a new video!");
-                                    payload.addCustomDictionary("action", n.getNotificationAction());
-
-
-                                    try {
-                                        Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
-                                                Config.APNS_PASSWORD_KEY, false, followerDevice.getDeviceUUID());
-                                    } catch(Exception e) {
-                                        Logging.log("High", e);
-                                        continue;
-                                    } finally {
-                                        //success
-                                        successfulNotification(n);
-                                    }
-                                }
-                            }
-                            catch(Exception e){
-                                Logging.log("High", e);
-                            }
+                            handleDeviceNotifications(followerDevice, n, message);
                         } else {
                             System.out.println("Couldn't find device information for user id: " + i);
                         }

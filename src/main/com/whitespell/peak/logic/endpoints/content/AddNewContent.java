@@ -4,30 +4,22 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import javapns.Push;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
-import main.com.whitespell.peak.logic.endpoints.authentication.GetDeviceDetails;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.impl.ContentUploadedNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
-import main.com.whitespell.peak.model.UserObject;
-import main.com.whitespell.peak.model.authentication.AuthenticationObject;
-import org.apache.log4j.BasicConfigurator;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author Pim de Witte & Cory McAn(cmcan), Whitespell Inc.
