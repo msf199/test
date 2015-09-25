@@ -1773,6 +1773,17 @@ public class IntegrationTests extends Server {
         UserFollowAction.FollowActionObject c = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
         assertEquals(c.getActionTaken(), "followed");
 
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + ADMIN_UID + "\",\n" +
+                        "\"action\": \"unfollow\"\n" +
+                        "}")
+                .asString();
+        UserFollowAction.FollowActionObject d = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(d.getActionTaken(), "unfollowed");
+
         /**
          * Upload content as the admin
          */
@@ -1881,7 +1892,7 @@ public class IntegrationTests extends Server {
                 .asString();
         GetUserNotifications.getUserNotificationsResponse notifications1 =
                 g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
-        ArrayList<UserNotification> notif2 = notifications.getUserNotifications();
+        ArrayList<UserNotification> notif2 = notifications1.getUserNotifications();
         for(UserNotification n : notif2){
             assertEquals(n.getNotificationStatus(), 1);
         }
@@ -1892,7 +1903,7 @@ public class IntegrationTests extends Server {
                 .asString();
         GetUserNotifications.getUserNotificationsResponse notifications2 =
                 g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
-        ArrayList<UserNotification> notif3 = notifications.getUserNotifications();
+        ArrayList<UserNotification> notif3 = notifications2.getUserNotifications();
         for(UserNotification n : notif3){
             assertEquals(n.getNotificationStatus(), 1);
         }

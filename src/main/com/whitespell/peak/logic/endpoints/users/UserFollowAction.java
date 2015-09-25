@@ -169,6 +169,7 @@ public class UserFollowAction extends EndpointHandler {
         /**
          * If the action taken was successfully performed then write the response.
          */
+        System.out.println("action: "+action);
         if (response.isSuccess()) {
 
             /**
