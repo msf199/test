@@ -7,7 +7,7 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
+ * @author Pim de Witte(wwadewitte) and Cory McAn(cmcan), Whitespell LLC
  *         9/18/15
  *         main.com.whitespell.peak.logic.notifications
  */

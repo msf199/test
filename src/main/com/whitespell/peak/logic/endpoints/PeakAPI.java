@@ -135,6 +135,9 @@ public class PeakAPI extends WhitespellAPI {
         //Get user notifications
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserNotifications(), "users/$/notifications", "userId");
 
+        //Update Email Notification status
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateEmailNotification(), "users/$/notifications", "userId");
+
         /**
          * STATISTICS
          */
@@ -166,8 +169,6 @@ public class PeakAPI extends WhitespellAPI {
         // Add a new content type
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
 
-
-
         // Get a content comment
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetContentComments(), "/content/$/comments", "contentId");
 
@@ -177,10 +178,11 @@ public class PeakAPI extends WhitespellAPI {
         //Add/delete a content like
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ContentLikeAction(), "/content/$/likes", "contentId");
 
-
-        // ad a child to a bundle
+        // add a child to a bundle
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentToBundle(), "/content/$/add_child", "contentId");
 
+        // Update content title, description and/or price
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateContent(), "/content/$", "contentId");
 
         /**
          * CATEGORIES

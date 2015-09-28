@@ -52,6 +52,8 @@ public class ContentUploadedNotification implements NotificationImplementation {
             if(me != null) {
                 ArrayList<Integer> followerIds = me.getUserFollowers();
                 String publisherUsername = me.getUserName();
+                boolean sendEmail = me.getEmailNotification() == 1;
+                boolean emailVerified = me.getEmailVerified() == 1;
 
                 if (followerIds != null && followerIds.size() >= 1) {
                     for (int i : followerIds) {
@@ -71,13 +73,18 @@ public class ContentUploadedNotification implements NotificationImplementation {
                         /**
                          * Send email notification to follower when uploading new content
                          */
+
                         String message = "A user you're following uploaded a video!";
 
                         UserNotification n = new UserNotification(follower.getUserId(), message, "open-content:"+contentObject.getContentId());
 
                         insertNotification(n);
-                        sent[0] = EmailSend.sendFollowerContentNotificationEmail(
-                                follower.getUserName(), me.getThumbnail(), follower.getEmail(), publisherUsername, contentObject.getContentTitle(), contentObject.getContentUrl());
+
+                        if(sendEmail && emailVerified) {
+                            sent[0] = EmailSend.sendFollowerContentNotificationEmail(
+                                    follower.getUserName(), me.getThumbnail(), follower.getEmail(),
+                                    publisherUsername, contentObject.getContentTitle(), contentObject.getContentUrl());
+                        }
 
                         /**
                          * Handle device notifications

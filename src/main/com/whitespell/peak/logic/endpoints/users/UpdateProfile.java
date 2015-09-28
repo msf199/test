@@ -49,32 +49,26 @@ public class UpdateProfile extends EndpointHandler {
         JsonObject j = context.getPayload().getAsJsonObject();
         String temp = "", temp1 = "", temp2 = "", temp3 = "", temp4 = "";
         final ArrayList<String> updateKeys = new ArrayList<>();
-        final ArrayList<String> updateValues = new ArrayList<>();
 
         if (j.get(PAYLOAD_USERNAME_KEY) != null) {
             temp = j.get(PAYLOAD_USERNAME_KEY).getAsString();
             updateKeys.add(PAYLOAD_USERNAME_KEY);
-            updateValues.add(temp);
         }
         if (j.get(PAYLOAD_DISPLAYNAME_KEY) != null) {
             temp1 = j.get(PAYLOAD_DISPLAYNAME_KEY).getAsString();
             updateKeys.add(PAYLOAD_DISPLAYNAME_KEY);
-            updateValues.add(temp1);
         }
         if (j.get(PAYLOAD_THUMBNAIL_KEY) != null) {
             temp2 = j.get(PAYLOAD_THUMBNAIL_KEY).getAsString();
             updateKeys.add(PAYLOAD_THUMBNAIL_KEY);
-            updateValues.add(temp2);
         }
         if (j.get(PAYLOAD_COVER_PHOTO_KEY) != null) {
             temp3 = j.get(PAYLOAD_COVER_PHOTO_KEY).getAsString();
             updateKeys.add("cover_photo");
-            updateValues.add(temp3);
         }
         if (j.get(PAYLOAD_SLOGAN_KEY) != null) {
             temp4 = j.get(PAYLOAD_SLOGAN_KEY).getAsString();
             updateKeys.add(PAYLOAD_SLOGAN_KEY);
-            updateValues.add(temp4);
         }
 
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
@@ -182,23 +176,23 @@ public class UpdateProfile extends EndpointHandler {
                     UserObject user = null;
                     int count = 1;
 
-                    if (updateValues.contains(finalUsername)) {
+                    if (updateKeys.contains(PAYLOAD_USERNAME_KEY)) {
                         ps.setString(count, finalUsername);
                         count++;
                     }
-                    if (updateValues.contains(finalDisplayname)) {
+                    if (updateKeys.contains(PAYLOAD_DISPLAYNAME_KEY)) {
                         ps.setString(count, finalDisplayname);
                         count++;
                     }
-                    if (updateValues.contains(finalThumbnail)) {
+                    if (updateKeys.contains(PAYLOAD_THUMBNAIL_KEY)) {
                         ps.setString(count, finalThumbnail);
                         count++;
                     }
-                    if (updateValues.contains(finalCoverPhoto)) {
+                    if (updateKeys.contains("cover_photo")) {
                         ps.setString(count, finalCoverPhoto);
                         count++;
                     }
-                    if (updateValues.contains(finalSlogan)) {
+                    if (updateKeys.contains(PAYLOAD_SLOGAN_KEY)) {
                         ps.setString(count, finalSlogan);
                         count++;
                     }
