@@ -97,7 +97,7 @@ public class UpdateEmailNotification extends EndpointHandler {
                         context.getResponse().setStatus(HttpStatus.OK_200);
                         UserObject uo = new UserObject();
                         uo.setUserName(s.getString("username"));
-                        uo.setEmailNotification(s.getInt("email_notifications"));
+                        uo.setEmailNotifications(s.getInt("email_notifications"));
                         uo.setEmailVerified(-1);
                         uo.setUserId(finalUserId);
                         uo.setPublisher(-1);

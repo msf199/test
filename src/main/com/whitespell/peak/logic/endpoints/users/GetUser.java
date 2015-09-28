@@ -202,7 +202,7 @@ public class GetUser extends EndpointHandler {
                         user = new UserObject(initialCategories, initialFollowers, initialFollowing, initialPublishing, results.getInt("user_id"), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                                 results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
                         user.setEmailVerified(results.getInt("email_verified"));
-                        user.setEmailNotification(results.getInt("email_notifications"));
+                        user.setEmailNotifications(results.getInt("email_notifications"));
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USER_NOT_FOUND);
                         return;

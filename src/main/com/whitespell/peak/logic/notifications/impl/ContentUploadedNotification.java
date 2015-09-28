@@ -52,7 +52,7 @@ public class ContentUploadedNotification implements NotificationImplementation {
             if(me != null) {
                 ArrayList<Integer> followerIds = me.getUserFollowers();
                 String publisherUsername = me.getUserName();
-                boolean sendEmail = me.getEmailNotification() == 1;
+                boolean sendEmail = me.getEmailNotifications() == 1;
                 boolean emailVerified = me.getEmailVerified() == 1;
 
                 if (followerIds != null && followerIds.size() >= 1) {

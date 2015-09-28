@@ -2008,7 +2008,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .asString();
         UserObject user = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(user.getEmailNotification(), 1);
+        assertEquals(user.getEmailNotifications(), 1);
 
         /**
          * Disable email notifications
@@ -2021,7 +2021,7 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
         UserObject user2 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(user2.getEmailNotification(), 0);
+        assertEquals(user2.getEmailNotifications(), 0);
 
         /**
          * One more check
@@ -2032,7 +2032,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .asString();
         UserObject user3 = g.fromJson(stringResponse.getBody(), UserObject.class);
-        assertEquals(user3.getEmailNotification(), 0);
+        assertEquals(user3.getEmailNotifications(), 0);
     }
 
 
