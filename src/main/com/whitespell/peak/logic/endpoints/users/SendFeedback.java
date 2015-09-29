@@ -12,6 +12,7 @@ import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.model.UserObject;
+import org.apache.commons.lang3.StringEscapeUtils;
 
 import java.io.IOException;
 
@@ -104,22 +105,26 @@ public class SendFeedback extends EndpointHandler {
          -H "Content-Type: application/json" -v -u {email_address}:{password} -X POST
          */
 
-        try {
-            stringResponse = Unirest.post("https://whitespell.zendesk.com/api/v2/tickets.json")
-                    .header("Content-Type", "application/json")
-                    .basicAuth("pim@whitespell.com", "XyK6bwhP")
-                    .body("{\"ticket\": {\"requester\": {\"name\": \""+user.getUserName()+"\", \"email\": \""+user.getEmail()+"\"}, \"subject\": \"[PEAK]: "+user.getUserName()+"("+userId+"), "+(user.getPublisher() == 1 ? "PUB" : "USR") + " : " + message.substring(0,message.length() > 10 ? 10 : message.length()) + "\", \"comment\": { \"body\": \""+message+"\" }}}")
-                    .asString();
+        if(!Config.TESTING) {
+            message = StringEscapeUtils.escapeCsv(message);
 
-        } catch (UnirestException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
+            try {
+                stringResponse = Unirest.post("https://whitespell.zendesk.com/api/v2/tickets.json")
+                        .header("Content-Type", "application/json")
+                        .basicAuth("pim@whitespell.com", "XyK6bwhP")
+                        .body("{\"ticket\": {\"requester\": {\"name\": \"" + user.getUserName() + "\", \"email\": \"" + user.getEmail() + "\"}, \"subject\": \"[PEAK]: " + user.getUserName() + "(" + userId + "), " + (user.getPublisher() == 1 ? "PUB" : "USR") + " : " + message.substring(0, message.length() > 10 ? 10 : message.length()) + "\", \"comment\": { \"body\": \"" + message + "\" }}}")
+                        .asString();
+
+            } catch (UnirestException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
         }
 
         feedbackSuccessObject f = new feedbackSuccessObject();
 
-        if(stringResponse.getStatus() == 201) {
+        if(Config.TESTING || stringResponse != null && stringResponse.getStatus() == 201) {
             f.setSuccess(true);
         } else {
             Logging.log("High", stringResponse.getBody());
