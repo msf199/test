@@ -106,13 +106,15 @@ public class SendFeedback extends EndpointHandler {
          */
 
         if(!Config.TESTING) {
-            message = StringEscapeUtils.escapeCsv(message);
+            message = StringEscapeUtils.escapeJava(message);
+            String body = "{\"ticket\": {\"requester\": {\"name\": \"" + user.getUserName() + "\", \"email\": \"" + user.getEmail() + "\"}, \"subject\": \"[PEAK]: " + user.getUserName() + "(" + userId + "), " + (user.getPublisher() == 1 ? "PUB" : "USR") + " : " + message.substring(0, message.length() > 10 ? 10 : message.length()) + "\", \"comment\": { \"body\": \"" + message + "\" }}}";
+            Logging.log("Low", body);
 
             try {
                 stringResponse = Unirest.post("https://whitespell.zendesk.com/api/v2/tickets.json")
                         .header("Content-Type", "application/json")
                         .basicAuth("pim@whitespell.com", "XyK6bwhP")
-                        .body("{\"ticket\": {\"requester\": {\"name\": \"" + user.getUserName() + "\", \"email\": \"" + user.getEmail() + "\"}, \"subject\": \"[PEAK]: " + user.getUserName() + "(" + userId + "), " + (user.getPublisher() == 1 ? "PUB" : "USR") + " : " + message.substring(0, message.length() > 10 ? 10 : message.length()) + "\", \"comment\": { \"body\": \"" + message + "\" }}}")
+                        .body(body)
                         .asString();
 
             } catch (UnirestException e) {
