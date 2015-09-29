@@ -29,6 +29,7 @@ public class StaticRules {
     public static final int DEFAULT_MIN_OFFSET = 0;
     public static final int DEFAULT_MAX_CEIL = -1;
     public static final String MASTER_KEY = "4ajerifjaierjf34ijfi34jij3a4ifj34ijf";
+    public static final int MIN_FEEDBACK_LENGTH = 10;
 
     public static int BUNDLE_CONTENT_TYPE = 6;
 
@@ -97,7 +98,9 @@ public class StaticRules {
         PROVIDE_DEVICE_DETAILS(155, "Unable to authenticate, please provide device details", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_RETRIEVE_DEVICE_DETAILS(156, "Unable to retrieve details about user's device", HttpStatus.NOT_FOUND_404),
         COULD_NOT_SEND_DEVICE_NOTIFICATION(157, "Unable to send push notification to user's device", HttpStatus.NOT_FOUND_404),
-        EMPTY_NEWSFEED(158, "Follow some users or categories and refresh the newsfeed", HttpStatus.NOT_FOUND_404);
+        EMPTY_NEWSFEED(158, "Follow some users or categories and refresh the newsfeed", HttpStatus.NOT_FOUND_404),
+        CONTENT_NOT_EDITED(159, "Content was not edited in updateContent", HttpStatus.BAD_REQUEST_400),
+        NOTIFICATION_UPDATE_FAILED(160, "Could not update email notification status" , HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;
@@ -124,9 +127,12 @@ public class StaticRules {
 
     public enum InputTypes {
         REG_INT_REQUIRED("int", true, 1,Integer.MAX_VALUE),
+        REG_INT_REQUIRED_BOOL("int", true, 0, 1),
         REG_INT_REQUIRED_ZERO("int", true, -1,Integer.MAX_VALUE),
         REG_STRING_REQUIRED("string", true, 1,255),
         REG_STRING_REQUIRED_UNLIMITED("string", true, 1,Integer.MAX_VALUE),
+        REG_DOUBLE_REQUIRED("double", true, 1, Integer.MAX_VALUE),
+        REG_DOUBLE_OPTIONAL("double", false, 1, Integer.MAX_VALUE),
         REG_INT_OPTIONAL("int", false, 1,Integer.MAX_VALUE),
         REG_INT_OPTIONAL_ZERO("int", false, -1, Integer.MAX_VALUE),
         REG_STRING_OPTIONAL("string", false, 1,255),

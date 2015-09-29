@@ -156,8 +156,10 @@ public class Search extends EndpointHandler {
                             ResultSet results = ps.executeQuery();
 
                             while(results.next()) {
-                                tempContent.add(new ContentObject(results.getInt(USER_ID_KEY), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_KEY), results.getString(CONTENT_TITLE_KEY),
-                                        results.getString(CONTENT_URL_KEY), results.getString(CONTENT_DESCRIPTION_KEY),  results.getString(CONTENT_THUMBNAIL_KEY)));
+                                ContentObject c = new ContentObject(results.getInt(USER_ID_KEY), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_KEY), results.getString(CONTENT_TITLE_KEY),
+                                        results.getString(CONTENT_URL_KEY), results.getString(CONTENT_DESCRIPTION_KEY),  results.getString(CONTENT_THUMBNAIL_KEY));
+                                c.setPrice(results.getDouble("content_price"));
+                                tempContent.add(c);
                             }
 
                         });

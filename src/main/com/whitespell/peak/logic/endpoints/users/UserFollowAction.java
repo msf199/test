@@ -2,11 +2,13 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.NewFollowerNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -168,6 +170,14 @@ public class UserFollowAction extends EndpointHandler {
          * If the action taken was successfully performed then write the response.
          */
         if (response.isSuccess()) {
+
+            /**
+             * Send user you are following a "new follower" notification
+             */
+            if(action.equalsIgnoreCase("follow")) {
+                Server.NotificationService.offerNotification(new NewFollowerNotification(following_user_id, user_id));
+            }
+
             context.getResponse().setStatus(HttpStatus.OK_200);
             FollowActionObject followObject = new FollowActionObject();
             followObject.setActionTaken(response.getActionTaken());

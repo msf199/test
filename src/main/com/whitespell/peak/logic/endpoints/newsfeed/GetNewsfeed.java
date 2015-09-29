@@ -2,7 +2,6 @@ package main.com.whitespell.peak.logic.endpoints.newsfeed;
 
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
@@ -19,8 +18,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author Cory McAn(cmcan), Whitespell Inc.
@@ -56,6 +53,7 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
+    private static final String CONTENT_PRICE = "content_price";
 
     @Override
     protected void setUserInputs() {
@@ -162,6 +160,7 @@ public class GetNewsfeed extends EndpointHandler {
                         newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
                                 results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                                 results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                        newsfeedContent.setPrice(results.getDouble(CONTENT_PRICE));
 
                         if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                             // we are entering a nested recursiveGetChildren loop
@@ -248,6 +247,7 @@ public class GetNewsfeed extends EndpointHandler {
                             newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
                                     results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), "(Recommended) " + results.getString(CONTENT_TITLE),
                                     results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                            newsfeedContent.setPrice(results.getDouble(CONTENT_PRICE));
 
                             if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                                 // we are entering a nested recursiveGetChildren loop

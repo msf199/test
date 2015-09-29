@@ -29,6 +29,7 @@ public class RequestContent extends EndpointHandler {
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
+    private static final String CONTENT_PRICE = "content_price";
 
     private static final String GET_BUNDLE_CHILDREN = "SELECT * FROM bundle_match INNER JOIN `content` ON content.content_id=bundle_match.child_content_id where parent_content_id = ?";
 
@@ -40,7 +41,6 @@ public class RequestContent extends EndpointHandler {
     private static final String QS_CONTENT_ID = "contentId";
     private static final String QS_CONTENT_TYPE_ID = "contentType";
     private static final String QS_CATEGORY_ID = "categoryId";
-    private static final String QS_NOT_CURATED = "notCurated";
 
     @Override
     protected void setUserInputs() {
@@ -50,7 +50,6 @@ public class RequestContent extends EndpointHandler {
         queryStringInput.put(QS_CONTENT_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CONTENT_TYPE_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
-        queryStringInput.put(QS_NOT_CURATED, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
     @Override
@@ -234,6 +233,7 @@ public class RequestContent extends EndpointHandler {
 
                     ContentObject content = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
+                    content.setPrice(results.getDouble(CONTENT_PRICE));
 
                     if(content.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                         // we are entering a nested recursiveGetChildren loop

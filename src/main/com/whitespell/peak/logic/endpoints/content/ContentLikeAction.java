@@ -8,6 +8,7 @@ import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.ContentLikeNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import org.eclipse.jetty.http.HttpStatus;
 
@@ -154,6 +155,13 @@ public class ContentLikeAction extends EndpointHandler {
          * If the action taken was successfully performed then write the response.
          */
         if (ar.isSuccess()) {
+
+            /**
+             * Send notification to publisher that they have received a like on their content
+             */
+
+            Server.NotificationService.offerNotification(new ContentLikeNotification(user_id, content_id));
+
             context.getResponse().setStatus(HttpStatus.OK_200);
             LikeActionObject likeActionObject = new LikeActionObject();
             likeActionObject.setActionTaken(ar.getActionTaken());

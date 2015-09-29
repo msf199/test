@@ -11,8 +11,8 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import org.eclipse.jetty.http.HttpStatus;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 
 /**
  * Created by cory on 15/07/15.

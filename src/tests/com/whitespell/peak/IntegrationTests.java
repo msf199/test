@@ -19,6 +19,8 @@ import main.com.whitespell.peak.logic.endpoints.content.ContentLikeAction;
 import main.com.whitespell.peak.logic.endpoints.content.types.AddReportingType;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.GetUserNotifications;
+import main.com.whitespell.peak.logic.notifications.UserNotification;
 import main.com.whitespell.peak.logic.sql.Pool;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.*;
@@ -41,6 +43,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -69,6 +72,15 @@ public class IntegrationTests extends Server {
     static ContentTypeObject[] contentTypes;
     static ContentObject[] content;
 
+    static String ADMIN_USERNAME = "cory";
+    static String ADMIN_PASSWORD = "3#$$$$$494949($(%*__''";
+    static String ADMIN_EMAIL = "cory@whitespell.com";
+    static String ADMIN_DEVICE_UUID = "dxrStfyjzJI:APA91bFULn4RMTawNQr8Sg91LqKbog" +
+            "4AHxVtHbu-ZvcTgfCpfIujMtvob3AVPNKgDpcNQMdaZ4mr7Zma9tvzYq6Bcetpsx4YsDB" +
+            "MiERqeZ4cP7lxLUYaVcwBPtHoUDRqdoL27dRN84Ev";
+    static String ADMIN_DEVICE_NAME = "cory's phone";
+    static int ADMIN_DEVICE_TYPE = 1;
+
     static String SKYDIVER_USERNAME = "skydiver10";
     static String SKYDIVER_PASSWORD = "3#$$$$$494949($(%*__''";
     static String SKYDIVER_EMAIL = "skydiver10@testy.com";
@@ -76,7 +88,7 @@ public class IntegrationTests extends Server {
 
     static String ROLLERSKATER_USERNAME = "rollerskater10";
     static String ROLLERSKATER_PASSWORD = "3#$$$$$494949($(%*__''";
-    static String ROLLERSKATER_EMAIL = "cory@whitespell.com";
+    static String ROLLERSKATER_EMAIL = "rollerskater10@testy.com";
     static int ROLLERSKATER_UID;
 
     static String API = null;
@@ -87,7 +99,7 @@ public class IntegrationTests extends Server {
 
 
     @Test
-    public void test1_startTests() throws Exception {
+    public void test0001_StartTests() throws Exception {
 
         // load the system with test properties
         Config.TESTING = true;
@@ -104,10 +116,12 @@ public class IntegrationTests extends Server {
         for ( Logger logger : loggers ) {
             logger.setLevel(Level.OFF);
         }
+
+        Config.NOTIFICATION_TOGGLE = false;
     }
 
     @Test
-    public void test2_newDatabase() throws IOException {
+    public void test0002_NewDatabase() throws IOException {
 
 
         if (Config.DB_USER.equals("testpeak")) { // ensure we are on the test server
@@ -161,7 +175,7 @@ public class IntegrationTests extends Server {
 
 
     @Test
-    public void test3_waitForOnlineTest() {
+    public void test0003_WaitForOnlineTest() {
         int attempts = 45;
 
         boolean isOnline = false;
@@ -183,7 +197,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void test4_forceErrorTest() throws UnirestException {
+    public void test0004_ForceErrorTest() throws UnirestException {
         /**
          * Force an error
          */
@@ -207,7 +221,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void test5_createAccountTest() throws UnirestException {
+    public void test0005_CreateAccountTest() throws UnirestException {
 
         /**
          * Create the account we are testing with
@@ -304,7 +318,7 @@ public class IntegrationTests extends Server {
         TEST2_UID = c.getUserId();
         TEST2_KEY = c.getKey();
 
-        assertEquals(b.getUserId() > -1, true);
+        assertEquals(c.getUserId() > -1, true);
 
         /**
          * Authenticate the 2nd User with email
@@ -323,7 +337,7 @@ public class IntegrationTests extends Server {
         TEST2_UID = d.getUserId();
         TEST2_KEY = d.getKey();
 
-        assertEquals(b.getUserId() > -1, true);
+        assertEquals(d.getUserId() > -1, true);
 
         /**
          * Get the UserObject from the users/userid endpoint
@@ -355,7 +369,7 @@ public class IntegrationTests extends Server {
 
 
     @Test
-    public void test6_categoriesTest() throws UnirestException {
+    public void test0006_CategoriesTest() throws UnirestException {
         Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
                 .body("{\n" +
@@ -382,7 +396,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void test7_followCategoriesTest() throws UnirestException {
+    public void test0007_FollowCategoriesTest() throws UnirestException {
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/categories")
                 .header("accept", "application/json")
@@ -424,7 +438,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void test8_createPublishers() throws UnirestException {
+    public void test0008_CreatePublishers() throws UnirestException {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users")
                 .header("accept", "application/json")
                 .body("{\n" +
@@ -442,7 +456,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void test9_contentTypesTest() throws UnirestException {
+    public void test0009_ContentTypesTest() throws UnirestException {
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/types")
                 .header("accept", "application/json")
@@ -471,7 +485,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testA_followTest() throws UnirestException {
+    public void test0010_FollowTest() throws UnirestException {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -498,7 +512,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testB_contentTest() throws UnirestException {
+    public void test0011_ContentTest() throws UnirestException {
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -605,7 +619,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testC_getPublishersByCategory() {
+    public void test0012_getPublishersByCategory() {
         //todo(pim) do a search on /users where publishing list contains numbers category[0] and category[1] and output as json
         // then follow these users
         // then post content as the publishers
@@ -613,12 +627,12 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testD_incurCreateAccountErrors() {
+    public void test0013_incurCreateAccountErrors() {
         //todo(pim) create accounts with usernames and too long strings that are already taken and should give us errors
     }
 
 	@Test
-	public void testE_editUser() throws UnirestException{
+	public void test0014_EditUser() throws UnirestException{
 
         /**
          * Currently the response for this object is only the values the user updated. This is to avoid an additional
@@ -694,6 +708,7 @@ public class IntegrationTests extends Server {
                         "\"slogan\": \"slogan\"\n" +
                         "}")
                 .asString();
+        TEST_USERNAME = "evenneweruser2";
         UserObject userEdit5 = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(userEdit5.getUserId(), TEST_UID);
         assertEquals(userEdit5.getUserName(), "evenneweruser2");
@@ -701,7 +716,7 @@ public class IntegrationTests extends Server {
 	}
 
     @Test
-    public void testF_editSettings() throws UnirestException{
+    public void test0015_EditSettings() throws UnirestException{
 
         /**
          * Currently the response for this object is only the values the user updated. This is to avoid an additional
@@ -765,6 +780,7 @@ public class IntegrationTests extends Server {
                         "\"publisher\": " + 0 + "\n"+
                         "}")
                 .asString();
+
         UserObject user4 = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(user4.getEmail(), "newtestemail2@lol.com");
         assertEquals(user4.getPublisher(), 0);
@@ -781,6 +797,7 @@ public class IntegrationTests extends Server {
                         "\"publisher\": " + 1 + "\n"+
                         "}")
                 .asString();
+        TEST_PASSWORD = "newestpass";
         UserObject user5 = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(user5.getEmail(), "newestemail@email.com");
         assertEquals(user5.getPublisher(), 1);
@@ -788,7 +805,7 @@ public class IntegrationTests extends Server {
 
 
     @Test
-    public void testG_search() throws UnirestException{
+    public void test0016_Search() throws UnirestException{
 
         //assertEquals(true,false); //purposely fail test to test jenkins
 
@@ -824,7 +841,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testH_getUserFollowingAndFollowers() throws UnirestException{
+    public void test0017_GetUserFollowingAndFollowers() throws UnirestException{
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
                 .header("accept", "application/json")
@@ -863,7 +880,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testI_getCategoryFollowing() throws UnirestException{
+    public void test0018_GetCategoryFollowing() throws UnirestException{
 
         /**
          * List categories user is following
@@ -879,7 +896,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testJ_getUsers() throws UnirestException{
+    public void test0019_GetUsers() throws UnirestException{
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/?offset=1&limit=50")
                 .header("accept", "application/json")
@@ -892,7 +909,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testK_getNewsfeed() throws UnirestException{
+    public void test0020_GetNewsfeed() throws UnirestException{
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/" + TEST_UID)
                 .header("accept", "application/json")
@@ -900,10 +917,8 @@ public class IntegrationTests extends Server {
                 .asString();
 
         NewsfeedObject[] n = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
-        System.out.println(stringResponse.getBody());
 
         for(int i = 0; i < 3; i++){
-            System.out.println(content[i].getContentId());
             if(i == 0) {
                 assertEquals(n[i].getNewsfeedId(), content[2].getContentId());
                 assertEquals(n[i].getNewsfeedUser().getUserId(), TEST2_UID);
@@ -921,7 +936,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testL_ensureContentPostersAreCategoryPublishers() throws UnirestException{
+    public void test0021_EnsureContentPostersAreCategoryPublishers() throws UnirestException{
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID+"?includePublishing=1")
                 .header("accept", "application/json")
@@ -941,7 +956,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testM_TrendingPublishingUsers() throws UnirestException{
+    public void test0022_TrendingPublishingUsers() throws UnirestException{
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/trending")
                 .header("accept", "application/json")
@@ -954,7 +969,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testN_AddAndGetSavedContent() throws UnirestException{
+    public void test0023_AddAndGetSavedContent() throws UnirestException{
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/saved")
                 .header("accept", "application/json")
@@ -977,31 +992,8 @@ public class IntegrationTests extends Server {
         assertEquals(get.getSavedContent().get(0).getContentId(), content[0].getContentId());
     }
 
-    /*@Test
-    public void testO_AddAndGetBundle() throws UnirestException{
-
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/bundles")
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\"contentId\": \"" + content[0].getContentId() + "\"\n" +
-                        "}")
-                .asString();
-
-        AddToBundle.AddToBundleResponse add = g.fromJson(stringResponse.getBody(), AddToBundle.AddToBundleResponse.class);
-        assertEquals(add.getAddedContentId(), content[0].getContentId());
-
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" +TEST_UID + "/bundles")
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .asString();
-
-        GetBundle.GetBundleResponse get = g.fromJson(stringResponse.getBody(), GetBundle.GetBundleResponse.class);
-        assertEquals(get.getBundle().get(0).getContentId(), content[0].getContentId());
-    }*/
-
     @Test
-    public void testP_AddAndGetContentComments() throws UnirestException{
+    public void test0024_AddAndGetContentComments() throws UnirestException{
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
                 .header("accept", "application/json")
@@ -1057,7 +1049,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testQ_testMandrillEmailsAndTokens() throws UnirestException{
+    public void test0025_TestMandrillEmailsAndTokens() throws UnirestException{
 
         EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
         if(et != null){
@@ -1139,6 +1131,7 @@ public class IntegrationTests extends Server {
             int tempId = a.getUserId();
             String tempKey = a.getKey();
 
+            ROLLERSKATER_PASSWORD = "qqqqqq";
             assertEquals(tempId > -1, true);
             assertEquals(tempKey != null, true);
         }
@@ -1150,7 +1143,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testR_ContentLikeAction() throws UnirestException{
+    public void test0026_ContentLikeAction() throws UnirestException{
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/")
                 .header("accept", "application/json")
@@ -1220,7 +1213,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testS_ContentCurationTest() throws UnirestException {
+    public void test0027_ContentCurationTest() throws UnirestException {
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/contentcurated")
                 .header("accept", "application/json")
@@ -1317,7 +1310,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testT_FacebookLoginTest() throws UnirestException {
+    public void test0028_FacebookLoginTest() throws UnirestException {
         TestUser user, user2, user3;
         /**
          * Authenticate FB API and create our testUsers
@@ -1352,8 +1345,8 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\"accessToken\":\"" + user.getAccessToken() + "\"," +
-                        "\"deviceName\":\"iPhone 6\",\n" +
-                        "\"deviceUUID\":\"99d82470564059f9c2e1918ffdb4a86a1869b5bf2fa7cffbadf897f553ef9c96\",\n" +
+                        "\"deviceName\":\"iPhone 5s\",\n" +
+                        "\"deviceUUID\":\"eeaaa8d930919a6fc7675447ebacd0355dff2cd10f8b3b40aed1b7ac87383c10\",\n" +
                         "\"deviceType\":0\n" +
                         "}")
                 .asString();
@@ -1402,7 +1395,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void testU_FeedbackAndReportingTest() throws UnirestException {
+    public void test0029_FeedbackAndReportingTest() throws UnirestException {
 
         /**
          * Test feedback with different users
@@ -1486,7 +1479,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
-                        "\"reportedUserId\": \""+TEST_UID+"\",\n" +
+                        "\"reportedUserId\": \"" + TEST_UID + "\",\n" +
                         "\"typeId\": " + types[1].getReportingTypeId() + "," +
                         "\"message\": \"Being offensive in comments on Lebron's video\"" +
                         "\n}")
@@ -1495,10 +1488,8 @@ public class IntegrationTests extends Server {
         assertEquals(d.isSuccess(), true);
     }
 
-
-
     @Test
-    public void testV_makeBundleTest() throws UnirestException {
+    public void test0030_MakeBundleTest() throws UnirestException {
 
         // create the root bundle
             Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
@@ -1633,7 +1624,7 @@ public class IntegrationTests extends Server {
                 .asString();
 
 
-        // grab /content/bundles[0].getContentId() and check if it has 3 children, check child with content id bundles[1].getContentId() for 1 child
+        // grab /content/bundles[0].getContentId() and check if it has 4 children, check child with content id bundles[1].getContentId() for 1 child
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + bundles[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1651,15 +1642,409 @@ public class IntegrationTests extends Server {
     }
 
 
+    @Test
+    public void test0031_PushNotificationTest() throws UnirestException {
+
+        Config.NOTIFICATION_TOGGLE = true;
+
+        /**
+         * Test that notifications are updated in DB
+         */
+
+        /**
+         * Create the admin and user accounts we are testing with
+         */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + ADMIN_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ADMIN_PASSWORD + "\",\n" +
+                        "\"email\" : \"" + ADMIN_EMAIL + "\"\n" +
+                        "}")
+                .asString();
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"test11\",\n" +
+                        "\"password\" : \"test11\",\n" +
+                        "\"email\" : \"test1@lol.com\"\n" +
+                        "}")
+                .asString();
+        TEST_USERNAME = "test11";
+        TEST_PASSWORD = TEST_USERNAME;
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"test22\",\n" +
+                        "\"password\" : \"test22\",\n" +
+                        "\"email\" : \"test2@lol.com\"\n" +
+                        "}")
+                .asString();
+        ROLLERSKATER_USERNAME = "test22";
+        ROLLERSKATER_PASSWORD = ROLLERSKATER_USERNAME;
+
+        /**
+         * Authenticate the admin
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + ADMIN_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ADMIN_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"" + ADMIN_DEVICE_UUID + "\",\n" +
+                        "\"deviceName\" : \"" + ADMIN_DEVICE_NAME + "\",\n" +
+                        "\"deviceType\" : " + ADMIN_DEVICE_TYPE + "\n" +
+                        "}")
+                .asString();
+        AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        ADMIN_UID = a.getUserId();
+        ADMIN_KEY = a.getKey();
+
+        /**
+         * Authenticate the other users with device info for testing
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + TEST_USERNAME + "\",\n" +
+                        "\"password\" : \"" + TEST_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"cz-HvHQ2oX8:APA91bGbM8F4HT0BOXdORmmu0xVYVM0RMhRGXOciUmG5V92H5v-1VuWY7Svj" +
+                        "HHpOFOUeqATafD3CxPuqyzB_yg1TLAS2DlLoEGcUnsgBLW2knL-o1Q9e199hFu6eluexO8HainFRYTbW\",\n" +
+                        "\"deviceName\" : \"otheruser2\",\n" +
+                        "\"deviceType\" : "+1+"\n" +
+                        "}")
+                .asString();
+        AuthenticationObject a2 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST_UID = a2.getUserId();
+        TEST_KEY = a2.getKey();
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"99d82470564059f9c2e1918ffdb4a86a1869b5bf2fa7cffbadf897f553ef9c96\",\n" +
+                        "\"deviceName\" : \"otheruser\",\n" +
+                        "\"deviceType\" : " + 0 + "\n" +
+                        "}")
+                .asString();
+        AuthenticationObject a3 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST2_UID = a3.getUserId();
+        TEST2_KEY = a3.getKey();
+
+        /**
+         * Upload a new category, all users get a notification
+         */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"categoryName\": \"yoga\",\n" +
+                        "\"categoryThumbnail\": \"http://upperlimits.com/west-county/wp-content/uploads/2014/05/yoga.jpg\"\n" +
+                        "}")
+                .asString();
+
+        /**
+         * Have some users follow the admin
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + ADMIN_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+        UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(b.getActionTaken(), "followed");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + ADMIN_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+        UserFollowAction.FollowActionObject c = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(c.getActionTaken(), "followed");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + ADMIN_UID + "\",\n" +
+                        "\"action\": \"unfollow\"\n" +
+                        "}")
+                .asString();
+        UserFollowAction.FollowActionObject d = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(d.getActionTaken(), "unfollowed");
+
+        /**
+         * Upload content as the admin
+         */
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[1].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
+                        "\"contentDescription\": \"admincontent\",\n" +
+                        "\"contentTitle\": \"admincontent\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=admin\"," +
+                        "\"thumbnailUrl\": \"thumbadmin.com\"" +
+                        "\n}")
+                .asString();
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + ADMIN_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        int contentId = content[0].getContentId();
+
+        /**
+         * Have both followers like the uploaded content
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la.getActionTaken(), "like");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la1 = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la1.getActionTaken(), "like");
+
+        /**
+         * Have both followers comment on the uploaded content
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"comment\": \"awesome video!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add.isCommentAdded(), true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"comment\": \"wow this is so cool!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add2.isCommentAdded(), true);
+
+        /**
+         * Sleep to let the notifications go through (There are a lot of notifications...)
+         */
+        try {
+            Thread.sleep(90000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        /**
+         * Check admin user for follower notifications
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        GetUserNotifications.getUserNotificationsResponse notifications =
+                g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
+        ArrayList<UserNotification> notif = notifications.getUserNotifications();
+        if(notif != null) {
+            for (UserNotification n : notif) {
+                assertEquals(n.getNotificationStatus(), 1);
+            }
+        }
+
+        /**
+         * Check for notifications on both following users for uploaded content
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        GetUserNotifications.getUserNotificationsResponse notifications1 =
+                g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
+        ArrayList<UserNotification> notif2 = notifications1.getUserNotifications();
+        if(notif2 != null) {
+            for (UserNotification n : notif2) {
+                assertEquals(n.getNotificationStatus(), 1);
+            }
+        }
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+        GetUserNotifications.getUserNotificationsResponse notifications2 =
+                g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
+        ArrayList<UserNotification> notif3 = notifications2.getUserNotifications();
+        if(notif3 != null) {
+            for (UserNotification n : notif3) {
+                assertEquals(n.getNotificationStatus(), 1);
+            }
+        }
+    }
+
+    @Test
+    public void test0032_UpdateContent() throws UnirestException{
+
+        /**
+         * Currently the response for this object is only the values the user updated. This is to avoid an additional
+         * get of the content's current fields.
+         */
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        ContentObject[] content1 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        System.out.println(stringResponse.getBody());
+
+        assertEquals(content1[0].getContentId(), content[0].getContentId());
+        assertEquals(content1[0].getUserId(), ADMIN_UID);
+
+        /**
+         * Change only title
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .body("{\n\"contentTitle\": \"testy\",\n" +
+                        "\"userId\": "+ADMIN_UID +
+                        "}")
+                .asString();
+        ContentObject content2 = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        System.out.println(stringResponse.getBody());
+
+        assertEquals(content2.getContentTitle(), "testy");
+
+        /**
+         * Change only description
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .body("{\n\"contentDescription\": \"newDesc\","+
+                        "\"userId\": "+ADMIN_UID +
+                        "}")
+                .asString();
+        ContentObject content3 = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(content3.getContentDescription(), "newDesc");
+
+        /**
+         * Change only price
+         **/
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .body("{\n\"contentPrice\": " + 0.99 +
+                        ",\"userId\": "+ADMIN_UID +
+                        "}")
+                .asString();
+        ContentObject content4 = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(content4.getPrice(), 0.99, 0.0);
+
+        /**
+         * Change all fields
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .body("{\n" +
+                        "\"contentTitle\": \"lastTitle\","+
+                        "\"contentDescription\": \"lastDesc\","+
+                        "\"contentPrice\": "+ 1.99 +
+                        ",\"userId\": "+ADMIN_UID +
+                        "}")
+                .asString();
+        ContentObject content5 = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(content5.getContentTitle(), "lastTitle");
+        assertEquals(content5.getContentDescription(), "lastDesc");
+        assertEquals(content5.getPrice(), 1.99, 0.0);
+    }
+
+    @Test
+    public void test0033_UpdateEmailNotification() throws UnirestException{
+
+        /**
+         * Update the user's email notification status in the database.
+         */
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        UserObject user = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(user.getEmailNotifications(), 1);
+
+        /**
+         * Disable email notifications
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .body("{\n\"emailNotifications\": 0\n" +
+                        "}")
+                .asString();
+        UserObject user2 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(user2.getEmailNotifications(), 0);
+
+        /**
+         * One more check
+         */
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        UserObject user3 = g.fromJson(stringResponse.getBody(), UserObject.class);
+        assertEquals(user3.getEmailNotifications(), 0);
+    }
+
+
     /**
      * DO NOT COPY SHOULD BE LAST TEST
      */
 
     @Test
-    public void testZ_UserLogoutTest() throws UnirestException {
+    public void test1000_UserLogoutTest() throws UnirestException {
 
         /**
-         * Test feedback with different users
+         * Test logout
          */
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/logout")
@@ -1669,13 +2054,20 @@ public class IntegrationTests extends Server {
         ExpireAuthentication.LogoutObject d = g.fromJson(stringResponse.getBody(), ExpireAuthentication.LogoutObject.class);
         assertEquals(d.isLoggedOut(), true);
 
+        /**
+         * Wait a moment to allow logout
+         */
+        try {
+            Thread.sleep(5000);
+        }catch(Exception e){
+            Logging.log("Low", e);
+        }
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID)
                 .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .asString();
-
-        assertEquals(stringResponse.getStatus(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+        assertEquals(stringResponse.getStatus(), 401);
     }
 
 

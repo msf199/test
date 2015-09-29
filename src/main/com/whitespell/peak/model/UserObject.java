@@ -31,6 +31,7 @@ public class UserObject {
     int userId;
     int publisher;
     int emailVerified;
+    int emailNotifications;
     String userName;
     String displayName;
     String email;
@@ -138,6 +139,14 @@ public class UserObject {
     public void followCategory(int categoryId) { categoryFollowing.add(categoryId); }
 
     public void publishCategory(int categoryId) { categoryPublishing.add(categoryId); }
+
+    public int getEmailNotifications() {
+        return emailNotifications;
+    }
+
+    public void setEmailNotifications(int emailNotifications) {
+        this.emailNotifications = emailNotifications;
+    }
 
     public ArrayList<Integer> getUserFollowing() { return userFollowing; }
 

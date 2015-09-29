@@ -21,6 +21,7 @@ public class ContentObject {
     int likes = 0;
     String thumbnailUrl;
     int userLiked = 0;
+    double price = 0.00;
     UserObject poster;
     ArrayList<ContentObject> children = new ArrayList<>();
 
@@ -101,6 +102,14 @@ public class ContentObject {
 
     public void setUserLiked(int userLiked) {
         this.userLiked = userLiked;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 
     public UserObject getPoster() {
