@@ -53,6 +53,12 @@ public class ContentLikeNotification implements NotificationImplementation {
                     .asString();
             UserObject publisher = g.fromJson(stringResponse.getBody(), UserObject.class);
 
+            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + like_user_id + "")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
+                    .asString();
+            UserObject likeUser = g.fromJson(stringResponse.getBody(), UserObject.class);
+
             /**
              * Notification that someone has commented on your published video (publisher)
              */
@@ -66,8 +72,8 @@ public class ContentLikeNotification implements NotificationImplementation {
                 /**
                  * Send user notification to publisher of video that they have received a new comment.
                  */
-                String message = "A user just liked your video!";
-                UserNotification n = new UserNotification(publisher.getUserId(), message, "open-content:" + like_content_id);
+                String message = likeUser.getUserName() + " just liked your video!";
+                UserNotification n = new UserNotification(publisher.getUserId(), message, "open-content:" + like_content_id, likeUser.getThumbnail());
 
                 insertNotification(n);
 

@@ -62,8 +62,8 @@ public class NewFollowerNotification implements NotificationImplementation {
                  * Send user notification to user being followed
                  */
 
-                String message = "You got a new follower!";
-                UserNotification n = new UserNotification(me.getUserId(), message, "open-user:"+follower.getUserId());
+                String message = follower.getUserName() + " followed you!";
+                UserNotification n = new UserNotification(me.getUserId(), message, "open-user:"+follower.getUserId(), follower.getThumbnail());
 
                 insertNotification(n);
 

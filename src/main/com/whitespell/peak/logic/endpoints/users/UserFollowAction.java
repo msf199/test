@@ -51,7 +51,7 @@ public class UserFollowAction extends EndpointHandler {
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID_KEY));
         final int following_user_id = Integer.parseInt(following_user_string);
         final String action = payload.get(PAYLOAD_ACTION_KEY).getAsString();
-        final Timestamp now = new Timestamp(new Date().getTime());
+        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
 
         /**
          * Check that the action being performed is valid.
