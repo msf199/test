@@ -1,6 +1,7 @@
 package main.com.whitespell.peak.logic.endpoints.authentication;
 
 import com.google.gson.Gson;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
@@ -25,7 +26,7 @@ public class GetDeviceDetails extends EndpointHandler {
     }
 
     private static final String RETRIEVE_DEVICE_DETAILS = "SELECT au.`device_uuid`, de.`device_type` FROM `authentication` as au INNER JOIN" +
-            " `device` as de ON au.`device_uuid`=de.`device_uuid` WHERE au.`user_id` = ? ORDER BY au.`authentication_id` DESC LIMIT 1";
+            " `device` as de ON au.`device_uuid`=de.`device_uuid` WHERE au.`user_id` = ? AND `expires` != -1 AND `expires` > ? ORDER BY au.`authentication_id` DESC LIMIT 1";
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
@@ -39,6 +40,7 @@ public class GetDeviceDetails extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_DEVICE_DETAILS);
             executor.execute(ps -> {
                 ps.setInt(1, userId);
+                ps.setLong(2, Server.getCalendar().getTimeInMillis());
 
                 ResultSet r = ps.executeQuery();
                 DeviceInfo d = new DeviceInfo();
