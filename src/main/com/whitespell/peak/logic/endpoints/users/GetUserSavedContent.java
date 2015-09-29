@@ -80,7 +80,7 @@ public class GetUserSavedContent extends EndpointHandler {
                                 ContentObject c = new ContentObject(results2.getInt(CONTENT_CATEGORY_ID), results2.getInt("user_id"), results2.getInt(CONTENT_ID_KEY),
                                         results2.getInt(CONTENT_TYPE_ID), results2.getString(CONTENT_TITLE), results2.getString(CONTENT_URL), results2.getString(CONTENT_DESCRIPTION),
                                         results2.getString(CONTENT_THUMBNAIL));
-                                c.setPrice(results2.getDouble(CONTENT_PRICE));
+                                c.setContentPrice(results2.getDouble(CONTENT_PRICE));
                                 getSavedContent.addToSavedContent(c);
                             }
                         });

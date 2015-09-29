@@ -158,7 +158,7 @@ public class Search extends EndpointHandler {
                             while(results.next()) {
                                 ContentObject c = new ContentObject(results.getInt(USER_ID_KEY), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_KEY), results.getString(CONTENT_TITLE_KEY),
                                         results.getString(CONTENT_URL_KEY), results.getString(CONTENT_DESCRIPTION_KEY),  results.getString(CONTENT_THUMBNAIL_KEY));
-                                c.setPrice(results.getDouble("content_price"));
+                                c.setContentPrice(results.getDouble("content_price"));
                                 tempContent.add(c);
                             }
 

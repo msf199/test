@@ -21,7 +21,7 @@ public class ContentObject {
     int likes = 0;
     String thumbnailUrl;
     int userLiked = 0;
-    double price = 0.00;
+    double contentPrice = 0.00;
     UserObject poster;
     ArrayList<ContentObject> children = new ArrayList<>();
 
@@ -36,6 +36,18 @@ public class ContentObject {
         return false;
     }
 
+    public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
+                         String contentUrl, String contentDescription, String thumbnailUrl, double contentPrice){
+        this.userId = userId;
+        this.categoryId = categoryId;
+        this.contentId = contentId;
+        this.contentType = contentType;
+        this.contentTitle = contentTitle;
+        this.contentUrl = contentUrl;
+        this.contentDescription = contentDescription;
+        this.thumbnailUrl = thumbnailUrl;
+        this.contentPrice = contentPrice;
+    }
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
                          String contentUrl, String contentDescription, String thumbnailUrl){
@@ -104,12 +116,12 @@ public class ContentObject {
         this.userLiked = userLiked;
     }
 
-    public double getPrice() {
-        return price;
+    public double getContentPrice() {
+        return contentPrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setContentPrice(double contentPrice) {
+        this.contentPrice = contentPrice;
     }
 
     public UserObject getPoster() {

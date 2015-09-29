@@ -160,7 +160,7 @@ public class GetNewsfeed extends EndpointHandler {
                         newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
                                 results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
                                 results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-                        newsfeedContent.setPrice(results.getDouble(CONTENT_PRICE));
+                        newsfeedContent.setContentPrice(results.getDouble(CONTENT_PRICE));
 
                         if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                             // we are entering a nested recursiveGetChildren loop
@@ -247,7 +247,7 @@ public class GetNewsfeed extends EndpointHandler {
                             newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
                                     results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), "(Recommended) " + results.getString(CONTENT_TITLE),
                                     results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-                            newsfeedContent.setPrice(results.getDouble(CONTENT_PRICE));
+                            newsfeedContent.setContentPrice(results.getDouble(CONTENT_PRICE));
 
                             if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                                 // we are entering a nested recursiveGetChildren loop
