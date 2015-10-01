@@ -2,9 +2,11 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.endpoints.content.ContentHelper;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -62,6 +64,13 @@ public class Search extends EndpointHandler {
         int limit =  GenericAPIActions.getLimit(context.getQueryString());
         int offset =  GenericAPIActions.getOffset(context.getQueryString());
 
+        final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
+        int currentUser = a.getUserId();
+
+        if (!a.isAuthenticated()) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            return;
+        }
 
         ArrayList<UserObject> tempUsers = new ArrayList<>();
         ArrayList<Integer> tempCategories = new ArrayList<>();
@@ -156,9 +165,9 @@ public class Search extends EndpointHandler {
                             ResultSet results = ps.executeQuery();
 
                             while(results.next()) {
-                                ContentObject c = new ContentObject(results.getInt(USER_ID_KEY), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_KEY), results.getString(CONTENT_TITLE_KEY),
-                                        results.getString(CONTENT_URL_KEY), results.getString(CONTENT_DESCRIPTION_KEY),  results.getString(CONTENT_THUMBNAIL_KEY));
-                                c.setContentPrice(results.getDouble("content_price"));
+                                int currentContentId = results.getInt(CONTENT_ID_KEY);
+                                ContentObject c = ContentHelper.constructContent(results, context, currentContentId, currentUser);
+
                                 tempContent.add(c);
                             }
 

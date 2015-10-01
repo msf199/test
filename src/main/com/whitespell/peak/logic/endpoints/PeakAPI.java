@@ -138,6 +138,9 @@ public class PeakAPI extends WhitespellAPI {
         //Update Email Notification status
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateEmailNotification(), "users/$/notifications", "userId");
 
+        //Update a user's access to a content (such as when the user purchases a video)
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new GrantContentAccess(), "users/$/access", "userId");
+
         /**
          * STATISTICS
          */

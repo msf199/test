@@ -22,6 +22,8 @@ public class ContentObject {
     String thumbnailUrl;
     int userLiked = 0;
     double contentPrice = 0.00;
+    int hasAccess = 0;
+    int recommended = 0;
     UserObject poster;
     ArrayList<ContentObject> children = new ArrayList<>();
 
@@ -130,6 +132,22 @@ public class ContentObject {
 
     public void setPoster(UserObject poster) {
         this.poster = poster;
+    }
+
+    public int hasAccess() {
+        return hasAccess;
+    }
+
+    public int getRecommended() {
+        return recommended;
+    }
+
+    public void setRecommended(int recommended) {
+        this.recommended = recommended;
+    }
+
+    public void setHasAccess(int hasAccess) {
+        this.hasAccess = hasAccess;
     }
 
     public void addChild(ContentObject child) {

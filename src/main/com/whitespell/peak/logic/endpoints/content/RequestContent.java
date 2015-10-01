@@ -20,22 +20,9 @@ import java.util.Map;
  */
 public class RequestContent extends EndpointHandler {
 
-    private static final String CONTENT_CATEGORY_ID = "category_id";
     private static final String CONTENT_SIZE_LIMIT = "limit";
     private static final String CONTENT_OFFSET = "offset";
     private static final String CONTENT_ID_KEY = "content_id";
-    private static final String CONTENT_TYPE_ID = "content_type";
-    private static final String CONTENT_TITLE = "content_title";
-    private static final String CONTENT_URL = "content_url";
-    private static final String CONTENT_DESCRIPTION = "content_description";
-    private static final String CONTENT_THUMBNAIL = "thumbnail_url";
-    private static final String CONTENT_PRICE = "content_price";
-
-    private static final String GET_BUNDLE_CHILDREN = "SELECT * FROM bundle_match INNER JOIN `content` ON content.content_id=bundle_match.child_content_id where parent_content_id = ?";
-
-    private static final String GET_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `content_id` = ?";
-    private static final String GET_USER_LIKED_QUERY = "SELECT `like_datetime` from `content_likes` WHERE `user_id` = ? AND `content_id` = ?";
-    private static final String USER_OBJECT_QUERY = "SELECT * FROM `user` WHERE `user_id` = ?";
 
     private static final String QS_USER_ID = "userId";
     private static final String QS_CONTENT_ID = "contentId";
@@ -93,7 +80,6 @@ public class RequestContent extends EndpointHandler {
         int contentId = temp_content_id;
         int contentType = temp_content_type_id;
         int categoryId = temp_category_id;
-        int[] userLiked = {0};
 
         /**
          * Ensure that the user is authenticated properly
@@ -161,87 +147,8 @@ public class RequestContent extends EndpointHandler {
                 ResultSet results = ps.executeQuery();
                 //display results
                 while (results.next()) {
-                    int[] contentLikes = {0};
-
-                    /**
-                     * Get the content likes
-                     */
-                    try {
-                        StatementExecutor executor1 = new StatementExecutor(GET_LIKES_QUERY);
-                        executor1.execute(ps2 -> {
-                            ps2.setInt(1, results.getInt(CONTENT_ID_KEY));
-
-                            ResultSet results1 = ps2.executeQuery();
-
-                            //display results
-                            while (results1.next()) {
-                                contentLikes[0]++;
-                            }
-                        });
-                    } catch (SQLException e) {
-                        Logging.log("High", e);
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                        return;
-                    }
-
-                    /**
-                     * Check if the user has liked this content
-                     */
-                    try {
-                        StatementExecutor executor1 = new StatementExecutor(GET_USER_LIKED_QUERY);
-                        executor1.execute(ps2 -> {
-                            ps2.setInt(1, currentUser);
-                            ps2.setInt(2, results.getInt(CONTENT_ID_KEY));
-
-                            ResultSet results1 = ps2.executeQuery();
-
-                            //display results
-                            if (results1.next()) {
-                                userLiked[0] = 1;
-                            } else {
-                                userLiked[0] = 0;
-                            }
-                        });
-                    } catch (SQLException e) {
-                        Logging.log("High", e);
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                        return;
-                    }
-
-                    UserObject contentPoster = new UserObject();
-                    try {
-                        StatementExecutor executor1 = new StatementExecutor(USER_OBJECT_QUERY);
-                        executor1.execute(ps1 -> {
-                            final int posterUserId = results.getInt("user_id");
-                            ps1.setInt(1, posterUserId);
-
-                            ResultSet results2 = ps1.executeQuery();
-                            if (results2.next()) {
-                                contentPoster.setUserId(posterUserId);
-                                contentPoster.setUserName(results2.getString("username"));
-                                contentPoster.setThumbnail(results2.getString("thumbnail"));
-                            } else {
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                                return;
-                            }
-                        });
-                    } catch (SQLException e) {
-                        Logging.log("High", e);
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                        return;
-                    }
-
-                    ContentObject content = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                            results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-                    content.setContentPrice(results.getDouble(CONTENT_PRICE));
-
-                    if(content.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                        // we are entering a nested recursiveGetChildren loop
-                          content.setChildren(recursiveGetChildren(content, context));
-                    }
-                    content.setPoster(contentPoster);
-                    content.setLikes(contentLikes[0]);
-                    content.setUserLiked(userLiked[0]);
+                    int currentContentId = results.getInt(CONTENT_ID_KEY);
+                    ContentObject content = ContentHelper.constructContent(results, context, currentContentId, currentUser);
                     contents.add(content);
                 }
 
@@ -262,31 +169,4 @@ public class RequestContent extends EndpointHandler {
             return;
         }
     }
-
-    public ArrayList<ContentObject> recursiveGetChildren(ContentObject parent, RequestObject context) {
-        try {
-            StatementExecutor executor1 = new StatementExecutor(GET_BUNDLE_CHILDREN);
-            executor1.execute(ps -> {
-
-                ps.setInt(1, parent.getContentId());
-
-                ResultSet results = ps.executeQuery();
-                while (results.next()) {
-                    ContentObject child = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                            results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-
-                    if(child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                        child.setChildren(recursiveGetChildren(child, context));
-                    }
-                    parent.addChild(child);
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-            return null;
-        }
-        return parent.getChildren();
-    }
-
 }
