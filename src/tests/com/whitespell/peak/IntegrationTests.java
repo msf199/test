@@ -1654,7 +1654,7 @@ public class IntegrationTests extends Server {
 
             for(int i = 0; i < content1.length; i++){
                 /**
-                 * Ensure we don't have access to this paid content, and the thumbnail is null in the response
+                 * Ensure we don't have access to this paid content, and the url is null in the response
                  */
                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content1[i].getContentId())
                         .header("accept", "application/json")
