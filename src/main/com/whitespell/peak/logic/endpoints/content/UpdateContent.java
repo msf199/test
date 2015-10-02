@@ -13,6 +13,7 @@ import main.com.whitespell.peak.model.ContentObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -28,6 +29,8 @@ public class UpdateContent extends EndpointHandler {
     private static final String CONTENT_TITLE = "contentTitle";
     private static final String CONTENT_DESCRIPTION = "contentDescription";
     private static final String CONTENT_PRICE = "contentPrice";
+
+    private static final String GET_CONTENT_QUERY = "SELECT * FROM `content` WHERE `content_id` = ?";
 
     @Override
     protected void setUserInputs() {
@@ -78,6 +81,30 @@ public class UpdateContent extends EndpointHandler {
 
         if (!a.isAuthenticated() || user_id != a.getUserId()) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            return;
+        }
+
+        /**
+         * Ensure user attempting to update content is the uploader
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_CONTENT_QUERY);
+
+            executor.execute(ps -> {
+                ps.setInt(1, content_id);
+
+                ResultSet results = ps.executeQuery();
+
+                if(results.next()){
+                    if(results.getInt("user_id") != user_id){
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+                        return;
+                    }
+                }
+                });
+        }catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
             return;
         }
 
@@ -138,7 +165,7 @@ public class UpdateContent extends EndpointHandler {
 
                         content = new ContentObject(user_id, finalContentId, 0, finalContentTitle,
                                 "", finalContentDescription, "");
-                        content.setPrice(finalContentPrice);
+                        content.setContentPrice(finalContentPrice);
 
                     } else {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_EDITED);

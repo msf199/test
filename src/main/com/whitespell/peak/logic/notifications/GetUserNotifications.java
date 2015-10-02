@@ -65,7 +65,7 @@ public class GetUserNotifications extends EndpointHandler {
                 ResultSet results = ps.executeQuery();
 
                 while (results.next()) {
-                    UserNotification n = new UserNotification(finalUser_id, results.getString("notification_text"), results.getString("notification_action"));
+                    UserNotification n = new UserNotification(finalUser_id, results.getString("notification_text"), results.getString("notification_action"), results.getString("notification_image"));
                     n.setNotificationBadge(results.getInt("notification_badge"));
                     n.setNotificationSound(results.getInt("notification_sound"));
                     n.setNotificationStatus(results.getInt("notification_status"));

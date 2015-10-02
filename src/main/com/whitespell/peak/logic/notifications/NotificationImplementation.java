@@ -19,8 +19,8 @@ import java.sql.SQLException;
  */
 public interface NotificationImplementation {
 
-    static final String INSERT_NOTIFCATION = "INSERT INTO `notification`(`user_id`, `notification_text`, `notification_action`, `notification_badge`, `notification_sound`)" +
-                                            "VALUES (?,?,?,?,?)";
+    static final String INSERT_NOTIFCATION = "INSERT INTO `notification`(`user_id`, `notification_text`, `notification_action`, `notification_badge`, `notification_sound`, `notification_image`)" +
+                                            "VALUES (?,?,?,?,?,?)";
     static final String UPDATE_NOTIFICATION = "UPDATE `notification` SET `notification_status` = 1 WHERE `user_id` = ? AND `notification_text` = ? " +
             "AND `notification_action` = ?";
 
@@ -39,6 +39,7 @@ public interface NotificationImplementation {
                     ps1.setString(3, n.getNotificationAction());
                     ps1.setInt(4, n.getNotificationBadge());
                     ps1.setInt(5, n.getNotificationSound());
+                    ps1.setString(6, n.getNotificationImage());
 
                     ps1.executeUpdate();
                 });

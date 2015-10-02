@@ -61,6 +61,20 @@ public class ContentCommentNotification implements NotificationImplementation {
             CommentObject[] comments = g.fromJson(stringResponse.getBody(), CommentObject[].class);
 
             /**
+             * Get the commenter's thumbnail and username
+             */
+            String commenterThumbnail = "";
+            String commenterUsername = "";
+            if(comments != null) {
+                for (int i = 0; i < comments.length; i++) {
+                    if (comments[i].getPoster().getUserId() == commenter_user_id) {
+                        commenterUsername = comments[i].getPoster().getUserName();
+                        commenterThumbnail = comments[i].getPoster().getThumbnail();
+                    }
+                }
+            }
+
+            /**
              * Notification that someone has commented on your published video (publisher)
              */
             if(publisher != null && publisher.getUserId() != commenter_user_id) {
@@ -73,8 +87,8 @@ public class ContentCommentNotification implements NotificationImplementation {
                 /**
                  * Send user notification to publisher of video that they have received a new comment.
                  */
-                String message = "A user just commented on your video!";
-                UserNotification n = new UserNotification(publisher.getUserId(), message, "open-content:"+comment_content_id);
+                String message = commenterUsername + " just commented on your video!";
+                UserNotification n = new UserNotification(publisher.getUserId(), message, "open-content:"+comment_content_id, commenterThumbnail);
 
                 insertNotification(n);
 
@@ -104,8 +118,8 @@ public class ContentCommentNotification implements NotificationImplementation {
                         * Send user notification to other commenters that a new comment was posted.
                         */
 
-                       String message = "New comment on a video you commented on!";
-                       UserNotification n = new UserNotification(comments[i].getPoster().getUserId(), message, "open-content:" + comment_content_id);
+                       String message = commenterUsername + " commented on a video you commented on!";
+                       UserNotification n = new UserNotification(comments[i].getPoster().getUserId(), message, "open-content:" + comment_content_id, commenterThumbnail);
 
                        insertNotification(n);
 

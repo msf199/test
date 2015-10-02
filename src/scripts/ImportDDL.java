@@ -53,6 +53,7 @@ public class ImportDDL {
         tables.add("authentication");
         tables.add("bundle_match");
         tables.add("content_comments");
+        tables.add("content_access");
         tables.add("fb_user");
         tables.add("reporting_type");
 

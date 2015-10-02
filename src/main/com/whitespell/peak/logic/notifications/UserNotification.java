@@ -21,6 +21,10 @@ public class UserNotification {
         return notificationAction;
     }
 
+    public String getNotificationImage() {
+        return notificationImage;
+    }
+
     public int getNotificationBadge() {
         return notificationBadge;
     }
@@ -31,6 +35,10 @@ public class UserNotification {
 
     public int getNotificationStatus() {
         return notificationStatus;
+    }
+
+    public void setNotificationImage(String notificationImage) {
+        this.notificationImage = notificationImage;
     }
 
     public void setNotificationBadge(int notificationBadge) {
@@ -56,14 +64,16 @@ public class UserNotification {
     private int userId;
     private String notificationText;
     private String notificationAction;
+    private String notificationImage;
     private int notificationBadge = 0;
     private int notificationSound = 0;
     private int notificationStatus = 0;
     private Timestamp notificationTimestamp;
 
-    public UserNotification(int userId, String notificationText, String notificationAction) {
+    public UserNotification(int userId, String notificationText, String notificationAction, String notificationImage) {
         this.userId = userId;
         this.notificationText = notificationText;
         this.notificationAction = notificationAction;
+        this.notificationImage = notificationImage;
     }
 }

@@ -3,9 +3,11 @@ package main.com.whitespell.peak.logic.endpoints.newsfeed;
 
 import com.google.gson.Gson;
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.endpoints.content.ContentHelper;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -33,8 +35,6 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String FIND_USER_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
     private static final String FIND_CATEGORY_FOLLOWING_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
 
-    private static final String GET_BUNDLE_CHILDREN = "SELECT * FROM bundle_match INNER JOIN `content` ON content.content_id=bundle_match.child_content_id where parent_content_id = ?";
-
     //user keys
     private static final String USER_ID_KEY = "user_id";
     private static final String USERNAME_KEY = "username";
@@ -46,14 +46,7 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String PUBLISHER_KEY = "publisher";
 
     //content keys
-    private static final String CONTENT_CATEGORY_ID = "category_id";
     private static final String CONTENT_ID_KEY = "content_id";
-    private static final String CONTENT_TYPE_ID = "content_type";
-    private static final String CONTENT_TITLE = "content_title";
-    private static final String CONTENT_URL = "content_url";
-    private static final String CONTENT_DESCRIPTION = "content_description";
-    private static final String CONTENT_THUMBNAIL = "thumbnail_url";
-    private static final String CONTENT_PRICE = "content_price";
 
     @Override
     protected void setUserInputs() {
@@ -73,6 +66,18 @@ public class GetNewsfeed extends EndpointHandler {
         ArrayList<Integer> categoryIds = new ArrayList<>();
         ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
         Set<Integer> contentIdSet = new HashSet<>();
+
+        /**
+         * Ensure that the user is authenticated properly
+         */
+
+        final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
+        int currentUser = a.getUserId();
+
+        if (!a.isAuthenticated()) {
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            return;
+        }
 
         /**
          * Get the userIds current user is following.
@@ -153,21 +158,15 @@ public class GetNewsfeed extends EndpointHandler {
                             continue;
                         }
 
+                        int currentContentId = results.getInt(CONTENT_ID_KEY);
+
                         followedUser = new UserObject(results.getInt(USER_ID_KEY), results.getString(USERNAME_KEY),
                                 results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
                                 results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
 
-                        newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
-                                results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                                results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-                        newsfeedContent.setPrice(results.getDouble(CONTENT_PRICE));
+                        newsfeedContent = ContentHelper.constructContent(results, context, currentContentId, currentUser);
 
-                        if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                            // we are entering a nested recursiveGetChildren loop
-                            newsfeedContent.setChildren(recursiveGetChildren(newsfeedContent, context));
-                        }
-
-                        contentIdSet.add(results.getInt(CONTENT_ID_KEY));
+                        contentIdSet.add(currentContentId);
                         newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
                     }
                 });
@@ -236,7 +235,9 @@ public class GetNewsfeed extends EndpointHandler {
 
                         ResultSet results = ps.executeQuery();
                         while (results.next()) {
-                            if (results.getInt("is_child") == 1 || contentIdSet.contains(results.getInt(CONTENT_ID_KEY))) {
+                            int currentContentId = results.getInt(CONTENT_ID_KEY);
+
+                            if (results.getInt("is_child") == 1 || contentIdSet.contains(currentContentId)) {
                                 continue;
                             }
 
@@ -244,17 +245,10 @@ public class GetNewsfeed extends EndpointHandler {
                                     results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
                                     results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
 
-                            newsfeedContent = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt(USER_ID_KEY),
-                                    results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), "(Recommended) " + results.getString(CONTENT_TITLE),
-                                    results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-                            newsfeedContent.setPrice(results.getDouble(CONTENT_PRICE));
+                            newsfeedContent = ContentHelper.constructContent(results, context, currentContentId, currentUser);
+                            newsfeedContent.setRecommended(1);
 
-                            if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                                // we are entering a nested recursiveGetChildren loop
-                                newsfeedContent.setChildren(recursiveGetChildren(newsfeedContent, context));
-                            }
-
-                            contentIdSet.add(results.getInt(CONTENT_ID_KEY));
+                            contentIdSet.add(currentContentId);
                             newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
                         }
                     });
@@ -281,32 +275,5 @@ public class GetNewsfeed extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
-    }
-
-    public ArrayList<ContentObject> recursiveGetChildren(ContentObject parent, RequestObject context) {
-        try {
-            StatementExecutor executor1 = new StatementExecutor(GET_BUNDLE_CHILDREN);
-            executor1.execute(ps -> {
-
-                ps.setInt(1, parent.getContentId());
-
-                ResultSet results = ps.executeQuery();
-                while (results.next()) {
-                    ContentObject child = new ContentObject(results.getInt(CONTENT_CATEGORY_ID), results.getInt("user_id"), results.getInt(CONTENT_ID_KEY), results.getInt(CONTENT_TYPE_ID), results.getString(CONTENT_TITLE),
-                            results.getString(CONTENT_URL), results.getString(CONTENT_DESCRIPTION), results.getString(CONTENT_THUMBNAIL));
-
-
-                    if (child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                        child.setChildren(recursiveGetChildren(child, context));
-                    }
-                    parent.addChild(child);
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-            return null;
-        }
-        return parent.getChildren();
     }
 }

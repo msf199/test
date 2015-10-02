@@ -50,9 +50,11 @@ public class NewCategoryNotification implements NotificationImplementation {
             CategoryObject[] categories = g.fromJson(stringResponse.getBody(), CategoryObject[].class);
 
             CategoryObject newCategory = null;
-            for(int i = 0; i < categories.length; i++){
-                if(categories[i].getCategoryName().equalsIgnoreCase(newCategoryName)){
-                    newCategory = categories[i];
+            if(categories != null) {
+                for (int i = 0; i < categories.length; i++) {
+                    if (categories[i].getCategoryName().equalsIgnoreCase(newCategoryName)) {
+                        newCategory = categories[i];
+                    }
                 }
             }
 
@@ -67,8 +69,8 @@ public class NewCategoryNotification implements NotificationImplementation {
                     /**
                      * Send email notification to follower when uploading new content
                      */
-                    String message = "A new category has been added to Peak!";
-                    UserNotification n = new UserNotification(users[i].getUserId(), message, "open-category:" + newCategory.getCategoryId());
+                    String message = "Category " + newCategory.getCategoryName() + " has been added to Peak!";
+                    UserNotification n = new UserNotification(users[i].getUserId(), message, "open-category:" + newCategory.getCategoryId(), newCategory.getCategoryThumbnail());
 
                     insertNotification(n);
 

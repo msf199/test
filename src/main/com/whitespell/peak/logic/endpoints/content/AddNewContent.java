@@ -27,7 +27,7 @@ import java.sql.Timestamp;
  */
 public class AddNewContent extends EndpointHandler {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `timestamp`) VALUES (?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
     private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ?";
 
@@ -39,6 +39,8 @@ public class AddNewContent extends EndpointHandler {
     private static final String PAYLOAD_CONTENT_URL = "contentUrl";
     private static final String PAYLOAD_CONTENT_DESCRIPTION = "contentDescription";
     private static final String PAYLOAD_CONTENT_THUMBNAIL = "thumbnailUrl";
+    private static final String PAYLOAD_CONTENT_PRICE = "contentPrice";
+
 
     private static final String URL_USER_ID_KEY = "userId";
 
@@ -51,6 +53,7 @@ public class AddNewContent extends EndpointHandler {
         payloadInput.put(PAYLOAD_CONTENT_URL, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_REQUIRED);
     }
 
     @Override
@@ -65,6 +68,7 @@ public class AddNewContent extends EndpointHandler {
         final String content_title = payload.get(PAYLOAD_CONTENT_TITLE).getAsString();
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
+        final double content_price = payload.get(PAYLOAD_CONTENT_PRICE).getAsDouble();
         final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
 
         int[] contentId = {0};
@@ -99,7 +103,8 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(5, content_title);
                 ps.setString(6, content_description);
                 ps.setString(7, thumbnail_url);
-                ps.setTimestamp(8, now);
+                ps.setDouble(8, content_price);
+                ps.setTimestamp(9, now);
 
                 int rows = ps.executeUpdate();
                 if (rows <= 0){
@@ -212,9 +217,9 @@ public class AddNewContent extends EndpointHandler {
          * Send notifications to users for the ContentUpload if it's not a bundle (only when videos get added, could be inside bundle)
          */
 
+
         if(Integer.parseInt(content_type) != StaticRules.BUNDLE_CONTENT_TYPE) {
-            System.out.println("Adding to notification service");
-            Server.NotificationService.offerNotification(new ContentUploadedNotification(user_id, new ContentObject(
+             Server.NotificationService.offerNotification(new ContentUploadedNotification(user_id, new ContentObject(
                     category_id,
                     user_id,
                     contentId[0],
@@ -225,6 +230,7 @@ public class AddNewContent extends EndpointHandler {
                     thumbnail_url
             )));
         }
+
 
         context.getResponse().setStatus(HttpStatus.OK_200);
         AddContentObject object = new AddContentObject();
