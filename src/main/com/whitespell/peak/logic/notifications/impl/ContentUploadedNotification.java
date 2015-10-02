@@ -74,11 +74,9 @@ public class ContentUploadedNotification implements NotificationImplementation {
                          * Send email notification to follower when uploading new content
                          */
 
-<<<<<<< HEAD
+
                         String message = publisherUsername + " uploaded a video!";
-=======
-                        String message = me.getUserName() + " uploaded a video!";
->>>>>>> e7bc8ef55a594057d941716d2029913973b6a6af
+
 
                         UserNotification n = new UserNotification(follower.getUserId(), message, "open-content:"+contentObject.getContentId(), me.getThumbnail());
 
