@@ -926,6 +926,7 @@ public class IntegrationTests extends Server {
                 .asString();
 
         NewsfeedObject[] n = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
+        System.out.println(stringResponse.getBody());
 
         for(int i = 0; i < 3; i++){
             if(i == 0) {
@@ -1638,11 +1639,69 @@ public class IntegrationTests extends Server {
                     .asString();
 
 
+            /**
+             * Test for userAccess in bundles
+             */
+
             // grab /content/bundles[0].getContentId() and check if it has 4 children, check child with content id bundles[1].getContentId() for 1 child
             stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + bundles[0].getContentId())
                     .header("accept", "application/json")
                     .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                     .asString();
+            ContentObject[] content1 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+            assertEquals(content1[0].hasAccess(), 0);
+            assertEquals(content1[0].getContentUrl(), null);
+
+            for(int i = 0; i < content1.length; i++){
+                /**
+                 * Ensure we don't have access to this paid content, and the thumbnail is null in the response
+                 */
+                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content1[i].getContentId())
+                        .header("accept", "application/json")
+                        .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                        .asString();
+                System.out.println(stringResponse.getBody());
+
+                ContentObject[] content2 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+                assertEquals(content2[0].hasAccess(), 0);
+                assertEquals(content2[0].getContentUrl(), null);
+
+                /**
+                 * Purchase the content on client side, then update the user's access
+                 */
+
+                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/access")
+                        .header("accept", "application/json")
+                        .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                        .body("{\n" +
+                                "\"contentId\": \"" + content1[i].getContentId() + "\"\n" +
+                                "\n}")
+                        .asString();
+                System.out.println(stringResponse.getBody());
+
+
+                GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
+                assertEquals(hasAccess.isSuccess(), true);
+
+
+                /**
+                 * Check the content to ensure we have access as this user and the url is displayed
+                 */
+                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content1[i].getContentId())
+                        .header("accept", "application/json")
+                        .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                        .asString();
+
+                System.out.println(stringResponse.getBody());
+
+
+                ContentObject[] content3 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+                assertEquals(content3[0].hasAccess(), 1);
+                assertEquals(content3[0].getUserId(), TEST_UID);
+                assertEquals(content3[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
+            }
+
+
 
             // get 3 random uyt videos to place inside the bundles
             ContentObject[] finalBundleResponseArray = g.fromJson(stringResponse.getBody(), ContentObject[].class);
@@ -2064,8 +2123,8 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .body("{\n" +
-                        "\"categoryId\": \""+categories[1].getCategoryId()+"\",\n" +
-                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
+                        "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"newest\",\n" +
                         "\"contentTitle\": \"new\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=newadmin\"," +
@@ -2076,7 +2135,7 @@ public class IntegrationTests extends Server {
         ContentObject content = g.fromJson(stringResponse.getBody(), ContentObject.class);
 
         /**
-         * Ensure we don't have access to this paid content, and the thumbnail is null in the response
+         * Ensure we don't have access to this paid content, and the url is null in the response
          */
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content.getContentId())
                 .header("accept", "application/json")
@@ -2101,7 +2160,7 @@ public class IntegrationTests extends Server {
         assertEquals(hasAccess.isSuccess(), true);
 
         /**
-         * Check the content to ensure we have access as this user and the thumbnail is displayed
+         * Check the content to ensure we have access as this user and the url is displayed
          */
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content.getContentId())
                 .header("accept", "application/json")

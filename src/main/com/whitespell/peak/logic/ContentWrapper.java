@@ -82,7 +82,7 @@ public class ContentWrapper {
      * Rather than getting all the user's liked content each loop, we will index the content ids of liked content and compare against it in loops
      * ^ same for access
      * We're adding a +1 / -1 function to the content table for content_likes and content_comments so we don't have to query again.
-     * Make this stuff digetable
+     * Make this stuff digestable
      * JOIN with user for every single content call
      */
 
@@ -209,7 +209,7 @@ public class ContentWrapper {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
-                tempContent.setContentUrl("NOT_REVEALED, UPGRADE");
+                tempContent.setContentUrl(null);
             }
 
 
@@ -258,8 +258,6 @@ public class ContentWrapper {
                     currentObject.getString(COVER_PHOTO_KEY),
                     currentObject.getString(SLOGAN_KEY),
                     1 // always a publisher
-
-
             );
 
             tempContent = this.personalizeContent(tempContent, tempPublisher, currentObject);
@@ -310,14 +308,11 @@ public class ContentWrapper {
                             results.getString(COVER_PHOTO_KEY),
                             results.getString(SLOGAN_KEY),
                             1 // always a publisher
-
-
                     );
 
                     child = this.personalizeContent(child, tempPublisher, results);
 
                 /** personalize the child **/
-
 
                     if (child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                         child.setChildren(recursiveGetChildren(child, context));

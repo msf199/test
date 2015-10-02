@@ -101,25 +101,6 @@ public class GetNewsfeed extends EndpointHandler {
         }
 
         /**
-         * Get the userIds current user is following.
-         */
-        try {
-            StatementExecutor executor = new StatementExecutor(FIND_USER_FOLLOWING_QUERY);
-            executor.execute(ps -> {
-                ps.setInt(1, user_id);
-
-                ResultSet results = ps.executeQuery();
-                while (results.next()) {
-                    followerIds.add(results.getInt("following_id"));
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
-        }
-
-        /**
          * Ensure user is following another user
          */
         if(followerIds != null && followerIds.size() > 0) {
