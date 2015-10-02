@@ -58,7 +58,7 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUser(), "/users/$", "userId"); //always have the variable first
 
        // Get a specific user based on their user ID
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ExpireAuthentication(), "/users/$/logout", "userId"); //always have the variable first
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ExpireAuthentication(), "/users/$/logout", "userId");
 
         // Get a specific user's workout based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSavedContent(), "/users/$/saved", "userId");

@@ -66,7 +66,7 @@ public class ContentLikeNotification implements NotificationImplementation {
                 /**
                  * Send user notification to publisher of video that they have received a new comment.
                  */
-                String message = "A user just liked your video!";
+                String message = like_user_id + "just liked your video!";
                 UserNotification n = new UserNotification(publisher.getUserId(), message, "open-content:" + like_content_id);
 
                 insertNotification(n);
@@ -82,7 +82,7 @@ public class ContentLikeNotification implements NotificationImplementation {
                 }
             }
 
-        }catch(Exception e){
+        } catch(Exception e){
             Logging.log("High", e);
             return;
         }
