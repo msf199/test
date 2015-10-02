@@ -6,7 +6,7 @@ import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
-import main.com.whitespell.peak.logic.endpoints.content.ContentHelper;
+import main.com.whitespell.peak.logic.ContentWrapper;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -71,6 +71,8 @@ public class Search extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
+
+        ContentWrapper contentWrapper = new ContentWrapper(context, currentUser);
 
         ArrayList<UserObject> tempUsers = new ArrayList<>();
         ArrayList<Integer> tempCategories = new ArrayList<>();
@@ -153,7 +155,7 @@ public class Search extends EndpointHandler {
         new Thread(
                 () -> {
                     try {
-                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content`" +
+                        StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id`" +
                                 " WHERE `content_title`" +
                                 " LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'" +
                                 " AND `content_id` > "+GenericAPIActions.getOffset(context.getQueryString())+"" +
@@ -165,8 +167,7 @@ public class Search extends EndpointHandler {
                             ResultSet results = ps.executeQuery();
 
                             while(results.next()) {
-                                int currentContentId = results.getInt(CONTENT_ID_KEY);
-                                ContentObject c = ContentHelper.constructContent(results, context, currentContentId, currentUser);
+                                 ContentObject c = contentWrapper.wrapContent(results);
 
                                 tempContent.add(c);
                             }

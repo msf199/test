@@ -39,8 +39,9 @@ public class ImportDDL {
         tables.add("content");
         tables.add("content_curation");
         tables.add("newsfeed");
-        tables.add("saved_content");
+        tables.add("content_saved");
         tables.add("content_likes");
+        tables.add("content_views");
         tables.add("feedback");
         tables.add("reporting");
         tables.add("notification");

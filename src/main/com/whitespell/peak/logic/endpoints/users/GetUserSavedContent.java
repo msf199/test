@@ -5,13 +5,11 @@ import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
-import main.com.whitespell.peak.logic.endpoints.content.ContentHelper;
+import main.com.whitespell.peak.logic.ContentWrapper;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
-import main.com.whitespell.peak.model.UserObject;
 
-import javax.swing.text.AbstractDocument;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,8 +21,8 @@ import java.util.ArrayList;
  */
 public class GetUserSavedContent extends EndpointHandler {
 
-    private static final String GET_USER_SAVED_CONTENT_ID_QUERY = "SELECT `content_id` FROM `saved_content` WHERE `user_id` = ?";
-    private static final String GET_CONTENT_OBJECT_QUERY = "SELECT * FROM `content` WHERE `content_id` = ?";
+    private static final String GET_USER_content_saved_ID_QUERY = "SELECT `content_id` FROM `content_saved` WHERE `user_id` = ?";
+    private static final String GET_CONTENT_OBJECT_QUERY = "SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` = ?";
 
     private static final String URL_USER_ID = "userId";
 
@@ -53,9 +51,13 @@ public class GetUserSavedContent extends EndpointHandler {
             return;
         }
 
+        ContentWrapper contentWrapper = new ContentWrapper(context, user_id);
+
+
+
         final getSavedContent getSavedContent = new getSavedContent();
         try {
-            StatementExecutor executor = new StatementExecutor(GET_USER_SAVED_CONTENT_ID_QUERY);
+            StatementExecutor executor = new StatementExecutor(GET_USER_content_saved_ID_QUERY);
             final int finalUser_id = user_id;
 
             executor.execute(ps -> {
@@ -76,7 +78,7 @@ public class GetUserSavedContent extends EndpointHandler {
                             ResultSet results2 = ps2.executeQuery();
 
                             if (results2.next()) {
-                                ContentObject content = ContentHelper.constructContent(results2, context, currentContentId, currentUser);
+                                ContentObject content = contentWrapper.wrapContent(results2);
                                 getSavedContent.addToSavedContent(content);
                             }
                         });

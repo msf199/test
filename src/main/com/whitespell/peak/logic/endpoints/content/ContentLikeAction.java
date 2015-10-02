@@ -25,6 +25,9 @@ public class ContentLikeAction extends EndpointHandler {
 
     private static final String INSERT_LIKE_ACTION_QUERY = "INSERT INTO `content_likes`(`user_id`, `content_id`, `like_datetime`) VALUES (?,?,?)";
 
+    private static final String PLUS_LIKE_QUERY = "UPDATE `content` SET `content_likes` = `content_likes` + 1 WHERE `content_id` = ?";
+    private static final String MIN_LIKE_QUERY = "UPDATE `content` SET `content_likes` = `content_likes` - 1 WHERE `content_id` = ?";
+
     private static final String URL_CONTENT_LIKE_ID = "contentId";
     private static final String PAYLOAD_ACTION_KEY = "action";
 
@@ -125,6 +128,18 @@ public class ContentLikeAction extends EndpointHandler {
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                     return;
                 }
+
+                try {
+                    StatementExecutor executor = new StatementExecutor(PLUS_LIKE_QUERY);
+                    executor.execute(ps -> {
+                        ps.setInt(1, content_id);
+
+                        ps.executeUpdate();
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e); // crash doesn't matter but we need to log it
+                }
+
                 break;
 
             case "unlike":
@@ -147,6 +162,17 @@ public class ContentLikeAction extends EndpointHandler {
                     Logging.log("High", e);
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                     return;
+                }
+
+                try {
+                    StatementExecutor executor = new StatementExecutor(MIN_LIKE_QUERY);
+                    executor.execute(ps -> {
+                        ps.setInt(1, content_id);
+
+                        ps.executeUpdate();
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e); // crash doesn't matter but we need to log it
                 }
                 break;
         }

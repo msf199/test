@@ -94,7 +94,7 @@ public class GetBundle extends EndpointHandler {
                         });
                     } catch (SQLException e) {
                         Logging.log("High", e);
-                        if (e.getMessage().contains("fk_lists_saved_content_id")) {
+                        if (e.getMessage().contains("fk_lists_content_saved_id")) {
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
                         }else if(e.getMessage().contains("fk_lists_saved_user_id")){
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);

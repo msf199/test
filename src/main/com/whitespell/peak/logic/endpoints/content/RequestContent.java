@@ -93,13 +93,16 @@ public class RequestContent extends EndpointHandler {
             return;
         }
 
+        ContentWrapper contentWrapper = new ContentWrapper(context, currentUser);
+
         /**
          * Construct the SELECT FROM CONTENT query based on the the desired query output.
          */
         StringBuilder selectString = new StringBuilder();
-        selectString.append("SELECT * FROM `content` WHERE `content_id` > ? ");
+        selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` > ? ");
         for (String s : queryKeys) {
-            selectString.append("AND `" + s + "` = ? ");
+
+            selectString.append("AND `ct`.`" + s + "` = ? ");
         }
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
@@ -147,8 +150,8 @@ public class RequestContent extends EndpointHandler {
                 ResultSet results = ps.executeQuery();
                 //display results
                 while (results.next()) {
-                    int currentContentId = results.getInt(CONTENT_ID_KEY);
-                    ContentObject content = ContentHelper.constructContent(results, context, currentContentId, currentUser);
+
+                    ContentObject content = contentWrapper.wrapContent(results);
                     contents.add(content);
                 }
 

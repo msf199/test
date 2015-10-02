@@ -1221,8 +1221,6 @@ public class IntegrationTests extends Server {
         assertEquals(c4[0].getLikes(), 1);
     }
 
-    @Ignore
-    public class test0027_ignore {
         @Test
         public void test0027_ContentCurationTest() throws UnirestException {
 
@@ -1657,7 +1655,6 @@ public class IntegrationTests extends Server {
             assertEquals(finalBundleResponse.getChildren().size(), 4);
         }
 
-    }
         @Test
         public void test0031_PushNotificationTest() throws UnirestException {
 

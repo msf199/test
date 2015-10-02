@@ -153,4 +153,8 @@ public class ContentObject {
     public void addChild(ContentObject child) {
         this.children.add(child);
     }
+
+    public void setContentUrl(String contentUrl) {
+        this.contentUrl = contentUrl;
+    }
 }

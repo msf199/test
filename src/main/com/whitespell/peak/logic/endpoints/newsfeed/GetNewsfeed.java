@@ -7,7 +7,7 @@ import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
-import main.com.whitespell.peak.logic.endpoints.content.ContentHelper;
+import main.com.whitespell.peak.logic.ContentWrapper;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -78,6 +78,8 @@ public class GetNewsfeed extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
+
+        ContentWrapper contentWrapper = new ContentWrapper(context, currentUser);
 
         /**
          * Get the userIds current user is following.
@@ -164,7 +166,7 @@ public class GetNewsfeed extends EndpointHandler {
                                 results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
                                 results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
 
-                        newsfeedContent = ContentHelper.constructContent(results, context, currentContentId, currentUser);
+                        newsfeedContent = contentWrapper.wrapContent(results);
 
                         contentIdSet.add(currentContentId);
                         newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
@@ -245,7 +247,7 @@ public class GetNewsfeed extends EndpointHandler {
                                     results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
                                     results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
 
-                            newsfeedContent = ContentHelper.constructContent(results, context, currentContentId, currentUser);
+                            newsfeedContent = contentWrapper.wrapContent(results);
                             newsfeedContent.setRecommended(1);
 
                             contentIdSet.add(currentContentId);
