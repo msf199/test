@@ -132,7 +132,6 @@ public class GetNewsfeed extends EndpointHandler {
             try {
                 StatementExecutor executor = new StatementExecutor(GET_FOLLOWERS_CONTENT_QUERY);
                 executor.execute(ps -> {
-                    UserObject followedUser;
                     ContentObject newsfeedContent;
 
                     ResultSet results = ps.executeQuery();
@@ -143,14 +142,10 @@ public class GetNewsfeed extends EndpointHandler {
 
                         int currentContentId = results.getInt(CONTENT_ID_KEY);
 
-                        followedUser = new UserObject(results.getInt(USER_ID_KEY), results.getString(USERNAME_KEY),
-                                results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
-                                results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
-
                         newsfeedContent = contentWrapper.wrapContent(results);
 
                         contentIdSet.add(currentContentId);
-                        newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
+                        newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), newsfeedContent));
                     }
                 });
             } catch (SQLException e) {
@@ -213,7 +208,6 @@ public class GetNewsfeed extends EndpointHandler {
                 try {
                     StatementExecutor executor = new StatementExecutor(GET_CATEGORY_FOLLOWING_CONTENT_QUERY);
                     executor.execute(ps -> {
-                        UserObject followedUser;
                         ContentObject newsfeedContent;
 
                         ResultSet results = ps.executeQuery();
@@ -224,15 +218,11 @@ public class GetNewsfeed extends EndpointHandler {
                                 continue;
                             }
 
-                            followedUser = new UserObject(results.getInt(USER_ID_KEY), results.getString(USERNAME_KEY),
-                                    results.getString(DISPLAYNAME_KEY), results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY),
-                                    results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
-
                             newsfeedContent = contentWrapper.wrapContent(results);
                             newsfeedContent.setRecommended(1);
 
                             contentIdSet.add(currentContentId);
-                            newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), followedUser, newsfeedContent));
+                            newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), newsfeedContent));
                         }
                     });
                 } catch (SQLException e) {

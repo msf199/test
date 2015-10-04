@@ -5,23 +5,16 @@ package main.com.whitespell.peak.model;
  */
 public class NewsfeedObject implements Comparable<NewsfeedObject> {
 
-    public NewsfeedObject(long newsfeedId, UserObject user, ContentObject content) {
+    public NewsfeedObject(long newsfeedId, ContentObject content) {
         this.newsfeedId = newsfeedId;
-        this.user = user;
         this.content= content;
     }
 
     public long newsfeedId;
-    public UserObject user;
     public ContentObject content;
-
-    final static int TIMESTAMP_LENGTH = 13;
 
     public ContentObject getNewsfeedContent() {
         return content;
-    }
-    public UserObject getNewsfeedUser() {
-        return user;
     }
 
     public long getNewsfeedId() {
@@ -30,18 +23,6 @@ public class NewsfeedObject implements Comparable<NewsfeedObject> {
 
     public void setNewsfeedId(long newsfeedId) {
         this.newsfeedId = newsfeedId;
-    }
-
-    public boolean hasContent(long contentId){
-        String stringNewsfeedId = String.valueOf(newsfeedId);
-        String currContentId = String.valueOf(contentId);
-
-        String newsfeedContentId = stringNewsfeedId.substring(TIMESTAMP_LENGTH);
-
-        if(newsfeedContentId.equals(currContentId)){
-            return true;
-        }
-        return false;
     }
 
     /**

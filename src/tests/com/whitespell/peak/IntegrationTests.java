@@ -629,10 +629,6 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getThumbnailUrl(), "thumbguy.com");
     }
 
-
-
-    @Ignore
-    public class ignore{
     @Test
     public void test0012_getPublishersByCategory() {
         //todo(pim) do a search on /users where publishing list contains numbers category[0] and category[1] and output as json
@@ -937,15 +933,15 @@ public class IntegrationTests extends Server {
         for (int i = 0; i < 3; i++) {
             if (i == 0) {
                 assertEquals(n[i].getNewsfeedId(), content[2].getContentId());
-                assertEquals(n[i].getNewsfeedUser().getUserId(), TEST2_UID);
+                assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST2_UID);
                 assertEquals(n[i].getNewsfeedContent().getContentTitle(), "content2");
             } else if (i == 1) {
                 assertEquals(n[i].getNewsfeedId(), content[i].getContentId());
-                assertEquals(n[i].getNewsfeedUser().getUserId(), TEST_UID);
+                assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
                 assertEquals(n[i].getNewsfeedContent().getRecommended(), 1);
             } else if (i == 2) {
                 assertEquals(n[i].getNewsfeedId(), content[0].getContentId());
-                assertEquals(n[i].getNewsfeedUser().getUserId(), TEST_UID);
+                assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
                 assertEquals(n[i].getNewsfeedContent().getRecommended(), 1);
             }
         }
@@ -1504,497 +1500,496 @@ public class IntegrationTests extends Server {
         assertEquals(d.isSuccess(), true);
     }
 
-}
 
-        @Test
-        public void test0030_MakeBundleTest() throws UnirestException {
+    @Test
+    public void test0030_MakeBundleTest() throws UnirestException {
 
-            // create the root bundle
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
-                            "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
-                            "\"contentDescription\": \"This is the root bundle.\",\n" +
-                            "\"contentTitle\": \"Root bundle\",\n" +
-                            "\"contentUrl\": \"doesnt matter\"," +
-                            "\"contentPrice\": 1.99," +
-                            "\"thumbnailUrl\": \"thumburl.com\"" +
-                            "\n}")
-                    .asString();
+        // create the root bundle
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Root bundle\",\n" +
+                        "\"contentUrl\": \"doesnt matter\"," +
+                        "\"contentPrice\": 1.99," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
 
-            // test youtube video to be added into the bundle
+        // test youtube video to be added into the bundle
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
-                            "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
-                            "\"contentDescription\": \"This is the root bundle.\",\n" +
-                            "\"contentTitle\": \"Child 1 of root bundle (yt video)\",\n" +
-                            "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
-                            "\"contentPrice\": 1.99," +
-                            "\"thumbnailUrl\": \"thumburl.com\"" +
-                            "\n}")
-                    .asString();
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Child 1 of root bundle (yt video)\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentPrice\": 1.99," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
-                            "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
-                            "\"contentDescription\": \"This is the root bundle.\",\n" +
-                            "\"contentTitle\": \"Child 2 of root bundle (yt video)\",\n" +
-                            "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
-                            "\"contentPrice\": 1.99," +
-                            "\"thumbnailUrl\": \"thumburl.com\"" +
-                            "\n}")
-                    .asString();
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Child 2 of root bundle (yt video)\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentPrice\": 1.99," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
 
-            // add a child bundle
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
-                            "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
-                            "\"contentDescription\": \"This is the root bundle.\",\n" +
-                            "\"contentTitle\": \"Child bundle\",\n" +
-                            "\"contentUrl\": \"doesnt matter\"," +
-                            "\"contentPrice\": 1.99," +
-                            "\"thumbnailUrl\": \"thumburl.com\"" +
-                            "\n}")
-                    .asString();
+        // add a child bundle
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Child bundle\",\n" +
+                        "\"contentUrl\": \"doesnt matter\"," +
+                        "\"contentPrice\": 1.99," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
-                            "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
-                            "\"contentDescription\": \"This is the root bundle.\",\n" +
-                            "\"contentTitle\": \"Video of Child bundle\",\n" +
-                            "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
-                            "\"contentPrice\": 1.99," +
-                            "\"thumbnailUrl\": \"thumburl.com\"" +
-                            "\n}")
-                    .asString();
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
+                        "\"contentDescription\": \"This is the root bundle.\",\n" +
+                        "\"contentTitle\": \"Video of Child bundle\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentPrice\": 1.99," +
+                        "\"thumbnailUrl\": \"thumburl.com\"" +
+                        "\n}")
+                .asString();
 
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[0].getContentTypeId())
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .asString();
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[0].getContentTypeId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
 
-            // index 0 should be the root bundle, 1 should be the child bundle
-            ContentObject bundles[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        // index 0 should be the root bundle, 1 should be the child bundle
+        ContentObject bundles[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
 
-            // add the child bundle as a child to the root bundle
+        // add the child bundle as a child to the root bundle
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"childId\": \"" + bundles[1].getContentId() + "\"" +
-                            "\n}")
-                    .asString();
-
-
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[1].getContentTypeId())
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .asString();
-
-            // get 3 random uyt videos to place inside the bundles
-            ContentObject videos[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-
-            // add 2 videos to root bundle, and 1 to child bundle
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \"" + bundles[1].getContentId() + "\"" +
+                        "\n}")
+                .asString();
 
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"childId\": \"" + videos[0].getContentId() + "\"" +
-                            "\n}")
-                    .asString();
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[1].getContentTypeId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"childId\": \"" + videos[1].getContentId() + "\"" +
-                            "\n}")
-                    .asString();
+        // get 3 random uyt videos to place inside the bundles
+        ContentObject videos[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"childId\": \"" + bundles[1].getContentId() + "\"" +
-                            "\n}")
-                    .asString();
+        // add 2 videos to root bundle, and 1 to child bundle
 
 
-            Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[1].getContentId() + "/add_child")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"childId\": \"" + videos[2].getContentId() + "\"" +
-                            "\n}")
-                    .asString();
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \"" + videos[0].getContentId() + "\"" +
+                        "\n}")
+                .asString();
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \"" + videos[1].getContentId() + "\"" +
+                        "\n}")
+                .asString();
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \"" + bundles[1].getContentId() + "\"" +
+                        "\n}")
+                .asString();
 
 
-            /**
-             * Test for userAccess in bundles
-             */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + bundles[1].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \"" + videos[2].getContentId() + "\"" +
+                        "\n}")
+                .asString();
 
-            // grab /content/bundles[0].getContentId() and check if it has 4 children, check child with content id bundles[1].getContentId() for 1 child
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + bundles[0].getContentId())
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .asString();
-            ContentObject[] content1 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-            assertEquals(content1[0].hasAccess(), 0);
-            assertEquals(content1[0].getContentUrl(), null);
 
-            /**
-             * Ensure we don't yet have access to this paid content
-             */
-            for(ContentObject c : bundles[0].getChildren()){
-                if(c.getContentPrice() != 0){
-                    assertEquals(c.hasAccess(), 0);
-                    assertEquals(c.getContentUrl(), null);
-                }
-                else{
-                    assertEquals(c.hasAccess(), 1);
-                    assertEquals(c.getContentUrl() != null, true);
-                }
+        /**
+         * Test for userAccess in bundles
+         */
+
+        // grab /content/bundles[0].getContentId() and check if it has 4 children, check child with content id bundles[1].getContentId() for 1 child
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + bundles[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        ContentObject[] content1 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content1[0].hasAccess(), 0);
+        assertEquals(content1[0].getContentUrl(), null);
+
+        /**
+         * Ensure we don't yet have access to this paid content
+         */
+        for(ContentObject c : bundles[0].getChildren()){
+            if(c.getContentPrice() != 0){
+                assertEquals(c.hasAccess(), 0);
+                assertEquals(c.getContentUrl(), null);
             }
-
-            // get 3 random uyt videos to place inside the bundles
-            ContentObject[] finalBundleResponseArray = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-
-            ContentObject finalBundleResponse = finalBundleResponseArray[0]; // always the first index bc we're sorting based on content id, and thats unique
-
-            for (ContentObject c : finalBundleResponse.getChildren()) {
-                System.out.println(c.getContentId() + "---" + c.getContentDescription());
-
-                /**
-                 * Purchase the content on client side, then update the user's access
-                 */
-
-                stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/access")
-                        .header("accept", "application/json")
-                        .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                        .body("{\n" +
-                                "\"contentId\": \"" + c.getContentId() + "\"\n" +
-                                "\n}")
-                        .asString();
-                GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
-                assertEquals(hasAccess.isSuccess(), true);
-
-
-                /**
-                 * Check the content to ensure we have access as this user and the url is displayed
-                 */
-                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + c.getContentId())
-                        .header("accept", "application/json")
-                        .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                        .asString();
-
-                ContentObject[] content3 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-                assertEquals(content3[0].hasAccess(), 1);
-                assertEquals(content3[0].getUserId(), TEST_UID);
-                if(content3[0].getContentType() == StaticRules.BUNDLE_CONTENT_TYPE){
-                    assertEquals(content3[0].getContentUrl(), "doesnt matter");
-                }else {
-                    assertEquals(content3[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
-                }
+            else{
+                assertEquals(c.hasAccess(), 1);
+                assertEquals(c.getContentUrl() != null, true);
             }
-            assertEquals(finalBundleResponse.getChildren().size(), 4);
         }
 
-        @Test
-        public void test0031_PushNotificationTest() throws UnirestException {
+        // get 3 random uyt videos to place inside the bundles
+        ContentObject[] finalBundleResponseArray = g.fromJson(stringResponse.getBody(), ContentObject[].class);
 
-            Config.NOTIFICATION_TOGGLE = false;
+        ContentObject finalBundleResponse = finalBundleResponseArray[0]; // always the first index bc we're sorting based on content id, and thats unique
 
-            /**
-             * Test that notifications are updated in DB
-             */
-
-            /**
-             * Create the admin and user accounts we are testing with
-             */
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"userName\":\"" + ADMIN_USERNAME + "\",\n" +
-                            "\"password\" : \"" + ADMIN_PASSWORD + "\",\n" +
-                            "\"email\" : \"" + ADMIN_EMAIL + "\"\n" +
-                            "}")
-                    .asString();
-
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"userName\":\"test11\",\n" +
-                            "\"password\" : \"test11\",\n" +
-                            "\"email\" : \"test1@lol.com\"\n" +
-                            "}")
-                    .asString();
-            TEST_USERNAME = "test11";
-            TEST_PASSWORD = TEST_USERNAME;
-
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"userName\":\"test22\",\n" +
-                            "\"password\" : \"test22\",\n" +
-                            "\"email\" : \"test2@lol.com\"\n" +
-                            "}")
-                    .asString();
-            ROLLERSKATER_USERNAME = "test22";
-            ROLLERSKATER_PASSWORD = ROLLERSKATER_USERNAME;
+        for (ContentObject c : finalBundleResponse.getChildren()) {
+            System.out.println(c.getContentId() + "---" + c.getContentDescription());
 
             /**
-             * Authenticate the admin
-             */
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"userName\":\"" + ADMIN_USERNAME + "\",\n" +
-                            "\"password\" : \"" + ADMIN_PASSWORD + "\",\n" +
-                            "\"deviceUUID\" : \"" + ADMIN_DEVICE_UUID + "\",\n" +
-                            "\"deviceName\" : \"" + ADMIN_DEVICE_NAME + "\",\n" +
-                            "\"deviceType\" : " + ADMIN_DEVICE_TYPE + "\n" +
-                            "}")
-                    .asString();
-            AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-            ADMIN_UID = a.getUserId();
-            ADMIN_KEY = a.getKey();
-
-            /**
-             * Authenticate the other users with device info for testing
+             * Purchase the content on client side, then update the user's access
              */
 
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"userName\":\"" + TEST_USERNAME + "\",\n" +
-                            "\"password\" : \"" + TEST_PASSWORD + "\",\n" +
-                            "\"deviceUUID\" : \"cz-HvHQ2oX8:APA91bGbM8F4HT0BOXdORmmu0xVYVM0RMhRGXOciUmG5V92H5v-1VuWY7Svj" +
-                            "HHpOFOUeqATafD3CxPuqyzB_yg1TLAS2DlLoEGcUnsgBLW2knL-o1Q9e199hFu6eluexO8HainFRYTbW\",\n" +
-                            "\"deviceName\" : \"otheruser2\",\n" +
-                            "\"deviceType\" : "+1+"\n" +
-                            "}")
-                    .asString();
-            AuthenticationObject a2 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-            TEST_UID = a2.getUserId();
-            TEST_KEY = a2.getKey();
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"userName\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
-                            "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\",\n" +
-                            "\"deviceUUID\" : \"99d82470564059f9c2e1918ffdb4a86a1869b5bf2fa7cffbadf897f553ef9c96\",\n" +
-                            "\"deviceName\" : \"otheruser\",\n" +
-                            "\"deviceType\" : " + 0 + "\n" +
-                            "}")
-                    .asString();
-            AuthenticationObject a3 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-            TEST2_UID = a3.getUserId();
-            TEST2_KEY = a3.getKey();
-
-            /**
-             * Upload a new category, all users get a notification
-             */
-            Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
-                    .header("accept", "application/json")
-                    .body("{\n" +
-                            "\"categoryName\": \"yoga\",\n" +
-                            "\"categoryThumbnail\": \"http://upperlimits.com/west-county/wp-content/uploads/2014/05/yoga.jpg\"\n" +
-                            "}")
-                    .asString();
-
-            /**
-             * Have some users follow the admin
-             */
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
+            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/access")
                     .header("accept", "application/json")
                     .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                     .body("{\n" +
-                            "\"followingId\": \"" + ADMIN_UID + "\",\n" +
-                            "\"action\": \"follow\"\n" +
-                            "}")
-                    .asString();
-            UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
-            assertEquals(b.getActionTaken(), "followed");
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                    .body("{\n" +
-                            "\"followingId\": \"" + ADMIN_UID + "\",\n" +
-                            "\"action\": \"follow\"\n" +
-                            "}")
-                    .asString();
-            UserFollowAction.FollowActionObject c = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
-            assertEquals(c.getActionTaken(), "followed");
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                    .body("{\n" +
-                            "\"followingId\": \"" + ADMIN_UID + "\",\n" +
-                            "\"action\": \"unfollow\"\n" +
-                            "}")
-                    .asString();
-            UserFollowAction.FollowActionObject d = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
-            assertEquals(d.getActionTaken(), "unfollowed");
-
-            /**
-             * Upload content as the admin
-             */
-
-            Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/content")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                    .body("{\n" +
-                            "\"categoryId\": \""+categories[1].getCategoryId()+"\",\n" +
-                            "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
-                            "\"contentDescription\": \"admincontent\",\n" +
-                            "\"contentTitle\": \"admincontent\",\n" +
-                            "\"contentUrl\": \"https://www.youtube.com/watch?v=admin\"," +
-                            "\"contentPrice\": 1.99," +
-                            "\"thumbnailUrl\": \"thumbadmin.com\"" +
+                            "\"contentId\": \"" + c.getContentId() + "\"\n" +
                             "\n}")
                     .asString();
+            GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
+            assertEquals(hasAccess.isSuccess(), true);
 
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + ADMIN_UID)
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                    .asString();
-            content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-            int contentId = content[0].getContentId();
-            assertEquals(content[0].getContentPrice(), 1.99, 0.0);
 
             /**
-             * Have both followers like the uploaded content
+             * Check the content to ensure we have access as this user and the url is displayed
              */
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"userId\": \"" + TEST_UID + "\",\n" +
-                            "\"action\": \"like\"\n" +
-                            "}")
-                    .asString();
-            ContentLikeAction.LikeActionObject la = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
-            assertEquals(la.getActionTaken(), "like");
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                    .body("{\n" +
-                            "\"userId\": \"" + TEST2_UID + "\",\n" +
-                            "\"action\": \"like\"\n" +
-                            "}")
-                    .asString();
-            ContentLikeAction.LikeActionObject la1 = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
-            assertEquals(la1.getActionTaken(), "like");
-
-            /**
-             * Have both followers comment on the uploaded content
-             */
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                    .body("{\n" +
-                            "\"userId\": \"" + TEST_UID + "\",\n" +
-                            "\"comment\": \"awesome video!\"\n" +
-                            "}")
-                    .asString();
-
-            AddContentComment.AddContentCommentObject add = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
-            assertEquals(add.isCommentAdded(), true);
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                    .body("{\n" +
-                            "\"userId\": \"" + TEST2_UID + "\",\n" +
-                            "\"comment\": \"wow this is so cool!\"\n" +
-                            "}")
-                    .asString();
-
-            AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
-            assertEquals(add2.isCommentAdded(), true);
-
-            /**
-             * Sleep to let the notifications go through (There are a lot of notifications...)
-             */
-
-            if(Config.NOTIFICATION_TOGGLE) {
-                try {
-                    Thread.sleep(90000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            /**
-             * Check admin user for follower notifications
-             */
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/notifications")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                    .asString();
-            GetUserNotifications.getUserNotificationsResponse notifications =
-                    g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
-            ArrayList<UserNotification> notif = notifications.getUserNotifications();
-            if(notif != null) {
-                for (UserNotification n : notif) {
-                    assertEquals(n.getNotificationStatus(), 1);
-                }
-            }
-
-            /**
-             * Check for notifications on both following users for uploaded content
-             */
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/notifications")
+            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + c.getContentId())
                     .header("accept", "application/json")
                     .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                     .asString();
-            GetUserNotifications.getUserNotificationsResponse notifications1 =
-                    g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
-            ArrayList<UserNotification> notif2 = notifications1.getUserNotifications();
-            if(notif2 != null) {
-                for (UserNotification n : notif2) {
-                    assertEquals(n.getNotificationStatus(), 1);
-                }
-            }
 
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/notifications")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                    .asString();
-            GetUserNotifications.getUserNotificationsResponse notifications2 =
-                    g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
-            ArrayList<UserNotification> notif3 = notifications2.getUserNotifications();
-            if(notif3 != null) {
-                for (UserNotification n : notif3) {
-                    assertEquals(n.getNotificationStatus(), 1);
-                }
+            ContentObject[] content3 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+            assertEquals(content3[0].hasAccess(), 1);
+            assertEquals(content3[0].getUserId(), TEST_UID);
+            if(content3[0].getContentType() == StaticRules.BUNDLE_CONTENT_TYPE){
+                assertEquals(content3[0].getContentUrl(), "doesnt matter");
+            }else {
+                assertEquals(content3[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
             }
-
-            Config.NOTIFICATION_TOGGLE = false;
         }
+        assertEquals(finalBundleResponse.getChildren().size(), 4);
+    }
+
+    @Test
+    public void test0031_PushNotificationTest() throws UnirestException {
+
+        Config.NOTIFICATION_TOGGLE = false;
+
+        /**
+         * Test that notifications are updated in DB
+         */
+
+        /**
+         * Create the admin and user accounts we are testing with
+         */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + ADMIN_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ADMIN_PASSWORD + "\",\n" +
+                        "\"email\" : \"" + ADMIN_EMAIL + "\"\n" +
+                        "}")
+                .asString();
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"test11\",\n" +
+                        "\"password\" : \"test11\",\n" +
+                        "\"email\" : \"test1@lol.com\"\n" +
+                        "}")
+                .asString();
+        TEST_USERNAME = "test11";
+        TEST_PASSWORD = TEST_USERNAME;
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"test22\",\n" +
+                        "\"password\" : \"test22\",\n" +
+                        "\"email\" : \"test2@lol.com\"\n" +
+                        "}")
+                .asString();
+        ROLLERSKATER_USERNAME = "test22";
+        ROLLERSKATER_PASSWORD = ROLLERSKATER_USERNAME;
+
+        /**
+         * Authenticate the admin
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + ADMIN_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ADMIN_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"" + ADMIN_DEVICE_UUID + "\",\n" +
+                        "\"deviceName\" : \"" + ADMIN_DEVICE_NAME + "\",\n" +
+                        "\"deviceType\" : " + ADMIN_DEVICE_TYPE + "\n" +
+                        "}")
+                .asString();
+        AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        ADMIN_UID = a.getUserId();
+        ADMIN_KEY = a.getKey();
+
+        /**
+         * Authenticate the other users with device info for testing
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + TEST_USERNAME + "\",\n" +
+                        "\"password\" : \"" + TEST_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"cz-HvHQ2oX8:APA91bGbM8F4HT0BOXdORmmu0xVYVM0RMhRGXOciUmG5V92H5v-1VuWY7Svj" +
+                        "HHpOFOUeqATafD3CxPuqyzB_yg1TLAS2DlLoEGcUnsgBLW2knL-o1Q9e199hFu6eluexO8HainFRYTbW\",\n" +
+                        "\"deviceName\" : \"otheruser2\",\n" +
+                        "\"deviceType\" : "+1+"\n" +
+                        "}")
+                .asString();
+        AuthenticationObject a2 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST_UID = a2.getUserId();
+        TEST_KEY = a2.getKey();
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + ROLLERSKATER_USERNAME + "\",\n" +
+                        "\"password\" : \"" + ROLLERSKATER_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"99d82470564059f9c2e1918ffdb4a86a1869b5bf2fa7cffbadf897f553ef9c96\",\n" +
+                        "\"deviceName\" : \"otheruser\",\n" +
+                        "\"deviceType\" : " + 0 + "\n" +
+                        "}")
+                .asString();
+        AuthenticationObject a3 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST2_UID = a3.getUserId();
+        TEST2_KEY = a3.getKey();
+
+        /**
+         * Upload a new category, all users get a notification
+         */
+        Unirest.post("http://localhost:" + Config.API_PORT + "/categories")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"categoryName\": \"yoga\",\n" +
+                        "\"categoryThumbnail\": \"http://upperlimits.com/west-county/wp-content/uploads/2014/05/yoga.jpg\"\n" +
+                        "}")
+                .asString();
+
+        /**
+         * Have some users follow the admin
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + ADMIN_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+        UserFollowAction.FollowActionObject b = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(b.getActionTaken(), "followed");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + ADMIN_UID + "\",\n" +
+                        "\"action\": \"follow\"\n" +
+                        "}")
+                .asString();
+        UserFollowAction.FollowActionObject c = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(c.getActionTaken(), "followed");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/following")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"followingId\": \"" + ADMIN_UID + "\",\n" +
+                        "\"action\": \"unfollow\"\n" +
+                        "}")
+                .asString();
+        UserFollowAction.FollowActionObject d = g.fromJson(stringResponse.getBody(), UserFollowAction.FollowActionObject.class);
+        assertEquals(d.getActionTaken(), "unfollowed");
+
+        /**
+         * Upload content as the admin
+         */
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \""+categories[1].getCategoryId()+"\",\n" +
+                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
+                        "\"contentDescription\": \"admincontent\",\n" +
+                        "\"contentTitle\": \"admincontent\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=admin\"," +
+                        "\"contentPrice\": 1.99," +
+                        "\"thumbnailUrl\": \"thumbadmin.com\"" +
+                        "\n}")
+                .asString();
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + ADMIN_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        int contentId = content[0].getContentId();
+        assertEquals(content[0].getContentPrice(), 1.99, 0.0);
+
+        /**
+         * Have both followers like the uploaded content
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la.getActionTaken(), "like");
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/likes")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"action\": \"like\"\n" +
+                        "}")
+                .asString();
+        ContentLikeAction.LikeActionObject la1 = g.fromJson(stringResponse.getBody(), ContentLikeAction.LikeActionObject.class);
+        assertEquals(la1.getActionTaken(), "like");
+
+        /**
+         * Have both followers comment on the uploaded content
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST_UID + "\",\n" +
+                        "\"comment\": \"awesome video!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add.isCommentAdded(), true);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"userId\": \"" + TEST2_UID + "\",\n" +
+                        "\"comment\": \"wow this is so cool!\"\n" +
+                        "}")
+                .asString();
+
+        AddContentComment.AddContentCommentObject add2 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
+        assertEquals(add2.isCommentAdded(), true);
+
+        /**
+         * Sleep to let the notifications go through (There are a lot of notifications...)
+         */
+
+        if(Config.NOTIFICATION_TOGGLE) {
+            try {
+                Thread.sleep(90000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        /**
+         * Check admin user for follower notifications
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + ADMIN_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+        GetUserNotifications.getUserNotificationsResponse notifications =
+                g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
+        ArrayList<UserNotification> notif = notifications.getUserNotifications();
+        if(notif != null) {
+            for (UserNotification n : notif) {
+                assertEquals(n.getNotificationStatus(), 1);
+            }
+        }
+
+        /**
+         * Check for notifications on both following users for uploaded content
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        GetUserNotifications.getUserNotificationsResponse notifications1 =
+                g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
+        ArrayList<UserNotification> notif2 = notifications1.getUserNotifications();
+        if(notif2 != null) {
+            for (UserNotification n : notif2) {
+                assertEquals(n.getNotificationStatus(), 1);
+            }
+        }
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/notifications")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+        GetUserNotifications.getUserNotificationsResponse notifications2 =
+                g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
+        ArrayList<UserNotification> notif3 = notifications2.getUserNotifications();
+        if(notif3 != null) {
+            for (UserNotification n : notif3) {
+                assertEquals(n.getNotificationStatus(), 1);
+            }
+        }
+
+        Config.NOTIFICATION_TOGGLE = false;
+    }
 
 
 
