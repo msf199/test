@@ -80,6 +80,14 @@ public class UserFollowAction extends EndpointHandler {
         }
 
         /**
+         * Prevent user from following themselves
+         */
+        if(following_user_id == user_id){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CANNOT_FOLLOW_YOURSELF);
+            return;
+        }
+
+        /**
          * Create the {@link UserFollowAction.ActionResponse}.
          */
         final ActionResponse response = new ActionResponse();

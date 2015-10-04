@@ -141,6 +141,9 @@ public class PeakAPI extends WhitespellAPI {
         //Update a user's access to a content (such as when the user purchases a video)
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new GrantContentAccess(), "users/$/access", "userId");
 
+        //Update a user's access to a content (such as when the user purchases a video)
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetTotalViews(), "users/$/views", "userId");
+
         /**
          * STATISTICS
          */
@@ -186,6 +189,9 @@ public class PeakAPI extends WhitespellAPI {
 
         // Update content title, description and/or price
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new UpdateContent(), "/content/$", "contentId");
+
+        // Update content title, description and/or price
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ContentViewAction(), "/content/$/views", "contentId");
 
         /**
          * CATEGORIES

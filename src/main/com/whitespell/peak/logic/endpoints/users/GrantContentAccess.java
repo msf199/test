@@ -123,9 +123,6 @@ public class GrantContentAccess extends EndpointHandler {
         }
     }
 
-
-
-
     public void recursiveGrantChildrenAccess(ContentObject c) {
         contentIdsToGrantAccessTo.add(c.getContentId());
         if(c.getChildren() != null) {

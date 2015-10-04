@@ -16,8 +16,6 @@ import main.com.whitespell.peak.model.ContentObject;
 public class ContentHelper {
 
     public ContentObject getContentById(int contentId) throws UnirestException {
-        ContentObject temptObject;
-
         Gson g = new Gson();
         HttpResponse<String> stringResponse;
 

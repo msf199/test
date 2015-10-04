@@ -101,7 +101,8 @@ public class StaticRules {
         EMPTY_NEWSFEED(158, "Follow some users or categories and refresh the newsfeed", HttpStatus.NOT_FOUND_404),
         CONTENT_NOT_EDITED(159, "Content was not edited in updateContent", HttpStatus.BAD_REQUEST_400),
         NOTIFICATION_UPDATE_FAILED(160, "Could not update email notification status" , HttpStatus.NOT_FOUND_404),
-        COULD_NOT_GRANT_CONTENT_ACCESS(161, "Could not grant content access", HttpStatus.NOT_FOUND_404);
+        COULD_NOT_GRANT_CONTENT_ACCESS(161, "Could not grant content access", HttpStatus.NOT_FOUND_404),
+        CANNOT_FOLLOW_YOURSELF(162, "Cannot follow yourself", HttpStatus.BAD_REQUEST_400);
 
         int errorId;
         String errorMessage;

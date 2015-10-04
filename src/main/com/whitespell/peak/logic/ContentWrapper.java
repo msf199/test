@@ -24,6 +24,7 @@ public class ContentWrapper {
     private static final String CONTENT_TYPE_ID = "content_type";
     private static final String CONTENT_TITLE = "content_title";
     private static final String CONTENT_LIKES_KEY = "content_likes";
+    private static final String CONTENT_VIEWS_KEY = "content_views";
     private static final String CONTENT_URL = "content_url";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
@@ -38,7 +39,7 @@ public class ContentWrapper {
     private static final String THUMBNAIL_KEY = "thumbnail";
     private static final String COVER_PHOTO_KEY = "cover_photo";
     private static final String SLOGAN_KEY = "slogan";
-    private static final String PUBLISHER_KEY = "publisher";
+
 
     private static final String GET_BUNDLE_CHILDREN =
             "SELECT * FROM bundle_match as bm" +
@@ -59,7 +60,7 @@ public class ContentWrapper {
     private static final String GET_USER_SAVED_QUERY = "SELECT `content_id` from `content_saved` WHERE `user_id` = ?";
 
 
-       private RequestObject context;
+    private RequestObject context;
     private int requesterUserId;
     private ArrayList<Integer> userLikes;
     private ArrayList<Integer> userAccess;
@@ -81,7 +82,7 @@ public class ContentWrapper {
      * <p>
      * Rather than getting all the user's liked content each loop, we will index the content ids of liked content and compare against it in loops
      * ^ same for access
-     * We're adding a +1 / -1 function to the content table for content_likes and content_comments so we don't have to query again.
+     * We're adding a +1 / -1 function to the content table for content_likes and content_views so we don't have to query again.
      * Make this stuff digestable
      * JOIN with user for every single content call
      */
@@ -101,8 +102,8 @@ public class ContentWrapper {
                 ResultSet results1 = ps2.executeQuery();
 
                 //display results
-                if (results1.next()) {
-                    tempList.add(results1.getInt("content_id"));
+                while (results1.next()) {
+                    tempList.add(results1.getInt(CONTENT_ID_KEY));
                 }
             });
         } catch (SQLException e) {
@@ -118,7 +119,7 @@ public class ContentWrapper {
 
         final ArrayList<Integer> tempList = new ArrayList<>();
         /**
-         * Get all the content this user has liked
+         * Get all the content this user has access to
          */
         try {
             StatementExecutor executor1 = new StatementExecutor(GET_USER_ACCESS_QUERY);
@@ -128,8 +129,8 @@ public class ContentWrapper {
                 ResultSet results1 = ps2.executeQuery();
 
                 //display results
-                if (results1.next()) {
-                    tempList.add(results1.getInt("content_id"));
+                while (results1.next()) {
+                    tempList.add(results1.getInt(CONTENT_ID_KEY));
                 }
             });
         } catch (SQLException e) {
@@ -145,7 +146,7 @@ public class ContentWrapper {
 
         final ArrayList<Integer> tempList = new ArrayList<>();
         /**
-         * Get all the content this user has liked
+         * Get all the content this user has viewed
          */
         try {
             StatementExecutor executor1 = new StatementExecutor(GET_USER_VIEW_QUERY);
@@ -155,8 +156,8 @@ public class ContentWrapper {
                 ResultSet results1 = ps2.executeQuery();
 
                 //display results
-                if (results1.next()) {
-                    tempList.add(results1.getInt("content_id"));
+                while (results1.next()) {
+                    tempList.add(results1.getInt(CONTENT_ID_KEY));
                 }
             });
         } catch (SQLException e) {
@@ -172,7 +173,7 @@ public class ContentWrapper {
 
         final ArrayList<Integer> tempList = new ArrayList<>();
         /**
-         * Get all the content this user has liked
+         * Get all the content this user has saved
          */
         try {
             StatementExecutor executor1 = new StatementExecutor(GET_USER_SAVED_QUERY);
@@ -182,8 +183,8 @@ public class ContentWrapper {
                 ResultSet results1 = ps2.executeQuery();
 
                 //display results
-                if (results1.next()) {
-                    tempList.add(results1.getInt("content_id"));
+                while (results1.next()) {
+                    tempList.add(results1.getInt(CONTENT_ID_KEY));
                 }
             });
         } catch (SQLException e) {
@@ -199,26 +200,28 @@ public class ContentWrapper {
 
     private ContentObject personalizeContent(ContentObject tempContent, UserObject tempPublisher, ResultSet currentObject) {
 
+        int currentContentId = tempContent.getContentId();
         try {
             /**
              * Set content access. If free, user has access
              */
             if (currentObject.getDouble(CONTENT_PRICE) == 0.00) {
                 tempContent.setHasAccess(1);
-            } else if (userAccess.contains(tempContent.getContentId())) {
+            } else if (userAccess.contains(currentContentId)) {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
                 tempContent.setContentUrl(null);
             }
 
+            /** Construct the poster **/
 
-        /** Construct the poster **/
-
-        tempContent.setPoster(tempPublisher);
-        tempContent.setLikes(currentObject.getInt(CONTENT_LIKES_KEY));
-        tempContent.setUserLiked(userLikes.contains(tempContent.getContentId()) ? 1 : 0);
-
+            tempContent.setPoster(tempPublisher);
+            tempContent.setLikes(currentObject.getInt(CONTENT_LIKES_KEY));
+            tempContent.setViews(currentObject.getInt(CONTENT_VIEWS_KEY));
+            tempContent.setUserLiked(userLikes.contains(currentContentId) ? 1 : 0);
+            tempContent.setUserSaved(userSaved.contains(currentContentId) ? 1 : 0);
+            tempContent.setUserViewed(userViewed.contains(currentContentId) ? 1 : 0);
 
         } catch(SQLException e) {
             Logging.log("High", e);
@@ -226,6 +229,8 @@ public class ContentWrapper {
 
         return tempContent;
     }
+
+
     /**
      * wrapContent is a centralized way to construct content that can be returned in JSON responses throughout the entire API
      * Takes care of making it personalized and recurses bundles
@@ -285,7 +290,6 @@ public class ContentWrapper {
 
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
-
 
                     /** Construct the child **/
 

@@ -19,8 +19,11 @@ public class ContentObject {
     String contentUrl;
     String contentDescription;
     int likes = 0;
+    int views = 0;
     String thumbnailUrl;
     int userLiked = 0;
+    int userSaved = 0;
+    int userViewed = 0;
     double contentPrice = 0.00;
     int hasAccess = 0;
     int recommended = 0;
@@ -144,6 +147,30 @@ public class ContentObject {
 
     public void setRecommended(int recommended) {
         this.recommended = recommended;
+    }
+
+    public int getUserSaved() {
+        return userSaved;
+    }
+
+    public void setUserSaved(int userSaved) {
+        this.userSaved = userSaved;
+    }
+
+    public int getUserViewed() {
+        return userViewed;
+    }
+
+    public void setUserViewed(int userViewed) {
+        this.userViewed = userViewed;
+    }
+
+    public int getViews() {
+        return views;
+    }
+
+    public void setViews(int views) {
+        this.views = views;
     }
 
     public void setHasAccess(int hasAccess) {
