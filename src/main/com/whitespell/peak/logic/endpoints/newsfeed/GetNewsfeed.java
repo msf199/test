@@ -145,7 +145,11 @@ public class GetNewsfeed extends EndpointHandler {
                         newsfeedContent = contentWrapper.wrapContent(results);
 
                         contentIdSet.add(currentContentId);
-                        newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), newsfeedContent));
+                        if(newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE && newsfeedContent.getChildren().isEmpty()) {
+                            // send notification to add videos to bundle todo(cmcan) to publisher
+                        } else {
+                            newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), newsfeedContent));
+                        }
                     }
                 });
             } catch (SQLException e) {
