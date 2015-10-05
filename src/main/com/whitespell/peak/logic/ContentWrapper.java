@@ -203,9 +203,9 @@ public class ContentWrapper {
         int currentContentId = tempContent.getContentId();
         try {
             /**
-             * Set content access. If free, user has access
+             * Set content access. If free or the user is the publisher, user has access
              */
-            if (currentObject.getDouble(CONTENT_PRICE) == 0.00) {
+            if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempContent.getUserId()) {
                 tempContent.setHasAccess(1);
             } else if (userAccess.contains(currentContentId)) {
                 tempContent.setHasAccess(1);

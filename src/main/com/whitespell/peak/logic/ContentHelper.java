@@ -26,6 +26,10 @@ public class ContentHelper {
 
         ContentObject c[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
 
+        if(stringResponse.getBody().equals("[]")){
+            return null;
+        }
+
         return c[0];
     }
 

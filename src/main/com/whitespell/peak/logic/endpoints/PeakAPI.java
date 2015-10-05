@@ -193,6 +193,9 @@ public class PeakAPI extends WhitespellAPI {
         // Update content title, description and/or price
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ContentViewAction(), "/content/$/views", "contentId");
 
+        // Delete content from DB, delete video and thumbnails from AWS/Cloudinary
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteContent(), "/content/$", "contentId");
+
         /**
          * CATEGORIES
          */
