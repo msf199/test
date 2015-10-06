@@ -14,10 +14,7 @@ import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EmailSend;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.authentication.ExpireAuthentication;
-import main.com.whitespell.peak.logic.endpoints.content.AddContentComment;
-import main.com.whitespell.peak.logic.endpoints.content.ContentLikeAction;
-import main.com.whitespell.peak.logic.endpoints.content.ContentViewAction;
-import main.com.whitespell.peak.logic.endpoints.content.DeleteContent;
+import main.com.whitespell.peak.logic.endpoints.content.*;
 import main.com.whitespell.peak.logic.endpoints.content.types.AddReportingType;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -69,6 +66,11 @@ public class IntegrationTests extends Server {
     static String TEST2_KEY;
     static int ADMIN_UID = -1;
     static String ADMIN_KEY;
+    static int COMMENTER_UID;
+    static String COMMENTER_KEY;
+
+    static int COMMENT_CONTENT_ID;
+    static int COMMENT_TEST_ID;
 
     static CategoryObject[] categories;
     static ContentTypeObject[] contentTypes;
@@ -1049,6 +1051,7 @@ public class IntegrationTests extends Server {
         AddContentComment.AddContentCommentObject add3 = g.fromJson(stringResponse.getBody(), AddContentComment.AddContentCommentObject.class);
         assertEquals(add3.isCommentAdded(), true);
 
+
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/comments")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -1056,7 +1059,16 @@ public class IntegrationTests extends Server {
         CommentObject[] comments = g.fromJson(stringResponse.getBody(), CommentObject[].class);
         assertEquals(comments[0].getComment(), "awesome video!");
         assertEquals(comments[1].getComment(), "wow this is so cool! definitely going to try it :)!");
+        assertEquals(comments[2].getComment(), "wow another comment!");
         assertEquals(comments[0].getTimestamp().before(comments[2].getTimestamp()), true);
+
+        /**
+         * Save this uid and key to test comments in deleteTest, (new users are created and assigned TEST2 uid and key)
+         */
+        COMMENTER_UID = TEST2_UID;
+        COMMENTER_KEY = TEST2_KEY;
+        COMMENT_CONTENT_ID = content[0].getContentId();
+        COMMENT_TEST_ID = comments[2].getCommentId();
     }
 
     @Test
@@ -2322,11 +2334,58 @@ public class IntegrationTests extends Server {
         /**
          * Try to access content as another user
          */
+
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content.getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .asString();
         assertEquals(stringResponse.getBody(), "[]");
+
+        /**
+         * Test user delete test
+         */
+
+        stringResponse = Unirest.delete("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        DeleteUser.DeleteUserResponse u = g.fromJson(stringResponse.getBody(), DeleteUser.DeleteUserResponse.class);
+        assertEquals(u.userDeleted(), true);
+
+        /**
+         * Try to access user as another user
+         */
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+        assertEquals(stringResponse.getStatus(), 404);
+
+        /**
+         * Comment delete test (delete a previously posted comment from ContentCommentsTest)
+         */
+
+        stringResponse = Unirest.delete("http://localhost:" + Config.API_PORT + "/comments/" + COMMENT_TEST_ID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + COMMENTER_UID + "," + COMMENTER_KEY + "")
+                .asString();
+        DeleteComment.DeleteCommentResponse c = g.fromJson(stringResponse.getBody(), DeleteComment.DeleteCommentResponse.class);
+        assertEquals(c.commentDeleted(), true);
+
+        /**
+         * Try to access the comment as another user
+         */
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + COMMENT_CONTENT_ID + "/comments")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+
+        CommentObject[] co = g.fromJson(stringResponse.getBody(), CommentObject[].class);
+        for(int i = 0; i < co.length; i++) {
+            assertEquals(co[i].getContentId() != COMMENT_TEST_ID, true);
+        }
     }
 
 

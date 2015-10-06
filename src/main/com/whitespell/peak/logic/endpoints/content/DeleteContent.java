@@ -106,7 +106,7 @@ public class DeleteContent extends EndpointHandler {
             /**
              * Attempt the delete from AWS
              */
-            d.deleteVideo(filename);
+            d.deleteAWSContent(Config.AWS_API_VID_BUCKET, filename);
 
         }
 
@@ -126,7 +126,7 @@ public class DeleteContent extends EndpointHandler {
             /**
              * Attempt the delete from AWS
              */
-            d.deleteAWSThumbnail(filename);
+            d.deleteAWSContent(Config.AWS_API_IMG_BUCKET, filename);
         }
 
         /**
@@ -144,7 +144,7 @@ public class DeleteContent extends EndpointHandler {
             String split[] = filename.split("\\.");
             String publicId = split[0];
 
-            d.deleteCloudinaryThumbnail(publicId);
+            d.deleteCloudinaryImage(publicId);
         }
 
         /**

@@ -6,31 +6,31 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.config.Config;
-import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
 
 /**
- * @author Pim de Witte(wwadewitte), Whitespell LLC
- *         10/2/15
- *         main.com.whitespell.peak.logic
+ * @author Cory McAn(cmcan), Whitespell Inc.
+ *         10/6/2015
  */
-public class ContentHelper {
+public class UserHelper {
 
-    public ContentObject getContentById(int contentId) throws UnirestException {
+    public UserObject getUserById(int userId) throws UnirestException {
         Gson g = new Gson();
         HttpResponse<String> stringResponse;
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/?contentId="+contentId)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + userId)
                 .header("accept", "application/json")
                 .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
                 .asString();
 
-        ContentObject c[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        System.out.println(stringResponse.getBody());
 
-        if(stringResponse.getBody().equals("[]")){
+        UserObject u = g.fromJson(stringResponse.getBody(), UserObject.class);
+
+        if(stringResponse.getStatus() == 404){
             return null;
         }
 
-        return c[0];
+        return u;
     }
 }

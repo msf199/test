@@ -144,6 +144,9 @@ public class PeakAPI extends WhitespellAPI {
         //Update a user's access to a content (such as when the user purchases a video)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetTotalViews(), "users/$/views", "userId");
 
+        //Delete user from DB, delete userThumbail and coverPhoto from AWS/Cloudinary
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteUser(), "/users/$", "userId");
+
         /**
          * STATISTICS
          */
@@ -195,6 +198,9 @@ public class PeakAPI extends WhitespellAPI {
 
         // Delete content from DB, delete video and thumbnails from AWS/Cloudinary
         dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteContent(), "/content/$", "contentId");
+
+        // Delete comment from DB
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteComment(), "/comments/$", "commentId");
 
         /**
          * CATEGORIES

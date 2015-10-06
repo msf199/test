@@ -28,6 +28,8 @@ public class GetContentComments extends EndpointHandler {
     private static final String COMMENT_USER_ID = "user_id";
     private static final String COMMENT_VALUE = "comment_value";
     private static final String COMMENT_TIMESTAMP = "comment_timestamp";
+    private static final String COMMENT_ID = "comment_id";
+
 
     private static final String USER_OBJECT_QUERY = "SELECT * FROM `user` WHERE `user_id` = ?";
 
@@ -60,7 +62,7 @@ public class GetContentComments extends EndpointHandler {
         final String REQUEST_COMMENTS = selectString.toString();
 
         /**
-         * Request the content based on query string
+         * Request the comments based on query string
          */
         try {
             ArrayList<CommentObject> comments = new ArrayList<>();
@@ -96,6 +98,7 @@ public class GetContentComments extends EndpointHandler {
 
                     CommentObject comment = new CommentObject(results.getInt(CONTENT_ID), results.getString(COMMENT_VALUE), results.getTimestamp(COMMENT_TIMESTAMP));
                     comment.setPoster(commentUser);
+                    comment.setCommentId(results.getInt(COMMENT_ID));
                     comments.add(comment);
                 }
 
