@@ -62,6 +62,7 @@ public final class Config {
 
     //External Functionality Toggles
     public static boolean NOTIFICATION_TOGGLE = true;
+    public static int INTRO_CONTENT_ID = 14131;
 
     //server.Server Ports
     public static int API_PORT = 8000;

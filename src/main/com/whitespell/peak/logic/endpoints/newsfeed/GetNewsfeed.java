@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.*;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -135,6 +136,13 @@ public class GetNewsfeed extends EndpointHandler {
                         }
 
                         int currentContentId = results.getInt(CONTENT_ID_KEY);
+
+                        /**
+                         * Do not add intro video to newsfeed
+                         */
+                        if(currentContentId == Config.INTRO_CONTENT_ID){
+                            continue;
+                        }
 
                         newsfeedContent = contentWrapper.wrapContent(results);
 
