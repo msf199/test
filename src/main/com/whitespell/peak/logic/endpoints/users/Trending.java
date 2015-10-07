@@ -98,7 +98,7 @@ public class Trending extends EndpointHandler {
                                             ResultSet results2 = ps2.executeQuery();
 
                                             if (results2.next()) {
-                                                if (results2.getInt(COUNT_KEY) >= 0) {
+                                                if (results2.getInt(COUNT_KEY) > 0) {
                                                     map.put(new UserObject(
                                                             results.getInt(USER_ID_KEY),
                                                             results.getString((USERNAME_KEY)),
