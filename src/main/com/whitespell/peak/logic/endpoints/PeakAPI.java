@@ -64,7 +64,7 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSavedContent(), "/users/$/saved", "userId");
 
         // Post a contentId to this endpoint to add to user's MyWorkouts
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserSavedContent(), "/users/$/saved", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SavedContentAction(), "/users/$/saved", "userId");
 
         // Post a contentId to this endpoint to add to user's bundle
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToBundle(), "/users/$/bundles", "userId");

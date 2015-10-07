@@ -73,7 +73,7 @@ public class StaticRules {
         USER_NOT_FOUND(132, "User was not found", HttpStatus.NOT_FOUND_404),
 		USER_NOT_EDITED(133, "User was not edited in profile edit", HttpStatus.BAD_REQUEST_400),
         CONTENT_NOT_FOUND(134, "Content not found", HttpStatus.NOT_FOUND_404),
-        CONTENT_ALREADY_IN_BUNDLE(135, "The content you are trying to add to your list is already in the list", HttpStatus.BAD_REQUEST_400),
+        CONTENT_ALREADY_IN_BUNDLE(135, "The content you are trying to save is already saved", HttpStatus.BAD_REQUEST_400),
         COMMENT_TOO_LONG(136, "The comment you are trying to post is too long", HttpStatus.BAD_REQUEST_400),
         COMMENT_NOT_POSTED(137, "The comment could not be posted", HttpStatus.NOT_FOUND_404),
         COMMENTS_NOT_FOUND(138, "The comments for this video could not be loaded", HttpStatus.NOT_FOUND_404),

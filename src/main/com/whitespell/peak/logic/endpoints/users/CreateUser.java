@@ -225,5 +225,10 @@ public class CreateUser extends EndpointHandler {
          * Update the user's email verification status in the database.
          */
         updateDBandSendWelcomeEmail(username, email);
+
+        /**
+         * Send a push notification to the user with a welcome video
+         */
+        //todo(cory)
     }
 }
