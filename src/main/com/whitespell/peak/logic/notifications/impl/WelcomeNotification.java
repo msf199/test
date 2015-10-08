@@ -50,7 +50,7 @@ public class WelcomeNotification implements NotificationImplementation {
 
                 String message = "Welcome to Peak!";
 
-                UserNotification n = new UserNotification(me.getUserId(), "Welcome to Peak!", "open-content:" + Config.INTRO_CONTENT_ID, me.getThumbnail());
+                UserNotification n = new UserNotification(me.getUserId(), "Welcome to Peak!", "open-content:" + Config.INTRO_CONTENT_ID, Config.PEAK_THUMBNAIL_URL);
                 insertNotification(n);
 
                 /**
