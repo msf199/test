@@ -15,12 +15,11 @@ import main.com.whitespell.peak.logic.logging.Logging;
  *         main.com.whitespell.peak.logic
  */
 public class DeleteHelper {
-    static BasicAWSCredentials aws;
-    static AmazonS3Client s3;
+    static BasicAWSCredentials aws = new BasicAWSCredentials(Config.AWS_API_KEY_ID, Config.AWS_API_SECRET);
+    static AmazonS3Client s3 = new AmazonS3Client(aws);
 
     public DeleteHelper(){
-        aws = new BasicAWSCredentials(Config.AWS_API_KEY_ID, Config.AWS_API_SECRET);
-        s3 = new AmazonS3Client(aws);
+
     }
 
     /**
@@ -35,6 +34,7 @@ public class DeleteHelper {
          * Attempt to delete the object in the bucket
          */
         try{
+
             s3.deleteObject(bucket, filename);
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException.");
@@ -48,7 +48,6 @@ public class DeleteHelper {
             System.out.println("Error Message: " + ace.getMessage());
         }
 
-
         /**
          * Get object metadata for deleted object, ensure it returns 404.
          */
@@ -58,6 +57,7 @@ public class DeleteHelper {
             /**
              * Catch the ASE which will return 404 if delete succeeded
              */
+            System.out.println(ase.getErrorMessage());
             if(ase.getErrorCode().contains("404")){
                 return true;
             }
@@ -97,7 +97,6 @@ public class DeleteHelper {
                     .header("accept", "application/json")
                     .asString();
 
-
             if(stringResponse.getBody().contains("Resource not found")){
                 return true;
             }
@@ -106,5 +105,24 @@ public class DeleteHelper {
             Logging.log("High", e); //don't throw an error on client side
         }
         return false;
+    }
+
+    public static void main(String[] args){
+        String cloudImg = "dto7xnjps2nxlbixyah0";
+        String awsImg = "134_1_1442781285085_20150918_155716.jpg";
+        String awsVid = "134_1_1442947038421_MP4_20150922_143704_-1753158175.mp4";
+
+
+        if(deleteCloudinaryImage(cloudImg)){
+            System.out.println("delete " + cloudImg + " success");
+        }
+
+        if(deleteAWSContent(Config.AWS_API_IMG_BUCKET,awsImg)){
+            System.out.println("delete " + awsImg + " success");
+        }
+
+        if(deleteAWSContent(Config.AWS_API_VID_BUCKET,awsVid)){
+            System.out.println("delete " + awsVid + " success");
+        }
     }
 }
