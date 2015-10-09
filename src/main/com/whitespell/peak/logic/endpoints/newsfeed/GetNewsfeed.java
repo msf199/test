@@ -100,7 +100,6 @@ public class GetNewsfeed extends EndpointHandler {
             /**
              * Add newsfeed requesting user to followerIds to get your published content on your newsfeed
              */
-            System.out.println("adding " + user_id + " to newsfeed");
             followerIds.add(user_id);
 
             int count = 1;
@@ -109,7 +108,6 @@ public class GetNewsfeed extends EndpointHandler {
                 if (ceil > 0) {
                     ceilString = "AND ct.`content_id` < " + ceil;
                 }
-                System.out.println("appending userid: " + s);
                 selectString.append("ct.`content_id` > " + offset + " " + ceilString + " AND ut.`user_id` = " + s + " ");
                 if (count < followerIds.size()) {
                     selectString.append(" OR ");
@@ -119,7 +117,6 @@ public class GetNewsfeed extends EndpointHandler {
             selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
 
             final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
-            System.out.println(GET_FOLLOWERS_CONTENT_QUERY);
 
             /**
              * Get content based on users you are following and construct newsfeed

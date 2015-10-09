@@ -147,6 +147,9 @@ public class PeakAPI extends WhitespellAPI {
         //Delete user from DB, delete userThumbail and coverPhoto from AWS/Cloudinary
         dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteUser(), "/users/$", "userId");
 
+        //Create a new order for a user
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateOrder(), "/users/$/order", "userId");
+
         /**
          * STATISTICS
          */

@@ -45,6 +45,8 @@ public class ImportDDL {
         tables.add("feedback");
         tables.add("reporting");
         tables.add("notification");
+        //requires backticks, `order` is reserved
+        tables.add("`order`");
 
         // add reference tables
         tables.add("user_following");
@@ -57,6 +59,9 @@ public class ImportDDL {
         tables.add("content_access");
         tables.add("fb_user");
         tables.add("reporting_type");
+        tables.add("order_origin");
+        tables.add("order_status");
+        tables.add("order_type");
 
         //build the DDL
 
@@ -64,6 +69,8 @@ public class ImportDDL {
             try {
                 StatementExecutor executor = new StatementExecutor("show create table " + table);
                 executor.execute(ps -> {
+
+                    System.out.println("table: "  + table);
 
                     final ResultSet results = ps.executeQuery();
                     while (results.next()) {

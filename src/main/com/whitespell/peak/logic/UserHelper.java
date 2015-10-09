@@ -23,8 +23,6 @@ public class UserHelper {
                 .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
                 .asString();
 
-        System.out.println(stringResponse.getBody());
-
         UserObject u = g.fromJson(stringResponse.getBody(), UserObject.class);
 
         if(stringResponse.getStatus() == 404){
