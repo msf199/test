@@ -64,14 +64,15 @@ public class DeleteContent extends EndpointHandler {
             if(toDelete == null){
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
                 return;
-            }else{
-                System.out.println(toDelete.getContentId());
             }
 
             /**
              * If user is not the publisher of this content they are unauthorized
              */
-            if(toDelete != null && toDelete.getPoster().getUserId() != a.getUserId()){
+
+            if(a.getUserId() == -1 && a.isMasterKey(a.getKey())){
+                System.out.println("master is authorized");
+            }else if(toDelete != null && toDelete.getPoster().getUserId() != a.getUserId()){
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
                 return;
             }
