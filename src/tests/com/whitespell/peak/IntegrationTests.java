@@ -2431,6 +2431,33 @@ public class IntegrationTests extends Server {
         }
     }
 
+    @Test
+    public void test0037_OrderTest() throws UnirestException {
+
+        /**
+         * Test order system, inserting, (todo cmcan) updating and getting order details.
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/order")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"orderType\":1,\n" +
+                        "\"orderStatus\" : 1,\n" +
+                        "\"publisherId\" : " + content[0].getPoster().getUserId() + ",\n" +
+                        "\"buyerId\" :  " + TEST2_UID + ",\n" +
+                        "\"contentId\" :  " + content[0].getContentId() + ",\n" +
+                        "\"currencyId\" :  "+1+",\n" +
+                        "\"buyerDetails\" :  \"details\",\n" +
+                        "\"orderOriginId\" :  "+1+"\n" +
+                        "}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+
+        CreateOrder.CreateOrderResponse c = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
+        assertEquals(c.isSuccess(), true);
+    }
+
 
     /**
      * DO NOT COPY SHOULD BE LAST TEST
