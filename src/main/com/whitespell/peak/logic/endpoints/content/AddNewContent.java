@@ -53,7 +53,7 @@ public class AddNewContent extends EndpointHandler {
         payloadInput.put(PAYLOAD_CONTENT_URL, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_REQUIRED);
-        payloadInput.put(PAYLOAD_CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
     }
 
     @Override
@@ -68,7 +68,14 @@ public class AddNewContent extends EndpointHandler {
         final String content_title = payload.get(PAYLOAD_CONTENT_TITLE).getAsString();
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
-        final double content_price = payload.get(PAYLOAD_CONTENT_PRICE).getAsDouble();
+        final double[] content_price ={0};
+        if(payload.get(PAYLOAD_CONTENT_PRICE) != null) {
+            content_price[0] = payload.get(PAYLOAD_CONTENT_PRICE).getAsDouble();
+        }
+        else{
+            content_price[0] = 0.0;
+        }
+
         final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
 
         int[] contentId = {0};
@@ -103,7 +110,7 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(5, content_title);
                 ps.setString(6, content_description);
                 ps.setString(7, thumbnail_url);
-                ps.setDouble(8, content_price);
+                ps.setDouble(8, content_price[0]);
                 ps.setTimestamp(9, now);
 
                 int rows = ps.executeUpdate();

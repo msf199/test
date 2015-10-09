@@ -102,7 +102,7 @@ public class DeleteContent extends EndpointHandler {
             /**
              * Parse url to get video name (get everything after last "/")
              */
-            String filename = contentUrl.substring(contentUrl.lastIndexOf("/") + 1);
+            String filename = contentUrl.substring(contentUrl.lastIndexOf(Config.AWS_API_HOSTNAME + "/") + 1);
 
             /**
              * Attempt the delete from AWS
@@ -122,7 +122,7 @@ public class DeleteContent extends EndpointHandler {
             /**
              * Parse url to get image name (get everything after last "/")
              */
-            String filename = contentThumbnail.substring(contentThumbnail.lastIndexOf("/") + 1);
+            String filename = contentThumbnail.substring(contentThumbnail.lastIndexOf(Config.AWS_API_HOSTNAME + "/") + 1);
 
             /**
              * Attempt the delete from AWS
