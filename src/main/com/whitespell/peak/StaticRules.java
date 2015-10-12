@@ -73,8 +73,8 @@ public class StaticRules {
         USERID_NOT_NUMERIC(131, "User ID In URL is not a numeric value", HttpStatus.BAD_REQUEST_400),
         USER_NOT_FOUND(132, "User was not found", HttpStatus.NOT_FOUND_404),
 		USER_NOT_EDITED(133, "User was not edited in profile edit", HttpStatus.BAD_REQUEST_400),
-        CONTENT_NOT_FOUND(134, "The content you are trying to add to your list was not found", HttpStatus.NOT_FOUND_404),
-        CONTENT_ALREADY_IN_BUNDLE(135, "The content you are trying to add to your list is already in the list", HttpStatus.BAD_REQUEST_400),
+        CONTENT_NOT_FOUND(134, "Content not found", HttpStatus.NOT_FOUND_404),
+        CONTENT_ALREADY_IN_BUNDLE(135, "The content you are trying to save is already saved", HttpStatus.BAD_REQUEST_400),
         COMMENT_TOO_LONG(136, "The comment you are trying to post is too long", HttpStatus.BAD_REQUEST_400),
         COMMENT_NOT_POSTED(137, "The comment could not be posted", HttpStatus.NOT_FOUND_404),
         COMMENTS_NOT_FOUND(138, "The comments for this video could not be loaded", HttpStatus.NOT_FOUND_404),
@@ -104,7 +104,10 @@ public class StaticRules {
         NOTIFICATION_UPDATE_FAILED(160, "Could not update email notification status" , HttpStatus.NOT_FOUND_404),
         COULD_NOT_GRANT_CONTENT_ACCESS(161, "Could not grant content access", HttpStatus.NOT_FOUND_404),
         CANNOT_FOLLOW_YOURSELF(162, "Cannot follow yourself", HttpStatus.BAD_REQUEST_400),
-        CHILD_UPDATE_FAILED(163, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500);
+        COULD_NOT_SUBMIT_ORDER(163, "Order could not be submitted, please try again", HttpStatus.NOT_FOUND_404),
+        INCORRECT_ORDER_PAYLOAD(164, "Please check the payload ids for accuracy", HttpStatus.BAD_REQUEST_400),
+        CHILD_UPDATE_FAILED(165, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500);
+
 
         int errorId;
         String errorMessage;

@@ -2,10 +2,15 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
+import main.com.whitespell.peak.logic.notifications.UserNotification;
+import main.com.whitespell.peak.logic.notifications.impl.WelcomeNotification;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.UserObject;
@@ -192,7 +197,10 @@ public class CreateUser extends EndpointHandler {
                     if (s.next()) {
                         context.getResponse().setStatus(HttpStatus.OK_200);
                         UserObject uo = new UserObject();
-                        uo.setUserId(s.getInt("user_id"));
+
+                        user_id[0] = s.getInt("user_id");
+
+                        uo.setUserId(user_id[0]);
                         uo.setEmail(s.getString("email"));
                         uo.setUserName(s.getString("username"));
                         uo.setPublisher(s.getInt("publisher"));
@@ -225,5 +233,10 @@ public class CreateUser extends EndpointHandler {
          * Update the user's email verification status in the database.
          */
         updateDBandSendWelcomeEmail(username, email);
+
+        /**
+         * Send a push notification to the user with the welcome video
+         */
+        Server.NotificationService.offerNotification(new WelcomeNotification(user_id[0]));
     }
 }

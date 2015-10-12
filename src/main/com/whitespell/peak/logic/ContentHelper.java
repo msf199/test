@@ -7,6 +7,7 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.model.ContentObject;
+import main.com.whitespell.peak.model.UserObject;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -26,7 +27,10 @@ public class ContentHelper {
 
         ContentObject c[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
 
+        if(stringResponse.getBody().equals("[]")){
+            return null;
+        }
+
         return c[0];
     }
-
 }

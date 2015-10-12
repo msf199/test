@@ -6,7 +6,6 @@ import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
-import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.ResultSet;

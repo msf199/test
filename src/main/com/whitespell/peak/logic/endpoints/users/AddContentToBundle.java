@@ -29,7 +29,7 @@ public class AddContentToBundle extends EndpointHandler{
 
     private static final String ADD_TO_BUNDLE_INSERT_QUERY = "INSERT INTO `bundle_match`(`parent_content_id`, `child_content_id`) VALUES (?,?)";
     private static final String CHECK_BUNDLE_OWNERSHIP_QUERY = "SELECT `content_type`, `user_id` FROM `content` WHERE `content_id` = ? LIMIT 1";
-    private static final String UPDATE_TO_CHILD = "UPDATE `content` SET `is_child` = 1 WHERE `content_id` = ?";
+    private static final String UPDATE_TO_CHILD = "UPDATE `content` SET `parent` = ? WHERE `content_id` = ?";
 
     private static final String URL_CONTENT_ID_KEY = "contentId"; // content id is the parent
 
@@ -64,7 +64,6 @@ public class AddContentToBundle extends EndpointHandler{
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
-
 
 
         /** Check if content type is bundle, and if bundle is owned by the user **/
@@ -120,7 +119,8 @@ public class AddContentToBundle extends EndpointHandler{
                         try {
                             StatementExecutor executor_childupdate = new StatementExecutor(UPDATE_TO_CHILD);
                             executor_childupdate.execute(ps_childupdate -> {
-                                ps_childupdate.setInt(1, CHILD_CONTENT_ID);
+                                ps_childupdate.setInt(1, PARENT_CONTENT_ID);
+                                ps_childupdate.setInt(2, CHILD_CONTENT_ID);
 
                                 int rows_childupdate = ps_childupdate.executeUpdate();
                                 if (rows_childupdate <= 0) {

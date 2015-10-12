@@ -39,6 +39,20 @@ public final class Config {
     public static String APNS_CERTIFICATE_LOCATION = "certificates/iosPushCertificate.p12";
     public static String APNS_PASSWORD_KEY = "Halo2";
 
+    //AWS S3 API information
+    public static String AWS_API_KEY_ID = "AKIAIKEHG3TEUSIZLVVQ";
+    public static String AWS_API_SECRET = "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";
+    public static String AWS_API_BUCKET = "peak-users";
+    public static String AWS_API_VID_BUCKET = "peak-users/vid";
+    public static String AWS_API_IMG_BUCKET = "peak-users/img";
+    public static String AWS_API_HOSTNAME = "s3.amazonaws.com";
+
+    //Cloudinary API information
+    public static String CL_API_KEY_ID = "417454796385697";
+    public static String CL_API_SECRET = "_i8gmSm5ZSVcURutBeAOFI93UZ4";
+    public static String CL_API_FOLDER = "whitespell-inc";
+    public static String CL_API_HOSTNAME = "res.cloudinary.com";
+
     //General mysql information
     public static String DB = "peak";
     public static String DB_HOST = "127.0.0.1";
@@ -48,6 +62,10 @@ public final class Config {
 
     //External Functionality Toggles
     public static boolean NOTIFICATION_TOGGLE = true;
+
+    //Static ids and urls
+    public static int INTRO_CONTENT_ID = 14131;
+    public static String PEAK_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/peak_thumbnail.png";
 
     //server.Server Ports
     public static int API_PORT = 8000;

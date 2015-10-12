@@ -14,6 +14,7 @@ import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.WelcomeNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.authentication.AuthenticationObject;
 import main.com.whitespell.peak.security.PasswordHash;
@@ -333,6 +334,7 @@ public class LinkFB extends EndpointHandler {
          * If user is Peak only and logging in with FB for first time,
          * use provided Peak password to authenticate.
          */
+
         if(payloadPass != null && (!newPeakUser[0] && newFbUser[0])){
             try {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
@@ -368,14 +370,24 @@ public class LinkFB extends EndpointHandler {
                 return;
             }
         }else if ((newPeakUser[0] && newFbUser[0]) || (!newPeakUser[0] && !newFbUser[0])) {
+
             /**
              * If user is either completely new to Peak or already has merged their account with FB
              * authenticate using the FB access token.
              */
+
             if((newPeakUser[0] && newFbUser[0])){
+
+                /**
+                 * Send a push notification to the user with the welcome video
+                 */
+
+                Server.NotificationService.offerNotification(new WelcomeNotification(userId[0]));
+
                 /**
                  * Update the user's email verification status in the database, reset email expiration and token to null.
                  */
+
                 try {
                     StatementExecutor executor = new StatementExecutor(UPDATE_EMAIL_VERIFICATION);
                     final String finalUsername = username;
@@ -396,6 +408,7 @@ public class LinkFB extends EndpointHandler {
                     return;
                 }
             }
+
             /**
              * Authenticate the user using FB Access Token
              */

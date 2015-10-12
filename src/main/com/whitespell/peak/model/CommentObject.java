@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 public class CommentObject implements Comparable<CommentObject>{
 
     public CommentObject(){
+        this.commentId = -1;
         this.contentId = -1;
         this.likes = 0;
         this.comment = "";
@@ -24,6 +25,7 @@ public class CommentObject implements Comparable<CommentObject>{
         this.timestamp = timestamp;
     }
 
+    int commentId;
     int contentId;
     int likes;
     String comment;
@@ -68,6 +70,14 @@ public class CommentObject implements Comparable<CommentObject>{
 
     public void setPoster(UserObject poster) {
         this.poster = poster;
+    }
+
+    public int getCommentId() {
+        return commentId;
+    }
+
+    public void setCommentId(int commentId) {
+        this.commentId = commentId;
     }
 
 

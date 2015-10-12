@@ -64,10 +64,7 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetUserSavedContent(), "/users/$/saved", "userId");
 
         // Post a contentId to this endpoint to add to user's MyWorkouts
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToUserSavedContent(), "/users/$/saved", "userId");
-
-        // Post a contentId to this endpoint to add to user's bundle
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToBundle(), "/users/$/bundles", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SavedContentAction(), "/users/$/saved", "userId");
 
         // Get a specific user's saved list based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetBundle(), "/users/$/bundles", "userId");
@@ -144,6 +141,12 @@ public class PeakAPI extends WhitespellAPI {
         //Update a user's access to a content (such as when the user purchases a video)
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetTotalViews(), "users/$/views", "userId");
 
+        //Delete user from DB, delete userThumbail and coverPhoto from AWS/Cloudinary
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteUser(), "/users/$", "userId");
+
+        //Create a new order for a user
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateOrder(), "/users/$/order", "userId");
+
         /**
          * STATISTICS
          */
@@ -192,6 +195,12 @@ public class PeakAPI extends WhitespellAPI {
 
         // Update content title, description and/or price
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ContentViewAction(), "/content/$/views", "contentId");
+
+        // Delete content from DB, delete video and thumbnails from AWS/Cloudinary
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteContent(), "/content/$", "contentId");
+
+        // Delete comment from DB
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new DeleteComment(), "/comments/$", "commentId");
 
         /**
          * CATEGORIES

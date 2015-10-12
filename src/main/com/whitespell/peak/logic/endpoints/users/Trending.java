@@ -30,6 +30,7 @@ public class Trending extends EndpointHandler {
     private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
     private static final String THUMBNAIL_KEY = "thumbnail";
+    private static final String PUBLISHER_KEY = "publisher";
     private static final String COUNT_KEY = "count";
 
     /**
@@ -80,7 +81,7 @@ public class Trending extends EndpointHandler {
                     final Map<UserObject, Integer> map = new HashMap<>();
 
                     try {
-                        StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"`, `"+THUMBNAIL_KEY+"` FROM `user` ORDER BY `user_id` DESC LIMIT "+limit+"");
+                        StatementExecutor executor = new StatementExecutor("SELECT `"+USER_ID_KEY+"`, `"+USERNAME_KEY+"`,`"+DISPLAYNAME_KEY+"`, `"+THUMBNAIL_KEY+"`, `"+PUBLISHER_KEY+"` FROM `user` WHERE `"+PUBLISHER_KEY+"` = 1 ORDER BY `user_id` DESC LIMIT "+limit+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();
 
@@ -88,12 +89,11 @@ public class Trending extends EndpointHandler {
                                 try {
                                     StatementExecutor executor2 = new StatementExecutor("SELECT COUNT(*) AS `count` FROM `content` WHERE `user_id` = ? LIMIT 1");
                                     executor2.execute(ps2 -> {
-
                                         ps2.setInt(1, results.getInt(USER_ID_KEY));
                                         ResultSet results2 = ps2.executeQuery();
 
                                         if (results2.next()) {
-                                            if (results2.getInt(COUNT_KEY) >= 0) {
+                                            if (results2.getInt(COUNT_KEY) > 0) {
                                                 map.put(new UserObject(
                                                         results.getInt(USER_ID_KEY),
                                                         results.getString((USERNAME_KEY)),
@@ -101,11 +101,10 @@ public class Trending extends EndpointHandler {
                                                         null,
                                                         results.getString(THUMBNAIL_KEY),
                                                         null,
-                                                        null, -1
+                                                        null, 1
                                                 ), results2.getInt(COUNT_KEY));
                                             }
                                         }
-
                                     });
                                 } catch (SQLException e) {
                                     Logging.log("High", e);

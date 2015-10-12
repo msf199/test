@@ -2,17 +2,14 @@ package main.com.whitespell.peak.logic.endpoints.newsfeed;
 
 
 import com.google.gson.Gson;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.EndpointHandler;
-import main.com.whitespell.peak.logic.GenericAPIActions;
-import main.com.whitespell.peak.logic.RequestObject;
-import main.com.whitespell.peak.logic.ContentWrapper;
+import main.com.whitespell.peak.logic.*;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.NewsfeedObject;
-import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -33,17 +30,6 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String NEWSFEED_CEIL_KEY = "ceil";
 
     private static final String FIND_USER_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
-    private static final String FIND_CATEGORY_FOLLOWING_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
-
-    //user keys
-    private static final String USER_ID_KEY = "user_id";
-    private static final String USERNAME_KEY = "username";
-    private static final String DISPLAYNAME_KEY = "displayname";
-    private static final String EMAIL_KEY = "email";
-    private static final String THUMBNAIL_KEY = "thumbnail";
-    private static final String COVER_PHOTO_KEY = "cover_photo";
-    private static final String SLOGAN_KEY = "slogan";
-    private static final String PUBLISHER_KEY = "publisher";
 
     //content keys
     private static final String CONTENT_ID_KEY = "content_id";
@@ -72,14 +58,14 @@ public class GetNewsfeed extends EndpointHandler {
          */
 
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
-        int currentUser = a.getUserId();
+        boolean isMe = user_id == a.getUserId();
 
-        if (!a.isAuthenticated()) {
+        if (!a.isAuthenticated() || !isMe) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
 
-        ContentWrapper contentWrapper = new ContentWrapper(context, currentUser);
+        ContentWrapper contentWrapper = new ContentWrapper(context, user_id);
 
         /**
          * Get the userIds current user is following.
@@ -110,6 +96,12 @@ public class GetNewsfeed extends EndpointHandler {
             StringBuilder selectString = new StringBuilder();
             selectString.append("SELECT DISTINCT * FROM `content` as ct " +
                     "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
+
+            /**
+             * Add newsfeed requesting user to followerIds to get your published content on your newsfeed
+             */
+            followerIds.add(user_id);
+
             int count = 1;
 
             /**
@@ -147,11 +139,16 @@ public class GetNewsfeed extends EndpointHandler {
 
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
-                        if (results.getInt("is_child") == 1) {
-                            continue;
-                        }
+
 
                         int currentContentId = results.getInt(CONTENT_ID_KEY);
+
+                        /**
+                         * Do not add intro video to newsfeed
+                         */
+                        if(currentContentId == Config.INTRO_CONTENT_ID){
+                            continue;
+                        }
 
                         newsfeedContent = contentWrapper.wrapContent(results);
 
@@ -167,84 +164,6 @@ public class GetNewsfeed extends EndpointHandler {
                 Logging.log("High", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
-            }
-        }
-
-        /**
-         * If newsfeed size returned is smaller than limit, populate remaining space with category following
-         */
-        if(newsfeedResponse.size() < limit) {
-            int remaining = limit - newsfeedResponse.size();
-
-            /**
-             * Get the categoryIds current user is following.
-             */
-            try {
-                StatementExecutor executor = new StatementExecutor(FIND_CATEGORY_FOLLOWING_QUERY);
-                executor.execute(ps -> {
-                    ps.setInt(1, user_id);
-
-                    ResultSet results = ps.executeQuery();
-                    while (results.next()) {
-                        categoryIds.add(results.getInt("category_id"));
-                    }
-                });
-            } catch (SQLException e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                return;
-            }
-
-            if (categoryIds != null && categoryIds.size() > 0) {
-                /**
-                 * Construct the SELECT FROM CONTENT query based on the the desired query output.
-                 */
-                StringBuilder selectString1 = new StringBuilder();
-                selectString1.append("SELECT DISTINCT * FROM `content` as ct " +
-                        "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
-                int count1 = 1;
-                for (Integer s : categoryIds) {
-                    String ceilString = "";
-                    if (ceil > 0) {
-                        ceilString = " AND ct.`content_id` < " + ceil;
-                    }
-                    selectString1.append("(ct.`content_id` > " + offset + " " + ceilString + " AND ct.`category_id` = " + s + ") ");
-                    if (count1 < categoryIds.size()) {
-                        selectString1.append(" OR ");
-                        count1++;
-                    }
-                }
-                selectString1.append("ORDER BY ct.`content_id` DESC LIMIT " + remaining);
-                final String GET_CATEGORY_FOLLOWING_CONTENT_QUERY = selectString1.toString();
-
-                /**
-                 * Get content based on categories you are following and append to newsfeed
-                 */
-                try {
-                    StatementExecutor executor = new StatementExecutor(GET_CATEGORY_FOLLOWING_CONTENT_QUERY);
-                    executor.execute(ps -> {
-                        ContentObject newsfeedContent;
-
-                        ResultSet results = ps.executeQuery();
-                        while (results.next()) {
-                            int currentContentId = results.getInt(CONTENT_ID_KEY);
-
-                            if (results.getInt("is_child") == 1 || contentIdSet.contains(currentContentId)) {
-                                continue;
-                            }
-
-                            newsfeedContent = contentWrapper.wrapContent(results);
-                            newsfeedContent.setRecommended(1);
-
-                            contentIdSet.add(currentContentId);
-                            newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), newsfeedContent));
-                        }
-                    });
-                } catch (SQLException e) {
-                    Logging.log("High", e);
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                    return;
-                }
             }
         }
 
