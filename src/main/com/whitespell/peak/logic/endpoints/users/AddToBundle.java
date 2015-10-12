@@ -20,6 +20,7 @@ public class AddToBundle extends EndpointHandler {
 
     private static final String INSERT_BUNDLE_CONTENT = "INSERT INTO `bundles` (`content_id`, `user_id`) VALUES(?,?)";
     private static final String CHECK_DUPLICATE_CONTENT_IN_BUNDLE = "SELECT * FROM `bundles` WHERE `content_id` = ? AND `user_id` = ? LIMIT 1";
+    private static final String UPDATE_CHILD_STATUS = "UPDATE `content` SET `parent` = ? WHERE `content_id` = ?";
     private static final String URL_USER_ID = "userId";
     private static final String CONTENT_ID = "contentId";
 
@@ -81,6 +82,28 @@ public class AddToBundle extends EndpointHandler {
             final int finalUser_id = user_id;
             final int finalContent_id = content_id;
             final AddToBundleResponse addToBundleResponse = new AddToBundleResponse();
+
+
+            /**
+             * Update the child status in the content table to 1 so that it doesn't return as stand-alone video
+             */
+            StatementExecutor childUpdateExecutor = new StatementExecutor(UPDATE_CHILD_STATUS);
+
+            childUpdateExecutor.execute(psChild -> {
+                psChild.setInt(1, finalContent_id);
+                psChild.setInt(2, finalContent_id);
+
+                int rows = psChild.executeUpdate();
+
+                if (rows <= 0) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CHILD_UPDATE_FAILED);
+                }
+            });
+
+            /**
+             * Insert the actual bundle match
+             */
+
             executor.execute(ps -> {
                 ps.setInt(1, finalContent_id);
                 ps.setInt(2, finalUser_id);
@@ -100,6 +123,8 @@ public class AddToBundle extends EndpointHandler {
                     }
                 }
             });
+
+
         } catch (SQLException e) {
             Logging.log("High", e);
             if (e.getMessage().contains("fk_bundles_content_id")) {

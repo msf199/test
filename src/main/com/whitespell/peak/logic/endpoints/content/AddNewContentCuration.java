@@ -23,7 +23,7 @@ import java.util.Date;
  */
 public class AddNewContentCuration extends EndpointHandler{
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_curation`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_curation`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`, `processed`) VALUES (?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
 
 
@@ -61,17 +61,20 @@ public class AddNewContentCuration extends EndpointHandler{
         final Timestamp now = new Timestamp(new Date().getTime());
 
         Gson g = new Gson();
+        int content_type_int = Integer.parseInt(content_type);
             try {
                 StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
                 executor.execute(ps -> {
                     ps.setString(1, String.valueOf(user_id));
                     ps.setInt(2, category_id);
-                    ps.setInt(3, Integer.parseInt(content_type));
+                    ps.setInt(3, content_type_int);
                     ps.setString(4, content_url);
                     ps.setString(5, content_title);
                     ps.setString(6, content_description);
                     ps.setString(7, thumbnail_url);
                     ps.setString(8, now.toString());
+                    // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
+                    ps.setInt(9, content_type_int == StaticRules.PEAK_CONTENT_TYPE ? 0 : 1);
 
                     int rows = ps.executeUpdate();
                     if (rows <= 0) {

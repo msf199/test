@@ -28,6 +28,8 @@ public class RequestContent extends EndpointHandler {
     private static final String QS_CONTENT_ID = "contentId";
     private static final String QS_CONTENT_TYPE_ID = "contentType";
     private static final String QS_CATEGORY_ID = "categoryId";
+    private static final String QS_PROCESSED = "processed";
+    private static final String QS_PARENT = "parent";
 
     @Override
     protected void setUserInputs() {
@@ -37,12 +39,20 @@ public class RequestContent extends EndpointHandler {
         queryStringInput.put(QS_CONTENT_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CONTENT_TYPE_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         queryStringInput.put(QS_CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_PROCESSED, StaticRules.InputTypes.REG_INT_OPTIONAL);
+        queryStringInput.put(QS_PARENT, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
-        int temp_user_id = 0, temp_content_id = 0, temp_content_type_id = 0, temp_category_id = 0;
+        int temp_user_id = -1,
+                temp_content_id = -1,
+                temp_content_type_id = -1,
+                temp_category_id = -1,
+                temp_processed=1,
+                temp_parent=-1;
+
         ArrayList<String> queryKeys = new ArrayList<>();
         Map<String, String[]> urlQueryString = context.getQueryString();
 
@@ -76,10 +86,36 @@ public class RequestContent extends EndpointHandler {
             }
         }
 
+        /** We always only want to return processed videos unless specified otherwise **/
+
+        queryKeys.add("processed");
+
+        if (urlQueryString.get(QS_PROCESSED) != null) {
+            if (Safety.isInteger(urlQueryString.get(QS_PROCESSED)[0])
+                    && Integer.parseInt(urlQueryString.get(QS_PROCESSED)[0]) > 0) {
+                temp_processed = Integer.parseInt(urlQueryString.get(QS_PROCESSED)[0]);
+
+            }
+        }
+        /** We always only want to return processed videos unless specified otherwise **/
+
+
+
+        if (urlQueryString.get(QS_PARENT) != null) {
+            if (Safety.isInteger(urlQueryString.get(QS_PARENT)[0])
+                    && Integer.parseInt(urlQueryString.get(QS_PARENT)[0]) > 0) {
+                temp_parent = Integer.parseInt(urlQueryString.get(QS_PARENT)[0]);
+                queryKeys.add("parent");
+
+            }
+        }
+
         int userId = temp_user_id;
         int contentId = temp_content_id;
         int contentType = temp_content_type_id;
         int categoryId = temp_category_id;
+        int processed = temp_processed;
+        int parent = temp_parent;
 
         /**
          * Ensure that the user is authenticated properly
@@ -104,6 +140,7 @@ public class RequestContent extends EndpointHandler {
 
             selectString.append("AND `ct`.`" + s + "` = ? ");
         }
+
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
 
@@ -118,12 +155,18 @@ public class RequestContent extends EndpointHandler {
             final int finalUserId = userId;
             final int finalContentId = contentId;
             final int finalContentType = contentType;
+            final int finalProcessed = processed;
+            final int finalParent = parent;
 
             StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
 
             executor.execute(ps -> {
+                
                 ps.setInt(1, finalOffset);
+                
                 int count = 2;
+
+                //todo(cmcan) turn this into a loop, this is bad code
 
                 if (queryKeys.contains("user_id")) {
                     ps.setInt(count, finalUserId);
@@ -142,6 +185,15 @@ public class RequestContent extends EndpointHandler {
 
                 if (queryKeys.contains("category_id")) {
                     ps.setInt(count, finalCategoryId);
+                    count++;
+                }
+
+                if (queryKeys.contains("processed")) {
+                    ps.setInt(count, finalProcessed);
+                    count++;
+                }
+                if (queryKeys.contains("parent")) {
+                    ps.setInt(count, finalParent);
                     count++;
                 }
 

@@ -111,12 +111,23 @@ public class GetNewsfeed extends EndpointHandler {
             selectString.append("SELECT DISTINCT * FROM `content` as ct " +
                     "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
             int count = 1;
+
+            /**
+             * We only want to show videos that have been processed
+             */
+            String processedString = "AND `processed` = 1";
+
+            /**
+             * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves
+             */
+            String parentString = " AND `parent` = -1";
+
             for (Integer s : followerIds) {
                 String ceilString = "";
                 if (ceil > 0) {
                     ceilString = "AND ct.`content_id` < " + ceil;
                 }
-                selectString.append("ct.`content_id` > " + offset + " " + ceilString + " AND ut.`user_id` = " + s + " ");
+                selectString.append("ct.`content_id` > " + offset + " " + ceilString + " " + processedString + " " + parentString + " AND ut.`user_id` = " + s + " ");
                 if (count < followerIds.size()) {
                     selectString.append(" OR ");
                     count++;
