@@ -20,6 +20,7 @@ import java.sql.SQLException;
 public class DeleteContent extends EndpointHandler {
 
     private static final String DELETE_CONTENT_QUERY = "DELETE FROM `content` WHERE `content_id` = ?";
+    private static final String DELETE_NOTIFICATION_QUERY = "DELETE FROM `notification` where `notification_action` = ?";
 
     /**
      * Define user input variables
@@ -156,7 +157,29 @@ public class DeleteContent extends EndpointHandler {
             executor.execute(ps -> {
                 ps.setInt(1, contentId);
 
-                ps.executeUpdate();
+                int rows = ps.executeUpdate();
+                if(rows > 0){
+                    System.out.println("success deleting contentId " +contentId);
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        /**
+         * Delete notifications related to this content
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(DELETE_NOTIFICATION_QUERY);
+            executor.execute(ps -> {
+                ps.setString(1, "open-content:"+contentId);
+
+                int rows = ps.executeUpdate();
+                if(rows > 0){
+                    System.out.println("success deleting content notifications");
+                }
             });
         } catch (SQLException e) {
             Logging.log("High", e);

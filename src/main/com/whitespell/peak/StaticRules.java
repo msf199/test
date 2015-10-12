@@ -16,7 +16,7 @@ public class StaticRules {
     public static final int MIN_USERNAME_LENGTH = 1;
     public static final int MAX_USERNAME_LENGTH = 30;
     public static final int MIN_EMAIL_LENGTH = 6;
-    public static final int MAX_EMAIL_LENGTH = 512;
+    public static final int MAX_EMAIL_LENGTH = 255;
     public static final int MIN_PASSWORD_LENGTH = 6;
     public static final int MAX_PASSWORD_LENGTH = 512;
     public static final int MAX_CONTENT_TYPE_LENGTH = 10;

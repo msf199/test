@@ -18,8 +18,8 @@ public class ContentDeleter {
          * Used to delete junk content from db along with thumbnails and videos if they exist
          */
 
-        int firstContentId = 14061;
-        int lastContentId = 14130;
+        int firstContentId = 14185;
+        int lastContentId = 14185;
 
         for(int i = firstContentId; i<= lastContentId; i++){
             try {
