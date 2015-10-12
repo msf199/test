@@ -29,7 +29,7 @@ public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `timestamp`) VALUES (?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
-    private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ?";
+    private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ? AND `timestamp` = ?";
 
     private static final String DELETE_FROM_CURATION = "DELETE FROM `content_curation` WHERE `content_url` = ?";
 
@@ -135,9 +135,11 @@ public class AddNewContent extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_ID_QUERY);
             executor.execute(ps -> {
                 ps.setString(1, content_url);
+                ps.setTimestamp(2, now);
 
                 ResultSet r = ps.executeQuery();
                 if (r.next()){
+                    System.out.println("found the content");
                     contentId[0] = r.getInt("content_id");
                 }
             });
