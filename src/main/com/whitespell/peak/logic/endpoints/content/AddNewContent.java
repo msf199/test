@@ -27,9 +27,11 @@ import java.sql.Timestamp;
  */
 public class AddNewContent extends EndpointHandler {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `timestamp`) VALUES (?,?,?,?,?,?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`) VALUES (?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
+
     private static final String GET_CONTENT_ID_QUERY = "SELECT LAST_INSERT_ID()";
+
 
     private static final String DELETE_FROM_CURATION = "DELETE FROM `content_curation` WHERE `content_url` = ?";
 
@@ -111,7 +113,9 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(6, content_description);
                 ps.setString(7, thumbnail_url);
                 ps.setDouble(8, content_price[0]);
-                ps.setTimestamp(9, now);
+                // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
+                ps.setInt(9, Integer.parseInt(content_type) == StaticRules.PEAK_CONTENT_TYPE ? 0 : 1);
+                ps.setTimestamp(10, now);
 
                 int rows = ps.executeUpdate();
                 if (rows <= 0){
@@ -134,6 +138,7 @@ public class AddNewContent extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_ID_QUERY);
             executor.execute(ps -> {
+
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 
                 ResultSet r = ps.executeQuery();
                 if (r.next()){

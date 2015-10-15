@@ -105,7 +105,6 @@ public class RequestContent extends EndpointHandler {
                     && Integer.parseInt(urlQueryString.get(QS_PARENT)[0]) > 0) {
                 temp_parent = Integer.parseInt(urlQueryString.get(QS_PARENT)[0]);
                 queryKeys.add("parent");
-
             }
         }
 
@@ -142,6 +141,7 @@ public class RequestContent extends EndpointHandler {
 
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
+        System.out.println(REQUEST_CONTENT);
 
         /**
          * Request the content based on query string
