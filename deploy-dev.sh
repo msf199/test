@@ -18,8 +18,8 @@ ssh peakapi-dev-internal.whitespell.com "sudo mkdir /usr/share/peak-api/lib && s
 #place the right content in the directories
 scp -r bin/* peakapi-dev-internal.whitespell.com:/usr/share/peak-api/bin
 scp -r lib/* peakapi-dev-internal.whitespell.com:/usr/share/peak-api/lib
-scp run.sh peakapi-dev-internal.whitespell.com:/usr/share/peak-api
-scp config.prop peakapi-dev-internal.whitespell.com:/usr/share/peak-api
+scp run-dev.sh peakapi-dev-internal.whitespell.com:/usr/share/peak-api
+scp config-dev.prop peakapi-dev-internal.whitespell.com:/usr/share/peak-api
 scp build.sh peakapi-dev-internal.whitespell.com:/usr/share/peak-api
 
 #kill current api, and nohup the new version
