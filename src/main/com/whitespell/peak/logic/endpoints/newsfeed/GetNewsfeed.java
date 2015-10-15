@@ -112,7 +112,7 @@ public class GetNewsfeed extends EndpointHandler {
             /**
              * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves
              */
-            String parentString = " AND `parent` = -1";
+            String parentString = " AND `parent` IS NULL";
 
             for (Integer s : followerIds) {
                 String ceilString = "";

@@ -157,7 +157,7 @@ public class IntegrationTests extends Server {
              * EXECUTING DDL ON TEST DATABASE
              */
 
-            String[] queries = readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
+            String[] queries = readFile("ddl/peakdev.sql", StandardCharsets.UTF_8).split(";");
 
             for (int i = 0; i < queries.length - 1; i++) {
                 if (queries[i] == null || queries[i].length() < 2 || queries[i].isEmpty()) {
@@ -486,6 +486,7 @@ public class IntegrationTests extends Server {
         assertEquals(contentTypes[0].getContentTypeName(), "bundle");
 
         StaticRules.BUNDLE_CONTENT_TYPE = contentTypes[0].getContentTypeId();
+        StaticRules.PEAK_CONTENT_TYPE = -1; // todo(do a video with peak content type and set this to the actual one)
     }
 
     @Test
@@ -2183,9 +2184,10 @@ public class IntegrationTests extends Server {
                         "\"contentTitle\": \"new\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=newadmin\"," +
                         "\"contentPrice\": 3.99," +
-                        "\"thumbnailUrl\": \"thumbnewadmin.com\"" +
+                        "\"thumbnailUrl\": \"thumbnewadmin.comz\"" +
                         "\n}")
                 .asString();
+        System.out.println(stringResponse.getBody());
         ContentObject content = g.fromJson(stringResponse.getBody(), ContentObject.class);
 
         /**

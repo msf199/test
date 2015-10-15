@@ -28,6 +28,8 @@ public class ContentObject {
 
     // 480p content url
     String contentUrl480p;
+    // 720P PREVIEW url
+    String contentPreview720p;
 
     String contentDescription;
     int likes = 0;
@@ -56,7 +58,7 @@ public class ContentObject {
     }
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
-                         String contentUrl, String contentUrl1080p, String contentUrl720p, String contentUrl480p, String contentDescription, String thumbnailUrl, double contentPrice, int parent){
+                         String contentUrl, String contentUrl1080p, String contentUrl720p, String contentUrl480p, String contentPreview720p, String contentDescription, String thumbnailUrl, double contentPrice, int parent){
         this.userId = userId;
         this.categoryId = categoryId;
         this.contentId = contentId;
@@ -66,6 +68,7 @@ public class ContentObject {
         this.contentUrl1080p = contentUrl1080p;
         this.contentUrl720p = contentUrl720p;
         this.contentUrl480p = contentUrl480p;
+        this.contentPreview720p = contentPreview720p;
         this.contentDescription = contentDescription;
         this.thumbnailUrl = thumbnailUrl;
         this.contentPrice = contentPrice;

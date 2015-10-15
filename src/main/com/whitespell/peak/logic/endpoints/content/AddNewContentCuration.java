@@ -23,7 +23,7 @@ import java.util.Date;
  */
 public class AddNewContentCuration extends EndpointHandler{
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_curation`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`, `processed`) VALUES (?,?,?,?,?,?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content_curation`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `timestamp`) VALUES (?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
 
 
@@ -73,8 +73,7 @@ public class AddNewContentCuration extends EndpointHandler{
                     ps.setString(6, content_description);
                     ps.setString(7, thumbnail_url);
                     ps.setString(8, now.toString());
-                    // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
-                    ps.setInt(9, content_type_int == StaticRules.PEAK_CONTENT_TYPE ? 0 : 1);
+
 
                     int rows = ps.executeUpdate();
                     if (rows <= 0) {

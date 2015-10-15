@@ -28,6 +28,7 @@ public class ContentWrapper {
     private static final String CONTENT_URL_1080P = "content_url_1080p";
     private static final String CONTENT_URL_720P = "content_url_720p";
     private static final String CONTENT_URL_480P = "content_url_480p";
+    private static final String CONTENT_PREVIEW_720P = "content_preview_720p";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
     private static final String CONTENT_PRICE = "content_price";
@@ -256,6 +257,7 @@ public class ContentWrapper {
                     currentObject.getString(CONTENT_URL_1080P),
                     currentObject.getString(CONTENT_URL_720P),
                     currentObject.getString(CONTENT_URL_480P),
+                    currentObject.getString(CONTENT_PREVIEW_720P),
                     currentObject.getString(CONTENT_DESCRIPTION),
                     currentObject.getString(CONTENT_THUMBNAIL),
                     currentObject.getDouble(CONTENT_PRICE),
@@ -310,6 +312,7 @@ public class ContentWrapper {
                             results.getString(CONTENT_URL_1080P),
                             results.getString(CONTENT_URL_720P),
                             results.getString(CONTENT_URL_480P),
+                            results.getString(CONTENT_PREVIEW_720P),
                             results.getString(CONTENT_DESCRIPTION),
                             results.getString(CONTENT_THUMBNAIL),
                             results.getDouble(CONTENT_PRICE),
