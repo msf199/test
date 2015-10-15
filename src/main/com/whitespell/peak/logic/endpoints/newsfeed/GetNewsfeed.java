@@ -103,12 +103,23 @@ public class GetNewsfeed extends EndpointHandler {
             followerIds.add(user_id);
 
             int count = 1;
+
+            /**
+             * We only want to show videos that have been processed
+             */
+            String processedString = "AND `processed` = 1";
+
+            /**
+             * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves
+             */
+            String parentString = " AND `parent` = -1";
+
             for (Integer s : followerIds) {
                 String ceilString = "";
                 if (ceil > 0) {
                     ceilString = "AND ct.`content_id` < " + ceil;
                 }
-                selectString.append("ct.`content_id` > " + offset + " " + ceilString + " AND ut.`user_id` = " + s + " ");
+                selectString.append("ct.`content_id` > " + offset + " " + ceilString + " " + processedString + " " + parentString + " AND ut.`user_id` = " + s + " ");
                 if (count < followerIds.size()) {
                     selectString.append(" OR ");
                     count++;
@@ -128,9 +139,7 @@ public class GetNewsfeed extends EndpointHandler {
 
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
-                        if (results.getInt("is_child") == 1) {
-                            continue;
-                        }
+
 
                         int currentContentId = results.getInt(CONTENT_ID_KEY);
 

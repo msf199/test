@@ -16,7 +16,19 @@ public class ContentObject {
     int contentType;
     int categoryId;
     String contentTitle;
+
+    // original content urk
     String contentUrl;
+
+    // 1080p content url
+    String contentUrl1080p;
+
+    // 720p content url
+    String contentUrl720p;
+
+    // 480p content url
+    String contentUrl480p;
+
     String contentDescription;
     int likes = 0;
     int views = 0;
@@ -29,6 +41,8 @@ public class ContentObject {
     int recommended = 0;
     UserObject poster;
     ArrayList<ContentObject> children = new ArrayList<>();
+    int parent = -1;
+
 
     public boolean hasEmptyBundleChildren() {
         for(ContentObject c : children) {
@@ -42,16 +56,20 @@ public class ContentObject {
     }
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
-                         String contentUrl, String contentDescription, String thumbnailUrl, double contentPrice){
+                         String contentUrl, String contentUrl1080p, String contentUrl720p, String contentUrl480p, String contentDescription, String thumbnailUrl, double contentPrice, int parent){
         this.userId = userId;
         this.categoryId = categoryId;
         this.contentId = contentId;
         this.contentType = contentType;
         this.contentTitle = contentTitle;
         this.contentUrl = contentUrl;
+        this.contentUrl1080p = contentUrl1080p;
+        this.contentUrl720p = contentUrl720p;
+        this.contentUrl480p = contentUrl480p;
         this.contentDescription = contentDescription;
         this.thumbnailUrl = thumbnailUrl;
         this.contentPrice = contentPrice;
+        this.parent = parent;
     }
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,

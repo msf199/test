@@ -1,5 +1,6 @@
 package main.com.whitespell.peak.logic;
 
+import com.sun.tools.corba.se.idl.ParameterEntry;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -25,10 +26,14 @@ public class ContentWrapper {
     private static final String CONTENT_LIKES_KEY = "content_likes";
     private static final String CONTENT_VIEWS_KEY = "content_views";
     private static final String CONTENT_URL = "content_url";
+    private static final String CONTENT_URL_1080P = "content_url_1080p";
+    private static final String CONTENT_URL_720P = "content_url_720p";
+    private static final String CONTENT_URL_480P = "content_url_480p";
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
     private static final String CONTENT_PRICE = "content_price";
     private static final String USER_ID_KEY = "user_id";
+    private static final String PARENT_KEY = "parent";
 
 
     /** user table keys **/
@@ -249,9 +254,14 @@ public class ContentWrapper {
                     currentObject.getInt(CONTENT_TYPE_ID),
                     currentObject.getString(CONTENT_TITLE),
                     currentObject.getString(CONTENT_URL),
+                    currentObject.getString(CONTENT_URL_1080P),
+                    currentObject.getString(CONTENT_URL_720P),
+                    currentObject.getString(CONTENT_URL_480P),
                     currentObject.getString(CONTENT_DESCRIPTION),
                     currentObject.getString(CONTENT_THUMBNAIL),
-                    currentObject.getDouble(CONTENT_PRICE));
+                    currentObject.getDouble(CONTENT_PRICE),
+                    currentObject.getInt(PARENT_KEY)
+            );
 
             tempPublisher = new UserObject(
                     currentObject.getInt(USER_ID_KEY),
@@ -298,9 +308,13 @@ public class ContentWrapper {
                             results.getInt(CONTENT_TYPE_ID),
                             results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL),
+                            results.getString(CONTENT_URL_1080P),
+                            results.getString(CONTENT_URL_720P),
+                            results.getString(CONTENT_URL_480P),
                             results.getString(CONTENT_DESCRIPTION),
                             results.getString(CONTENT_THUMBNAIL),
-                            results.getDouble(CONTENT_PRICE));
+                            results.getDouble(CONTENT_PRICE),
+                            results.getInt(PARENT_KEY));
 
                     UserObject tempPublisher = new UserObject(
                             results.getInt(USER_ID_KEY),

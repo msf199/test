@@ -32,6 +32,7 @@ public class StaticRules {
     public static final int MIN_FEEDBACK_LENGTH = 10;
 
     public static int BUNDLE_CONTENT_TYPE = 6;
+    public static int PEAK_CONTENT_TYPE = 2;
 
     public enum ErrorCodes {
 
@@ -104,7 +105,9 @@ public class StaticRules {
         COULD_NOT_GRANT_CONTENT_ACCESS(161, "Could not grant content access", HttpStatus.NOT_FOUND_404),
         CANNOT_FOLLOW_YOURSELF(162, "Cannot follow yourself", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_SUBMIT_ORDER(163, "Order could not be submitted, please try again", HttpStatus.NOT_FOUND_404),
-        INCORRECT_ORDER_PAYLOAD(164, "Please check the payload ids for accuracy", HttpStatus.BAD_REQUEST_400);
+        INCORRECT_ORDER_PAYLOAD(164, "Please check the payload ids for accuracy", HttpStatus.BAD_REQUEST_400),
+        CHILD_UPDATE_FAILED(165, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500);
+
 
         int errorId;
         String errorMessage;
