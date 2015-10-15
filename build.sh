@@ -33,6 +33,7 @@ fi
 mkdir -p $OUTDIR/errors $OUTDIR/install
 
   cp config.prop $OUTDIR/config.prop
+  cp config-dev.prop $OUTDIR/config-dev.prop
   cp tests.prop $OUTDIR/tests.prop
   cp -r certificates $OUTDIR/certificates
 

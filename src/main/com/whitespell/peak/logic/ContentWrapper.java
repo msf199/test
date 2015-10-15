@@ -1,6 +1,5 @@
 package main.com.whitespell.peak.logic;
 
-import com.sun.tools.corba.se.idl.ParameterEntry;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
