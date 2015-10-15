@@ -27,6 +27,7 @@ public class ImportDDL {
 
 
     public static void main(String[] args) throws Exception {
+        Config.CONFIGURATION_FILE = "config-dev.prop";
 
         Server.readConfigs();
 
