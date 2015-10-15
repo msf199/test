@@ -138,9 +138,9 @@ public class StaticRules {
         REG_INT_REQUIRED_ZERO("int", true, -1,Integer.MAX_VALUE),
         REG_STRING_REQUIRED("string", true, 1,255),
         REG_STRING_REQUIRED_UNLIMITED("string", true, 1,Integer.MAX_VALUE),
-        REG_DOUBLE_REQUIRED("double", true, 1, Integer.MAX_VALUE),
-        REG_DOUBLE_OPTIONAL("double", false, 1, Integer.MAX_VALUE),
-        REG_INT_OPTIONAL("int", false, 1,Integer.MAX_VALUE),
+        REG_DOUBLE_REQUIRED("double", true, 0, Integer.MAX_VALUE),
+        REG_DOUBLE_OPTIONAL("double", false, 0, Integer.MAX_VALUE),
+        REG_INT_OPTIONAL("int", false, 0,Integer.MAX_VALUE),
         REG_INT_OPTIONAL_ZERO("int", false, -1, Integer.MAX_VALUE),
         REG_STRING_OPTIONAL("string", false, 1,255),
         JSON_ARRAY_REQUIRED("jsonarray", false, 1,10000);
