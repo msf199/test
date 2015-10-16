@@ -43,6 +43,7 @@ public class ContentObject {
     int recommended = 0;
     UserObject poster;
     ArrayList<ContentObject> children = new ArrayList<>();
+    int processed = 0;
     int parent = -1;
 
 
@@ -58,7 +59,7 @@ public class ContentObject {
     }
 
     public ContentObject(int categoryId, int userId, int contentId, int contentType, String contentTitle,
-                         String contentUrl, String contentUrl1080p, String contentUrl720p, String contentUrl480p, String contentPreview720p, String contentDescription, String thumbnailUrl, double contentPrice, int parent){
+                         String contentUrl, String contentUrl1080p, String contentUrl720p, String contentUrl480p, String contentPreview720p, String contentDescription, String thumbnailUrl, double contentPrice, int processed, int parent){
         this.userId = userId;
         this.categoryId = categoryId;
         this.contentId = contentId;
@@ -72,6 +73,7 @@ public class ContentObject {
         this.contentDescription = contentDescription;
         this.thumbnailUrl = thumbnailUrl;
         this.contentPrice = contentPrice;
+        this.processed = processed;
         this.parent = parent;
     }
 

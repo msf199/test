@@ -21,7 +21,6 @@ public class RequestContent extends EndpointHandler {
 
     private static final String CONTENT_SIZE_LIMIT = "limit";
     private static final String CONTENT_OFFSET = "offset";
-    private static final String CONTENT_ID_KEY = "content_id";
 
     private static final String QS_USER_ID = "userId";
     private static final String QS_CONTENT_ID = "contentId";
@@ -87,13 +86,12 @@ public class RequestContent extends EndpointHandler {
 
         /** We always only want to return processed videos unless specified otherwise **/
 
-        queryKeys.add("processed");
+
 
         if (urlQueryString.get(QS_PROCESSED) != null) {
-            if (Safety.isInteger(urlQueryString.get(QS_PROCESSED)[0])
-                    && Integer.parseInt(urlQueryString.get(QS_PROCESSED)[0]) > 0) {
+            if (Safety.isInteger(urlQueryString.get(QS_PROCESSED)[0])) {
                 temp_processed = Integer.parseInt(urlQueryString.get(QS_PROCESSED)[0]);
-
+                queryKeys.add("processed");
             }
         }
         /** We always only want to return processed videos unless specified otherwise **/
@@ -134,14 +132,13 @@ public class RequestContent extends EndpointHandler {
          */
         StringBuilder selectString = new StringBuilder();
         selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` > ? ");
-        for (String s : queryKeys) {
 
+        for (String s : queryKeys) {
             selectString.append("AND `ct`.`" + s + "` = ? ");
         }
 
         selectString.append("LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
-        System.out.println(REQUEST_CONTENT);
 
         /**
          * Request the content based on query string

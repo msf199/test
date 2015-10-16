@@ -33,6 +33,7 @@ public class ContentWrapper {
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
     private static final String CONTENT_PRICE = "content_price";
     private static final String USER_ID_KEY = "user_id";
+    private static final String PROCESSED_KEY = "processed";
     private static final String PARENT_KEY = "parent";
 
 
@@ -261,6 +262,7 @@ public class ContentWrapper {
                     currentObject.getString(CONTENT_DESCRIPTION),
                     currentObject.getString(CONTENT_THUMBNAIL),
                     currentObject.getDouble(CONTENT_PRICE),
+                    currentObject.getInt(PROCESSED_KEY),
                     currentObject.getInt(PARENT_KEY)
             );
 
@@ -316,6 +318,7 @@ public class ContentWrapper {
                             results.getString(CONTENT_DESCRIPTION),
                             results.getString(CONTENT_THUMBNAIL),
                             results.getDouble(CONTENT_PRICE),
+                            results.getInt(PROCESSED_KEY),
                             results.getInt(PARENT_KEY));
 
                     UserObject tempPublisher = new UserObject(
