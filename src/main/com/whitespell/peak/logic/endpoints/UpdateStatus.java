@@ -6,7 +6,11 @@ package main.com.whitespell.peak.logic.endpoints;
  *         main.com.whitespell.peak.logic.endpoints
  */
 public class UpdateStatus {
+
     private String updateStatus;
 
-    public UpdateStatus
+    public UpdateStatus (String status) {
+        this.updateStatus = status;
+    }
+
 }

@@ -2060,74 +2060,82 @@ public class IntegrationTests extends Server {
          * get of the content's current fields.
          */
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content[0].getContentId())
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .asString();
-        ContentObject[] content1 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content1[0].getContentId(), content[0].getContentId());
-        assertEquals(content1[0].getUserId(), ADMIN_UID);
+        ContentObject objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(objectToMorph.getContentId(), content[0].getContentId());
+        assertEquals(objectToMorph.getUserId(), ADMIN_UID);
 
         /**
          * Change only title
          */
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + objectToMorph.getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n\"contentTitle\": \"testy\",\n" +
-                        "\"userId\": " + ADMIN_UID +
+                .body("{\n\"contentTitle\": \"test_title\"" +
+
                         "}")
                 .asString();
-        ContentObject content2 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content2.getContentTitle(), "testy");
 
-        /**
-         * Change only description
-         */
+        assertEquals(stringResponse.getBody().contains("success"), true);
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+        /** Get the object again and check **/
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n\"contentDescription\": \"newDesc\"," +
-                        "\"userId\": " + ADMIN_UID +
-                        "}")
                 .asString();
-        ContentObject content3 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content3.getContentDescription(), "newDesc");
+        objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(objectToMorph.getContentTitle(), "test_title");
 
-        /**
-         * Change only price
-         **/
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+
+
+
+
+        /** Update ALL values at once **/
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + objectToMorph.getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n\"contentPrice\": " + 0.99 +
-                        ",\"userId\": " + ADMIN_UID +
+                .body("{" +
+                        "\n\"contentTitle\": \"title_test\"," +
+                        "\n\"contentDescription\": \"description_test\"," +
+                        "\n\"contentPrice\": 1.33," +
+                        "\n\"categoryId\": "+categories[0].getCategoryId()+"," +
+                        "\n\"contentUrl\": \"url_test\"," +
+                        "\n\"contentUrl1080p\": \"url_1080p_test\"," +
+                        "\n\"contentUrl720p\": \"url_720p_test\"," +
+                        "\n\"contentUrl480p\": \"url_480p_test\"," +
+                        "\n\"contentPreview720p\": \"preview_720p_test\"," +
+                        "\n\"processed\": \"0\"" +
+
                         "}")
                 .asString();
-        ContentObject content4 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content4.getContentPrice(), 0.99, 0.0);
 
-        /**
-         * Change all fields
-         */
+        assertEquals(stringResponse.getBody().contains("success"), true);
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+        /** Get the object again and check **/
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n" +
-                        "\"contentTitle\": \"lastTitle\"," +
-                        "\"contentDescription\": \"lastDesc\"," +
-                        "\"contentPrice\": " + 1.99 +
-                        ",\"userId\": " + ADMIN_UID +
-                        "}")
                 .asString();
-        ContentObject content5 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content5.getContentTitle(), "lastTitle");
-        assertEquals(content5.getContentDescription(), "lastDesc");
-        assertEquals(content5.getContentPrice(), 1.99, 0.0);
+        objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(objectToMorph.getContentTitle(), "title_test");
+        assertEquals(objectToMorph.getContentDescription(), "description_test");
+        assertEquals(objectToMorph.getContentPrice(), 1.33D, 0D);
+        assertEquals(objectToMorph.getCategoryId(), categories[0].getCategoryId());
+        assertEquals(objectToMorph.getContentUrl(), "url_test");
+        assertEquals(objectToMorph.getContentUrl1080p(), "url_1080p_test");
+        assertEquals(objectToMorph.getContentUrl720p(), "url_720p_test");
+        assertEquals(objectToMorph.getContentUrl480p(), "url_480p_test");
+        assertEquals(objectToMorph.getContentPreview720p(), "preview_720p_test");
+        assertEquals(objectToMorph.getProcessed(), 0);
+
     }
 
     @Test
@@ -2492,6 +2500,8 @@ public class IntegrationTests extends Server {
         /**
          * Test logout
          */
+
+        System.out.println("Logout keys:" + TEST2_UID + " : " + TEST2_KEY);
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/logout")
                 .header("accept", "application/json")
