@@ -3,7 +3,7 @@ package main.com.whitespell.peak.logic;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
-public final class SessionIdentifierGenerator {
+public final class RandomGenerator {
     private static SecureRandom random = new SecureRandom();
 
     public static String nextSessionId() {
@@ -20,5 +20,9 @@ public final class SessionIdentifierGenerator {
 
     public static String nextTempPass(){
         return new BigInteger(130, random).toString(6);
+    }
+
+    public static String nextInstanceId(){
+        return new BigInteger(130, random).toString(8);
     }
 }

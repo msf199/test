@@ -24,7 +24,7 @@ public class EmailSend {
 
     public static tokenResponseObject updateDBandSendWelcomeEmail(String username, String email){
         try {
-            String emailToken = main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextEmailId();
+            String emailToken = RandomGenerator.nextEmailId();
 
             /**
              * Update the user's email verification status in the database.
@@ -70,7 +70,7 @@ public class EmailSend {
 
     public static tokenResponseObject updateDBandSendResetEmail(String username, String email){
         try {
-            String resetToken = main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextResetId();
+            String resetToken = RandomGenerator.nextResetId();
 
             /**
              * Update the user's Forgot Password reset token in the database.
