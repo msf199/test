@@ -42,7 +42,7 @@ public class ShellExecution {
         // in avcpvm create function to retrieve instance based on internal IP and hostname command
 
           String output = returnOutputOfCommand(commandToRun);
-        if(output.contains("\n") && output.contains("ZONE")) {
+        if(output.contains("\n") && output.contains("RUNNING")) {
             System.out.println("output was: " + output);
             String[] lines = new String[2];
             // line 0 has the table names
@@ -60,6 +60,7 @@ public class ShellExecution {
                 instanceDetails.put(tableHeads[i], nodeDetails[i]);
                 System.out.println(tableHeads[i] + " : " + nodeDetails[i]);
             }
+
 
             try {
                 HttpResponse stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/videoprocessing/instances")
