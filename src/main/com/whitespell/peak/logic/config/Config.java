@@ -66,6 +66,7 @@ public final class Config {
     //Static ids and urls
     public static int INTRO_CONTENT_ID = 14131;
     public static String PEAK_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/peak_thumbnail.png";
+    public static String PEAK_VIEW_CONTENT_URL = "http://app.peakapp.me/#/post/";
 
     //server.Server Ports
     public static int API_PORT = 8000;

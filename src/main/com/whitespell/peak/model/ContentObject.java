@@ -46,6 +46,33 @@ public class ContentObject {
     int processed = 0;
     int parent = -1;
 
+    public String getContentUrl1080p() {
+        return contentUrl1080p;
+    }
+
+    public String getContentUrl720p() {
+        return contentUrl720p;
+    }
+
+    public String getContentUrl480p() {
+        return contentUrl480p;
+    }
+
+    public String getContentPreview720p() {
+        return contentPreview720p;
+    }
+
+    public int getHasAccess() {
+        return hasAccess;
+    }
+
+    public int getProcessed() {
+        return processed;
+    }
+
+    public int getParent() {
+        return parent;
+    }
 
     public boolean hasEmptyBundleChildren() {
         for(ContentObject c : children) {

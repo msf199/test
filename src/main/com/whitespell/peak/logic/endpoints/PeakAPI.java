@@ -169,6 +169,9 @@ public class PeakAPI extends WhitespellAPI {
         // Get a list of all the content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContent(), "/content/");
 
+        // Get a unique content object
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetContent(), "/content/$", "contentId");
+
         // Get a list of all the curated content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentCuration(), "/contentcurated/");
 
@@ -177,6 +180,7 @@ public class PeakAPI extends WhitespellAPI {
 
         // Add a new content type
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
+
 
         // Get a content comment
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetContentComments(), "/content/$/comments", "contentId");

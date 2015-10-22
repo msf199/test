@@ -124,7 +124,6 @@ public class EmailSend {
                 sendContentNotificationTemplatedMessage("peak@whitespell.com",
                         "Peak Fitness",
                         publisherName + " uploaded a new video!", "https://peakapp.me",
-
                         publisherName,  contentName, contentUrl,
                         "content-follower-notification", userThumb, email);
 
