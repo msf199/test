@@ -59,10 +59,12 @@ public class MandrillMailer {
         request.setTemplate_content(content);
         request.setTemplate_name(templateName);
         List<MergeVar> globalMergeVars = new ArrayList<>();
+        globalMergeVars.add(new MergeVar("PLATFORM", Config.PLATFORM_NAME));
+        globalMergeVars.add(new MergeVar("CONTACT_EMAIL", Config.PLATFORM_EMAIL_SEND_ADDRESS));
         globalMergeVars.add(new MergeVar("NAME", username));
         globalMergeVars.add(new MergeVar("HOST", host));
         globalMergeVars.add(new MergeVar("TOKEN", token));
-        globalMergeVars.add(new MergeVar("URL", "http://peakapp.me/email/" + htmlName + ".html?token=" + token + "&username=" + username));
+        globalMergeVars.add(new MergeVar("URL", Config.PLATFORM_HOME_PAGE_URL+ "/email/" + htmlName + ".html?token=" + token + "&username=" + username));
         message.setGlobal_merge_vars(globalMergeVars);
 
         try {
@@ -92,6 +94,8 @@ public class MandrillMailer {
         request.setTemplate_content(content);
         request.setTemplate_name(templateName);
         List<MergeVar> globalMergeVars = new ArrayList<>();
+        globalMergeVars.add(new MergeVar("PLATFORM", Config.PLATFORM_NAME));
+        globalMergeVars.add(new MergeVar("CONTACT_EMAIL", Config.PLATFORM_EMAIL_SEND_ADDRESS));
         globalMergeVars.add(new MergeVar("NAME", username));
         globalMergeVars.add(new MergeVar("HOST", host));
         globalMergeVars.add(new MergeVar("UPLOADER_THUMB", thumbnailUrl));

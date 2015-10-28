@@ -1,6 +1,7 @@
 package main.com.whitespell.peak.logic;
 
 import main.com.whitespell.peak.Server;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
@@ -49,9 +50,9 @@ public class EmailSend {
                 return null;
             }
             boolean sent =
-                    sendTokenTemplatedMessage("peak@whitespell.com",
-                            "Peak Fitness",
-                            "Welcome to Peak!", "http://peakapp.me",
+                    sendTokenTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
+                            Config.PLATFORM_EMAIL_SEND_NAME,
+                            "Welcome to "+ Config.PLATFORM_NAME+"!", Config.PLATFORM_HOME_PAGE_URL,
                             username, emailToken,
                             "peak", "verify_email", email);
 
@@ -88,9 +89,9 @@ public class EmailSend {
                     int rows = ps.executeUpdate();
                     if(rows>=0){
                         sent[0] =
-                                sendTokenTemplatedMessage("peak@whitespell.com",
-                                        "Peak Fitness",
-                                        "Password Reset Confirmation", "http://peakapp.me",
+                                sendTokenTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
+                                        Config.PLATFORM_EMAIL_SEND_NAME,
+                                        "Password Reset Confirmation", Config.PLATFORM_HOME_PAGE_URL,
                                         username, resetToken,
                                         "peak-1", "forgot_password", email);
                     }
@@ -121,9 +122,9 @@ public class EmailSend {
         boolean sent[] = {false};
 
         sent[0] =
-                sendContentNotificationTemplatedMessage("peak@whitespell.com",
-                        "Peak Fitness",
-                        publisherName + " uploaded a new video!", "https://peakapp.me",
+                sendContentNotificationTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
+                        Config.PLATFORM_EMAIL_SEND_NAME,
+                        publisherName + " uploaded a new video!", Config.PLATFORM_HOME_PAGE_URL,
                         publisherName,  contentName, contentUrl,
                         "content-follower-notification", userThumb, email);
 
