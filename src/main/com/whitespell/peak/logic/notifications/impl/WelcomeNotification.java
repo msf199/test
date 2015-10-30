@@ -48,9 +48,9 @@ public class WelcomeNotification implements NotificationImplementation {
                         .asString();
                 GetDeviceDetails.DeviceInfo myDevice = g.fromJson(stringResponse.getBody(), GetDeviceDetails.DeviceInfo.class);
 
-                String message = "Welcome to Peak!";
+                String message = "Welcome to "+Config.PLATFORM_NAME+"!";
 
-                UserNotification n = new UserNotification(me.getUserId(), "Welcome to Peak!", "open-content:" + Config.INTRO_CONTENT_ID, Config.PEAK_THUMBNAIL_URL);
+                UserNotification n = new UserNotification(me.getUserId(), message, "open-content:" + Config.INTRO_CONTENT_ID, Config.PLATFORM_THUMBNAIL_URL);
                 insertNotification(n);
 
                 /**
