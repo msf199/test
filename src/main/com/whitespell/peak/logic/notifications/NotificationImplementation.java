@@ -110,7 +110,7 @@ public interface NotificationImplementation {
 
                 try {
                     Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
-                            Config.APNS_PASSWORD_KEY, false, deviceInfo.getDeviceUUID());
+                            null, false, deviceInfo.getDeviceUUID());
                 } catch (Exception e) {
                     Logging.log("High", e);
                     e.printStackTrace();
