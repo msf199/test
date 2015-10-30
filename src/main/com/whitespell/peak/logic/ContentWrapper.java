@@ -208,12 +208,7 @@ public class ContentWrapper {
         int currentContentId = tempContent.getContentId();
         try {
 
-            //todo(cmcan) REMOVE AFTER BETA TO ALLOW PURCHASES
-            /**
-             * BETA ACCESS AND FREE CONTENT UNTIL RELEASE (around dec, 15, 2015)
-             */
-            tempContent.setHasAccess(1);
-            tempContent.setContentPrice(0);
+
 
 
 
