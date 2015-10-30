@@ -37,7 +37,7 @@ public final class Config {
 
     //APNS Push API information
     public static String APNS_CERTIFICATE_LOCATION = "certificates/iosPushCertificate.p12";
-    public static String APNS_PASSWORD_KEY = "";
+    public static String APNS_PASSWORD_KEY = "Halo2";
 
     //AWS S3 API information
     public static String AWS_API_KEY_ID = "AKIAIKEHG3TEUSIZLVVQ";
