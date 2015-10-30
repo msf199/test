@@ -2,6 +2,7 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
@@ -275,11 +276,12 @@ public class UpdateSettings extends EndpointHandler {
                          */
                         if(resendEmailVerification){
                             try {
-                                Unirest.post("http://localhost:" + Config.API_PORT + "/users/resendemail")
+                                HttpResponse<String> stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/resendemail")
                                         .header("accept", "application/json")
                                         .body("{\n" +
                                                 "\"email\": \"" + finalEmail + "\"\n" + "}")
                                         .asString();
+                                Logging.log("Low", stringResponse.getBody());
                             }catch(Exception e){
                                 Logging.log("Low", e);
                                 //don't throw an error for client side
