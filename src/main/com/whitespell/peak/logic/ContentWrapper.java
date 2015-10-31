@@ -211,9 +211,12 @@ public class ContentWrapper {
             //todo(cmcan) REMOVE AFTER BETA TO ALLOW PURCHASES
             /**
             * BETA ACCESS AND FREE CONTENT UNTIL RELEASE (around dec, 15, 2015)
+             * Allow publisher to see the price of their content
             */
             tempContent.setHasAccess(1);
-            tempContent.setContentPrice(0);
+            if(requesterUserId != tempContent.getUserId()) {
+                tempContent.setContentPrice(0);
+            }
 
 
             /**
