@@ -83,9 +83,14 @@ public class ContentUploadedNotification implements NotificationImplementation {
                         insertNotification(n);
 
                         if(sendEmail && emailVerified) {
+                            /**
+                             * The content will be displayed on the peakapp post page, based on contentId
+                             */
+                            String contentUrl = Config.PLATFORM_VIEW_CONTENT_URL + contentObject.getContentId();
+
                             sent[0] = EmailSend.sendFollowerContentNotificationEmail(
                                     follower.getUserName(), me.getThumbnail(), follower.getEmail(),
-                                    publisherUsername, contentObject.getContentTitle(), contentObject.getContentUrl());
+                                    publisherUsername, contentObject.getContentTitle(), contentUrl);
                         }
 
                         /**

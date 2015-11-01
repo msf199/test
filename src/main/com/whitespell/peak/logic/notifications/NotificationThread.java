@@ -25,6 +25,8 @@ public class NotificationThread extends Thread {
                 if (!notifications.isEmpty() && Config.NOTIFICATION_TOGGLE) {
                     NotificationImplementation notification = notifications.take();
                     notification.send();
+                } else {
+                    Thread.sleep(1000);
                 }
             } catch(Exception e) {
                 Logging.log("HIGH", e);

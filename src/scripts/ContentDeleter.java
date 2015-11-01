@@ -18,12 +18,12 @@ public class ContentDeleter {
          * Used to delete junk content from db along with thumbnails and videos if they exist
          */
 
-        int firstContentId = 14185;
-        int lastContentId = 14185;
+        int firstContentId = 14195;
+        int lastContentId = 14207;
 
         for(int i = firstContentId; i<= lastContentId; i++){
             try {
-                HttpResponse<String> stringResponse = Unirest.delete("https://peakapi.whitespell.com/content/" + i)
+                HttpResponse<String> stringResponse = Unirest.delete("https://peakapi-dev.whitespell.com/content/" + i)
                         .header("accept", "application/json")
                         .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
                         .asString();

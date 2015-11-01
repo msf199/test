@@ -1120,7 +1120,7 @@ public class IntegrationTests extends Server {
     @Test
     public void test0025_TestMandrillEmailsAndTokens() throws UnirestException {
 
-        EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
+        EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ADMIN_EMAIL);
         if (et != null) {
             /**
              * Check that the email expiration and verification got updated after sending the email.
@@ -1176,7 +1176,7 @@ public class IntegrationTests extends Server {
             assertEquals(evr2.getEmailVerified(), 0);
         }
 
-        EmailSend.tokenResponseObject et2 = EmailSend.updateDBandSendResetEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
+        EmailSend.tokenResponseObject et2 = EmailSend.updateDBandSendResetEmail(ROLLERSKATER_USERNAME, ADMIN_EMAIL);
         if (et2 != null) {
             stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/reset")
                     .header("accept", "application/json")
