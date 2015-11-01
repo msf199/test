@@ -118,7 +118,7 @@ public class SendFeedback extends EndpointHandler {
                         .asString();
 
             } catch (UnirestException e) {
-                Logging.log("High", e);
+                Logging.log("High", stringResponse.getBody());
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }

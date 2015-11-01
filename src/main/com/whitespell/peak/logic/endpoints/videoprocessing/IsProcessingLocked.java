@@ -37,11 +37,10 @@ public class IsProcessingLocked extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(GET_PROCESSING_LOCKS);
             executor.execute(ps -> {
                 ps.setInt(1, content_id);
+                System.out.println(new java.sql.Timestamp(Server.getCalendar().getTimeInMillis()).toString());
                 ps.setTimestamp(2, new java.sql.Timestamp(Server.getCalendar().getTimeInMillis()));
                 final ResultSet results = ps.executeQuery();
                 ProcessingLockedResponse p = new ProcessingLockedResponse();
-
-
                 if (results.next()) {
                     p.setLocked(true);
                 }

@@ -20,16 +20,21 @@ public class ContentObject {
     // original content urk
     String contentUrl;
 
-    // 1080p content url
     String contentUrl1080p;
-
-    // 720p content url
     String contentUrl720p;
-
-    // 480p content url
     String contentUrl480p;
+    String contentUrl360p;
+    String contentUrl240p;
+    String contentUrl144p;
+
     // 720P PREVIEW url
     String contentPreview720p;
+    String contentPreview480p;
+    String contentPreview360p;
+    String contentPreview240;
+    String contentPreview144p;
+
+
 
     String contentDescription;
     int likes = 0;

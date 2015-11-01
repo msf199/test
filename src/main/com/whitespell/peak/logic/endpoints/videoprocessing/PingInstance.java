@@ -21,13 +21,15 @@ import java.sql.Timestamp;
  */
 public class PingInstance extends EndpointHandler {
 
-    private static final String INSERT_INSTANCE = "UPDATE `avcpvm_monitoring` SET `last_ping` = ? WHERE `instance_id` = ?";
+    private static final String INSERT_INSTANCE = "UPDATE `avcpvm_monitoring` SET `last_ping` = ?, `queue_size` = ? WHERE `instance_id` = ?";
 
-    private static final String PAYLOAD_INSTANCE_ID = "instanceId";;
+    private static final String PAYLOAD_INSTANCE_ID = "instanceId";
+    private static final String PAYLOAD_QUEUE_SIZE = "queueSize";
 
     @Override
     protected void setUserInputs() {
         payloadInput.put(PAYLOAD_INSTANCE_ID, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_QUEUE_SIZE, StaticRules.InputTypes.REG_INT_OPTIONAL_ZERO);
     }
 
     @Override
@@ -36,6 +38,13 @@ public class PingInstance extends EndpointHandler {
         JsonObject payload = context.getPayload().getAsJsonObject();
 
         final String instance_id = payload.get(PAYLOAD_INSTANCE_ID).getAsString();
+
+        int queue_size = 0;
+
+        if(payload.get(PAYLOAD_QUEUE_SIZE) != null) {
+            queue_size = payload.get(PAYLOAD_QUEUE_SIZE).getAsInt();
+            System.out.println(queue_size);
+        }
 
         final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis()); // 15 mins max
 
@@ -53,9 +62,11 @@ public class PingInstance extends EndpointHandler {
         }
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_INSTANCE);
+            final int finalQueue_size = queue_size;
             executor.execute(ps -> {
                 ps.setTimestamp(1, now);
-                ps.setString(2, instance_id);
+                ps.setInt(2, finalQueue_size);
+                ps.setString(3, instance_id);
 
                 int rows = ps.executeUpdate();
                 if(rows > 0) {

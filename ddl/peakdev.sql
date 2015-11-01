@@ -25,7 +25,7 @@ CREATE TABLE `user` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `phone_UNIQUE` (`phone`),
   KEY `username_INDEX` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=11946 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
+) ENGINE=InnoDB AUTO_INCREMENT=11955 DEFAULT CHARSET=utf8;CREATE TABLE `category` (
   `category_id` int(11) NOT NULL AUTO_INCREMENT,
   `category_name` varchar(45) DEFAULT NULL,
   `category_thumbnail` varchar(255) DEFAULT NULL,
@@ -52,10 +52,10 @@ CREATE TABLE `user` (
   `content_comments` int(10) DEFAULT '0',
   `category_id` int(2) DEFAULT '1',
   `content_price` decimal(10,2) DEFAULT '0.00',
-  `content_preview_720p` varchar(45) DEFAULT NULL,
-  `content_url_1080p` varchar(45) DEFAULT NULL,
-  `content_url_720p` varchar(45) DEFAULT NULL,
-  `content_url_480p` varchar(45) DEFAULT NULL,
+  `content_preview_720p` varchar(255) DEFAULT NULL,
+  `content_url_1080p` varchar(255) DEFAULT NULL,
+  `content_url_720p` varchar(255) DEFAULT NULL,
+  `content_url_480p` varchar(255) DEFAULT NULL,
   `processed` int(1) NOT NULL DEFAULT '0',
   `parent` int(11) DEFAULT NULL,
   PRIMARY KEY (`content_id`),
@@ -69,7 +69,7 @@ CREATE TABLE `user` (
   CONSTRAINT `FK_content_content_type` FOREIGN KEY (`content_type`) REFERENCES `content_type` (`content_type_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_content_parent` FOREIGN KEY (`parent`) REFERENCES `content` (`content_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_user_content_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=14202 DEFAULT CHARSET=utf8;CREATE TABLE `content_curation` (
+) ENGINE=InnoDB AUTO_INCREMENT=14207 DEFAULT CHARSET=utf8;CREATE TABLE `content_curation` (
   `content_id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) DEFAULT NULL,
   `content_type` int(2) DEFAULT '0',
@@ -152,7 +152,7 @@ CREATE TABLE `user` (
   PRIMARY KEY (`notification_id`),
   KEY `FK_notification_user_id_idx` (`user_id`),
   CONSTRAINT `FK_notification_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1660 DEFAULT CHARSET=utf8;CREATE TABLE `order` (
+) ENGINE=InnoDB AUTO_INCREMENT=1706 DEFAULT CHARSET=utf8;CREATE TABLE `order` (
   `order_id` int(11) NOT NULL AUTO_INCREMENT,
   `order_type` int(11) DEFAULT NULL,
   `order_status` int(11) DEFAULT NULL,
@@ -177,7 +177,7 @@ CREATE TABLE `user` (
   `user_id` int(11) NOT NULL,
   `following_id` int(11) NOT NULL,
   `timestamp` datetime DEFAULT NULL,
-  KEY `followed_id` (`following_id`) USING BTREE,
+  KEY `followed_id` (`following_id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `FK_user_following_following_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_user_following_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION
@@ -199,7 +199,7 @@ CREATE TABLE `user` (
   KEY `FK_category_publishing_user_id_idx` (`user_id`),
   CONSTRAINT `FK_category_publishing_category_id` FOREIGN KEY (`category_id`) REFERENCES `category` (`category_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `FK_category_publishing_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8;CREATE TABLE `device` (
+) ENGINE=InnoDB AUTO_INCREMENT=42 DEFAULT CHARSET=utf8;CREATE TABLE `device` (
   `device_uuid` varchar(255) NOT NULL DEFAULT 'unknown',
   `device_name` varchar(255) DEFAULT NULL,
   `device_type` int(11) DEFAULT NULL,
@@ -220,7 +220,7 @@ CREATE TABLE `user` (
   KEY `FK_authentication_device_uuid_idx` (`device_uuid`),
   CONSTRAINT `FK_authentication_device_uuid` FOREIGN KEY (`device_uuid`) REFERENCES `device` (`device_uuid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=30794 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
+) ENGINE=InnoDB AUTO_INCREMENT=30813 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
   `bundle_match_id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_content_id` int(11) DEFAULT '0',
   `child_content_id` int(11) DEFAULT '0',
