@@ -164,7 +164,7 @@ public class AddNewContent extends EndpointHandler {
                 ps.setTimestamp(1,min_15_ago);
                 ps.setTimestamp(2,min_15_ago);
                 ResultSet r = ps.executeQuery();
-                if (!r.next()){
+                if (!r.next() && !Config.TESTING){
                     Logging.log("INFO", "not enough video nodes, inserting one");
                     ShellExecution.createAndInsertVideoConverter();
 
