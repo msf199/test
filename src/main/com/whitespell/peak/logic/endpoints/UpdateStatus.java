@@ -12,5 +12,4 @@ public class UpdateStatus {
     public UpdateStatus (String status) {
         this.updateStatus = status;
     }
-
 }

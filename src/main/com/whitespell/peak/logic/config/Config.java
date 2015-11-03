@@ -19,7 +19,6 @@ public final class Config {
     //General server information
     public static String SERVER_NAME = "API";
     public static int SERVER_VERSION = 1;
-    public static String SERVER_TIMEZONE = "UTC";
 
     //General mandrill mail information
     public static String MANDRILL_API_KEY = "_nuIwbGbVG1bvkxZo7LoiQ";

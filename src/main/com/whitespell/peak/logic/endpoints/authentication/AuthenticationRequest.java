@@ -6,6 +6,7 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.RandomGenerator;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -162,7 +163,7 @@ public class AuthenticationRequest extends EndpointHandler {
                             if (isVerified) {
                                 // initialize an authenticationobject and set the authentication key if verified
                                 final AuthenticationObject ao = new AuthenticationObject();
-                                ao.setKey(main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextSessionId());
+                                ao.setKey(RandomGenerator.nextSessionId());
                                 ao.setUserId(s.getInt("user_id"));
 
                                 // insert the new authentication key into the database

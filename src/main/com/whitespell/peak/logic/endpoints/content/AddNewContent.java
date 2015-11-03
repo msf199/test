@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import jdk.nashorn.tools.Shell;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.exec.ShellExecution;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.impl.ContentUploadedNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -30,6 +32,8 @@ public class AddNewContent extends EndpointHandler {
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`) VALUES (?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
 
+    private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
+    
     private static final String GET_CONTENT_ID_QUERY = "SELECT LAST_INSERT_ID()";
 
 
@@ -60,6 +64,7 @@ public class AddNewContent extends EndpointHandler {
 
     @Override
     public void safeCall(RequestObject context) throws IOException {
+
         System.out.println("Received content call");
         JsonObject payload = context.getPayload().getAsJsonObject();
 
@@ -143,6 +148,28 @@ public class AddNewContent extends EndpointHandler {
                 ResultSet r = ps.executeQuery();
                 if (r.next()){
                     contentId[0] = r.getInt("LAST_INSERT_ID()");
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
+            final Timestamp min_15_ago = new Timestamp(Server.getCalendar().getTimeInMillis() - (60 * 1000 * 15)); // 15 mins max
+            executor.execute(ps -> {
+
+                ps.setTimestamp(1,min_15_ago);
+                ps.setTimestamp(2,min_15_ago);
+                ResultSet r = ps.executeQuery();
+                if (!r.next() && !Config.TESTING){
+                    Logging.log("INFO", "not enough video nodes, inserting one");
+                    ShellExecution.createAndInsertVideoConverter();
+
+                } else {
+                    Logging.log("INFO", "we have enough video nodes");
                 }
             });
         } catch (SQLException e) {

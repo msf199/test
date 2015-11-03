@@ -34,10 +34,61 @@ public class UpdateContent extends EndpointHandler {
 
     /** Video URLs **/
     private static final String CONTENT_URL = "contentUrl";
+
+    // content urls
     private static final String CONTENT_URL_1080P = "contentUrl1080p";
     private static final String CONTENT_URL_720P = "contentUrl720p";
     private static final String CONTENT_URL_480P = "contentUrl480p";
+    private static final String CONTENT_URL_360P = "contentUrl360p";
+    private static final String CONTENT_URL_240P = "contentUrl240p";
+    private static final String CONTENT_URL_144P = "contentUrl144p";
+
+    // content previews
+    private static final String CONTENT_PREVIEW_1080P = "contentPreview1080p";
     private static final String CONTENT_PREVIEW_720P = "contentPreview720p";
+    private static final String CONTENT_PREVIEW_480P = "contentPreview480p";
+    private static final String CONTENT_PREVIEW_360P = "contentPreview360p";
+    private static final String CONTENT_PREVIEW_240P = "contentPreview240p";
+    private static final String CONTENT_PREVIEW_144P = "contentPreview144p";
+
+    // content thumbnails
+    private static final String THUMBNAIL_1080P = "thumbnail1080p";
+    private static final String THUMBNAIL_720P = "thumbnail720p";
+    private static final String THUMBNAIL_480P = "thumbnail480p";
+    private static final String THUMBNAIL_360P = "thumbnail360p";
+    private static final String THUMBNAIL_240P = "thumbnail240p";
+    private static final String THUMBNAIL_144P = "thumbnail144p";
+
+
+    private static final String VIDEO_LENGTH_SECONDS = "videoLengthSeconds";
+    private static final String SOCIAL_MEDIA_VIDEO = "socialMediaVideo";
+
+    // content urls
+    private static final String CONTENT_URL_1080P_DB = "content_url_1080p";
+    private static final String CONTENT_URL_720P_DB  = "content_url_720p";
+    private static final String CONTENT_URL_480P_DB  = "content_url_480p";
+    private static final String CONTENT_URL_360P_DB  = "content_url_360p";
+    private static final String CONTENT_URL_240P_DB  = "content_url_240p";
+    private static final String CONTENT_URL_144P_DB  = "content_url_144p";
+
+    // content previews
+    private static final String CONTENT_PREVIEW_1080P_DB  = "content_preview_1080p";
+    private static final String CONTENT_PREVIEW_720P_DB  = "content_preview_720p";
+    private static final String CONTENT_PREVIEW_480P_DB  = "content_preview_480p";
+    private static final String CONTENT_PREVIEW_360P_DB  = "content_preview_360p";
+    private static final String CONTENT_PREVIEW_240P_DB  = "content_preview_240p";
+    private static final String CONTENT_PREVIEW_144P_DB  = "content_preview_144p";
+
+    // content thumbnails
+    private static final String THUMBNAIL_1080P_DB  = "thumbnail_1080p";
+    private static final String THUMBNAIL_720P_DB  = "thumbnail_720p";
+    private static final String THUMBNAIL_480P_DB  = "thumbnail_480p";
+    private static final String THUMBNAIL_360P_DB  = "thumbnail_360p";
+    private static final String THUMBNAIL_240P_DB  = "thumbnail_240p";
+    private static final String THUMBNAIL_144P_DB  = "thumbnail_144p";
+
+    private static final String VIDEO_LENGTH_SECONDS_DB  = "video_length_seconds";
+    private static final String SOCIAL_MEDIA_VIDEO_DB  = "social_media_video";
 
     private static final String CONTENT_TITLE_DB = "content_title";
     private static final String CONTENT_DESCRIPTION_DB = "content_description";
@@ -45,10 +96,7 @@ public class UpdateContent extends EndpointHandler {
     private static final String CATEGORY_ID_DB = "category_id";
 
     private static final String CONTENT_URL_DB = "content_url";
-    private static final String CONTENT_URL_1080P_DB = "content_url_1080p";
-    private static final String CONTENT_URL_720P_DB = "content_url_720p";
-    private static final String CONTENT_URL_480P_DB = "content_url_480p";
-    private static final String CONTENT_PREVIEW_720P_DB = "content_preview_720p";
+
 
     private static final String PROCESSED = "processed";
 
@@ -63,10 +111,33 @@ public class UpdateContent extends EndpointHandler {
         payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
         payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
         payloadInput.put(CONTENT_URL, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+
+
         payloadInput.put(CONTENT_URL_1080P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(CONTENT_URL_720P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(CONTENT_URL_480P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_URL_360P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_URL_240P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_URL_144P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+
+
+        payloadInput.put(CONTENT_PREVIEW_1080P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(CONTENT_PREVIEW_720P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_PREVIEW_480P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_PREVIEW_360P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_PREVIEW_240P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_PREVIEW_144P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+
+        payloadInput.put(THUMBNAIL_1080P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(THUMBNAIL_720P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(THUMBNAIL_480P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(THUMBNAIL_360P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(THUMBNAIL_240P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(THUMBNAIL_144P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+
+        payloadInput.put(VIDEO_LENGTH_SECONDS, StaticRules.InputTypes.REG_INT_OPTIONAL_ZERO);
+        payloadInput.put(SOCIAL_MEDIA_VIDEO, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+
         payloadInput.put(PROCESSED, StaticRules.InputTypes.REG_STRING_OPTIONAL);
     }
 
@@ -74,7 +145,34 @@ public class UpdateContent extends EndpointHandler {
     public void safeCall(final RequestObject context) throws IOException {
 
         JsonObject j = context.getPayload().getAsJsonObject();
-        String temp_title="", temp_description="", temp_url="", temp_url_1080p="", temp_url_720p="", temp_url_480p="", temp_preview_720p="";
+        String temp_title="", temp_description="", temp_url="",
+                temp_url_1080p="",
+                temp_url_720p="",
+                temp_url_480p="",
+                temp_url_360p="",
+                temp_url_240p="",
+                temp_url_144p="",
+
+                temp_preview_1080p="",
+                temp_preview_720p="",
+                temp_preview_480p="",
+                temp_preview_360p="",
+                temp_preview_240p="",
+                temp_preview_144p="",
+
+                temp_thumbnail_1080p="",
+                temp_thumbnail_720p="",
+                temp_thumbnail_480p="",
+                temp_thumbnail_360p="",
+                temp_thumbnail_240p="",
+                temp_thumbnail_144p="",
+                temp_social_media_video="";
+
+                int temp_video_length_seconds=0;
+
+
+
+
         Double temp_price = 0.00;
         int temp_category_id=-1, temp_processed=0;
         final ArrayList<String> updateKeys = new ArrayList<>();
@@ -99,6 +197,11 @@ public class UpdateContent extends EndpointHandler {
             temp_url = j.get(CONTENT_URL).getAsString();
             updateKeys.add(CONTENT_URL_DB);
         }
+
+        /**
+         * CONTENT URLS
+         */
+
         if (j.get(CONTENT_URL_1080P) != null) {
             temp_url_1080p = j.get(CONTENT_URL_1080P).getAsString();
             updateKeys.add(CONTENT_URL_1080P_DB);
@@ -111,10 +214,88 @@ public class UpdateContent extends EndpointHandler {
             temp_url_480p = j.get(CONTENT_URL_480P).getAsString();
             updateKeys.add(CONTENT_URL_480P_DB);
         }
+        if (j.get(CONTENT_URL_360P) != null) {
+            temp_url_360p = j.get(CONTENT_URL_360P).getAsString();
+            updateKeys.add(CONTENT_URL_360P_DB);
+        }
+        if (j.get(CONTENT_URL_240P) != null) {
+            temp_url_240p = j.get(CONTENT_URL_240P).getAsString();
+            updateKeys.add(CONTENT_URL_240P_DB);
+        }
+        if (j.get(CONTENT_URL_144P) != null) {
+            temp_url_144p = j.get(CONTENT_URL_144P).getAsString();
+            updateKeys.add(CONTENT_URL_144P_DB);
+        }
+        /**
+         * preview URLS
+         */
+
+        if (j.get(CONTENT_PREVIEW_1080P) != null) {
+            temp_preview_1080p = j.get(CONTENT_PREVIEW_1080P).getAsString();
+            updateKeys.add(CONTENT_PREVIEW_1080P_DB);
+        }
         if (j.get(CONTENT_PREVIEW_720P) != null) {
             temp_preview_720p = j.get(CONTENT_PREVIEW_720P).getAsString();
             updateKeys.add(CONTENT_PREVIEW_720P_DB);
         }
+        if (j.get(CONTENT_PREVIEW_480P) != null) {
+            temp_preview_480p = j.get(CONTENT_PREVIEW_480P).getAsString();
+            updateKeys.add(CONTENT_PREVIEW_480P_DB);
+        }
+        if (j.get(CONTENT_PREVIEW_360P) != null) {
+            temp_preview_360p = j.get(CONTENT_PREVIEW_360P).getAsString();
+            updateKeys.add(CONTENT_PREVIEW_360P_DB);
+        }
+        if (j.get(CONTENT_PREVIEW_240P) != null) {
+            temp_preview_240p = j.get(CONTENT_PREVIEW_240P).getAsString();
+            updateKeys.add(CONTENT_PREVIEW_240P_DB);
+        }
+        if (j.get(CONTENT_PREVIEW_144P) != null) {
+            temp_preview_144p = j.get(CONTENT_PREVIEW_144P).getAsString();
+            updateKeys.add(CONTENT_PREVIEW_144P_DB);
+        }
+        /**
+         * thumbnail URLS
+         */
+
+        if (j.get(THUMBNAIL_1080P) != null) {
+            temp_thumbnail_1080p = j.get(THUMBNAIL_1080P).getAsString();
+            updateKeys.add(THUMBNAIL_1080P_DB);
+        }
+        if (j.get(THUMBNAIL_720P) != null) {
+            temp_thumbnail_720p = j.get(THUMBNAIL_720P).getAsString();
+            updateKeys.add(THUMBNAIL_720P_DB);
+        }
+        if (j.get(THUMBNAIL_480P) != null) {
+            temp_thumbnail_480p = j.get(THUMBNAIL_480P).getAsString();
+            updateKeys.add(THUMBNAIL_480P_DB);
+        }
+        if (j.get(THUMBNAIL_360P) != null) {
+            temp_thumbnail_360p = j.get(THUMBNAIL_360P).getAsString();
+            updateKeys.add(THUMBNAIL_360P_DB);
+        }
+        if (j.get(THUMBNAIL_240P) != null) {
+            temp_thumbnail_240p = j.get(THUMBNAIL_240P).getAsString();
+            updateKeys.add(THUMBNAIL_240P_DB);
+        }
+        if (j.get(THUMBNAIL_144P) != null) {
+            temp_thumbnail_144p = j.get(THUMBNAIL_144P).getAsString();
+            updateKeys.add(THUMBNAIL_144P_DB);
+        }
+        if (j.get(VIDEO_LENGTH_SECONDS) != null) {
+            temp_video_length_seconds = j.get(VIDEO_LENGTH_SECONDS).getAsInt();
+            updateKeys.add(VIDEO_LENGTH_SECONDS_DB);
+        }
+
+        if (j.get(SOCIAL_MEDIA_VIDEO) != null) {
+            temp_social_media_video = j.get(SOCIAL_MEDIA_VIDEO).getAsString();
+            updateKeys.add(SOCIAL_MEDIA_VIDEO_DB);
+        }
+
+
+
+
+
         if (j.get(PROCESSED) != null) {
             temp_processed = j.get(PROCESSED).getAsInt();
             updateKeys.add(PROCESSED);
@@ -131,10 +312,34 @@ public class UpdateContent extends EndpointHandler {
         final Double final_price = temp_price;
         final int final_category_id = temp_category_id;
         final String final_url = temp_url;
+
+
         final String final_url_1080p = temp_url_1080p;
         final String final_url_720p = temp_url_720p;
         final String final_url_480p = temp_url_480p;
+        final String final_url_360p = temp_url_360p;
+        final String final_url_240p = temp_url_240p;
+        final String final_url_144p = temp_url_144p;
+
+        final String final_preview_1080p = temp_preview_1080p;
         final String final_preview_720p = temp_preview_720p;
+        final String final_preview_480p = temp_preview_480p;
+        final String final_preview_360p = temp_preview_360p;
+        final String final_preview_240p = temp_preview_240p;
+        final String final_preview_144p = temp_preview_144p;
+
+        final String final_thumbnail_1080p = temp_thumbnail_1080p;
+        final String final_thumbnail_720p = temp_thumbnail_720p;
+        final String final_thumbnail_480p = temp_thumbnail_480p;
+        final String final_thumbnail_360p = temp_thumbnail_360p;
+        final String final_thumbnail_240p = temp_thumbnail_240p;
+        final String final_thumbnail_144p = temp_thumbnail_144p;
+
+        final int final_video_length_seconds = temp_video_length_seconds;
+
+        final String final_social_media_video = temp_social_media_video;
+
+
         final int final_processed = temp_processed;
 
         /**
@@ -245,9 +450,93 @@ public class UpdateContent extends EndpointHandler {
                         System.out.println("Set string " + count + " to " + final_url_480p);
                         count++;
                     }
+                    if (updateKeys.contains(CONTENT_URL_360P_DB)) {
+                        ps.setString(count, final_url_360p);
+                        System.out.println("Set string " + count + " to " + final_url_360p);
+                        count++;
+                    }
+                    if (updateKeys.contains(CONTENT_URL_240P_DB)) {
+                        ps.setString(count, final_url_240p);
+                        System.out.println("Set string " + count + " to " + final_url_240p);
+                        count++;
+                    }
+                    if (updateKeys.contains(CONTENT_URL_144P_DB)) {
+                        ps.setString(count, final_url_144p);
+                        System.out.println("Set string " + count + " to " + final_url_144p);
+                        count++;
+                    }
+
+                    //previews
+                    if (updateKeys.contains(CONTENT_PREVIEW_1080P_DB)) {
+                        ps.setString(count, final_preview_1080p);
+                        System.out.println("Set string " + count + " to " + final_preview_1080p);
+                        count++;
+                    }
                     if (updateKeys.contains(CONTENT_PREVIEW_720P_DB)) {
                         ps.setString(count, final_preview_720p);
                         System.out.println("Set string " + count + " to " + final_preview_720p);
+                        count++;
+                    }
+                    if (updateKeys.contains(CONTENT_PREVIEW_480P_DB)) {
+                        ps.setString(count, final_preview_480p);
+                        System.out.println("Set string " + count + " to " + final_preview_480p);
+                        count++;
+                    }
+                    if (updateKeys.contains(CONTENT_PREVIEW_360P_DB)) {
+                        ps.setString(count, final_preview_360p);
+                        System.out.println("Set string " + count + " to " + final_preview_360p);
+                        count++;
+                    }
+                    if (updateKeys.contains(CONTENT_PREVIEW_240P_DB)) {
+                        ps.setString(count, final_preview_240p);
+                        System.out.println("Set string " + count + " to " + final_preview_240p);
+                        count++;
+                    }
+                    if (updateKeys.contains(CONTENT_PREVIEW_144P_DB)) {
+                        ps.setString(count, final_preview_144p);
+                        System.out.println("Set string " + count + " to " + final_preview_144p);
+                        count++;
+                    }
+
+                    //thumbnails
+                    if (updateKeys.contains(THUMBNAIL_1080P_DB)) {
+                        ps.setString(count, final_thumbnail_1080p);
+                        System.out.println("Set string " + count + " to " + final_thumbnail_1080p);
+                        count++;
+                    }
+                    if (updateKeys.contains(THUMBNAIL_720P_DB)) {
+                        ps.setString(count, final_thumbnail_720p);
+                        System.out.println("Set string " + count + " to " + final_thumbnail_720p);
+                        count++;
+                    }
+                    if (updateKeys.contains(THUMBNAIL_480P_DB)) {
+                        ps.setString(count, final_thumbnail_480p);
+                        System.out.println("Set string " + count + " to " + final_thumbnail_480p);
+                        count++;
+                    }
+                    if (updateKeys.contains(THUMBNAIL_360P_DB)) {
+                        ps.setString(count, final_thumbnail_360p);
+                        System.out.println("Set string " + count + " to " + final_thumbnail_360p);
+                        count++;
+                    }
+                    if (updateKeys.contains(THUMBNAIL_240P_DB)) {
+                        ps.setString(count, final_thumbnail_240p);
+                        System.out.println("Set string " + count + " to " + final_thumbnail_240p);
+                        count++;
+                    }
+                    if (updateKeys.contains(THUMBNAIL_144P_DB)) {
+                        ps.setString(count, final_thumbnail_144p);
+                        System.out.println("Set string " + count + " to " + final_thumbnail_144p);
+                        count++;
+                    }
+                    if (updateKeys.contains(VIDEO_LENGTH_SECONDS_DB)) {
+                        ps.setInt(count, final_video_length_seconds);
+                        System.out.println("Set string " + count + " to " + final_video_length_seconds);
+                        count++;
+                    }
+                    if (updateKeys.contains(SOCIAL_MEDIA_VIDEO_DB)) {
+                        ps.setString(count, final_social_media_video);
+                        System.out.println("Set string " + count + " to " + final_social_media_video);
                         count++;
                     }
 

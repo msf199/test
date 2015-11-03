@@ -3,6 +3,7 @@ package main.com.whitespell.peak;
 import main.com.whitespell.peak.logic.ApiThread;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.config.ServerProperties;
+import main.com.whitespell.peak.logic.exec.ShellExecution;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
 import main.com.whitespell.peak.logic.notifications.NotificationThread;
@@ -10,13 +11,14 @@ import main.com.whitespell.peak.logic.notifications.NotificationThread;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class Server {
 
     private static ServerProperties systemProperties;
-    private static Calendar calendar = new GregorianCalendar();
+    private static Calendar calendar;
 
     public static ServerProperties getServerProperties() {
         return systemProperties;
@@ -30,7 +32,7 @@ public class Server {
     protected static final NotificationThread notificationThread = new NotificationThread();
 
     public static void main(String[] args) throws Exception {
-       start();
+        start();
     }
 
     public static void start() {
@@ -45,6 +47,7 @@ public class Server {
     public static void startApi() {
         apiThread.start();
     }
+
     public static void startNotifications() {
         notificationThread.start();
     }
@@ -56,9 +59,37 @@ public class Server {
     }
 
 
+    public static void setGMTTimeZone() {
+        calendar = Calendar.getInstance();
+        System.out.println("current: " + calendar.getTime());
+
+        TimeZone z = calendar.getTimeZone();
+        int offset = z.getRawOffset();
+        if (z.inDaylightTime(new Date())) {
+            offset = offset + z.getDSTSavings();
+        }
+        int offsetHrs = offset / 1000 / 60 / 60;
+        int offsetMins = offset / 1000 / 60 % 60;
+
+        System.out.println("offset: " + offsetHrs);
+        System.out.println("offset: " + offsetMins);
+
+        calendar.add(Calendar.HOUR_OF_DAY, (-offsetHrs));
+        calendar.add(Calendar.MINUTE, (-offsetMins));
+
+        System.out.println("GMT Time: " + calendar.getTime());
+
+    }
+
     public static void readConfigs() {
         systemProperties = new ServerProperties(Config.CONFIGURATION_FILE);
         ServerProperties.read();
+
+        setGMTTimeZone();
+
+
+        Logging.log("RESTART", "--------------------------------------------------------------------");
+
         try {
             System.setErr(new PrintStream(new Logging.ErrorFile(), true));
         } catch (Exception e) {
@@ -72,8 +103,7 @@ public class Server {
                 System.err.close();
             }
         }
-        calendar.setTimeZone(TimeZone.getTimeZone(Config.SERVER_TIMEZONE));
-        Logging.log("RESTART", "--------------------------------------------------------------------");
+
 
     }
 
