@@ -365,10 +365,10 @@ public class UpdateContent extends EndpointHandler {
 
                 ResultSet results = ps.executeQuery();
 
-                publisherUserId[0] = results.getInt("user_id");
-
                 if(results.next()){
-                    if(publisherUserId[0] != a.getUserId()){
+                    publisherUserId[0] = results.getInt("user_id");
+
+                    if(publisherUserId[0] != a.getUserId() || !a.isMaster()){
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
                         return;
                     }
