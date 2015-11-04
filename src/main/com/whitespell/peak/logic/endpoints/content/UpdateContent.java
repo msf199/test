@@ -3,14 +3,13 @@ package main.com.whitespell.peak.logic.endpoints.content;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.EndpointHandler;
-import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.endpoints.UpdateStatus;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
+import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -313,7 +312,6 @@ public class UpdateContent extends EndpointHandler {
         final int final_category_id = temp_category_id;
         final String final_url = temp_url;
 
-
         final String final_url_1080p = temp_url_1080p;
         final String final_url_720p = temp_url_720p;
         final String final_url_480p = temp_url_480p;
@@ -356,6 +354,9 @@ public class UpdateContent extends EndpointHandler {
         /**
          * Ensure user attempting to update content is the uploader
          */
+        int[] publisherUserId = {-1};
+        String[] publisherEmail = {""};
+        String[] publisherName = {""};
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_QUERY);
 
@@ -364,8 +365,10 @@ public class UpdateContent extends EndpointHandler {
 
                 ResultSet results = ps.executeQuery();
 
+                publisherUserId[0] = results.getInt("user_id");
+
                 if(results.next()){
-                    if(results.getInt("user_id") != a.getUserId()){
+                    if(publisherUserId[0] != a.getUserId()){
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
                         return;
                     }
@@ -376,6 +379,20 @@ public class UpdateContent extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
             return;
         }
+
+        /**
+         * Get the publisher's info to allow email notification for social media link
+         */
+        UserHelper h = new UserHelper();
+        UserObject publisher = null;
+        try {
+            publisher = h.getUserById(publisherUserId[0]);
+        }catch(Exception e){
+            Logging.log("High", e);
+            //don't throw client side error, this is only for email notifications
+        }
+        publisherEmail[0] = publisher.getEmail();
+        publisherName[0] = publisher.getUserName();
 
         /**
          * Construct the SET string based on the fields the user wants to update.
@@ -409,6 +426,7 @@ public class UpdateContent extends EndpointHandler {
 
                     ContentObject content = null;
                     int count = 1;
+                    boolean sendSocialMediaEmail = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
                         ps.setString(count, final_title);
@@ -535,6 +553,7 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(SOCIAL_MEDIA_VIDEO_DB)) {
+                        sendSocialMediaEmail = true;
                         ps.setString(count, final_social_media_video);
                         System.out.println("Set string " + count + " to " + final_social_media_video);
                         count++;
@@ -554,6 +573,17 @@ public class UpdateContent extends EndpointHandler {
                     UpdateStatus status = null;
                     if (update > 0) {
                         //outputs only the updated user fields, others will be "" or -1
+
+                        /**
+                         * If content was successfully updated and the social media link is ready, send email notification
+                         * to publisher
+                         */
+                        if(sendSocialMediaEmail){
+                            if(publisherEmail[0] != null) {
+                                EmailSend.sendSocialMediaLinkNotificationEmail(
+                                        final_thumbnail_1080p, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
+                            }
+                        }
 
                         status = new UpdateStatus("success");
 
