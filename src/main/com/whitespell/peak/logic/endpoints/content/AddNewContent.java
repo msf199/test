@@ -47,7 +47,6 @@ public class AddNewContent extends EndpointHandler {
     private static final String PAYLOAD_CONTENT_THUMBNAIL = "thumbnailUrl";
     private static final String PAYLOAD_CONTENT_PRICE = "contentPrice";
 
-
     private static final String URL_USER_ID_KEY = "userId";
 
     @Override
