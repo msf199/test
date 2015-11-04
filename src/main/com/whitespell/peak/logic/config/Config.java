@@ -73,7 +73,7 @@ public final class Config {
 
 
     //server.Server Ports
-    public static int API_PORT = 8000;
+    public static int API_PORT = 80;
 
     //security measures
     public static String ERROR_PATH = "/";
