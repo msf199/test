@@ -368,7 +368,9 @@ public class UpdateContent extends EndpointHandler {
                 if(results.next()){
                     publisherUserId[0] = results.getInt("user_id");
 
-                    if(publisherUserId[0] != a.getUserId() || !a.isMaster()){
+                    if(!a.isMaster() && publisherUserId[0] != a.getUserId()){
+                        System.out.println(a.getUserId());
+                        System.out.println("key:" + a.getKey());
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
                         return;
                     }
