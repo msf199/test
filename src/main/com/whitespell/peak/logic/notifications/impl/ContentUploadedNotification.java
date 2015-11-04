@@ -89,7 +89,7 @@ public class ContentUploadedNotification implements NotificationImplementation {
                             String contentUrl = Config.PLATFORM_VIEW_CONTENT_URL + contentObject.getContentId();
 
                             sent[0] = EmailSend.sendFollowerContentNotificationEmail(
-                                    follower.getUserName(), me.getThumbnail(), follower.getEmail(),
+                                    me.getThumbnail(), follower.getEmail(),
                                     publisherUsername, contentObject.getContentTitle(), contentUrl);
                         }
 
