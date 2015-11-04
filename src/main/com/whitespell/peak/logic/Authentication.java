@@ -51,6 +51,10 @@ public class Authentication {
 
     }
 
+    public boolean isMaster() {
+        return isMasterKey(key);
+    }
+
     /**
      * Check whether the user doing an API safeCall is authenticated properly
      *
