@@ -238,17 +238,32 @@ public class ContentWrapper {
 
         int currentContentId = tempContent.getContentId();
         try {
+
+            //todo(cmcan) REMOVE AFTER BETA TO ALLOW PURCHASES
+            /**
+            * BETA ACCESS AND FREE CONTENT UNTIL RELEASE (around dec, 15, 2015)
+             * Allow publisher to see the price of their content
+            */
+            tempContent.setHasAccess(1);
+            if(requesterUserId != tempContent.getUserId()) {
+                tempContent.setContentPrice(0);
+            }
+
+
+            /**
+             * AFTER BETA, UNCOMMENT BELOW:
+             */
             /**
              * Set content access. If free or the user is the publisher, user has access
              */
-            if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempContent.getUserId()) {
+            /*if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempContent.getUserId()) {
                 tempContent.setHasAccess(1);
             } else if (userAccess.contains(currentContentId)) {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
                 tempContent.setContentUrl(null);
-            }
+            }*/
 
             /** Construct the poster **/
 

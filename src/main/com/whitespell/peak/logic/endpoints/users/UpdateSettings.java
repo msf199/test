@@ -2,10 +2,13 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -244,12 +247,14 @@ public class UpdateSettings extends EndpointHandler {
 
                     UserObject user = null;
                     int count = 1;
+                    boolean resendEmailVerification = false;
 
                     if(publisher > -1){
                         ps.setInt(count, finalPublisher);
                         count++;
                     }
                     if (updateValues.contains(finalEmail)) {
+                        resendEmailVerification = true;
                         ps.setString(count, finalEmail);
                         count++;
                     }
@@ -265,6 +270,24 @@ public class UpdateSettings extends EndpointHandler {
                     if (update > 0) {
                         //only output the user_id and email
                         UserObject updatedUser = new UserObject(user_id,null,null,finalEmail,null,null,null,finalPublisher);
+
+                        /**
+                         * Resend email verification if email was updated
+                         */
+                        if(resendEmailVerification){
+                            try {
+                                HttpResponse<String> stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/resendemail")
+                                        .header("accept", "application/json")
+                                        .body("{\n" +
+                                                "\"email\": \"" + finalEmail + "\"\n" + "}")
+                                        .asString();
+                                Logging.log("Low", stringResponse.getBody());
+                            }catch(Exception e){
+                                Logging.log("Low", e);
+                                //don't throw an error for client side
+                            }
+                        }
+
                         Gson g = new Gson();
                         String response = g.toJson(updatedUser);
                         context.getResponse().setStatus(200);

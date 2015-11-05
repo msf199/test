@@ -118,7 +118,7 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(7, thumbnail_url);
                 ps.setDouble(8, content_price[0]);
                 // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
-                ps.setInt(9, Integer.parseInt(content_type) == StaticRules.PEAK_CONTENT_TYPE ? 0 : 1);
+                ps.setInt(9, Integer.parseInt(content_type) == StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE ? 0 : 1);
                 ps.setTimestamp(10, now);
 
                 int rows = ps.executeUpdate();

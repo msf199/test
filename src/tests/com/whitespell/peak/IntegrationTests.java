@@ -486,7 +486,7 @@ public class IntegrationTests extends Server {
         assertEquals(contentTypes[0].getContentTypeName(), "bundle");
 
         StaticRules.BUNDLE_CONTENT_TYPE = contentTypes[0].getContentTypeId();
-        StaticRules.PEAK_CONTENT_TYPE = -1; // todo(do a video with peak content type and set this to the actual one)
+        StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE = -1; // todo(do a video with peak content type and set this to the actual one)
     }
 
     @Test

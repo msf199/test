@@ -64,13 +64,12 @@ public final class Config {
 
     //Static ids and urls
     public static int INTRO_CONTENT_ID = 14131;
-    public static String PLATFORM_NAME = "UpFit";
+    public static String PLATFORM_NAME = "upfit";
     public static String PLATFORM_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/upfit-og.png";
     public static String PLATFORM_VIEW_CONTENT_URL = "http://app.upfit.co/#/post/";
     public static String PLATFORM_HOME_PAGE_URL = "http://www.upfit.co";
     public static String PLATFORM_EMAIL_SEND_ADDRESS = "upfit@whitespell.com";
-    public static String PLATFORM_EMAIL_SEND_NAME = "Upfit by Whitespell";
-
+    public static String PLATFORM_EMAIL_SEND_NAME = "upfit by Whitespell";
 
     //server.Server Ports
     public static int API_PORT = 80;

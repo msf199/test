@@ -60,7 +60,7 @@ public class ExpireAuthentication extends EndpointHandler {
         } catch (SQLException e) {
             Logging.log("High", e);
         }
-        
+
         if (success[0]) {
             context.getResponse().setStatus(HttpStatus.OK_200);
             LogoutObject object = new LogoutObject();
