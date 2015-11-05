@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTests extends Server {
 
-    static String TEST_DB_NAME = "test_" + (Server.getCalendar().getTimeInMillis() / 1000);
+    static String TEST_DB_NAME = "test_" + (System.currentTimeMillis() / 1000);
 
     static String TEST_USERNAME = "pimdewitte";
     static String TEST_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -2107,10 +2107,30 @@ public class IntegrationTests extends Server {
                         "\n\"contentPrice\": 1.33," +
                         "\n\"categoryId\": "+categories[0].getCategoryId()+"," +
                         "\n\"contentUrl\": \"url_test\"," +
+
                         "\n\"contentUrl1080p\": \"url_1080p_test\"," +
                         "\n\"contentUrl720p\": \"url_720p_test\"," +
                         "\n\"contentUrl480p\": \"url_480p_test\"," +
+                        "\n\"contentUrl360p\": \"url_360p_test\"," +
+                        "\n\"contentUrl240p\": \"url_240p_test\"," +
+                        "\n\"contentUrl144p\": \"url_144p_test\"," +
+
+                        "\n\"contentPreview1080p\": \"preview_1080p_test\"," +
                         "\n\"contentPreview720p\": \"preview_720p_test\"," +
+                        "\n\"contentPreview480p\": \"preview_480p_test\"," +
+                        "\n\"contentPreview360p\": \"preview_360p_test\"," +
+                        "\n\"contentPreview240p\": \"preview_240p_test\"," +
+                        "\n\"contentPreview144p\": \"preview_144p_test\"," +
+
+                        "\n\"thumbnail1080p\": \"thumbnail_1080p_test\"," +
+                        "\n\"thumbnail720p\": \"thumbnail_720p_test\"," +
+                        "\n\"thumbnail480p\": \"thumbnail_480p_test\"," +
+                        "\n\"thumbnail360p\": \"thumbnail_360p_test\"," +
+                        "\n\"thumbnail240p\": \"thumbnail_240p_test\"," +
+                        "\n\"thumbnail144p\": \"thumbnail_144p_test\"," +
+                        "\n\"videoLengthSeconds\": 91," +
+                        "\n\"socialMediaVideo\": \"social_media_video_test\"," +
+
                         "\n\"processed\": \"0\"" +
 
                         "}")
@@ -2130,10 +2150,33 @@ public class IntegrationTests extends Server {
         assertEquals(objectToMorph.getContentPrice(), 1.33D, 0D);
         assertEquals(objectToMorph.getCategoryId(), categories[0].getCategoryId());
         assertEquals(objectToMorph.getContentUrl(), "url_test");
+
+
         assertEquals(objectToMorph.getContentUrl1080p(), "url_1080p_test");
         assertEquals(objectToMorph.getContentUrl720p(), "url_720p_test");
         assertEquals(objectToMorph.getContentUrl480p(), "url_480p_test");
+        assertEquals(objectToMorph.getContentUrl360p(), "url_360p_test");
+        assertEquals(objectToMorph.getContentUrl240p(), "url_240p_test");
+        assertEquals(objectToMorph.getContentUrl144p(), "url_144p_test");
+
+
+        assertEquals(objectToMorph.getContentPreview1080p(), "preview_1080p_test");
         assertEquals(objectToMorph.getContentPreview720p(), "preview_720p_test");
+        assertEquals(objectToMorph.getContentPreview480p(), "preview_480p_test");
+        assertEquals(objectToMorph.getContentPreview360p(), "preview_360p_test");
+        assertEquals(objectToMorph.getContentPreview240p(), "preview_240p_test");
+        assertEquals(objectToMorph.getContentPreview144p(), "preview_144p_test");
+
+
+        assertEquals(objectToMorph.getThumbnail1080p(), "thumbnail_1080p_test");
+        assertEquals(objectToMorph.getThumbnail720p(), "thumbnail_720p_test");
+        assertEquals(objectToMorph.getThumbnail480p(), "thumbnail_480p_test");
+        assertEquals(objectToMorph.getThumbnail360p(), "thumbnail_360p_test");
+        assertEquals(objectToMorph.getThumbnail240p(), "thumbnail_240p_test");
+        assertEquals(objectToMorph.getThumbnail144p(), "thumbnail_144p_test");
+        assertEquals(objectToMorph.getVideoLengthSeconds(), 91);
+        assertEquals(objectToMorph.getSocialMediaVideo(), "social_media_video_test");
+
         assertEquals(objectToMorph.getProcessed(), 0);
 
     }

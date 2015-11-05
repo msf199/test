@@ -19,6 +19,7 @@ import main.com.whitespell.peak.logic.endpoints.newsfeed.GetNewsfeed;
 import main.com.whitespell.peak.logic.endpoints.statistics.GetUserSignups;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
+import main.com.whitespell.peak.logic.endpoints.videoprocessing.*;
 import main.com.whitespell.peak.logic.notifications.GetUserNotifications;
 
 /**
@@ -231,6 +232,15 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddNewsfeed(), "/newsfeed/$", "userId" );
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetNewsfeed(), "/newsfeed/$", "userId");
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetEmptyNewsfeed(), "/newsfeed/empty");
+
+        /** VIDEO PROCESSING **/
+
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddInstanceLock(), "/videoprocessing/$", "contentId" );
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new IsProcessingLocked(), "/videoprocessing/$", "contentId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new RemoveInstanceLock(), "/videoprocessing/$", "contentId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateInstance(), "/videoprocessing/instances");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new PingInstance(), "/videoprocessing/pinginstance");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ShutdownInstance(), "/videoprocessing/shutdowninstance");
     }
 
 }

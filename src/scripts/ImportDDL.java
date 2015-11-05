@@ -35,6 +35,8 @@ public class ImportDDL {
 
         // add model tables
         tables.add("user");
+        tables.add("avcpvm_monitoring");
+        tables.add("instance_lock");
         tables.add("category");
         tables.add("content_type");
         tables.add("content");

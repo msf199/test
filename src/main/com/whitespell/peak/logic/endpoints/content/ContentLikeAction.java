@@ -195,6 +195,7 @@ public class ContentLikeAction extends EndpointHandler {
             String json = g.toJson(likeActionObject);
             context.getResponse().getWriter().write(json);
         } else {
+
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }

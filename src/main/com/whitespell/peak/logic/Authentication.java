@@ -45,10 +45,14 @@ public class Authentication {
                 key = null;
             } else {
                 userId = Integer.parseInt(tempHeader[0]);
-                key = tempHeader[1];
+                key = tempHeader[1].replaceAll(" ", "");
             }
         }
 
+    }
+
+    public boolean isMaster() {
+        return isMasterKey(key);
     }
 
     /**

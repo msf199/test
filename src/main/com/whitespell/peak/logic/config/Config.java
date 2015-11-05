@@ -19,7 +19,6 @@ public final class Config {
     //General server information
     public static String SERVER_NAME = "API";
     public static int SERVER_VERSION = 1;
-    public static String SERVER_TIMEZONE = "UTC";
 
     //General mandrill mail information
     public static String MANDRILL_API_KEY = "_nuIwbGbVG1bvkxZo7LoiQ";
@@ -73,7 +72,7 @@ public final class Config {
     public static String PLATFORM_EMAIL_SEND_NAME = "upfit by Whitespell";
 
     //server.Server Ports
-    public static int API_PORT = 8000;
+    public static int API_PORT = 80;
 
     //security measures
     public static String ERROR_PATH = "/";

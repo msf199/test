@@ -25,10 +25,41 @@ public class ContentWrapper {
     private static final String CONTENT_LIKES_KEY = "content_likes";
     private static final String CONTENT_VIEWS_KEY = "content_views";
     private static final String CONTENT_URL = "content_url";
+
+
+    // content urls
     private static final String CONTENT_URL_1080P = "content_url_1080p";
     private static final String CONTENT_URL_720P = "content_url_720p";
     private static final String CONTENT_URL_480P = "content_url_480p";
+    private static final String CONTENT_URL_360P = "content_url_360p";
+    private static final String CONTENT_URL_240P = "content_url_240p";
+    private static final String CONTENT_URL_144P = "content_url_144p";
+
+    // content previews
+    private static final String CONTENT_PREVIEW_1080P = "content_preview_1080p";
     private static final String CONTENT_PREVIEW_720P = "content_preview_720p";
+    private static final String CONTENT_PREVIEW_480P = "content_preview_480p";
+    private static final String CONTENT_PREVIEW_360P = "content_preview_360p";
+    private static final String CONTENT_PREVIEW_240P = "content_preview_240p";
+    private static final String CONTENT_PREVIEW_144P = "content_preview_144p";
+
+    // content thumbnails
+    private static final String THUMBNAIL_1080P = "thumbnail_1080p";
+    private static final String THUMBNAIL_720P = "thumbnail_720p";
+    private static final String THUMBNAIL_480P = "thumbnail_480p";
+    private static final String THUMBNAIL_360P = "thumbnail_360p";
+    private static final String THUMBNAIL_240P = "thumbnail_240p";
+    private static final String THUMBNAIL_144P = "thumbnail_144p";
+
+    private static final String SOCIAL_MEDIA_VIDEO = "social_media_video";
+    private static final String VIDEO_LENGTH_SECONDS = "video_length_seconds";
+
+
+
+
+
+
+
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
     private static final String CONTENT_PRICE = "content_price";
@@ -264,22 +295,76 @@ public class ContentWrapper {
         UserObject tempPublisher;
 
         try {
-            tempContent = new ContentObject(currentObject.getInt(CONTENT_CATEGORY_ID),
+            tempContent = new ContentObject(
+                    currentObject.getInt(CONTENT_CATEGORY_ID),
                     currentObject.getInt(USER_ID_KEY),
                     currentObject.getInt(CONTENT_ID_KEY),
                     currentObject.getInt(CONTENT_TYPE_ID),
                     currentObject.getString(CONTENT_TITLE),
                     currentObject.getString(CONTENT_URL),
+
                     currentObject.getString(CONTENT_URL_1080P),
                     currentObject.getString(CONTENT_URL_720P),
                     currentObject.getString(CONTENT_URL_480P),
+                    currentObject.getString(CONTENT_URL_360P),
+                    currentObject.getString(CONTENT_URL_240P),
+                    currentObject.getString(CONTENT_URL_144P),
+
+                    currentObject.getString(CONTENT_PREVIEW_1080P),
                     currentObject.getString(CONTENT_PREVIEW_720P),
+                    currentObject.getString(CONTENT_PREVIEW_480P),
+                    currentObject.getString(CONTENT_PREVIEW_360P),
+                    currentObject.getString(CONTENT_PREVIEW_240P),
+                    currentObject.getString(CONTENT_PREVIEW_144P),
+
+                    currentObject.getString(THUMBNAIL_1080P),
+                    currentObject.getString(THUMBNAIL_720P),
+                    currentObject.getString(THUMBNAIL_480P),
+                    currentObject.getString(THUMBNAIL_360P),
+                    currentObject.getString(THUMBNAIL_240P),
+                    currentObject.getString(THUMBNAIL_144P),
+                    currentObject.getInt(VIDEO_LENGTH_SECONDS),
+
+                    currentObject.getString(SOCIAL_MEDIA_VIDEO),
+
                     currentObject.getString(CONTENT_DESCRIPTION),
                     currentObject.getString(CONTENT_THUMBNAIL),
                     currentObject.getDouble(CONTENT_PRICE),
                     currentObject.getInt(PROCESSED_KEY),
                     currentObject.getInt(PARENT_KEY)
             );
+
+            /**
+             * int categoryId,
+             int userId,
+             int contentId,
+             int contentType,
+             String contentTitle,
+             String contentUrl,
+             String contentUrl1080p,
+             String contentUrl720p,
+             String contentUrl480p,
+             String contentUrl360p,
+             String contentUrl240p,
+             String contentUrl144p,
+             String contentPreview1080p,
+             String contentPreview720p,
+             String contentPreview480p,
+             String contentPreview360p,
+             String contentPreview240p,
+             String contentPreview144p,
+             String thumbnail1080p,
+             String thumbnail720p,
+             String thumbnail480p,
+             String thumbnail360p,
+             String thumbnail240p,
+             String thumbnail144p,
+             String contentDescription,
+             String thumbnailUrl,
+             double contentPrice,
+             int processed,
+             int parent
+             */
 
             tempPublisher = new UserObject(
                     currentObject.getInt(USER_ID_KEY),
@@ -320,21 +405,44 @@ public class ContentWrapper {
 
                     /** Construct the child **/
 
-                    ContentObject child = new ContentObject(results.getInt(CONTENT_CATEGORY_ID),
+                    ContentObject child = new ContentObject(
+                            results.getInt(CONTENT_CATEGORY_ID),
                             results.getInt(USER_ID_KEY),
                             results.getInt(CONTENT_ID_KEY),
                             results.getInt(CONTENT_TYPE_ID),
                             results.getString(CONTENT_TITLE),
                             results.getString(CONTENT_URL),
+
                             results.getString(CONTENT_URL_1080P),
                             results.getString(CONTENT_URL_720P),
                             results.getString(CONTENT_URL_480P),
+                            results.getString(CONTENT_URL_360P),
+                            results.getString(CONTENT_URL_240P),
+                            results.getString(CONTENT_URL_144P),
+
+                            results.getString(CONTENT_PREVIEW_1080P),
                             results.getString(CONTENT_PREVIEW_720P),
+                            results.getString(CONTENT_PREVIEW_480P),
+                            results.getString(CONTENT_PREVIEW_360P),
+                            results.getString(CONTENT_PREVIEW_240P),
+                            results.getString(CONTENT_PREVIEW_144P),
+
+                            results.getString(THUMBNAIL_1080P),
+                            results.getString(THUMBNAIL_720P),
+                            results.getString(THUMBNAIL_480P),
+                            results.getString(THUMBNAIL_360P),
+                            results.getString(THUMBNAIL_240P),
+                            results.getString(THUMBNAIL_144P),
+                            results.getInt(VIDEO_LENGTH_SECONDS),
+
+                            results.getString(SOCIAL_MEDIA_VIDEO),
+
                             results.getString(CONTENT_DESCRIPTION),
                             results.getString(CONTENT_THUMBNAIL),
                             results.getDouble(CONTENT_PRICE),
                             results.getInt(PROCESSED_KEY),
-                            results.getInt(PARENT_KEY));
+                            results.getInt(PARENT_KEY)
+                    );
 
                     UserObject tempPublisher = new UserObject(
                             results.getInt(USER_ID_KEY),

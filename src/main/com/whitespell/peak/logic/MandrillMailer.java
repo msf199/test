@@ -76,6 +76,39 @@ public class MandrillMailer {
         }
     }
 
+    public static boolean sendDebugEmail(String fromEmail, String fromName, String subject,String name, String details, String debug, String templateName, String toEmail) {
+        MandrillTemplatedMessageRequest request = new MandrillTemplatedMessageRequest();
+        MandrillMessage message = new MandrillMessage();
+        Map<String, String> headers = new HashMap<>();
+        message.setFrom_email(fromEmail);
+        message.setFrom_name(fromName);
+        message.setHeaders(headers);
+        message.setSubject(subject);
+        MandrillRecipient[] recipients = new MandrillRecipient[]{new MandrillRecipient(toEmail, toEmail)};
+        message.setTo(recipients);
+        message.setTrack_clicks(true);
+        message.setTrack_opens(true);
+
+        request.setMessage(message);
+        List<TemplateContent> content = new ArrayList<>();
+        request.setTemplate_content(content);
+        request.setTemplate_name(templateName);
+        List<MergeVar> globalMergeVars = new ArrayList<>();
+        globalMergeVars.add(new MergeVar("NAME", name));
+        globalMergeVars.add(new MergeVar("DETAILS", details));
+        globalMergeVars.add(new MergeVar("DEBUG", debug));
+
+
+        message.setGlobal_merge_vars(globalMergeVars);
+
+        try {
+            messagesRequest.sendTemplatedMessage(request);
+            return true;
+        } catch (RequestFailedException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     public static boolean sendContentNotificationTemplatedMessage(String fromEmail, String fromName, String subject, String host, String username, String contentName, String contentUrl, String templateName, String thumbnailUrl, String toEmail) {
         MandrillTemplatedMessageRequest request = new MandrillTemplatedMessageRequest();
         MandrillMessage message = new MandrillMessage();

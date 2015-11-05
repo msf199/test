@@ -32,6 +32,7 @@ public class StaticRules {
     public static final int MIN_FEEDBACK_LENGTH = 10;
 
     public static int BUNDLE_CONTENT_TYPE = 6;
+
     public static int PLATFORM_UPLOAD_CONTENT_TYPE = 5;
 
     public enum ErrorCodes {
