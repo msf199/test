@@ -200,7 +200,7 @@ public class UpdateContent extends EndpointHandler {
             updateKeys.add(CONTENT_URL_DB);
         }
         if (j.get(CONTENT_THUMBNAIL) != null) {
-            temp_url = j.get(CONTENT_THUMBNAIL).getAsString();
+            temp_thumbnail = j.get(CONTENT_THUMBNAIL).getAsString();
             updateKeys.add(THUMBNAIL_ID_DB);
         }
 
