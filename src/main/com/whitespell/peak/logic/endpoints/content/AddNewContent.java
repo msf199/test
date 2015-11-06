@@ -166,7 +166,7 @@ public class AddNewContent extends EndpointHandler {
                 ResultSet r = ps.executeQuery();
                 if (!r.next() && !Config.TESTING){
                     Logging.log("INFO", "not enough video nodes, inserting one");
-                    ShellExecution.createAndInsertVideoConverter();
+                   // ShellExecution.createAndInsertVideoConverter();
 
                 } else {
                     Logging.log("INFO", "we have enough video nodes");
