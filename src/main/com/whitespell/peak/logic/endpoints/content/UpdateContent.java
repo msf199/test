@@ -30,6 +30,7 @@ public class UpdateContent extends EndpointHandler {
     private static final String CONTENT_DESCRIPTION = "contentDescription";
     private static final String CONTENT_PRICE = "contentPrice";
     private static final String CATEGORY_ID = "categoryId";
+    private static final String CONTENT_THUMBNAIL = "thumbnail";
 
     /** Video URLs **/
     private static final String CONTENT_URL = "contentUrl";
@@ -93,6 +94,7 @@ public class UpdateContent extends EndpointHandler {
     private static final String CONTENT_DESCRIPTION_DB = "content_description";
     private static final String CONTENT_PRICE_DB = "content_price";
     private static final String CATEGORY_ID_DB = "category_id";
+    private static final String THUMBNAIL_ID_DB = "thumbnail_url";
 
     private static final String CONTENT_URL_DB = "content_url";
 
@@ -110,6 +112,7 @@ public class UpdateContent extends EndpointHandler {
         payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
         payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
         payloadInput.put(CONTENT_URL, StaticRules.InputTypes.REG_STRING_OPTIONAL);
+        payloadInput.put(CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_OPTIONAL);
 
 
         payloadInput.put(CONTENT_URL_1080P, StaticRules.InputTypes.REG_STRING_OPTIONAL);
@@ -144,7 +147,7 @@ public class UpdateContent extends EndpointHandler {
     public void safeCall(final RequestObject context) throws IOException {
 
         JsonObject j = context.getPayload().getAsJsonObject();
-        String temp_title="", temp_description="", temp_url="",
+        String temp_title="", temp_description="", temp_url="", temp_thumbnail = "",
                 temp_url_1080p="",
                 temp_url_720p="",
                 temp_url_480p="",
@@ -195,6 +198,10 @@ public class UpdateContent extends EndpointHandler {
         if (j.get(CONTENT_URL) != null) {
             temp_url = j.get(CONTENT_URL).getAsString();
             updateKeys.add(CONTENT_URL_DB);
+        }
+        if (j.get(CONTENT_THUMBNAIL) != null) {
+            temp_url = j.get(CONTENT_THUMBNAIL).getAsString();
+            updateKeys.add(THUMBNAIL_ID_DB);
         }
 
         /**
@@ -311,6 +318,7 @@ public class UpdateContent extends EndpointHandler {
         final Double final_price = temp_price;
         final int final_category_id = temp_category_id;
         final String final_url = temp_url;
+        final String final_thumbnail = temp_thumbnail;
 
         final String final_url_1080p = temp_url_1080p;
         final String final_url_720p = temp_url_720p;
@@ -453,6 +461,11 @@ public class UpdateContent extends EndpointHandler {
                     if (updateKeys.contains(CONTENT_URL_DB)) {
                         ps.setString(count, final_url);
                         System.out.println("Set string " + count + " to " + final_url);
+                        count++;
+                    }
+                    if (updateKeys.contains(CONTENT_THUMBNAIL)) {
+                        ps.setString(count, final_thumbnail);
+                        System.out.println("Set string " + count + " to " + final_thumbnail);
                         count++;
                     }
                     if (updateKeys.contains(CONTENT_URL_1080P_DB)) {
