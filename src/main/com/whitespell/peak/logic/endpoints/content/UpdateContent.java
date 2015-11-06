@@ -607,40 +607,42 @@ public class UpdateContent extends EndpointHandler {
                         /**
                          * If the description was edited, edit the 'first comment' that holds the description
                          */
-                        try {
-                            StatementExecutor executor = new StatementExecutor(GET_DESCRIPTION_COMMENT);
+                        if(editDescriptionComment) {
+                            try {
+                                StatementExecutor executor = new StatementExecutor(GET_DESCRIPTION_COMMENT);
 
-                            executor.execute(ps2 -> {
-                                ps2.setInt(1, final_content_id);
-                                ps2.setInt(2, publisherUserId[0]);
+                                executor.execute(ps2 -> {
+                                    ps2.setInt(1, final_content_id);
+                                    ps2.setInt(2, publisherUserId[0]);
 
-                                ResultSet results = ps2.executeQuery();
+                                    ResultSet results = ps2.executeQuery();
 
-                                if(results.next()){
-                                    try {
-                                        StatementExecutor executor2 = new StatementExecutor(EDIT_DESCRIPTION_COMMENT);
+                                    if (results.next()) {
+                                        try {
+                                            StatementExecutor executor2 = new StatementExecutor(EDIT_DESCRIPTION_COMMENT);
 
-                                        executor2.execute(ps3 -> {
-                                            ps3.setString(1, final_description);
-                                            ps3.setInt(2, results.getInt("comment_id"));
+                                            executor2.execute(ps3 -> {
+                                                ps3.setString(1, final_description);
+                                                ps3.setInt(2, results.getInt("comment_id"));
 
-                                            int rows = ps3.executeUpdate();
+                                                int rows = ps3.executeUpdate();
 
-                                            if(rows<=0){
-                                                System.out.println("Comment could not be updated");
-                                            }
-                                        });
-                                    }catch (SQLException e) {
-                                        Logging.log("High", e);
-                                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENTS_NOT_FOUND);
-                                        return;
+                                                if (rows <= 0) {
+                                                    System.out.println("Comment could not be updated");
+                                                }
+                                            });
+                                        } catch (SQLException e) {
+                                            Logging.log("High", e);
+                                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENTS_NOT_FOUND);
+                                            return;
+                                        }
                                     }
-                                }
-                            });
-                        }catch (SQLException e) {
-                            Logging.log("High", e);
-                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                            return;
+                                });
+                            } catch (SQLException e) {
+                                Logging.log("High", e);
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                                return;
+                            }
                         }
 
                         status = new UpdateStatus("success");
