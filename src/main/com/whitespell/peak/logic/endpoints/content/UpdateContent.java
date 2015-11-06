@@ -103,6 +103,8 @@ public class UpdateContent extends EndpointHandler {
 
 
     private static final String GET_CONTENT_QUERY = "SELECT * FROM `content` WHERE `content_id` = ?";
+    private static final String GET_DESCRIPTION_COMMENT = "SELECT `comment_id` FROM `content_comments` WHERE `content_id` = ? AND `user_id` = ? order by `comment_id` ASC";
+    private static final String EDIT_DESCRIPTION_COMMENT = "UPDATE `content_comments` SET `comment_value` = ? WHERE `comment_id` = ?";
 
     @Override
     protected void setUserInputs() {
@@ -437,6 +439,7 @@ public class UpdateContent extends EndpointHandler {
                     ContentObject content = null;
                     int count = 1;
                     boolean sendSocialMediaEmail = false;
+                    boolean editDescriptionComment = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
                         ps.setString(count, final_title);
@@ -444,6 +447,7 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(CONTENT_DESCRIPTION_DB)) {
+                        editDescriptionComment = true;
                         ps.setString(count, final_description);
                         System.out.println("Set string " + count + " to " + final_description);
                         count++;
@@ -598,6 +602,45 @@ public class UpdateContent extends EndpointHandler {
                                 EmailSend.sendSocialMediaLinkNotificationEmail(
                                         final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
                             }
+                        }
+
+                        /**
+                         * If the description was edited, edit the 'first comment' that holds the description
+                         */
+                        try {
+                            StatementExecutor executor = new StatementExecutor(GET_DESCRIPTION_COMMENT);
+
+                            executor.execute(ps2 -> {
+                                ps2.setInt(1, final_content_id);
+                                ps2.setInt(2, publisherUserId[0]);
+
+                                ResultSet results = ps2.executeQuery();
+
+                                if(results.next()){
+                                    try {
+                                        StatementExecutor executor2 = new StatementExecutor(EDIT_DESCRIPTION_COMMENT);
+
+                                        executor2.execute(ps3 -> {
+                                            ps3.setString(1, final_description);
+                                            ps3.setInt(2, results.getInt("comment_id"));
+
+                                            int rows = ps3.executeUpdate();
+
+                                            if(rows<=0){
+                                                System.out.println("Comment could not be updated");
+                                            }
+                                        });
+                                    }catch (SQLException e) {
+                                        Logging.log("High", e);
+                                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENTS_NOT_FOUND);
+                                        return;
+                                    }
+                                }
+                            });
+                        }catch (SQLException e) {
+                            Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                            return;
                         }
 
                         status = new UpdateStatus("success");
