@@ -463,7 +463,7 @@ public class UpdateContent extends EndpointHandler {
                         System.out.println("Set string " + count + " to " + final_url);
                         count++;
                     }
-                    if (updateKeys.contains(CONTENT_THUMBNAIL)) {
+                    if (updateKeys.contains(THUMBNAIL_ID_DB)) {
                         ps.setString(count, final_thumbnail);
                         System.out.println("Set string " + count + " to " + final_thumbnail);
                         count++;
