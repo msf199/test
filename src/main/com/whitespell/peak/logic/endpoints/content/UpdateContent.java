@@ -109,7 +109,7 @@ public class UpdateContent extends EndpointHandler {
         urlInput.put(URL_CONTENT_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(CONTENT_TITLE, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-        payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
+        payloadInput.put(CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
         payloadInput.put(CONTENT_URL, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_OPTIONAL);
