@@ -251,6 +251,26 @@ public class AddNewContent extends EndpointHandler {
         }
 
         /**
+         * Add the description as the first comment of the video.
+         */
+        try {
+            HttpResponse<String> stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId[0] + "/comments")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + a.getUserId() + "," + a.getKey() + "")
+                    .body("{\n" +
+                            "\"userId\": \"" + a.getUserId() + "\",\n" +
+                            "\"comment\": \"" + content_description + "\"\n" +
+                            "}")
+                    .asString();
+            System.out.println(stringResponse.getBody());
+        }catch(Exception e){
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            //do not throw error on client side
+        }
+
+
+        /**
          * Send notifications to users for the ContentUpload if it's not a bundle (only when videos get added, could be inside bundle)
          */
 
@@ -267,6 +287,7 @@ public class AddNewContent extends EndpointHandler {
                     thumbnail_url
             )));
         }
+
 
 
         context.getResponse().setStatus(HttpStatus.OK_200);
