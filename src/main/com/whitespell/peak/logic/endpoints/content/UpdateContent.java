@@ -596,7 +596,7 @@ public class UpdateContent extends EndpointHandler {
                         if(sendSocialMediaEmail){
                             if(publisherEmail[0] != null) {
                                 EmailSend.sendSocialMediaLinkNotificationEmail(
-                                        final_thumbnail_1080p, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
+                                        final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
                             }
                         }
 
