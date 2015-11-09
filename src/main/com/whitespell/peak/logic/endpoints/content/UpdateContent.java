@@ -640,7 +640,7 @@ public class UpdateContent extends EndpointHandler {
                                 });
                             } catch (SQLException e) {
                                 Logging.log("High", e);
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENTS_NOT_FOUND);
                                 return;
                             }
                         }
