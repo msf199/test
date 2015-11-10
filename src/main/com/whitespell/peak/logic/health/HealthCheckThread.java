@@ -51,7 +51,7 @@ public class HealthCheckThread extends Thread {
                        if (!r.next() && !Config.TESTING){
                            Logging.log("INFO", "not enough video nodes, inserting one");
 
-                           int nodesToCreate = unprocessed / 3; // we allow a queue of 3 per node
+                           int nodesToCreate = unprocessed < 3 ? 1 : (unprocessed / 3); // we allow a queue of 3 per node
 
                            for(int i = 0; i < nodesToCreate; i++) {
                                ShellExecution.createAndInsertVideoConverter();
