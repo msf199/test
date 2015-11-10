@@ -44,6 +44,8 @@ public class Server {
         startApi();
         System.out.println("Starting notification thread");
         startNotifications();
+        System.out.println("Starting health check thread...");
+        startHealthCheck();
     }
 
     public static void startApi() {
