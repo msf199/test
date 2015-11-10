@@ -33,7 +33,6 @@ public class HealthCheckThread extends Thread {
     public void run() {
         running = true;
 
-
         do {
 
            if(hasUnprocessedContent()) {
@@ -84,11 +83,17 @@ public class HealthCheckThread extends Thread {
 
                 ResultSet r = ps.executeQuery();
                 if (r.next()){
-                    unprocessedVideos[0] = r.getInt("COUNT(1)");
-                    unprocessedContent[0] = true;
-                } else {
-                    Logging.log("INFO", "we have enough video nodes");
-                }
+                    int count = r.getInt("ct");
+                    if(count > 0 ) {
+                        unprocessedVideos[0] = count;
+                        unprocessedContent[0] = true;
+                    } else {
+                        Logging.log("INFO", "we have enough video nodes");
+                        unprocessedContent[0] = false;
+                    }
+
+
+                } 
             });
         } catch (SQLException e) {
             Logging.log("High", e);
