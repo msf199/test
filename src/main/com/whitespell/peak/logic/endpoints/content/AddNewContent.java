@@ -269,26 +269,9 @@ public class AddNewContent extends EndpointHandler {
             //do not throw error on client side
         }
 
-
         /**
-         * Send notifications to users for the ContentUpload if it's not a bundle (only when videos get added, could be inside bundle)
+         * Instead of sending notification when content is added, send notification when content has been processed.
          */
-
-
-        if(Integer.parseInt(content_type) != StaticRules.BUNDLE_CONTENT_TYPE) {
-             Server.NotificationService.offerNotification(new ContentUploadedNotification(user_id, new ContentObject(
-                    category_id,
-                    user_id,
-                    contentId[0],
-                    Integer.parseInt(content_type),
-                    content_title,
-                    content_url,
-                    content_description,
-                    thumbnail_url
-            )));
-        }
-
-
 
         context.getResponse().setStatus(HttpStatus.OK_200);
         AddContentObject object = new AddContentObject();

@@ -2,10 +2,12 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.endpoints.UpdateStatus;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.ContentUploadedNotification;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -407,6 +409,18 @@ public class UpdateContent extends EndpointHandler {
         publisherName[0] = publisher.getUserName();
 
         /**
+         * Get the content's info to allow email notification for content upload (processed == 1)
+         */
+        ContentHelper c = new ContentHelper();
+        ContentObject content = null;
+        try {
+            content = c.getContentById(final_content_id);
+        }catch(Exception e){
+            Logging.log("High", e);
+            //don't throw client side error, this is only for email notifications
+        }
+
+        /**
          * Construct the SET string based on the fields the user wants to update.
          */
 
@@ -601,6 +615,17 @@ public class UpdateContent extends EndpointHandler {
                             if(publisherEmail[0] != null) {
                                 EmailSend.sendSocialMediaLinkNotificationEmail(
                                         final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
+                            }
+                        }
+
+                        /**
+                         * Send notifications to followers of this user for the ContentUpload if it's not a bundle
+                         * (only when videos get added, could be inside bundle)
+                         * Send notification only if video is processed.
+                         */
+                        if(final_processed == 1){
+                            if(content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE) {
+                                Server.NotificationService.offerNotification(new ContentUploadedNotification(publisherUserId[0], content));
                             }
                         }
 
