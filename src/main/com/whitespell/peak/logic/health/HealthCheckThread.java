@@ -24,36 +24,39 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HealthCheckThread extends Thread {
 
 
-    private boolean running = false;
-
-
+    private static final String GET_CONTENT_PROCESSED = "SELECT 1 FROM `content` WHERE `processed` = 0";
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
-
+    private boolean running = false;
 
     public void run() {
         running = true;
 
+
         do {
 
-            try {
-                StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
-                final Timestamp min_15_ago = new Timestamp(Server.getCalendar().getTimeInMillis() - (60 * 1000 * 15)); // 15 mins max
-                executor.execute(ps -> {
+           if(hasUnprocessedContent()) {
 
-                    ps.setTimestamp(1,min_15_ago);
-                    ps.setTimestamp(2,min_15_ago);
-                    ResultSet r = ps.executeQuery();
-                    if (!r.next() && !Config.TESTING){
-                        Logging.log("INFO", "not enough video nodes, inserting one");
-                        ShellExecution.createAndInsertVideoConverter();
+               try {
+                   StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
+                   final Timestamp min_15_ago = new Timestamp(Server.getCalendar().getTimeInMillis() - (60 * 1000 * 15)); // 15 mins max
+                   executor.execute(ps -> {
 
-                    } else {
-                        Logging.log("INFO", "we have enough video nodes");
-                    }
-                });
-            } catch (SQLException e) {
-                Logging.log("High", e);
-            }
+                       ps.setTimestamp(1,min_15_ago);
+                       ps.setTimestamp(2,min_15_ago);
+                       ResultSet r = ps.executeQuery();
+                       if (!r.next() && !Config.TESTING){
+                           Logging.log("INFO", "not enough video nodes, inserting one");
+                           ShellExecution.createAndInsertVideoConverter();
+
+                       } else {
+                           Logging.log("INFO", "we have enough video nodes");
+                       }
+                   });
+               } catch (SQLException e) {
+                   Logging.log("High", e);
+               }
+           }
+
 
             try {
                 Thread.sleep(10000);
@@ -62,6 +65,25 @@ public class HealthCheckThread extends Thread {
             }
         } while (running);
 
+    }
+
+    boolean hasUnprocessedContent() {
+        final boolean[] unprocessedContent = {false};
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_CONTENT_PROCESSED);
+            executor.execute(ps -> {
+
+                ResultSet r = ps.executeQuery();
+                if (r.next()){
+                    unprocessedContent[0] = true;
+                } else {
+                    Logging.log("INFO", "we have enough video nodes");
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+        }
+    return unprocessedContent[0];
     }
 
 }
