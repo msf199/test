@@ -24,7 +24,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HealthCheckThread extends Thread {
 
 
-    private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) FROM `content` WHERE `processed` = 0";
+    private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) as ct FROM `content` WHERE `processed` = 0";
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     private boolean running = false;
 
@@ -93,7 +93,7 @@ public class HealthCheckThread extends Thread {
                     }
 
 
-                } 
+                }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
