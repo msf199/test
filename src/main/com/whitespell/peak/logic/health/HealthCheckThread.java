@@ -5,6 +5,7 @@ import javapns.notification.PushNotificationPayload;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.exec.ShellExecution;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import org.apache.log4j.BasicConfigurator;
@@ -44,7 +45,7 @@ public class HealthCheckThread extends Thread {
                     ResultSet r = ps.executeQuery();
                     if (!r.next() && !Config.TESTING){
                         Logging.log("INFO", "not enough video nodes, inserting one");
-                        // ShellExecution.createAndInsertVideoConverter();
+                        ShellExecution.createAndInsertVideoConverter();
 
                     } else {
                         Logging.log("INFO", "we have enough video nodes");
