@@ -47,8 +47,8 @@ public class ExpireAuthentication extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(LOGOUT_QUERY);
             executor.execute(ps -> {
-                ps.setTimestamp(1, new Timestamp(Server.getCalendar().getTimeInMillis()));
-                System.out.println("Set expires to " + new Timestamp(Server.getCalendar().getTimeInMillis()));
+                ps.setTimestamp(1, new Timestamp(Server.getMilliTime()));
+                System.out.println("Set expires to " + new Timestamp(Server.getMilliTime()));
                 ps.setString(2, a.getKey());
                 ps.setInt(3, a.getUserId());
 

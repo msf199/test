@@ -82,7 +82,7 @@ public class AddNewContent extends EndpointHandler {
             content_price[0] = 0.0;
         }
 
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        final Timestamp now = new Timestamp(Server.getMilliTime());
 
         int[] contentId = {0};
         int ADMIN_UID = -1;
@@ -157,7 +157,7 @@ public class AddNewContent extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
-            final Timestamp min_15_ago = new Timestamp(Server.getCalendar().getTimeInMillis() - (60 * 1000 * 15)); // 15 mins max
+            final Timestamp min_15_ago = new Timestamp(Server.getMilliTime() - (60 * 1000 * 15)); // 15 mins max
             executor.execute(ps -> {
 
                 ps.setTimestamp(1,min_15_ago);
