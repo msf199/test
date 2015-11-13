@@ -25,7 +25,7 @@ public class PoolTest {
             Connection con = null;
             try {
 
-                long start = Server.getCalendar().getTimeInMillis();
+                long start = Server.getMilliTime();
 
                 con = Pool.getConnection();
 
@@ -39,7 +39,7 @@ public class PoolTest {
                     System.out.println(s.getString("username"));
                 }
 
-                long end = Server.getCalendar().getTimeInMillis();
+                long end = Server.getMilliTime();
 
                 tests[i] = main.com.whitespell.peak.logic.Safety.safeLongToInt(end - start);
 

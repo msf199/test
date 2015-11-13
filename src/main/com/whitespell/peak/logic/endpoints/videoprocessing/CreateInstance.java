@@ -40,7 +40,7 @@ public class CreateInstance extends EndpointHandler {
         final String instance_id = payload.get(PAYLOAD_INSTANCE_ID).getAsString();
         final String ipv4_address = payload.get(PAYLOAD_INSTANCE_IPV4).getAsString();
 
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis()); // 15 mins max
+        final Timestamp now = new Timestamp(Server.getMilliTime()); // 15 mins max
 
         CreateInstanceResponse cir = new CreateInstanceResponse();
 

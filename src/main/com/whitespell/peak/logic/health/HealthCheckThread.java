@@ -13,6 +13,7 @@ import org.apache.log4j.BasicConfigurator;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -26,6 +27,7 @@ public class HealthCheckThread extends Thread {
 
     private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) as ct FROM `content` WHERE `processed` = 0";
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT COUNT(1) as ct FROM `avcpvm_monitoring` WHERE `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
+    private static final String DELETE_NODES = "SELECT `instance_id` FROM `avcpvm_monitoring` WHERE `shutdown_reported` = 1 OR `last_ping` IS NULL OR `creation_time` < ? OR `last_ping` < ?";
     private boolean running = false;
 
     public void run() {
@@ -38,11 +40,15 @@ public class HealthCheckThread extends Thread {
         running = true;
 
         do {
+
+              deleteOldNodes();
+
+
                int unprocessed = getUnprocessedContent();
 
                try {
                    StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
-                   final Timestamp min_15_ago = new Timestamp(Server.getCalendar().getTimeInMillis() - (60 * 1000 * 15)); // 15 mins max
+                   final Timestamp min_15_ago = new Timestamp(Server.getMilliTime() - (60 * 1000 * 15)); // 15 mins max
                    executor.execute(ps -> {
 
                        ps.setTimestamp(1,min_15_ago);
@@ -94,6 +100,27 @@ public class HealthCheckThread extends Thread {
             }
         } while (running);
 
+    }
+
+    private void deleteOldNodes() {
+        try {
+            StatementExecutor executor = new StatementExecutor(DELETE_NODES);
+            final Timestamp min_15_ago = new Timestamp(Server.getMilliTime() - (60 * 1000 * 15)); // 15 mins max
+            executor.execute(ps -> {
+
+                ps.setTimestamp(1,min_15_ago);
+                ps.setTimestamp(2,min_15_ago);
+                ResultSet r = ps.executeQuery();
+                while(r.next()){
+                    // count of available instances
+                    ShellExecution.deleteNode(r.getString("instance_id"));
+
+
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+        }
     }
 
     int getUnprocessedContent() {

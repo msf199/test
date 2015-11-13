@@ -71,10 +71,10 @@ public class LinkFB extends EndpointHandler {
         String accessToken = payload.get(ACCESS_TOKEN_KEY).getAsString();
         String payloadPass = null;
         String[] deviceName = {"unknown"};
-        String[] deviceUUID = {"unknown" + Server.getCalendar().getTimeInMillis()};
+        String[] deviceUUID = {"unknown" + Server.getMilliTime()};
         int[] deviceType = {-1};
         boolean device1 = false, device2 = false, device3 = false;
-        Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        Timestamp now = new Timestamp(Server.getMilliTime());
 
         if(payload.get(PASSWORD_KEY) != null){
             payloadPass = payload.get(PASSWORD_KEY).getAsString();

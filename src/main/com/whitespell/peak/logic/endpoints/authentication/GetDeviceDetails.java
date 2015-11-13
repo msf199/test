@@ -40,7 +40,7 @@ public class GetDeviceDetails extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_DEVICE_DETAILS);
             executor.execute(ps -> {
                 ps.setInt(1, userId);
-                ps.setLong(2, Server.getCalendar().getTimeInMillis());
+                ps.setLong(2, Server.getMilliTime());
 
                 ResultSet r = ps.executeQuery();
                 DeviceInfo d = new DeviceInfo();

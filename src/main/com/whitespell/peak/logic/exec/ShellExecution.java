@@ -33,12 +33,20 @@ public class ShellExecution {
      */
 
 
-    private static String cloudCommand = "gcloud compute instances create $instance-id --preemptible --zone us-central1-a --machine-type n1-highcpu-16 --image vp-autoupdate";
+    private static String cloudCommand = "bash createnode.sh $instance-id";
+    private static String deleteCommand = "bash deletenode.sh $instance-id";
+
+    public static void deleteNode(String instanceId) {
+        String commandToRun = deleteCommand.replace("$instance-id", instanceId);
+        String output = returnOutputOfCommand(commandToRun);
+        Logging.log("CMD", commandToRun);
+    }
+
     public static void createAndInsertVideoConverter() {
 
 
 
-        String instanceId = "vc-"+ Server.getCalendar().getTimeInMillis()/1000+"-"+ new Random().nextInt(100);
+        String instanceId = "vc-"+ Server.getMilliTime()/1000+"-"+ new Random().nextInt(100);
         String commandToRun = cloudCommand.replace("$instance-id", instanceId);
 
         // in avcpvm create function to retrieve instance based on internal IP and hostname command
