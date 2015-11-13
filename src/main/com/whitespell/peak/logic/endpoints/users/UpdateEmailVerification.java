@@ -61,7 +61,7 @@ public class UpdateEmailVerification extends EndpointHandler {
 
                 ResultSet s = ps.executeQuery();
                 if(s.next()){
-                    Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+                    Timestamp now = new Timestamp(Server.getMilliTime());
                     if(s.getInt("email_verified") == 1){
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_ALREADY_VERIFIED);
                         return;

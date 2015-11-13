@@ -82,7 +82,7 @@ public class CreateOrder extends EndpointHandler {
         final int currencyId = j.get(PAYLOAD_CURRENCY_ID_KEY).getAsInt();
         final String buyerDetails = j.get(PAYLOAD_BUYER_DETAILS_KEY).getAsString();
         final int orderOriginId = j.get(PAYLOAD_ORDER_ORIGIN_KEY).getAsInt();
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        final Timestamp now = new Timestamp(Server.getMilliTime());
 
         /**
          * Ensure the user is authenticated properly

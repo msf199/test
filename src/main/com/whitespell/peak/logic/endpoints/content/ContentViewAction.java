@@ -42,7 +42,7 @@ public class ContentViewAction extends EndpointHandler {
 
         int content_id = Integer.parseInt(context.getUrlVariables().get(URL_CONTENT_LIKE_ID));
         final int user_id = payload.get(PAYLOAD_USER_ID_KEY).getAsInt();
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        final Timestamp now = new Timestamp(Server.getMilliTime());
 
         ViewResponse vr = new ViewResponse();
 

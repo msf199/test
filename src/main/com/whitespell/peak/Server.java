@@ -19,14 +19,9 @@ import java.util.TimeZone;
 public class Server {
 
     private static ServerProperties systemProperties;
-    private static Calendar calendar;
 
     public static ServerProperties getServerProperties() {
         return systemProperties;
-    }
-
-    public static Calendar getCalendar() {
-        return calendar;
     }
 
     private static final ApiThread apiThread = new ApiThread();
@@ -67,34 +62,10 @@ public class Server {
     }
 
 
-    public static void setGMTTimeZone() {
-        calendar = Calendar.getInstance();
-        System.out.println("current: " + calendar.getTime());
-
-        TimeZone z = calendar.getTimeZone();
-        int offset = z.getRawOffset();
-        if (z.inDaylightTime(new Date())) {
-            offset = offset + z.getDSTSavings();
-        }
-        int offsetHrs = offset / 1000 / 60 / 60;
-        int offsetMins = offset / 1000 / 60 % 60;
-
-        System.out.println("offset: " + offsetHrs);
-        System.out.println("offset: " + offsetMins);
-
-        calendar.add(Calendar.HOUR_OF_DAY, (-offsetHrs));
-        calendar.add(Calendar.MINUTE, (-offsetMins));
-
-        System.out.println("GMT Time: " + calendar.getTime());
-
-    }
 
     public static void readConfigs() {
         systemProperties = new ServerProperties(Config.CONFIGURATION_FILE);
         ServerProperties.read();
-
-        setGMTTimeZone();
-
 
         Logging.log("RESTART", "--------------------------------------------------------------------");
 
@@ -113,6 +84,10 @@ public class Server {
         }
 
 
+    }
+
+    public static long getMilliTime() {
+        return System.currentTimeMillis();
     }
 
 }

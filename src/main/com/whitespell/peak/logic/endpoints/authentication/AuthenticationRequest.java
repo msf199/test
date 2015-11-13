@@ -62,7 +62,7 @@ public class AuthenticationRequest extends EndpointHandler {
         final String username;
         final String password;
         String[] deviceName = {"unknown"};
-        String[] deviceUUID = {"unknown" + Server.getCalendar().getTimeInMillis()};
+        String[] deviceUUID = {"unknown" + Server.getMilliTime()};
         int[] deviceType = {-1};
         boolean device1 = false, device2 = false, device3 = false;
 
@@ -202,9 +202,9 @@ public class AuthenticationRequest extends EndpointHandler {
                                         ps2.setInt(1, ao.getUserId());
                                         ps2.setString(2, ao.getKey());
                                         ps2.setString(3, finalDeviceUUID);
-                                        ps2.setTimestamp(4, new Timestamp(Server.getCalendar().getTimeInMillis()));
-                                        ps2.setTimestamp(5, new Timestamp(Server.getCalendar().getTimeInMillis() + (86400000 * 365 * 1)));
-                                        ps2.setTimestamp(6, new Timestamp(Server.getCalendar().getTimeInMillis()));
+                                        ps2.setTimestamp(4, new Timestamp(Server.getMilliTime()));
+                                        ps2.setTimestamp(5, new Timestamp(Server.getMilliTime() + (86400000 * 365 * 1)));
+                                        ps2.setTimestamp(6, new Timestamp(Server.getMilliTime()));
 
                                         ps2.executeUpdate();
                                     });

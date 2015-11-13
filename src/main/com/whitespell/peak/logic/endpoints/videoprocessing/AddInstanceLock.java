@@ -41,8 +41,8 @@ public class AddInstanceLock extends EndpointHandler {
 
         int content_id = Integer.parseInt(context.getUrlVariables().get(URL_CONTENT_ID));
         final String instance_id = payload.get(PAYLOAD_INSTANCE_ID).getAsString();
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis()); // 15 mins max
-        final Timestamp expires = new Timestamp(Server.getCalendar().getTimeInMillis()  + (15 * 60 * 1000)); // 15 mins max
+        final Timestamp now = new Timestamp(Server.getMilliTime()); // 15 mins max
+        final Timestamp expires = new Timestamp(Server.getMilliTime()  + (15 * 60 * 1000)); // 15 mins max
 
         LockResponse lr = new LockResponse();
 
