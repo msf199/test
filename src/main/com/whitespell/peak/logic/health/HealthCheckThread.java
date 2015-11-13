@@ -25,20 +25,15 @@ public class HealthCheckThread extends Thread {
 
 
     private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) as ct FROM `content` WHERE `processed` = 0";
-    private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
+    private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT COUNT(1) as ct FROM `avcpvm_monitoring` WHERE `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     private boolean running = false;
-
-    final int[] unprocessedVideos = {0};
 
     public void run() {
 
         running = true;
 
         do {
-
-           if(hasUnprocessedContent()) {
-
-               int unprocessed = unprocessedVideos[0];
+               int unprocessed = getUnprocessedContent();
 
                try {
                    StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
@@ -48,13 +43,34 @@ public class HealthCheckThread extends Thread {
                        ps.setTimestamp(1,min_15_ago);
                        ps.setTimestamp(2,min_15_ago);
                        ResultSet r = ps.executeQuery();
-                       if (!r.next() && !Config.TESTING){
-                           Logging.log("INFO", "not enough video nodes, inserting one");
+                       if (r.next()){
+                           // count of available instances
+                           int instanceCount = r.getInt("ct");
 
-                           int nodesToCreate = unprocessed < 3 ? 1 : (unprocessed / 3); // we allow a queue of 3 per node
 
-                           for(int i = 0; i < nodesToCreate; i++) {
-                               ShellExecution.createAndInsertVideoConverter();
+                           if(unprocessed <= 0) {
+                               Logging.log("INFO", "We dont need nodes");
+                           } else {
+
+                               Logging.log("INFO", "not enough video nodes, inserting one");
+
+                               int nodesToCreate = (unprocessed - instanceCount); // we allow a queue of 3 per node
+
+
+                               Logging.log("HIGH", "Creating " + unprocessed + ":" + nodesToCreate + " nodes");
+
+                               for(int i = 0; i < nodesToCreate; i++) {
+                                   ShellExecution.createAndInsertVideoConverter();
+                               }
+
+                               // giving it 3 minutes to start up and initialize
+                               try {
+                                   Thread.sleep(180000);
+                               } catch (InterruptedException e) {
+                                   e.printStackTrace();
+                               }
+
+
                            }
 
                        } else {
@@ -64,7 +80,6 @@ public class HealthCheckThread extends Thread {
                } catch (SQLException e) {
                    Logging.log("High", e);
                }
-           }
 
 
             try {
@@ -76,8 +91,8 @@ public class HealthCheckThread extends Thread {
 
     }
 
-    boolean hasUnprocessedContent() {
-        final boolean[] unprocessedContent = {false};
+    int getUnprocessedContent() {
+        final int[] unprocessedContent = {1};
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_PROCESSED);
             executor.execute(ps -> {
@@ -86,13 +101,11 @@ public class HealthCheckThread extends Thread {
                 if (r.next()){
                     int count = r.getInt("ct");
                     if(count > 0 ) {
-                        unprocessedVideos[0] = count;
-                        unprocessedContent[0] = true;
+                        unprocessedContent[0] = count;
                     } else {
                         Logging.log("INFO", "we have enough video nodes");
-                        unprocessedContent[0] = false;
-                    }
 
+                    }
 
                 }
             });
