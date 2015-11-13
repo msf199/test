@@ -4,6 +4,7 @@ import main.com.whitespell.peak.logic.ApiThread;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.config.ServerProperties;
 import main.com.whitespell.peak.logic.exec.ShellExecution;
+import main.com.whitespell.peak.logic.health.HealthCheckThread;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
 import main.com.whitespell.peak.logic.notifications.NotificationThread;
@@ -30,6 +31,7 @@ public class Server {
 
     private static final ApiThread apiThread = new ApiThread();
     protected static final NotificationThread notificationThread = new NotificationThread();
+    protected static final HealthCheckThread healthCheckThread = new HealthCheckThread();
 
     public static void main(String[] args) throws Exception {
         start();
@@ -42,6 +44,8 @@ public class Server {
         startApi();
         System.out.println("Starting notification thread");
         startNotifications();
+        System.out.println("Starting health check thread...");
+        startHealthCheck();
     }
 
     public static void startApi() {
@@ -50,6 +54,10 @@ public class Server {
 
     public static void startNotifications() {
         notificationThread.start();
+    }
+
+    public static void startHealthCheck() {
+        healthCheckThread.start();
     }
 
     public static class NotificationService {
