@@ -30,6 +30,11 @@ public class HealthCheckThread extends Thread {
 
     public void run() {
 
+
+        if(Config.isDev()) {
+            return;
+        }
+
         running = true;
 
         do {
