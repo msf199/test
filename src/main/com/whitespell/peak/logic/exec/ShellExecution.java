@@ -33,7 +33,7 @@ public class ShellExecution {
      */
 
 
-    private static String cloudCommand = "gcloud compute instances create $instance-id --preemptible --zone us-central1-a --machine-type n1-highcpu-16 --image working-vp-image";
+    private static String cloudCommand = "gcloud compute instances create $instance-id --preemptible --zone us-central1-a --machine-type n1-highcpu-16 --image vp-autoupdate";
     public static void createAndInsertVideoConverter() {
 
 
