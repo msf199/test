@@ -64,6 +64,8 @@ public class IntegrationTests extends Server {
     static String TEST_KEY;
     static int TEST2_UID = -1;
     static String TEST2_KEY;
+    static int TEST3_UID = -1;
+    static String TEST3_KEY;
     static int ADMIN_UID = -1;
     static String ADMIN_KEY;
     static int COMMENTER_UID;
@@ -342,6 +344,25 @@ public class IntegrationTests extends Server {
         TEST2_KEY = d.getKey();
 
         assertEquals(d.getUserId() > -1, true);
+
+        /**
+         * Authenticate third user we just created
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"coryqq\",\n" +
+                        "\"password\" : \"qqqqqq\"\n" +
+                        "}")
+                .asString();
+
+
+        AuthenticationObject e = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST3_UID = e.getUserId();
+        TEST3_KEY = e.getKey();
+
+        assertEquals(e.getUserId() > -1, true);
 
         /**
          * Get the UserObject from the users/userid endpoint
@@ -931,8 +952,8 @@ public class IntegrationTests extends Server {
                 .asString();
 
         UserObject[] a = g.fromJson(stringResponse.getBody(), UserObject[].class);
-        assertEquals(a[0].getUserId(), TEST_UID);
-        assertEquals(a[1].getUserId(), TEST2_UID);
+        assertEquals(a[0].getUserId(), SKYDIVER_UID);
+        assertEquals(a[1].getUserId(), TEST3_UID);
     }
 
     @Test
@@ -1102,9 +1123,10 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         CommentObject[] comments = g.fromJson(stringResponse.getBody(), CommentObject[].class);
-        assertEquals(comments[0].getComment(), "awesome video!");
-        assertEquals(comments[1].getComment(), "wow this is so cool! definitely going to try it :)!");
-        assertEquals(comments[2].getComment(), "wow another comment!");
+        assertEquals(comments[0].getComment(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(comments[1].getComment(), "awesome video!");
+        assertEquals(comments[2].getComment(), "wow this is so cool! definitely going to try it :)!");
+        assertEquals(comments[3].getComment(), "wow another comment!");
         assertEquals(comments[0].getTimestamp().before(comments[2].getTimestamp()), true);
 
         /**
@@ -1420,6 +1442,7 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
         AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        System.out.println(stringResponse.getBody());
         Integer testId = a.getUserId();
         String testKey = a.getKey();
         assertEquals(testId > 0, true);

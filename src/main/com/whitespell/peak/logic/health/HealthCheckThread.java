@@ -29,8 +29,12 @@ public class HealthCheckThread extends Thread {
     private boolean running = false;
 
     public void run() {
-        running = true;
 
+        /**
+         * CHANGE BACK TO TRUE LATER
+         */
+
+        running = true;
 
         do {
 
