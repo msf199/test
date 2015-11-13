@@ -215,7 +215,7 @@ public class LinkFB extends EndpointHandler {
                     ps2.setString(4, finalCover);
                     ps2.setString(5, finalProfilePic);
                     ps2.setString(6, finalFBId);
-                    ps2.setTimestamp(3, now);
+                    ps2.setTimestamp(7, now);
                     int rows = ps2.executeUpdate();
 
                     /**
