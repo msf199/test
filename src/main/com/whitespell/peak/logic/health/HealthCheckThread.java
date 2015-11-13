@@ -24,21 +24,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HealthCheckThread extends Thread {
 
 
-    private static final String GET_CONTENT_PROCESSED = "SELECT 1 FROM `content` WHERE `processed` = 0";
+    private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) as ct FROM `content` WHERE `processed` = 0";
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     private boolean running = false;
 
+    final int[] unprocessedVideos = {0};
+
     public void run() {
 
-        /**
-         * CHANGE BACK TO TRUE LATER
-         */
-
         running = true;
-
+        
         do {
 
            if(hasUnprocessedContent()) {
+
+               int unprocessed = unprocessedVideos[0];
 
                try {
                    StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
@@ -50,7 +50,12 @@ public class HealthCheckThread extends Thread {
                        ResultSet r = ps.executeQuery();
                        if (!r.next() && !Config.TESTING){
                            Logging.log("INFO", "not enough video nodes, inserting one");
-                           ShellExecution.createAndInsertVideoConverter();
+
+                           int nodesToCreate = unprocessed < 3 ? 1 : (unprocessed / 3); // we allow a queue of 3 per node
+
+                           for(int i = 0; i < nodesToCreate; i++) {
+                               ShellExecution.createAndInsertVideoConverter();
+                           }
 
                        } else {
                            Logging.log("INFO", "we have enough video nodes");
@@ -79,9 +84,16 @@ public class HealthCheckThread extends Thread {
 
                 ResultSet r = ps.executeQuery();
                 if (r.next()){
-                    unprocessedContent[0] = true;
-                } else {
-                    Logging.log("INFO", "we have enough video nodes");
+                    int count = r.getInt("ct");
+                    if(count > 0 ) {
+                        unprocessedVideos[0] = count;
+                        unprocessedContent[0] = true;
+                    } else {
+                        Logging.log("INFO", "we have enough video nodes");
+                        unprocessedContent[0] = false;
+                    }
+
+
                 }
             });
         } catch (SQLException e) {

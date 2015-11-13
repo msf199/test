@@ -33,7 +33,7 @@ public class ShellExecution {
      */
 
 
-    private static String cloudCommand = "gcloud compute instances create $instance-id --preemptible --zone us-central1-a --machine-type n1-highcpu-16 --image vp-image";
+    private static String cloudCommand = "gcloud compute instances create $instance-id --preemptible --zone us-central1-a --machine-type n1-highcpu-16 --image working-vp-image";
     public static void createAndInsertVideoConverter() {
 
 
@@ -77,6 +77,16 @@ public class ShellExecution {
                 e.printStackTrace();
             }
 
+            MandrillMailer.sendDebugEmail(
+                    "peak@whitepsell.com",
+                    "Peak API",
+                    "Created video node",
+                    "With ip: "+instanceDetails.get("EXTERNAL_IP")+"",
+                    "Details: The Peak API made a video node",
+                    "Debug: (output)" + output,
+                    "debug-email",
+                    "pim@whitespell.com"
+            );
         } else {
             Logging.log("HIGH", "Failed to create new video converter with debug message:" + output);
             //String fromEmail, String fromName, String subject, String name, String details, String debug, String templateName, String toEmail
