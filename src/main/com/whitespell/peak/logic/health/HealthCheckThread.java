@@ -29,6 +29,10 @@ public class HealthCheckThread extends Thread {
     private boolean running = false;
 
     public void run() {
+
+        if(Config.isDev()) {
+            return;
+        }
         running = true;
 
         do {

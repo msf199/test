@@ -16,6 +16,8 @@ public final class Config {
      */
 
 
+    private static boolean dev;
+
     //General server information
     public static String SERVER_NAME = "API";
     public static int SERVER_VERSION = 1;
@@ -79,4 +81,12 @@ public final class Config {
     public static int MAX_ERROR_FOLDER_SIZE_MB = 10;
 
 
+    public static void setDev(boolean devStatus) {
+        dev = devStatus;
+    }
+
+
+    public static boolean isDev() {
+        return dev;
+    }
 }
