@@ -36,8 +36,12 @@ public final class ServerProperties {
             Config.DB_HOST = (properties.getProperty("DB_HOST"));
             Config.DB_USER = (properties.getProperty("DB_USER"));
             Config.DB_PASS = (properties.getProperty("DB_PASS"));
+
             Config.DB_PORT = Integer.parseInt(properties.getProperty("DB_PORT"));
             Config.DB = (properties.getProperty("DB"));
+            Config.setDev(Config.DB.contains("dev"));
+            System.out.println("Is development server: " + Config.isDev());
+
 
 
         } else {
