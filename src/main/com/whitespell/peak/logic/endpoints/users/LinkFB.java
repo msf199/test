@@ -43,7 +43,8 @@ public class LinkFB extends EndpointHandler {
     private static final String UPDATE_USER_PASS_QUERY = "UPDATE `user` SET `password` = ? WHERE `user_id` = ?";
     private static final String UPDATE_EMAIL_VERIFICATION = "UPDATE `user` SET `email_verified` = ?, `email_token` = ?, `email_expiration` = ? WHERE `username` = ?";
 
-    private static final String INSERT_USER_QUERY = "INSERT INTO `user`(`username`,`password`,`email`,`cover_photo`,`thumbnail`,`fb_user_id`) VALUES (?,?,?,?,?,?)";
+    private static final String INSERT_USER_QUERY = "INSERT INTO `user`(`username`,`password`,`email`,`cover_photo`," +
+                                                    "`thumbnail`,`fb_user_id`,`registration_timestamp_utc`) VALUES (?,?,?,?,?,?,?)";
     private static final String INSERT_FB_USER_QUERY = "INSERT INTO `fb_user`(`user_id`,`fb_user_id`,`link_timestamp`) VALUES (?,?,?)";
 
     @Override
@@ -76,6 +77,7 @@ public class LinkFB extends EndpointHandler {
         String[] deviceUUID = {"unknown" + Server.getCalendar().getTimeInMillis()};
         int[] deviceType = {-1};
         boolean device1 = false, device2 = false, device3 = false;
+        Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
 
         if(payload.get(PASSWORD_KEY) != null){
             payloadPass = payload.get(PASSWORD_KEY).getAsString();
@@ -213,6 +215,7 @@ public class LinkFB extends EndpointHandler {
                     ps2.setString(4, finalCover);
                     ps2.setString(5, finalProfilePic);
                     ps2.setString(6, finalFBId);
+                    ps2.setTimestamp(3, now);
                     int rows = ps2.executeUpdate();
 
                     /**
@@ -293,7 +296,7 @@ public class LinkFB extends EndpointHandler {
                 executor.execute(ps -> {
                     ps.setInt(1, userId[0]);
                     ps.setString(2, finalFBId);
-                    ps.setTimestamp(3, new Timestamp(Server.getCalendar().getTimeInMillis()));
+                    ps.setTimestamp(3, now);
                     int rows = ps.executeUpdate();
 
                     /**

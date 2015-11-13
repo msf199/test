@@ -33,7 +33,7 @@ public class HealthCheckThread extends Thread {
     public void run() {
 
         running = true;
-        
+
         do {
 
            if(hasUnprocessedContent()) {
