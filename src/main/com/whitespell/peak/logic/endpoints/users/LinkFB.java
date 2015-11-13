@@ -138,7 +138,7 @@ public class LinkFB extends EndpointHandler {
             FacebookFactory ff = new FacebookFactory(cb.build());
             Facebook facebook = ff.getInstance();
 
-            User user = facebook.getUser(facebook.getId(), new Reading().fields("id,email,cover,picture"));
+            User user = facebook.getUser(facebook.getId(), new Reading().fields("id,email,cover,picture?type=medium"));
 
             /**
              * Ensure all user's details are accessible
