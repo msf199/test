@@ -97,7 +97,7 @@ public class HealthCheckThread extends Thread {
     }
 
     int getUnprocessedContent() {
-        final int[] unprocessedContent = {1};
+        final int[] unprocessedContent = {0};
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_PROCESSED);
             executor.execute(ps -> {
