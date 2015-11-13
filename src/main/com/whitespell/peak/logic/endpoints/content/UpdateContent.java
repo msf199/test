@@ -2,10 +2,12 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.endpoints.UpdateStatus;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.ContentUploadedNotification;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -103,13 +105,15 @@ public class UpdateContent extends EndpointHandler {
 
 
     private static final String GET_CONTENT_QUERY = "SELECT * FROM `content` WHERE `content_id` = ?";
+    private static final String GET_DESCRIPTION_COMMENT = "SELECT `comment_id` FROM `content_comments` WHERE `content_id` = ? AND `user_id` = ? order by `comment_id` ASC";
+    private static final String EDIT_DESCRIPTION_COMMENT = "UPDATE `content_comments` SET `comment_value` = ? WHERE `comment_id` = ?";
 
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_CONTENT_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(CONTENT_TITLE, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_OPTIONAL);
-        payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
+        payloadInput.put(CATEGORY_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
         payloadInput.put(CONTENT_URL, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_OPTIONAL);
@@ -405,6 +409,18 @@ public class UpdateContent extends EndpointHandler {
         publisherName[0] = publisher.getUserName();
 
         /**
+         * Get the content's info to allow email notification for content upload (processed == 1)
+         */
+        ContentHelper c = new ContentHelper();
+        ContentObject content = null;
+        try {
+            content = c.getContentById(final_content_id);
+        }catch(Exception e){
+            Logging.log("High", e);
+            //don't throw client side error, this is only for email notifications
+        }
+
+        /**
          * Construct the SET string based on the fields the user wants to update.
          */
 
@@ -437,6 +453,7 @@ public class UpdateContent extends EndpointHandler {
                     ContentObject content = null;
                     int count = 1;
                     boolean sendSocialMediaEmail = false;
+                    boolean editDescriptionComment = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
                         ps.setString(count, final_title);
@@ -444,6 +461,7 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(CONTENT_DESCRIPTION_DB)) {
+                        editDescriptionComment = true;
                         ps.setString(count, final_description);
                         System.out.println("Set string " + count + " to " + final_description);
                         count++;
@@ -597,6 +615,58 @@ public class UpdateContent extends EndpointHandler {
                             if(publisherEmail[0] != null) {
                                 EmailSend.sendSocialMediaLinkNotificationEmail(
                                         final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
+                            }
+                        }
+
+                        /**
+                         * Send notifications to followers of this user for the ContentUpload if it's not a bundle
+                         * (only when videos get added, could be inside bundle)
+                         * Send notification only if video is processed.
+                         */
+                        if(final_processed == 1){
+                            if(content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE) {
+                                Server.NotificationService.offerNotification(new ContentUploadedNotification(publisherUserId[0], content));
+                            }
+                        }
+
+                        /**
+                         * If the description was edited, edit the 'first comment' that holds the description
+                         */
+                        if(editDescriptionComment) {
+                            try {
+                                StatementExecutor executor = new StatementExecutor(GET_DESCRIPTION_COMMENT);
+
+                                executor.execute(ps2 -> {
+                                    ps2.setInt(1, final_content_id);
+                                    ps2.setInt(2, publisherUserId[0]);
+
+                                    ResultSet results = ps2.executeQuery();
+
+                                    if (results.next()) {
+                                        try {
+                                            StatementExecutor executor2 = new StatementExecutor(EDIT_DESCRIPTION_COMMENT);
+
+                                            executor2.execute(ps3 -> {
+                                                ps3.setString(1, final_description);
+                                                ps3.setInt(2, results.getInt("comment_id"));
+
+                                                int rows = ps3.executeUpdate();
+
+                                                if (rows <= 0) {
+                                                    System.out.println("Comment could not be updated");
+                                                }
+                                            });
+                                        } catch (SQLException e) {
+                                            Logging.log("High", e);
+                                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENTS_NOT_FOUND);
+                                            return;
+                                        }
+                                    }
+                                });
+                            } catch (SQLException e) {
+                                Logging.log("High", e);
+                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COMMENTS_NOT_FOUND);
+                                return;
                             }
                         }
 

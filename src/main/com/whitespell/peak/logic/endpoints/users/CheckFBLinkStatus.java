@@ -27,8 +27,8 @@ public class CheckFBLinkStatus extends EndpointHandler {
 
     private static final String ACCESS_TOKEN_KEY = "accessToken";
 
-    private static final String RETRIEVE_FB_USER_QUERY = "SELECT `link_timestamp` FROM `fb_user` WHERE `user_id` = ?";
-    private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `email` = ?";
+    private static final String RETRIEVE_FB_USER_QUERY = "SELECT `user_id` FROM `fb_user` WHERE `fb_user_id` = ?";
+    private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `fb_user_id` = ?";
 
     @Override
     protected void setUserInputs() {
@@ -43,6 +43,7 @@ public class CheckFBLinkStatus extends EndpointHandler {
         boolean[] newFbUser = {false};
 
         int[] userId = {0};
+        String[] facebookUserId = {""};
         String username;
         String email;
         String accessToken = payload.get(ACCESS_TOKEN_KEY).getAsString();
@@ -60,15 +61,17 @@ public class CheckFBLinkStatus extends EndpointHandler {
                     .setOAuthAppId(Config.FB_APP_ID)
                     .setOAuthAppSecret(Config.FB_APP_SECRET)
                     .setOAuthAccessToken(accessToken)
-                    .setOAuthPermissions("email,public_profile");
+                    .setOAuthPermissions("email,public_profile,cover,picture");
             FacebookFactory ff = new FacebookFactory(cb.build());
             Facebook facebook = ff.getInstance();
 
-            User user = facebook.getUser(facebook.getId(), new Reading().fields("email"));
-            email = user.getEmail();
-
-            String split[] = email.split("@");
-            username = split[0];
+            User user = facebook.getUser(facebook.getId(), new Reading().fields("id,email,cover,picture"));
+            /**
+             * Ensure all user's details are accessible
+             */
+            if(user.getId() != null) {
+                facebookUserId[0] = user.getId();
+            }
         } catch (Exception e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_RETRIEVE_FACEBOOK);
@@ -82,7 +85,7 @@ public class CheckFBLinkStatus extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
 
             executor.execute(ps -> {
-                ps.setString(1, email);
+                ps.setString(1, facebookUserId[0]);
                 final ResultSet s = ps.executeQuery();
 
                 if (!s.next()) {
@@ -104,7 +107,7 @@ public class CheckFBLinkStatus extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_FB_USER_QUERY);
 
             executor.execute(ps -> {
-                ps.setInt(1, userId[0]);
+                ps.setString(1, facebookUserId[0]);
                 final ResultSet s = ps.executeQuery();
 
                 if (!s.next()) {

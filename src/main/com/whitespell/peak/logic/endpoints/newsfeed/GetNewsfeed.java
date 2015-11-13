@@ -78,6 +78,7 @@ public class GetNewsfeed extends EndpointHandler {
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
                     followerIds.add(results.getInt("following_id"));
+                    System.out.println("add userFollowing: " +results.getInt("following_id"));
                 }
             });
         } catch (SQLException e) {
@@ -128,6 +129,7 @@ public class GetNewsfeed extends EndpointHandler {
             selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
 
             final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
+            System.out.println(GET_FOLLOWERS_CONTENT_QUERY);
 
             /**
              * Get content based on users you are following and construct newsfeed
@@ -150,12 +152,20 @@ public class GetNewsfeed extends EndpointHandler {
                             continue;
                         }
 
+                        /**
+                         * Do not allow duplicate contentIds on the newsfeed
+                         */
+                        if(contentIdSet.contains(currentContentId)){
+                            continue;
+                        }
+
                         newsfeedContent = contentWrapper.wrapContent(results);
 
                         contentIdSet.add(currentContentId);
                         if(newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE && newsfeedContent.getChildren().isEmpty()) {
                             // send notification to add videos to bundle todo(cmcan) to publisher
                         } else {
+                            System.out.println("add newsfeedObj: " +newsfeedContent.getContentId());
                             newsfeedResponse.add(new NewsfeedObject(newsfeedContent.getContentId(), newsfeedContent));
                         }
                     }
