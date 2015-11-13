@@ -3,10 +3,7 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mashape.unirest.http.Unirest;
-import facebook4j.Facebook;
-import facebook4j.FacebookFactory;
-import facebook4j.Reading;
-import facebook4j.User;
+import facebook4j.*;
 import facebook4j.conf.ConfigurationBuilder;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
@@ -138,7 +135,7 @@ public class LinkFB extends EndpointHandler {
             FacebookFactory ff = new FacebookFactory(cb.build());
             Facebook facebook = ff.getInstance();
 
-            User user = facebook.getUser(facebook.getId(), new Reading().fields("id,email,cover,picture?type=normal"));
+            User user = facebook.getUser(facebook.getId(), new Reading().fields("id,email,cover,picture"));
 
             /**
              * Ensure all user's details are accessible
@@ -149,14 +146,11 @@ public class LinkFB extends EndpointHandler {
                  * Get the profile pic and cover photo for automatic
                  */
                 if(user.getCover().getSource() != null && user.getPicture().getURL() != null){
-                    facebookProfilePic = user.getPicture().getURL().toString();
+                    facebookProfilePic = facebook.users().getPictureURL(PictureSize.normal).toString();
                     facebookCover = user.getCover().getSource();
-                    System.out.println(facebookProfilePic);
-                    System.out.println(facebookCover);
                 }
 
                 facebookUserId = user.getId();
-                System.out.println(facebookUserId);
                 email = user.getEmail();
                 String split[] = email.split("@");
                 username = split[0];
