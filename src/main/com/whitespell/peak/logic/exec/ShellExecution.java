@@ -36,10 +36,9 @@ public class ShellExecution {
     private static String cloudCommand = "bash createnode.sh $instance-id";
     private static String deleteCommand = "bash deletenode.sh $instance-id";
 
-    public static void deleteNode(String instanceId) {
+    public static int deleteNode(String instanceId) {
         String commandToRun = deleteCommand.replace("$instance-id", instanceId);
-        String output = returnOutputOfCommand(commandToRun);
-        Logging.log("CMD", commandToRun);
+        return executeCommand(commandToRun);
     }
 
     public static void createAndInsertVideoConverter() {
