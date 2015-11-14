@@ -34,8 +34,24 @@ public class ShellExecution {
      * @return exit code integer representation
      */
 
+    public static String[] zones = new String[] {
+            "asia-east1-a",
+            "asia-east1-b",
+            "asia-east1-c",
+            "europe-west1-b",
+            "europe-west1-c",
+            "europe-west1-d",
+            "us-central1-a",
+            "us-central1-b",
+            "us-central1-c",
+            "us-central1-f",
+            "us-east1-b",
+            "us-east1-c",
+            "us-east1-d"
+    };
 
-    private static String cloudCommand = "bash createnode.sh $instance-id";
+
+    private static String cloudCommand = "bash createnode.sh $instance-id $zone";
     private static String deleteCommand = "bash deletenode.sh $instance-id";
 
     public static int deleteNode(String instanceId) {
@@ -43,12 +59,16 @@ public class ShellExecution {
         return executeCommand(commandToRun);
     }
 
-    public static void createAndInsertVideoConverter() {
-
-
+    public static void createAndInsertVideoConverter(int zoneId) {
 
         String instanceId = "vc-"+ Server.getMilliTime()/1000+"-"+ new Random().nextInt(100);
         String commandToRun = cloudCommand.replace("$instance-id", instanceId);
+
+        if(zoneId >= zones.length ) {
+            return;
+        }
+
+        commandToRun = commandToRun.replace("$zone", zones[zoneId]);
 
         // in avcpvm create function to retrieve instance based on internal IP and hostname command
 
@@ -104,20 +124,28 @@ public class ShellExecution {
                     "debug-email",
                     "pim@whitespell.com"
             );
+
         } else {
             Logging.log("HIGH", "Failed to create new video converter with debug message:" + output);
             //String fromEmail, String fromName, String subject, String name, String details, String debug, String templateName, String toEmail
 
-                MandrillMailer.sendDebugEmail(
-                        "peak@whitepsell.com",
-                        "Peak API",
-                        "Error in creating video nodes",
-                        "Error in creating video nodes",
-                        "Details: The Peak API failed to create a video processing node",
-                        "Debug: (output)" + output,
-                        "debug-email",
-                        "pim@whitespell.com"
-                );
+            /*MandrillMailer.sendDebugEmail(
+                    "peak@whitepsell.com",
+                    "Peak API",
+                    "Failed to create node in " +zones[zoneId],
+                    "Error in creating video nodes, fail",
+                    "Details: The Peak API failed to create a video processing node",
+                    "Debug: (output)" + output,
+                    "debug-email",
+                    "pim@whitespell.com"
+            );*/
+
+            try {
+                    zoneId++;
+                    createAndInsertVideoConverter(zoneId);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
 
