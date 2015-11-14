@@ -41,7 +41,6 @@ public class Server {
         startNotifications();
         System.out.println("Starting health check thread...");
         startHealthCheck();
-        ShellExecution.createAndInsertVideoConverter();
     }
 
     public static void startApi() {
