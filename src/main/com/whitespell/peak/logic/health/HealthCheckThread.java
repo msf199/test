@@ -75,9 +75,9 @@ public class HealthCheckThread extends Thread {
                                    ShellExecution.createAndInsertVideoConverter();
                                }
 
-                               // giving it 3 minutes to start up and initialize
+                               // giving it 1 minutes to start up and initialize
                                try {
-                                   Thread.sleep(180000);
+                                   Thread.sleep(60000);
                                } catch (InterruptedException e) {
                                    e.printStackTrace();
                                }
