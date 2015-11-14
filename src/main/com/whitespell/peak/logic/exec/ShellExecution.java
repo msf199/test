@@ -10,10 +10,12 @@ import main.com.whitespell.peak.logic.MandrillMailer;
 import main.com.whitespell.peak.logic.RandomGenerator;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.util.FileOps;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
@@ -50,8 +52,16 @@ public class ShellExecution {
 
         // in avcpvm create function to retrieve instance based on internal IP and hostname command
 
-          String output = returnOutputOfCommand(commandToRun);
-        if(output.contains("\n") && output.contains("RUNNING")) {
+          int status = executeCommand(commandToRun);
+
+        String output = null;
+        try {
+            output = FileOps.readFile(instanceId + ".log", Charset.defaultCharset());
+            Logging.log("CMD", output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(output != null && output.contains("\n") && output.contains("RUNNING")) {
             System.out.println("output was: " + output);
             String[] lines = new String[2];
             // line 0 has the table names
