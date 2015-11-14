@@ -61,12 +61,14 @@ public class ShellExecution {
 
     public static void createAndInsertVideoConverter(int zoneId) {
 
-        String instanceId = "vc-"+ Server.getMilliTime()/1000+"-"+ new Random().nextInt(100);
-        String commandToRun = cloudCommand.replace("$instance-id", instanceId);
+
 
         if(zoneId >= zones.length ) {
             return;
         }
+
+        String instanceId = "vc-"+ Server.getMilliTime()/1000+"_"+ zones[zoneId];
+        String commandToRun = cloudCommand.replace("$instance-id", instanceId);
 
         commandToRun = commandToRun.replace("$zone", zones[zoneId]);
 
@@ -83,42 +85,45 @@ public class ShellExecution {
         }
         if(output != null && output.contains("\n") && output.contains("RUNNING")) {
             System.out.println("output was: " + output);
-            String[] lines = new String[2];
-            // line 0 has the table names
-            lines[0] = output.split("\n")[0].replaceAll(" +", " ");
-            // line 1 has the node details
-            lines[1] = output.split("\n")[1].replaceAll(" +", " ");
 
-            /// NAME,ZONE, MACHINE_TYPE,PREEMPTIBLE,INTERNAL_IP,EXTERNAL_IP,STATUS
-            String[] tableHeads = lines[0].split(" ");
-            String[] nodeDetails = lines[1].split(" ");
+            /**
+             *            String[] lines = new String[2];
+             // line 0 has the table names
+             lines[0] = output.split("\n")[0].replaceAll(" +", " ");
+             // line 1 has the node details
+             lines[1] = output.split("\n")[1].replaceAll(" +", " ");
 
-            HashMap<String, String> instanceDetails = new HashMap<>();
+             /// NAME,ZONE, MACHINE_TYPE,PREEMPTIBLE,INTERNAL_IP,EXTERNAL_IP,STATUS
+             String[] tableHeads = lines[0].split(" ");
+             String[] nodeDetails = lines[1].split(" ");
 
-            for(int i = 0; i < tableHeads.length; i++) {
-                instanceDetails.put(tableHeads[i], nodeDetails[i]);
-                System.out.println(tableHeads[i] + " : " + nodeDetails[i]);
-            }
+             HashMap<String, String> instanceDetails = new HashMap<>();
+
+             for(int i = 0; i < tableHeads.length; i++) {
+             instanceDetails.put(tableHeads[i], nodeDetails[i]);
+             System.out.println(tableHeads[i] + " : " + nodeDetails[i]);
+             }
 
 
-            try {
-                HttpResponse stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/videoprocessing/instances")
-                        .header("accept", "application/json")
-                        .header("X-Authentication", "-1," + StaticRules.MASTER_KEY)
-                        .body("{\n" +
-                                "\"instanceId\": \"" + instanceDetails.get("NAME") + "\",\n" +
-                                "\"ipv4Address\": \"" + instanceDetails.get("EXTERNAL_IP") + "\"" +
-                                "}")
-                        .asString();
-            } catch (UnirestException e) {
-                e.printStackTrace();
-            }
+             try {
+             HttpResponse stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/videoprocessing/instances")
+             .header("accept", "application/json")
+             .header("X-Authentication", "-1," + StaticRules.MASTER_KEY)
+             .body("{\n" +
+             "\"instanceId\": \"" + instanceDetails.get("NAME") + "\",\n" +
+             "\"ipv4Address\": \"" + instanceDetails.get("EXTERNAL_IP") + "\"" +
+             "}")
+             .asString();
+             } catch (UnirestException e) {
+             e.printStackTrace();
+             }
+             */
 
             MandrillMailer.sendDebugEmail(
                     "peak@whitepsell.com",
                     "Peak API",
                     "Created video node",
-                    "With ip: "+instanceDetails.get("EXTERNAL_IP")+"",
+                    "At time: todo",
                     "Details: The Peak API made a video node",
                     "Debug: (output)" + output,
                     "debug-email",
