@@ -72,7 +72,7 @@ public class HealthCheckThread extends Thread {
                                Logging.log("HIGH", "Creating " + unprocessed + ":" + nodesToCreate + " nodes");
 
                                for(int i = 0; i < nodesToCreate; i++) {
-                                   ShellExecution.createAndInsertVideoConverter();
+                                   ShellExecution.createAndInsertVideoConverter(0);
                                }
 
                                // giving it 1 minutes to start up and initialize
