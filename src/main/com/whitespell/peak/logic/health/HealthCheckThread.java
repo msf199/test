@@ -119,7 +119,7 @@ public class HealthCheckThread extends Thread {
 
                     if(s != 0 ) {
                         Logging.log("HIGH", "Delete node didn't exit as 0, not deleting");
-                        return;
+                        continue;
                     }
 
                     try {
