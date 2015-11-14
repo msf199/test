@@ -67,7 +67,7 @@ public class ShellExecution {
             return;
         }
 
-        String instanceId = "vc-"+ Server.getMilliTime()/1000+":"+ zones[zoneId];
+        String instanceId = "vc-"+ Server.getMilliTime()/1000+"--"+ zones[zoneId];
         String commandToRun = cloudCommand.replace("$instance-id", instanceId);
 
         commandToRun = commandToRun.replace("$zone", zones[zoneId]);
