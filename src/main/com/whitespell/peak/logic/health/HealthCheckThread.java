@@ -28,6 +28,7 @@ public class HealthCheckThread extends Thread {
     private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) as ct FROM `content` WHERE `processed` = 0";
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT COUNT(1) as ct FROM `avcpvm_monitoring` WHERE `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     private static final String DELETE_NODES = "SELECT `instance_id` FROM `avcpvm_monitoring` WHERE `shutdown_reported` = 1 OR `last_ping` IS NULL OR (`creation_time` < ? AND `last_ping` < ?)";
+    private static final String DELETE_OLD_NODE = "DELETE FROM `avcpvm_monitoring` WHERE `instance_id` = ?";
     private boolean running = false;
 
     public void run() {
@@ -113,7 +114,24 @@ public class HealthCheckThread extends Thread {
                 ResultSet r = ps.executeQuery();
                 while(r.next()){
                     // count of available instances
-                    ShellExecution.deleteNode(r.getString("instance_id"));
+                    String instance_id = r.getString("instance_id");
+                    int s = ShellExecution.deleteNode(instance_id);
+
+                    if(s != 0 ) {
+                        Logging.log("HIGH", "Delete node didn't exit as 0, not deleting");
+                        return;
+                    }
+
+                    try {
+                        StatementExecutor executor2 = new StatementExecutor(DELETE_OLD_NODE);
+                        executor2.execute(ps2 -> {
+
+                            ps2.setString(1,instance_id);
+                            ps2.executeUpdate();
+                        });
+                    } catch (SQLException e) {
+                        Logging.log("High", e);
+                    }
 
 
                 }
