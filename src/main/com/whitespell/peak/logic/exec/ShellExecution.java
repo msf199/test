@@ -52,10 +52,14 @@ public class ShellExecution {
 
 
     private static String cloudCommand = "bash createnode.sh $instance-id $zone";
-    private static String deleteCommand = "bash deletenode.sh $instance-id";
+    private static String deleteCommand = "bash deletenode.sh $instance-id $zone";
 
     public static int deleteNode(String instanceId) {
+        String[] nameAndZone = instanceId.split("--");
+        String name = nameAndZone[0];
+        String zone = nameAndZone[1];
         String commandToRun = deleteCommand.replace("$instance-id", instanceId);
+        commandToRun = commandToRun.replace("$zone", zone);
         return executeCommand(commandToRun);
     }
 
