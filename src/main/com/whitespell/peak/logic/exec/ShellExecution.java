@@ -10,10 +10,12 @@ import main.com.whitespell.peak.logic.MandrillMailer;
 import main.com.whitespell.peak.logic.RandomGenerator;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.util.FileOps;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.UUID;
@@ -32,75 +34,127 @@ public class ShellExecution {
      * @return exit code integer representation
      */
 
+    public static String[] zones = new String[] {
+            "asia-east1-a",
+            "asia-east1-b",
+            "asia-east1-c",
+            "europe-west1-b",
+            "europe-west1-c",
+            "europe-west1-d",
+            "us-central1-a",
+            "us-central1-b",
+            "us-central1-c",
+            "us-central1-f",
+            "us-east1-b",
+            "us-east1-c",
+            "us-east1-d"
+    };
 
-    private static String cloudCommand = "gcloud compute instances create $instance-id --preemptible --zone us-central1-a --machine-type n1-highcpu-16 --image working-vp-image";
-    public static void createAndInsertVideoConverter() {
+
+    private static String cloudCommand = "bash createnode.sh $instance-id $zone";
+    private static String deleteCommand = "bash deletenode.sh $instance-id $zone";
+
+    public static int deleteNode(String instanceId) {
+        String[] nameAndZone = instanceId.split("--");
+        String name = nameAndZone[0];
+        String zone = nameAndZone[1];
+        String commandToRun = deleteCommand.replace("$instance-id", instanceId);
+        commandToRun = commandToRun.replace("$zone", zone);
+        return executeCommand(commandToRun);
+    }
+
+    public static void createAndInsertVideoConverter(int zoneId) {
 
 
 
-        String instanceId = "vc-"+ Server.getCalendar().getTimeInMillis()/1000+"-"+ new Random().nextInt(100);
+        if(zoneId >= zones.length ) {
+            return;
+        }
+
+        String instanceId = "vc-"+ Server.getMilliTime()/1000+"--"+ zones[zoneId];
         String commandToRun = cloudCommand.replace("$instance-id", instanceId);
+
+        commandToRun = commandToRun.replace("$zone", zones[zoneId]);
 
         // in avcpvm create function to retrieve instance based on internal IP and hostname command
 
-          String output = returnOutputOfCommand(commandToRun);
-        if(output.contains("\n") && output.contains("RUNNING")) {
+          int status = executeCommand(commandToRun);
+
+        String output = null;
+        try {
+            output = FileOps.readFile(instanceId + ".log", Charset.defaultCharset());
+            Logging.log("CMD", output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if(output != null && output.contains("\n") && output.contains("RUNNING")) {
             System.out.println("output was: " + output);
-            String[] lines = new String[2];
-            // line 0 has the table names
-            lines[0] = output.split("\n")[0].replaceAll(" +", " ");
-            // line 1 has the node details
-            lines[1] = output.split("\n")[1].replaceAll(" +", " ");
 
-            /// NAME,ZONE, MACHINE_TYPE,PREEMPTIBLE,INTERNAL_IP,EXTERNAL_IP,STATUS
-            String[] tableHeads = lines[0].split(" ");
-            String[] nodeDetails = lines[1].split(" ");
+            /**
+             *            String[] lines = new String[2];
+             // line 0 has the table names
+             lines[0] = output.split("\n")[0].replaceAll(" +", " ");
+             // line 1 has the node details
+             lines[1] = output.split("\n")[1].replaceAll(" +", " ");
 
-            HashMap<String, String> instanceDetails = new HashMap<>();
+             /// NAME,ZONE, MACHINE_TYPE,PREEMPTIBLE,INTERNAL_IP,EXTERNAL_IP,STATUS
+             String[] tableHeads = lines[0].split(" ");
+             String[] nodeDetails = lines[1].split(" ");
 
-            for(int i = 0; i < tableHeads.length; i++) {
-                instanceDetails.put(tableHeads[i], nodeDetails[i]);
-                System.out.println(tableHeads[i] + " : " + nodeDetails[i]);
-            }
+             HashMap<String, String> instanceDetails = new HashMap<>();
+
+             for(int i = 0; i < tableHeads.length; i++) {
+             instanceDetails.put(tableHeads[i], nodeDetails[i]);
+             System.out.println(tableHeads[i] + " : " + nodeDetails[i]);
+             }
 
 
-            try {
-                HttpResponse stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/videoprocessing/instances")
-                        .header("accept", "application/json")
-                        .header("X-Authentication", "-1," + StaticRules.MASTER_KEY)
-                        .body("{\n" +
-                                "\"instanceId\": \"" + instanceDetails.get("NAME") + "\",\n" +
-                                "\"ipv4Address\": \"" + instanceDetails.get("EXTERNAL_IP") + "\"" +
-                                "}")
-                        .asString();
-            } catch (UnirestException e) {
-                e.printStackTrace();
-            }
+             try {
+             HttpResponse stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/videoprocessing/instances")
+             .header("accept", "application/json")
+             .header("X-Authentication", "-1," + StaticRules.MASTER_KEY)
+             .body("{\n" +
+             "\"instanceId\": \"" + instanceDetails.get("NAME") + "\",\n" +
+             "\"ipv4Address\": \"" + instanceDetails.get("EXTERNAL_IP") + "\"" +
+             "}")
+             .asString();
+             } catch (UnirestException e) {
+             e.printStackTrace();
+             }
+             */
 
             MandrillMailer.sendDebugEmail(
                     "peak@whitepsell.com",
                     "Peak API",
                     "Created video node",
-                    "With ip: "+instanceDetails.get("EXTERNAL_IP")+"",
+                    "At time: todo",
                     "Details: The Peak API made a video node",
                     "Debug: (output)" + output,
                     "debug-email",
                     "pim@whitespell.com"
             );
+
         } else {
             Logging.log("HIGH", "Failed to create new video converter with debug message:" + output);
             //String fromEmail, String fromName, String subject, String name, String details, String debug, String templateName, String toEmail
 
-                MandrillMailer.sendDebugEmail(
-                        "peak@whitepsell.com",
-                        "Peak API",
-                        "Error in creating video nodes",
-                        "Error in creating video nodes",
-                        "Details: The Peak API failed to create a video processing node",
-                        "Debug: (output)" + output,
-                        "debug-email",
-                        "pim@whitespell.com"
-                );
+            /*MandrillMailer.sendDebugEmail(
+                    "peak@whitepsell.com",
+                    "Peak API",
+                    "Failed to create node in " +zones[zoneId],
+                    "Error in creating video nodes, fail",
+                    "Details: The Peak API failed to create a video processing node",
+                    "Debug: (output)" + output,
+                    "debug-email",
+                    "pim@whitespell.com"
+            );*/
+
+            try {
+                    zoneId++;
+                    createAndInsertVideoConverter(zoneId);
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
         }
 
 

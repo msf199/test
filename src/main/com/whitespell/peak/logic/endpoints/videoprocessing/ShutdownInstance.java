@@ -41,7 +41,7 @@ public class ShutdownInstance extends EndpointHandler {
 
         int queue_size = 0;
 
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis()); // 15 mins max
+        final Timestamp now = new Timestamp(Server.getMilliTime()); // 15 mins max
 
         ShutdownResponse cir = new ShutdownResponse();
 

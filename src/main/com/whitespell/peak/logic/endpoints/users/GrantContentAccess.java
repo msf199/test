@@ -50,7 +50,7 @@ public class GrantContentAccess extends EndpointHandler {
 
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         final int content_id = j.get(PAYLOAD_CONTENT_ID).getAsInt();
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        final Timestamp now = new Timestamp(Server.getMilliTime());
 
         /**
          * Ensure that the user is authenticated properly

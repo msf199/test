@@ -45,7 +45,7 @@ public class SavedContentAction extends EndpointHandler {
         int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         int content_id = j.get(CONTENT_ID).getAsInt();
         String action = j.get(ACTION_ID).getAsString();
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        final Timestamp now = new Timestamp(Server.getMilliTime());
 
 
         /**

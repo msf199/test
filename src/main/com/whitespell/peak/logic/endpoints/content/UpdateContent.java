@@ -2,9 +2,13 @@ package main.com.whitespell.peak.logic.endpoints.content;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.*;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.UpdateStatus;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.impl.ContentUploadedNotification;
@@ -624,7 +628,18 @@ public class UpdateContent extends EndpointHandler {
                          * Send notification only if video is processed.
                          */
                         if(final_processed == 1){
-                            if(content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE) {
+                            HttpResponse<String> stringResponse = null;
+                            Gson g = new Gson();
+                            try {
+                                stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + final_content_id)
+                                         .header("accept", "application/json")
+                                         .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
+                                         .asString();
+                            } catch (UnirestException e) {
+                                e.printStackTrace();
+                            }
+                            content = g.fromJson(stringResponse.getBody(), ContentObject.class);
+                            if(content != null && content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE) {
                                 Server.NotificationService.offerNotification(new ContentUploadedNotification(publisherUserId[0], content));
                             }
                         }

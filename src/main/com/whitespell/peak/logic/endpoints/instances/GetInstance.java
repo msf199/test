@@ -37,7 +37,7 @@ public class GetInstance extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(GET_PROCESSING_LOCKS);
             executor.execute(ps -> {
                 ps.setInt(1, content_id);
-                ps.setTimestamp(2, new java.sql.Timestamp(Server.getCalendar().getTimeInMillis()));
+                ps.setTimestamp(2, new java.sql.Timestamp(Server.getMilliTime()));
                 final ResultSet results = ps.executeQuery();
                 ProcessingLockedResponse p = new ProcessingLockedResponse();
 

@@ -33,7 +33,7 @@ public class EmailSend {
 
             try {
                 StatementExecutor executor = new StatementExecutor(UPDATE_EMAIL_TOKEN);
-                Timestamp ts = new Timestamp(Server.getCalendar().getTimeInMillis() + EXPIRES_IN_24_HOURS);
+                Timestamp ts = new Timestamp(Server.getMilliTime() + EXPIRES_IN_24_HOURS);
                 final String finalUsername = username;
                 final String finalEmailToken = emailToken;
                 final Timestamp finalEmailExpiration = ts;

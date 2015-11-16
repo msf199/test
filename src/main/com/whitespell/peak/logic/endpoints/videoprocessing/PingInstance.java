@@ -21,7 +21,7 @@ import java.sql.Timestamp;
  */
 public class PingInstance extends EndpointHandler {
 
-    private static final String INSERT_INSTANCE = "UPDATE `avcpvm_monitoring` SET `last_ping` = ?, `queue_size` = ? WHERE `instance_id` = ?";
+    private static final String UPDATE_INSTANCE = "UPDATE `avcpvm_monitoring` SET `last_ping` = ?, `queue_size` = ? WHERE `instance_id` = ? LIMIT 1";
 
     private static final String PAYLOAD_INSTANCE_ID = "instanceId";
     private static final String PAYLOAD_QUEUE_SIZE = "queueSize";
@@ -46,7 +46,7 @@ public class PingInstance extends EndpointHandler {
             System.out.println(queue_size);
         }
 
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis()); // 15 mins max
+        final Timestamp now = new Timestamp(Server.getMilliTime()); // 15 mins max
 
         PingResponse cir = new PingResponse();
 
@@ -61,7 +61,7 @@ public class PingInstance extends EndpointHandler {
             return;
         }
         try {
-            StatementExecutor executor = new StatementExecutor(INSERT_INSTANCE);
+            StatementExecutor executor = new StatementExecutor(UPDATE_INSTANCE);
             final int finalQueue_size = queue_size;
             executor.execute(ps -> {
                 ps.setTimestamp(1, now);
