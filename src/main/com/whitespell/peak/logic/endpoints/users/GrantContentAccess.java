@@ -103,9 +103,11 @@ public class GrantContentAccess extends EndpointHandler {
 
         if (c != null && c.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
             recursiveGrantChildrenAccess(c);
-        } else {
-            if(!accessibleContentIds.contains(c.getContentId())) {
-                contentIdsToGrantAccessTo.add(c.getContentId());
+        } else if(c != null){
+            if(accessibleContentIds != null) {
+                if (!accessibleContentIds.contains(c.getContentId())) {
+                    contentIdsToGrantAccessTo.add(c.getContentId());
+                }
             }
         }
 
@@ -151,8 +153,10 @@ public class GrantContentAccess extends EndpointHandler {
     }
 
     public void recursiveGrantChildrenAccess(ContentObject c) {
-        if(!accessibleContentIds.contains(c.getContentId())) {
-            contentIdsToGrantAccessTo.add(c.getContentId());
+        if(accessibleContentIds != null) {
+            if (!accessibleContentIds.contains(c.getContentId())) {
+                contentIdsToGrantAccessTo.add(c.getContentId());
+            }
         }
         if(c.getChildren() != null) {
             c.getChildren().forEach(this::recursiveGrantChildrenAccess);
