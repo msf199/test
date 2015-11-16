@@ -14,6 +14,7 @@ import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 
 import java.io.IOException;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -29,7 +30,9 @@ public class GrantContentAccess extends EndpointHandler {
     private static final String PAYLOAD_CONTENT_ID = "contentId";
 
     private static final String ADD_CONTENT_ACCESS_QUERY = "INSERT INTO `content_access`(`content_id`, `user_id`, `timestamp`) VALUES (?,?,?)";
+    private static final String GET_CONTENT_ACCESS_QUERY = "SELECT `content_id` FROM `content_access` WHERE `user_id` = ?";
 
+    ArrayList<Integer> accessibleContentIds = new ArrayList<>();
     ArrayList<Integer> contentIdsToGrantAccessTo = new ArrayList<>();
 
     @Override
@@ -63,6 +66,27 @@ public class GrantContentAccess extends EndpointHandler {
         }
 
         /**
+         * Get all the contentAccess details for this user, construct list of contentIds to prevent multiple grant access attempts
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_CONTENT_ACCESS_QUERY);
+
+            executor.execute(ps -> {
+                ps.setInt(1, user_id);
+
+                ResultSet results = ps.executeQuery();
+
+                while (results.next()) {
+                    accessibleContentIds.add(results.getInt("content_id"));
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        /**
          * Grant access to this content
          */
 
@@ -72,14 +96,17 @@ public class GrantContentAccess extends EndpointHandler {
             c = h.getContentById(content_id);
         } catch (UnirestException e) {
             e.printStackTrace();
+            return;
         }
 
         /** If the type is a bundle, we need to grant all the children of the bundle access as well **/
 
-        if(c != null && c.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+        if (c != null && c.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
             recursiveGrantChildrenAccess(c);
         } else {
-            contentIdsToGrantAccessTo.add(c.getContentId());
+            if(!accessibleContentIds.contains(c.getContentId())) {
+                contentIdsToGrantAccessTo.add(c.getContentId());
+            }
         }
 
         for(int to_insert_content_id : contentIdsToGrantAccessTo) {
@@ -124,7 +151,9 @@ public class GrantContentAccess extends EndpointHandler {
     }
 
     public void recursiveGrantChildrenAccess(ContentObject c) {
-        contentIdsToGrantAccessTo.add(c.getContentId());
+        if(!accessibleContentIds.contains(c.getContentId())) {
+            contentIdsToGrantAccessTo.add(c.getContentId());
+        }
         if(c.getChildren() != null) {
             c.getChildren().forEach(this::recursiveGrantChildrenAccess);
         }
