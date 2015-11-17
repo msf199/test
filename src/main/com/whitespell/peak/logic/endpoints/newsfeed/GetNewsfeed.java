@@ -190,19 +190,16 @@ public class GetNewsfeed extends EndpointHandler {
                          * the bundle's contentId, move newsfeedContent up in the list.
                          */
                         int[] largestContentId = {0};
-
                         /**
                          * Only applies to children of a bundle
                          */
                         if (newsfeedContent.getParent() > 0) {
-
                             /**
                              * Ensure we don't double check contentIds in a given bundle
                              */
                             ArrayList<Integer> checkedContentIds = new ArrayList<>();
                             ContentHelper g = new ContentHelper();
                             try {
-
                                 /**
                                  * Get the parent of the current contentObject
                                  */
