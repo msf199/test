@@ -18,6 +18,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * @author Cory McAn(cmcan), Whitespell Inc.
@@ -29,11 +31,18 @@ public class GrantContentAccess extends EndpointHandler {
 
     private static final String PAYLOAD_CONTENT_ID = "contentId";
 
-    private static final String ADD_CONTENT_ACCESS_QUERY = "INSERT INTO `content_access`(`content_id`, `user_id`, `timestamp`) VALUES (?,?,?)";
+    private static final String ADD_CONTENT_ACCESS_UPDATE = "INSERT INTO `content_access`(`content_id`, `user_id`, `timestamp`) VALUES (?,?,?)";
     private static final String GET_CONTENT_ACCESS_QUERY = "SELECT `content_id` FROM `content_access` WHERE `user_id` = ?";
 
-    ArrayList<Integer> accessibleContentIds = new ArrayList<>();
-    ArrayList<Integer> contentIdsToGrantAccessTo = new ArrayList<>();
+    /**
+     * ContentIds the user already has access to
+     */
+    Set<Integer> accessibleContentIds = null;
+
+    /**
+     * ContentIds user will gain access to
+     */
+    Set<Integer> contentIdsToGrantAccessTo = null;
 
     @Override
     protected void setUserInputs() {
@@ -43,6 +52,11 @@ public class GrantContentAccess extends EndpointHandler {
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
+
+        accessibleContentIds = new HashSet<>();
+        contentIdsToGrantAccessTo = new HashSet<>();
+        ContentAccessResponse car = new ContentAccessResponse();
+        Gson g = new Gson();
 
         ContentHelper h = new ContentHelper();
 
@@ -94,9 +108,30 @@ public class GrantContentAccess extends EndpointHandler {
 
         try {
             c = h.getContentById(content_id);
+            if(c == null){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                return;
+            }
         } catch (UnirestException e) {
-            e.printStackTrace();
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
+        }
+
+        /**
+         * If the user already has access to this content (and it's not a bundle), simply return true.
+         */
+        if(c.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE &&
+                accessibleContentIds.contains(c.getContentId())){
+            car.setSuccess(true);
+            String response = g.toJson(car);
+            context.getResponse().setStatus(200);
+            try {
+                context.getResponse().getWriter().write(response);
+            } catch (Exception e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
         }
 
         /** If the type is a bundle, we need to grant all the children of the bundle access as well **/
@@ -111,10 +146,21 @@ public class GrantContentAccess extends EndpointHandler {
             }
         }
 
+        /**
+         * If no access can be granted, return
+         */
+        if(contentIdsToGrantAccessTo.size() == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_GRANT_CONTENT_ACCESS);
+            return;
+        }
+
+        /**
+         * Attempt to grant access to the relevant contentIds
+         */
         for(int to_insert_content_id : contentIdsToGrantAccessTo) {
 
             try {
-                StatementExecutor executor = new StatementExecutor(ADD_CONTENT_ACCESS_QUERY);
+                StatementExecutor executor = new StatementExecutor(ADD_CONTENT_ACCESS_UPDATE);
 
                 executor.execute(ps -> {
                     ps.setInt(1, to_insert_content_id);
@@ -125,9 +171,6 @@ public class GrantContentAccess extends EndpointHandler {
 
                     if (rows > 0) {
                         System.out.println("content_access successfully granted for contentId " + to_insert_content_id + " and userId " + user_id);
-                    } else {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_GRANT_CONTENT_ACCESS);
-                        return;
                     }
                 });
             } catch (SQLException e) {
@@ -137,10 +180,8 @@ public class GrantContentAccess extends EndpointHandler {
             }
         }
 
-        ContentAccessResponse car = new ContentAccessResponse();
         car.setSuccess(true);
 
-        Gson g = new Gson();
         String response = g.toJson(car);
         context.getResponse().setStatus(200);
         try {
