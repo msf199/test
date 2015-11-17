@@ -2119,11 +2119,6 @@ public class IntegrationTests extends Server {
         objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
         assertEquals(objectToMorph.getContentTitle(), "test_title");
 
-
-
-
-
-
         /** Update ALL values at once **/
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + objectToMorph.getContentId())

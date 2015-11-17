@@ -108,7 +108,7 @@ public class GrantContentAccess extends EndpointHandler {
 
         try {
             c = h.getContentById(content_id);
-            if(c == null){
+            if (c == null) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
                 return;
             }
@@ -120,8 +120,8 @@ public class GrantContentAccess extends EndpointHandler {
         /**
          * If the user already has access to this content (and it's not a bundle), simply return true.
          */
-        if(c.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE &&
-                accessibleContentIds.contains(c.getContentId())){
+        if (c.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE &&
+                accessibleContentIds.contains(c.getContentId())) {
             car.setSuccess(true);
             String response = g.toJson(car);
             context.getResponse().setStatus(200);
@@ -138,18 +138,15 @@ public class GrantContentAccess extends EndpointHandler {
 
         if (c != null && c.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
             recursiveGrantChildrenAccess(c);
-        } else if(c != null){
-            if(accessibleContentIds != null) {
-                if (!accessibleContentIds.contains(c.getContentId())) {
-                    contentIdsToGrantAccessTo.add(c.getContentId());
-                }
-            }
+        } else if (c != null && accessibleContentIds != null && !accessibleContentIds.contains(c.getContentId())) {
+            contentIdsToGrantAccessTo.add(c.getContentId());
         }
+
 
         /**
          * If no access can be granted, return
          */
-        if(contentIdsToGrantAccessTo.size() == 0){
+        if (contentIdsToGrantAccessTo.size() == 0){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_GRANT_CONTENT_ACCESS);
             return;
         }
@@ -157,7 +154,7 @@ public class GrantContentAccess extends EndpointHandler {
         /**
          * Attempt to grant access to the relevant contentIds
          */
-        for(int to_insert_content_id : contentIdsToGrantAccessTo) {
+        for (int to_insert_content_id: contentIdsToGrantAccessTo){
 
             try {
                 StatementExecutor executor = new StatementExecutor(ADD_CONTENT_ACCESS_UPDATE);
@@ -184,9 +181,10 @@ public class GrantContentAccess extends EndpointHandler {
 
         String response = g.toJson(car);
         context.getResponse().setStatus(200);
-        try {
+
+        try{
             context.getResponse().getWriter().write(response);
-        } catch (Exception e) {
+        } catch (Exception e){
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
@@ -194,12 +192,10 @@ public class GrantContentAccess extends EndpointHandler {
     }
 
     public void recursiveGrantChildrenAccess(ContentObject c) {
-        if(accessibleContentIds != null) {
-            if (!accessibleContentIds.contains(c.getContentId())) {
+        if (accessibleContentIds != null && !accessibleContentIds.contains(c.getContentId())) {
                 contentIdsToGrantAccessTo.add(c.getContentId());
-            }
         }
-        if(c.getChildren() != null) {
+        if (c.getChildren() != null) {
             c.getChildren().forEach(this::recursiveGrantChildrenAccess);
         }
     }
@@ -216,7 +212,7 @@ public class GrantContentAccess extends EndpointHandler {
 
         private boolean success;
 
-        public ContentAccessResponse(){
+        public ContentAccessResponse() {
             this.success = false;
         }
     }
