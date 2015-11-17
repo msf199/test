@@ -249,7 +249,11 @@ CREATE TABLE `user` (
   KEY `FK_authentication_device_uuid_idx` (`device_uuid`),
   CONSTRAINT `FK_authentication_device_uuid` FOREIGN KEY (`device_uuid`) REFERENCES `device` (`device_uuid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
+<<<<<<< Updated upstream
 ) ENGINE=InnoDB AUTO_INCREMENT=30892 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
+=======
+) ENGINE=InnoDB AUTO_INCREMENT=30890 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
+>>>>>>> Stashed changes
   `bundle_match_id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_content_id` int(11) DEFAULT '0',
   `child_content_id` int(11) DEFAULT '0',

@@ -3,7 +3,7 @@ package main.com.whitespell.peak.logic.config;
 
 public final class Config {
 
-    public static boolean TESTING = false;
+    public static boolean TESTING = true;
 
     /*
     NOT OVERWRITTEN BY CONFIG.PROP BUT USED BY THE SERVER:
