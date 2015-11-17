@@ -1756,23 +1756,28 @@ public class IntegrationTests extends Server {
 
         ContentObject finalBundleResponse = finalBundleResponseArray[0]; // always the first index bc we're sorting based on content id, and thats unique
 
+        /**
+         * Purchase the content on client side, then update the user's access. In this case we
+         * purchase the entire bundle and then check if all the content is accessible.
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/access")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"contentId\": \"" + finalBundleResponse.getContentId() + "\"\n" +
+                        "\n}")
+                .asString();
+        System.out.println("bundleId: " +finalBundleResponse.getContentId());
+        GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(hasAccess.isSuccess(), true);
+
+        /**
+         * Check all the content inside the bundle is accessible
+         */
         for (ContentObject c : finalBundleResponse.getChildren()) {
             System.out.println(c.getContentId() + "---" + c.getContentDescription());
-
-            /**
-             * Purchase the content on client side, then update the user's access
-             */
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/access")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                    .body("{\n" +
-                            "\"contentId\": \"" + c.getContentId() + "\"\n" +
-                            "\n}")
-                    .asString();
-            GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
-            assertEquals(hasAccess.isSuccess(), true);
-
 
             /**
              * Check the content to ensure we have access as this user and the url is displayed
@@ -2113,11 +2118,6 @@ public class IntegrationTests extends Server {
                 .asString();
         objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
         assertEquals(objectToMorph.getContentTitle(), "test_title");
-
-
-
-
-
 
         /** Update ALL values at once **/
 
