@@ -190,16 +190,23 @@ public class GetNewsfeed extends EndpointHandler {
                         /**
                          * Only applies to children of a bundle
                          */
-                        if (newsfeedContent.getParent() > 0) {
+                        if (newsfeedContent.getParent() >= 0) {
+                            /**
+                             * We already checked this bundle
+                             */
+                            if(bundleContentIds.contains(newsfeedContent.getParent())){
+                                continue;
+                            }
+
                             /**
                              * Ensure we don't double check contentIds in a given bundle
                              */
-                            Set<Integer> checkedContentIds = new HashSet<>();
                             ContentHelper g = new ContentHelper();
                             try {
                                 /**
                                  * Get the parent of the current contentObject
                                  */
+
                                 ContentObject parent = g.getContentById(newsfeedContent.getParent());
 
                                 /**
@@ -216,21 +223,12 @@ public class GetNewsfeed extends EndpointHandler {
                                 for (ContentObject i : parent.getChildren()) {
                                     if (i.getContentId() > parent.getContentId()) {
 
-                                        if (checkedContentIds.contains(i.getContentId())) {
-                                            continue;
-                                        }
-
                                         /**
                                          * Save the largest contentId in the bundle for updating the newsfeedId.
                                          */
                                         if (largestContentId[0] < i.getContentId()) {
                                             largestContentId[0] = i.getContentId();
                                         }
-
-                                        /**
-                                         * We have now checked this ID.
-                                         */
-                                        checkedContentIds.add(i.getContentId());
 
                                         /**
                                          * Set the newsfeedId to the largest child's contentId to maintain newsfeed order
