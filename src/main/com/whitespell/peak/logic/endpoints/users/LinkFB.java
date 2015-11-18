@@ -35,6 +35,7 @@ public class LinkFB extends EndpointHandler {
 
     private static final String RETRIEVE_FB_USER_QUERY = "SELECT `user_id` FROM `fb_user` WHERE `fb_user_id` = ?";
     private static final String RETRIEVE_USERID_QUERY = "SELECT `user_id`, `username`, `email` from `user` WHERE `fb_user_id` = ?";
+    private static final String CHECK_USER_DETAILS = "SELECT `user_id`, `username`, `email` from `user` WHERE `username` = ? OR `email` = ?";
 
     private static final String UPDATE_FB_LINK_QUERY = "UPDATE `user` SET `fb_link` = ?, `fb_user_id` = ? WHERE `user_id` = ?";
     private static final String UPDATE_USER_PASS_QUERY = "UPDATE `user` SET `password` = ? WHERE `user_id` = ?";
@@ -58,7 +59,7 @@ public class LinkFB extends EndpointHandler {
 
         JsonObject payload = context.getPayload().getAsJsonObject();
         com.mashape.unirest.http.HttpResponse<String> stringResponse;
-        boolean[] newPeakUser = {false};
+        boolean[] newUser = {false};
         boolean[] newFbUser = {false};
 
         int[] userId = {0};
@@ -68,6 +69,7 @@ public class LinkFB extends EndpointHandler {
         String[] authUsername ={null};
         String username = "test";
         String email = "test@test.test";
+        String[] userEmail = {null};
         String accessToken = payload.get(ACCESS_TOKEN_KEY).getAsString();
         String payloadPass = null;
         String[] deviceName = {"unknown"};
@@ -174,12 +176,14 @@ public class LinkFB extends EndpointHandler {
                 if (s.next()) {
                     userId[0] = s.getInt("user_id");
                     authUsername[0] = s.getString("username");
+                    userEmail[0] = s.getString("email");
+
                     System.out.println("user exists");
                 } else {
                     /**
                      * Create new account
                      */
-                    newPeakUser[0] = true;
+                    newUser[0] = true;
                     System.out.println("new user");
                 }
             });
@@ -189,7 +193,31 @@ public class LinkFB extends EndpointHandler {
             return;
         }
 
-        if (newPeakUser[0]) {
+        if (newUser[0]) {
+
+            /**
+             * Check that the fb login details are not already being used for another account, if so, throw relevant error
+             */
+            try {
+                StatementExecutor executor = new StatementExecutor(CHECK_USER_DETAILS);
+                final String finalFBUsername = username;
+                final String finalFBEmail = email;
+                executor.execute(ps -> {
+                    ps.setString(1, finalFBUsername);
+                    ps.setString(2, finalFBEmail);
+                    final ResultSet s = ps.executeQuery();
+
+                    if (s.next()) {
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_OR_EMAIL_TAKEN);
+                        return;
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+
             /**
              * Create a new user
              */
@@ -217,7 +245,7 @@ public class LinkFB extends EndpointHandler {
                      */
                     System.out.println("create a new user");
                     if (rows <= 0) {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_PROCESS_FB_LOGIN);
                         return;
                     }
                 });
@@ -274,7 +302,7 @@ public class LinkFB extends EndpointHandler {
         /**
          * Ensure a Peak only user linking to FB uses their Peak password.
          */
-        if(!newPeakUser[0] && newFbUser[0] && payloadPass == null){
+        if(!newUser[0] && newFbUser[0] && payloadPass == null){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.PEAK_PASSWORD_REQUIRED);
             return;
         }
@@ -312,7 +340,7 @@ public class LinkFB extends EndpointHandler {
         /**
          * Ensure that any user that has already linked their account to FB can log in with 1 click
          */
-        if(!newFbUser[0] && !newPeakUser[0]){
+        if(!newFbUser[0] && !newUser[0]){
             try {
                 final String finalPassword = passHash;
                 StatementExecutor executor = new StatementExecutor(UPDATE_USER_PASS_QUERY);
@@ -372,7 +400,7 @@ public class LinkFB extends EndpointHandler {
 
         System.out.println("attempt auth");
 
-        if(payloadPass != null && (!newPeakUser[0] && newFbUser[0])){
+        if(payloadPass != null && (!newUser[0] && newFbUser[0])){
             try {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
                         .header("accept", "application/json")
@@ -407,14 +435,14 @@ public class LinkFB extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_PROCESS_FB_LOGIN);
                 return;
             }
-        }else if ((newPeakUser[0] && newFbUser[0]) || (!newPeakUser[0] && !newFbUser[0])) {
+        }else if ((newUser[0] && newFbUser[0]) || (!newUser[0] && !newFbUser[0])) {
 
             /**
              * If user is either completely new to Peak or already has merged their account with FB
              * authenticate using the FB access token.
              */
 
-            if((newPeakUser[0] && newFbUser[0])){
+            if((newUser[0] && newFbUser[0])){
 
                 /**
                  * Send a push notification to the user with the welcome video
