@@ -200,7 +200,15 @@ public class RequestContent extends EndpointHandler {
                 while (results.next()) {
 
                     ContentObject content = contentWrapper.wrapContent(results);
-                    contents.add(content);
+
+                    /**
+                     * Only show top level content if we're getting a user's publications
+                     */
+                    if(content.getParent() < 0 && queryKeys.contains("user_id")) {
+                        contents.add(content);
+                    }else{
+                        contents.add(content);
+                    }
                 }
 
                 Gson g = new Gson();
