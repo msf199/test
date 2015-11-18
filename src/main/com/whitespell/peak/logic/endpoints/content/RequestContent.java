@@ -204,10 +204,11 @@ public class RequestContent extends EndpointHandler {
                     /**
                      * Only show top level content if we're getting a user's publications
                      */
-                    if(content.getParent() < 0 && queryKeys.contains("user_id")) {
+
+                    if(content.getParent() <= 0  && queryKeys.contains("user_id")) {
                         contents.add(content);
                     }else{
-                        contents.add(content);
+                        continue;
                     }
                 }
 
