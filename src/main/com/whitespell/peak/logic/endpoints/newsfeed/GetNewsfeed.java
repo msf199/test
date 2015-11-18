@@ -36,8 +36,6 @@ public class GetNewsfeed extends EndpointHandler {
     //content keys
     private static final String CONTENT_ID_KEY = "content_id";
 
-    private static final ContentObject popularBundle = null;
-
     @Override
     protected void setUserInputs() {
         urlInput.put(PROCESSING_URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
@@ -197,7 +195,7 @@ public class GetNewsfeed extends EndpointHandler {
                             /**
                              * Ensure we don't double check contentIds in a given bundle
                              */
-                            ArrayList<Integer> checkedContentIds = new ArrayList<>();
+                            Set<Integer> checkedContentIds = new HashSet<>();
                             ContentHelper g = new ContentHelper();
                             try {
                                 /**
@@ -214,7 +212,7 @@ public class GetNewsfeed extends EndpointHandler {
                                 /**
                                  * For each child, if the child is newer than the bundle,
                                  * save the largest child and use that contentId to represent the bundle,
-                                 * therefore moving it up in the newsfeed list.
+                                 * therefore moving it up in the newsfeed list (and maintaining offset order).
                                  */
                                 for (ContentObject i : parent.getChildren()) {
                                     if (i.getContentId() > parent.getContentId()) {
