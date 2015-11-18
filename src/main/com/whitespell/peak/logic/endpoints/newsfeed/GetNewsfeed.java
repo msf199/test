@@ -170,7 +170,6 @@ public class GetNewsfeed extends EndpointHandler {
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
 
-                        int[] popularBundleLikeCount = {0};
                         int currentContentId = results.getInt(CONTENT_ID_KEY);
 
                         /**
