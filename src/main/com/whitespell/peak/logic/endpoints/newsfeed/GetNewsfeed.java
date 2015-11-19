@@ -191,7 +191,7 @@ public class GetNewsfeed extends EndpointHandler {
                         /**
                          * Only applies to children of a bundle
                          */
-                        if (newsfeedContent.getParent() >= 0) {
+                        if (newsfeedContent.getParent() > 0) {
                             /**
                              * We already checked this bundle
                              */

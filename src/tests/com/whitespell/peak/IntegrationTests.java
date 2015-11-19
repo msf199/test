@@ -963,6 +963,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
+        System.out.println(stringResponse.getBody());
 
         NewsfeedObject[] n = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
 
