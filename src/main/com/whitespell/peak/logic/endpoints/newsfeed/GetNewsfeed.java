@@ -119,7 +119,8 @@ public class GetNewsfeed extends EndpointHandler {
             String processedString = "AND `processed` = 1";
 
             /**
-             * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves
+             * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves.
+             * Now handled when content is filled.
              */
             String parentString = " ";
                     //" AND `parent` IS NULL";
@@ -192,14 +193,18 @@ public class GetNewsfeed extends EndpointHandler {
                          */
                         if (newsfeedContent.getParent() > 0) {
                             /**
-                             * Ensure we don't double check contentIds in a given bundle
+                             * We already checked this bundle
                              */
-                            Set<Integer> checkedContentIds = new HashSet<>();
+                            if(bundleContentIds.contains(newsfeedContent.getParent())){
+                                continue;
+                            }
+
                             ContentHelper g = new ContentHelper();
                             try {
                                 /**
                                  * Get the parent of the current contentObject
                                  */
+
                                 ContentObject parent = g.getContentById(newsfeedContent.getParent());
 
                                 /**
@@ -216,21 +221,12 @@ public class GetNewsfeed extends EndpointHandler {
                                 for (ContentObject i : parent.getChildren()) {
                                     if (i.getContentId() > parent.getContentId()) {
 
-                                        if (checkedContentIds.contains(i.getContentId())) {
-                                            continue;
-                                        }
-
                                         /**
                                          * Save the largest contentId in the bundle for updating the newsfeedId.
                                          */
                                         if (largestContentId[0] < i.getContentId()) {
                                             largestContentId[0] = i.getContentId();
                                         }
-
-                                        /**
-                                         * We have now checked this ID.
-                                         */
-                                        checkedContentIds.add(i.getContentId());
 
                                         /**
                                          * Set the newsfeedId to the largest child's contentId to maintain newsfeed order
