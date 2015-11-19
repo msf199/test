@@ -8,3 +8,4 @@ bin
 .Error*
 errors/*
 *.iml
+*.log
