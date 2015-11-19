@@ -119,7 +119,8 @@ public class GetNewsfeed extends EndpointHandler {
             String processedString = "AND `processed` = 1";
 
             /**
-             * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves
+             * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves.
+             * Now handled when content is filled.
              */
             String parentString = " ";
                     //" AND `parent` IS NULL";
@@ -198,9 +199,6 @@ public class GetNewsfeed extends EndpointHandler {
                                 continue;
                             }
 
-                            /**
-                             * Ensure we don't double check contentIds in a given bundle
-                             */
                             ContentHelper g = new ContentHelper();
                             try {
                                 /**
