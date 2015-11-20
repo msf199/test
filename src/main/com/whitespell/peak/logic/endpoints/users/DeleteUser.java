@@ -20,6 +20,7 @@ import java.sql.SQLException;
 public class DeleteUser extends EndpointHandler {
 
     private static final String DELETE_USER_QUERY = "DELETE FROM `user` WHERE `user_id` = ?";
+    private static final String DELETE_NOTIFICATION_QUERY = "DELETE FROM `notification` where `notification_action` = ?";
 
     /**
      * Define user input variables
@@ -158,7 +159,7 @@ public class DeleteUser extends EndpointHandler {
         }
 
         /**
-         * Delete the content from the DB after attempting to delete from hosting services
+         * Delete the user from the DB after attempting to delete from hosting services
          */
         try {
             StatementExecutor executor = new StatementExecutor(DELETE_USER_QUERY);
@@ -166,6 +167,25 @@ public class DeleteUser extends EndpointHandler {
                 ps.setInt(1, userId);
 
                 ps.executeUpdate();
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        /**
+         * Delete notifications related to this user
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(DELETE_NOTIFICATION_QUERY);
+            executor.execute(ps -> {
+                ps.setString(1, "open-user:" + userId);
+
+                int rows = ps.executeUpdate();
+                if(rows > 0){
+                    System.out.println("success deleting notifications for this user");
+                }
             });
         } catch (SQLException e) {
             Logging.log("High", e);

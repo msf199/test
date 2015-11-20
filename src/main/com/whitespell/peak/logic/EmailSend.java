@@ -1,6 +1,7 @@
 package main.com.whitespell.peak.logic;
 
 import main.com.whitespell.peak.Server;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
@@ -24,7 +25,7 @@ public class EmailSend {
 
     public static tokenResponseObject updateDBandSendWelcomeEmail(String username, String email){
         try {
-            String emailToken = main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextEmailId();
+            String emailToken = RandomGenerator.nextEmailId();
 
             /**
              * Update the user's email verification status in the database.
@@ -32,7 +33,7 @@ public class EmailSend {
 
             try {
                 StatementExecutor executor = new StatementExecutor(UPDATE_EMAIL_TOKEN);
-                Timestamp ts = new Timestamp(Server.getCalendar().getTimeInMillis() + EXPIRES_IN_24_HOURS);
+                Timestamp ts = new Timestamp(Server.getMilliTime() + EXPIRES_IN_24_HOURS);
                 final String finalUsername = username;
                 final String finalEmailToken = emailToken;
                 final Timestamp finalEmailExpiration = ts;
@@ -49,9 +50,9 @@ public class EmailSend {
                 return null;
             }
             boolean sent =
-                    sendTokenTemplatedMessage("peak@whitespell.com",
-                            "Peak Fitness",
-                            "Welcome to Peak!", "http://peakapp.me",
+                    sendTokenTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
+                            Config.PLATFORM_EMAIL_SEND_NAME,
+                            "Welcome to "+ Config.PLATFORM_NAME+"!", Config.PLATFORM_HOME_PAGE_URL,
                             username, emailToken,
                             "peak", "verify_email", email);
 
@@ -70,7 +71,7 @@ public class EmailSend {
 
     public static tokenResponseObject updateDBandSendResetEmail(String username, String email){
         try {
-            String resetToken = main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextResetId();
+            String resetToken = RandomGenerator.nextResetId();
 
             /**
              * Update the user's Forgot Password reset token in the database.
@@ -88,9 +89,9 @@ public class EmailSend {
                     int rows = ps.executeUpdate();
                     if(rows>=0){
                         sent[0] =
-                                sendTokenTemplatedMessage("peak@whitespell.com",
-                                        "Peak Fitness",
-                                        "Password Reset Confirmation", "http://peakapp.me",
+                                sendTokenTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
+                                        Config.PLATFORM_EMAIL_SEND_NAME,
+                                        "Password Reset Confirmation", Config.PLATFORM_HOME_PAGE_URL,
                                         username, resetToken,
                                         "peak-1", "forgot_password", email);
                     }
@@ -113,7 +114,7 @@ public class EmailSend {
         return null;
     }
 
-    public static boolean sendFollowerContentNotificationEmail(String username, String userThumb, String email, String publisherName, String contentName, String contentUrl){
+    public static boolean sendFollowerContentNotificationEmail(String userThumb, String email, String publisherName, String contentName, String contentUrl){
         /**
          * Send a content upload notification email to the Follower
          */
@@ -121,12 +122,28 @@ public class EmailSend {
         boolean sent[] = {false};
 
         sent[0] =
-                sendContentNotificationTemplatedMessage("peak@whitespell.com",
-                        "Peak Fitness",
-                        publisherName + " uploaded a new video!", "https://peakapp.me",
-
+                sendContentNotificationTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
+                        Config.PLATFORM_EMAIL_SEND_NAME,
+                        publisherName + " uploaded a new video!", Config.PLATFORM_HOME_PAGE_URL,
                         publisherName,  contentName, contentUrl,
                         "content-follower-notification", userThumb, email);
+
+        return sent[0];
+    }
+
+    public static boolean sendSocialMediaLinkNotificationEmail(String contentThumb, String email, String publisherName, String contentName, String contentUrl){
+        /**
+         * Send a social media link notification to the publisher after their video processes
+         */
+
+        boolean sent[] = {false};
+
+        sent[0] =
+                sendContentNotificationTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
+                        Config.PLATFORM_EMAIL_SEND_NAME,
+                        "Share "+contentName+" on social media!", Config.PLATFORM_HOME_PAGE_URL,
+                        publisherName,  contentName, contentUrl,
+                        "social-media-link-notification", contentThumb, email);
 
         return sent[0];
     }

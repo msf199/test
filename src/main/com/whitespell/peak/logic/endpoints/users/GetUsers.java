@@ -21,7 +21,7 @@ import java.util.ArrayList;
  */
 public class GetUsers extends EndpointHandler {
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ? LIMIT ?";
+    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ? ORDER BY `user_id` DESC LIMIT ?";
     private static final String GET_USERS_EXCLUDE_TEMP = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ?  AND `email` NOT LIKE '%temporary.email' LIMIT ?";
 
 	private static final String USER_ID = "user_id";

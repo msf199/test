@@ -5,6 +5,7 @@ import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.logic.config.Config;
 
 import java.io.*;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 
 /**
@@ -15,7 +16,7 @@ public class Logging {
     public static int errorsNotWrittenCount;
 
     public static void writeSampleErrors(int amount) {
-        long start = Server.getCalendar().getTimeInMillis();
+        long start = Server.getMilliTime();
         for (int i = 0; i < amount; i++) {
             try {
                 throw new Exception();
@@ -23,14 +24,14 @@ public class Logging {
                 log("CRUCIAL", e);
             }
         }
-        long end = Server.getCalendar().getTimeInMillis();
+        long end = Server.getMilliTime();
         System.out.println("Write sample errors took: " + (end - start) + " ms");
     }
 
     public static boolean canLogToDisk(Object err) {
         long folderSize = 0;
         try {
-            long start = Server.getCalendar().getTimeInMillis();
+            long start = Server.getMilliTime();
             folderSize = FileChecks.folderSize(new File(Config.ERROR_PATH)) / 1000000;
             if (folderSize > Config.MAX_ERROR_FOLDER_SIZE_MB) {
                 errorsNotWrittenCount++;
@@ -43,7 +44,7 @@ public class Logging {
                 }
                 return false;
             }
-            long end = Server.getCalendar().getTimeInMillis();
+            long end = Server.getMilliTime();
             System.out.println("Checking log files took: " + (end - start) + " ms");
         } catch (Exception e) {
             System.out.println("Error in checking file of error folder");
@@ -58,8 +59,9 @@ public class Logging {
         if (!canLogToDisk(e)) {
             return;
         }
+        final Timestamp now = new Timestamp(Server.getMilliTime()); // 15 mins max
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        System.err.print("[" + errorLevel + " (version " + Config.SERVER_VERSION + ") " + sdf.format(Server.getCalendar().getTime()) + "]");
+        System.err.print("[" + errorLevel + " (version " + Config.SERVER_VERSION + ") " + sdf.format(now) + "]");
         e.printStackTrace(System.err);
     }
 
@@ -67,9 +69,11 @@ public class Logging {
         if (!canLogToDisk(s)) {
             return;
         }
+
+        final Timestamp now = new Timestamp(Server.getMilliTime()); // 15 mins max
         //synchronized(System.err) {
         SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss");
-        System.err.println("[" + errorLevel + " (version " + Config.SERVER_VERSION + ") " + sdf.format(Server.getCalendar().getTime()) + "] " + s);
+        System.err.println("[" + errorLevel + " (version " + Config.SERVER_VERSION + ") " + sdf.format(now) + "] " + s);
     }
 
 
@@ -92,9 +96,11 @@ public class Logging {
                 Config.ERROR_PATH = errorFolder;
             }
 
+            final Timestamp now = new Timestamp(Server.getMilliTime()); // 15 mins max
+
             String name = (Config.ERROR_PATH + "Error-v" +
                     Config.SERVER_VERSION + "-" +
-                    sdf.format(Server.getCalendar().getTime()) +
+                    sdf.format(now) +
                     ".log");
 
             return name;

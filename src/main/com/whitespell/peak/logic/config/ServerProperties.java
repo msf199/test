@@ -29,7 +29,6 @@ public final class ServerProperties {
             }
             Config.SERVER_NAME = (properties.getProperty("SERVER_NAME"));
             Config.SERVER_VERSION = Integer.parseInt(properties.getProperty("SERVER_VERSION"));
-            Config.SERVER_TIMEZONE = (properties.getProperty("SERVER_TIMEZONE"));
             Config.API_PORT = Integer.parseInt(properties.getProperty("API_PORT"));
             Config.MAX_ERROR_FOLDER_SIZE_MB = Integer.parseInt(properties.getProperty("MAX_ERROR_FOLDER_SIZE_MB"));
             Config.ERROR_PATH = (properties.getProperty("ERROR_PATH"));
@@ -37,8 +36,12 @@ public final class ServerProperties {
             Config.DB_HOST = (properties.getProperty("DB_HOST"));
             Config.DB_USER = (properties.getProperty("DB_USER"));
             Config.DB_PASS = (properties.getProperty("DB_PASS"));
+
             Config.DB_PORT = Integer.parseInt(properties.getProperty("DB_PORT"));
             Config.DB = (properties.getProperty("DB"));
+            Config.setDev(Config.DB.contains("dev"));
+            System.out.println("Is development server: " + Config.isDev());
+
 
 
         } else {

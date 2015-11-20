@@ -47,10 +47,10 @@ public class ExpireAuthentication extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(LOGOUT_QUERY);
             executor.execute(ps -> {
-                ps.setTimestamp(1, new Timestamp(Server.getCalendar().getTimeInMillis()));
+                ps.setTimestamp(1, new Timestamp(Server.getMilliTime()));
+                System.out.println("Set expires to " + new Timestamp(Server.getMilliTime()));
                 ps.setString(2, a.getKey());
                 ps.setInt(3, a.getUserId());
-
 
                int rows =  ps.executeUpdate();
                 if(rows > 0) {
@@ -61,8 +61,6 @@ public class ExpireAuthentication extends EndpointHandler {
             Logging.log("High", e);
         }
 
-
-
         if (success[0]) {
             context.getResponse().setStatus(HttpStatus.OK_200);
             LogoutObject object = new LogoutObject();
@@ -71,6 +69,7 @@ public class ExpireAuthentication extends EndpointHandler {
             String json = g.toJson(object);
             context.getResponse().getWriter().write(json);
         } else {
+            System.out.println("Logout failed in expireAuthentication");
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }

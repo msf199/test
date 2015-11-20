@@ -19,6 +19,7 @@ import main.com.whitespell.peak.logic.endpoints.newsfeed.GetNewsfeed;
 import main.com.whitespell.peak.logic.endpoints.statistics.GetUserSignups;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
+import main.com.whitespell.peak.logic.endpoints.videoprocessing.*;
 import main.com.whitespell.peak.logic.notifications.GetUserNotifications;
 
 /**
@@ -65,9 +66,6 @@ public class PeakAPI extends WhitespellAPI {
 
         // Post a contentId to this endpoint to add to user's MyWorkouts
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SavedContentAction(), "/users/$/saved", "userId");
-
-        // Post a contentId to this endpoint to add to user's bundle
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddToBundle(), "/users/$/bundles", "userId");
 
         // Get a specific user's saved list based on their user ID
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetBundle(), "/users/$/bundles", "userId");
@@ -175,6 +173,9 @@ public class PeakAPI extends WhitespellAPI {
         // Get a list of all the content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContent(), "/content/");
 
+        // Get a unique content object
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetContent(), "/content/$", "contentId");
+
         // Get a list of all the curated content in the whole system based on certain search criteria
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new RequestContentCuration(), "/contentcurated/");
 
@@ -183,6 +184,7 @@ public class PeakAPI extends WhitespellAPI {
 
         // Add a new content type
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddContentType(), "/content/types");
+
 
         // Get a content comment
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetContentComments(), "/content/$/comments", "contentId");
@@ -239,6 +241,14 @@ public class PeakAPI extends WhitespellAPI {
          */
 
 
+        /** VIDEO PROCESSING **/
+
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AddInstanceLock(), "/videoprocessing/$", "contentId" );
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new IsProcessingLocked(), "/videoprocessing/$", "contentId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.DELETE, new RemoveInstanceLock(), "/videoprocessing/$", "contentId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateInstance(), "/videoprocessing/instances");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new PingInstance(), "/videoprocessing/pinginstance");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ShutdownInstance(), "/videoprocessing/shutdowninstance");
     }
 
 }

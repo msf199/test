@@ -55,7 +55,7 @@ import static org.junit.Assert.assertEquals;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class IntegrationTests extends Server {
 
-    static String TEST_DB_NAME = "test_" + (Server.getCalendar().getTimeInMillis() / 1000);
+    static String TEST_DB_NAME = "test_" + (System.currentTimeMillis() / 1000);
 
     static String TEST_USERNAME = "pimdewitte";
     static String TEST_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -64,6 +64,8 @@ public class IntegrationTests extends Server {
     static String TEST_KEY;
     static int TEST2_UID = -1;
     static String TEST2_KEY;
+    static int TEST3_UID = -1;
+    static String TEST3_KEY;
     static int ADMIN_UID = -1;
     static String ADMIN_KEY;
     static int COMMENTER_UID;
@@ -157,7 +159,7 @@ public class IntegrationTests extends Server {
              * EXECUTING DDL ON TEST DATABASE
              */
 
-            String[] queries = readFile("ddl/peak.sql", StandardCharsets.UTF_8).split(";");
+            String[] queries = readFile("ddl/peakdev.sql", StandardCharsets.UTF_8).split(";");
 
             for (int i = 0; i < queries.length - 1; i++) {
                 if (queries[i] == null || queries[i].length() < 2 || queries[i].isEmpty()) {
@@ -393,6 +395,25 @@ public class IntegrationTests extends Server {
         assertEquals(d.getUserId() > -1, true);
 
         /**
+         * Authenticate third user we just created
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"coryqq\",\n" +
+                        "\"password\" : \"qqqqqq\"\n" +
+                        "}")
+                .asString();
+
+
+        AuthenticationObject e = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        TEST3_UID = e.getUserId();
+        TEST3_KEY = e.getKey();
+
+        assertEquals(e.getUserId() > -1, true);
+
+        /**
          * Get the UserObject from the users/userid endpoint
          */
 
@@ -535,6 +556,7 @@ public class IntegrationTests extends Server {
         assertEquals(contentTypes[0].getContentTypeName(), "bundle");
 
         StaticRules.BUNDLE_CONTENT_TYPE = contentTypes[0].getContentTypeId();
+        StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE = -1; // todo(do a video with peak content type and set this to the actual one)
     }
 
     @Test
@@ -571,7 +593,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
                         "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
-                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
@@ -613,7 +635,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
@@ -628,7 +650,7 @@ public class IntegrationTests extends Server {
                 .asString();
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentId(), content[0].getContentId());
-        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
@@ -637,12 +659,12 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentPrice(), 1.99, 0.0);
         assertEquals(content[0].getUserId(), TEST_UID);
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[1].getContentTypeId())
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentType=" + contentTypes[0].getContentTypeId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
@@ -657,7 +679,7 @@ public class IntegrationTests extends Server {
                 .asString();
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
-        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
@@ -670,7 +692,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
@@ -683,7 +705,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .asString();
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
+        assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
         assertEquals(content[0].getContentUrl(), null);
@@ -979,8 +1001,8 @@ public class IntegrationTests extends Server {
                 .asString();
 
         UserObject[] a = g.fromJson(stringResponse.getBody(), UserObject[].class);
-        assertEquals(a[0].getUserId(), TEST_UID);
-        assertEquals(a[1].getUserId(), TEST2_UID);
+        assertEquals(a[0].getUserId(), SKYDIVER_UID);
+        assertEquals(a[1].getUserId(), TEST3_UID);
     }
 
     @Test
@@ -990,6 +1012,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
+        System.out.println(stringResponse.getBody());
 
         NewsfeedObject[] n = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
 
@@ -1006,6 +1029,46 @@ public class IntegrationTests extends Server {
                 assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
             }
         }
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
+                        "\"contentDescription\": \"new content for bundle update test\",\n" +
+                        "\"contentTitle\": \"testerino\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentPrice\": 1.99," +
+                        "\"thumbnailUrl\": \"thumbguy.com\"" +
+                        "\n}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        ContentObject child = g.fromJson(stringResponse.getBody(), ContentObject.class);
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \"" + child.getContentId() + "\"" +
+                        "\n}")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/newsfeed/" + TEST_UID)
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        /**
+         * Check that first item of newsfeed is now the updated bundle. Also ensure bundle contains new content.
+         * New newsfeedId = the updated child to maintain order of newsfeed and offset.
+         */
+        NewsfeedObject[] n2 = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
+        assertEquals(n2[0].getNewsfeedId(), child.getContentId());
+        assertEquals(n2[0].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
+        assertEquals(n2[0].getNewsfeedContent().getChildren().get(0).getContentTitle(), "testerino");
     }
 
     @Test
@@ -1097,6 +1160,7 @@ public class IntegrationTests extends Server {
         assertEquals(stringResponse.getBody(), "{\"savedContent\":[]}");
     }
 
+
     @Test
     public void test0024_AddAndGetContentComments() throws UnirestException {
 
@@ -1149,9 +1213,10 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
         CommentObject[] comments = g.fromJson(stringResponse.getBody(), CommentObject[].class);
-        assertEquals(comments[0].getComment(), "awesome video!");
-        assertEquals(comments[1].getComment(), "wow this is so cool! definitely going to try it :)!");
-        assertEquals(comments[2].getComment(), "wow another comment!");
+        assertEquals(comments[0].getComment(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
+        assertEquals(comments[1].getComment(), "awesome video!");
+        assertEquals(comments[2].getComment(), "wow this is so cool! definitely going to try it :)!");
+        assertEquals(comments[3].getComment(), "wow another comment!");
         assertEquals(comments[0].getTimestamp().before(comments[2].getTimestamp()), true);
 
         /**
@@ -1163,10 +1228,11 @@ public class IntegrationTests extends Server {
         COMMENT_TEST_ID = comments[2].getCommentId();
     }
 
+
     @Test
     public void test0025_TestMandrillEmailsAndTokens() throws UnirestException {
 
-        EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
+        EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ADMIN_EMAIL);
         if (et != null) {
             /**
              * Check that the email expiration and verification got updated after sending the email.
@@ -1222,7 +1288,7 @@ public class IntegrationTests extends Server {
             assertEquals(evr2.getEmailVerified(), 0);
         }
 
-        EmailSend.tokenResponseObject et2 = EmailSend.updateDBandSendResetEmail(ROLLERSKATER_USERNAME, ROLLERSKATER_EMAIL);
+        EmailSend.tokenResponseObject et2 = EmailSend.updateDBandSendResetEmail(ROLLERSKATER_USERNAME, ADMIN_EMAIL);
         if (et2 != null) {
             stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/reset")
                     .header("accept", "application/json")
@@ -1466,6 +1532,7 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
         AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        System.out.println(stringResponse.getBody());
         Integer testId = a.getUserId();
         String testKey = a.getKey();
         assertEquals(testId > 0, true);
@@ -1761,14 +1828,14 @@ public class IntegrationTests extends Server {
         assertEquals(content1[0].getContentUrl() != null, true);
 
         /**
-         * Ensure we don't yet have access to this paid content
+         * Ensure poster has access to this paid content
          */
-        for(ContentObject c : bundles[0].getChildren()){
-            if(c.getContentPrice() != 0){
-                assertEquals(c.hasAccess(), 0);
-                assertEquals(c.getContentUrl(), null);
-            }
-            else{
+        for (ContentObject c : content1[0].getChildren()) {
+            if (c.getUserId() == TEST_UID) {
+
+
+                System.out.println("poster: " + c.getUserId() + " TEST: " +TEST_UID);
+
                 assertEquals(c.hasAccess(), 1);
                 assertEquals(c.getContentUrl() != null, true);
             }
@@ -1779,23 +1846,28 @@ public class IntegrationTests extends Server {
 
         ContentObject finalBundleResponse = finalBundleResponseArray[0]; // always the first index bc we're sorting based on content id, and thats unique
 
+        /**
+         * Purchase the content on client side, then update the user's access. In this case we
+         * purchase the entire bundle and then check if all the content is accessible.
+         */
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/access")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"contentId\": \"" + finalBundleResponse.getContentId() + "\"\n" +
+                        "\n}")
+                .asString();
+        System.out.println("bundleId: " +finalBundleResponse.getContentId());
+        GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
+        System.out.println(stringResponse.getBody());
+        assertEquals(hasAccess.isSuccess(), true);
+
+        /**
+         * Check all the content inside the bundle is accessible
+         */
         for (ContentObject c : finalBundleResponse.getChildren()) {
             System.out.println(c.getContentId() + "---" + c.getContentDescription());
-
-            /**
-             * Purchase the content on client side, then update the user's access
-             */
-
-            stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/access")
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
-                    .body("{\n" +
-                            "\"contentId\": \"" + c.getContentId() + "\"\n" +
-                            "\n}")
-                    .asString();
-            GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
-            assertEquals(hasAccess.isSuccess(), true);
-
 
             /**
              * Check the content to ensure we have access as this user and the url is displayed
@@ -1808,14 +1880,15 @@ public class IntegrationTests extends Server {
             ContentObject[] content3 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
             assertEquals(content3[0].hasAccess(), 1);
             assertEquals(content3[0].getUserId(), TEST_UID);
-            if(content3[0].getContentType() == StaticRules.BUNDLE_CONTENT_TYPE){
+            if (content3[0].getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                 assertEquals(content3[0].getContentUrl(), "doesnt matter");
-            }else {
+            } else {
                 assertEquals(content3[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
             }
         }
-        assertEquals(finalBundleResponse.getChildren().size(), 4);
+        assertEquals(finalBundleResponse.getChildren().size(), 5);
     }
+
 
     @Test
     public void test0031_PushNotificationTest() throws UnirestException {
@@ -1887,7 +1960,7 @@ public class IntegrationTests extends Server {
                         "\"deviceUUID\" : \"cz-HvHQ2oX8:APA91bGbM8F4HT0BOXdORmmu0xVYVM0RMhRGXOciUmG5V92H5v-1VuWY7Svj" +
                         "HHpOFOUeqATafD3CxPuqyzB_yg1TLAS2DlLoEGcUnsgBLW2knL-o1Q9e199hFu6eluexO8HainFRYTbW\",\n" +
                         "\"deviceName\" : \"otheruser2\",\n" +
-                        "\"deviceType\" : "+1+"\n" +
+                        "\"deviceType\" : " + 1 + "\n" +
                         "}")
                 .asString();
         AuthenticationObject a2 = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
@@ -1964,8 +2037,8 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .body("{\n" +
-                        "\"categoryId\": \""+categories[1].getCategoryId()+"\",\n" +
-                        "\"contentType\": \""+contentTypes[1].getContentTypeId()+"\",\n" +
+                        "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"admincontent\",\n" +
                         "\"contentTitle\": \"admincontent\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=admin\"," +
@@ -2038,7 +2111,7 @@ public class IntegrationTests extends Server {
          * Sleep to let the notifications go through (There are a lot of notifications...)
          */
 
-        if(Config.NOTIFICATION_TOGGLE) {
+        if (Config.NOTIFICATION_TOGGLE) {
             try {
                 Thread.sleep(90000);
             } catch (InterruptedException e) {
@@ -2056,7 +2129,7 @@ public class IntegrationTests extends Server {
         GetUserNotifications.getUserNotificationsResponse notifications =
                 g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
         ArrayList<UserNotification> notif = notifications.getUserNotifications();
-        if(notif != null) {
+        if (notif != null) {
             for (UserNotification n : notif) {
                 assertEquals(n.getNotificationStatus(), 1);
             }
@@ -2072,7 +2145,7 @@ public class IntegrationTests extends Server {
         GetUserNotifications.getUserNotificationsResponse notifications1 =
                 g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
         ArrayList<UserNotification> notif2 = notifications1.getUserNotifications();
-        if(notif2 != null) {
+        if (notif2 != null) {
             for (UserNotification n : notif2) {
                 assertEquals(n.getNotificationStatus(), 1);
             }
@@ -2085,7 +2158,7 @@ public class IntegrationTests extends Server {
         GetUserNotifications.getUserNotificationsResponse notifications2 =
                 g.fromJson(stringResponse.getBody(), GetUserNotifications.getUserNotificationsResponse.class);
         ArrayList<UserNotification> notif3 = notifications2.getUserNotifications();
-        if(notif3 != null) {
+        if (notif3 != null) {
             for (UserNotification n : notif3) {
                 assertEquals(n.getNotificationStatus(), 1);
             }
@@ -2095,95 +2168,131 @@ public class IntegrationTests extends Server {
     }
 
 
-
     @Test
-    public void test0032_UpdateContent() throws UnirestException{
+    public void test0032_UpdateContent() throws UnirestException {
 
         /**
          * Currently the response for this object is only the values the user updated. This is to avoid an additional
          * get of the content's current fields.
          */
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content[0].getContentId())
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .asString();
-        ContentObject[] content1 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
-        assertEquals(content1[0].getContentId(), content[0].getContentId());
-        assertEquals(content1[0].getUserId(), ADMIN_UID);
+        ContentObject objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(objectToMorph.getContentId(), content[0].getContentId());
+        assertEquals(objectToMorph.getUserId(), ADMIN_UID);
 
         /**
          * Change only title
          */
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + objectToMorph.getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n\"contentTitle\": \"testy\",\n" +
-                        "\"userId\": "+ADMIN_UID +
+                .body("{\n\"contentTitle\": \"test_title\"" +
+
                         "}")
                 .asString();
-        ContentObject content2 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content2.getContentTitle(), "testy");
 
-        /**
-         * Change only description
-         */
+        assertEquals(stringResponse.getBody().contains("success"), true);
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+        /** Get the object again and check **/
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n\"contentDescription\": \"newDesc\","+
-                        "\"userId\": "+ADMIN_UID +
-                        "}")
                 .asString();
-        ContentObject content3 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content3.getContentDescription(), "newDesc");
-
+        objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(objectToMorph.getContentTitle(), "test_title");
 
         /** Update ALL values at once **/
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + objectToMorph.getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .body("{" +
                         "\n\"contentTitle\": \"title_test\"," +
                         "\n\"contentDescription\": \"description_test\"," +
                         "\n\"contentPrice\": 1.33," +
-                        "\n\"categoryId\": " + categories[0].getCategoryId() + "," +
+                        "\n\"categoryId\": "+categories[0].getCategoryId()+"," +
                         "\n\"contentUrl\": \"url_test\"," +
+
                         "\n\"contentUrl1080p\": \"url_1080p_test\"," +
                         "\n\"contentUrl720p\": \"url_720p_test\"," +
                         "\n\"contentUrl480p\": \"url_480p_test\"," +
+                        "\n\"contentUrl360p\": \"url_360p_test\"," +
+                        "\n\"contentUrl240p\": \"url_240p_test\"," +
+                        "\n\"contentUrl144p\": \"url_144p_test\"," +
+
+                        "\n\"contentPreview1080p\": \"preview_1080p_test\"," +
                         "\n\"contentPreview720p\": \"preview_720p_test\"," +
+                        "\n\"contentPreview480p\": \"preview_480p_test\"," +
+                        "\n\"contentPreview360p\": \"preview_360p_test\"," +
+                        "\n\"contentPreview240p\": \"preview_240p_test\"," +
+                        "\n\"contentPreview144p\": \"preview_144p_test\"," +
+
+                        "\n\"thumbnail1080p\": \"thumbnail_1080p_test\"," +
+                        "\n\"thumbnail720p\": \"thumbnail_720p_test\"," +
+                        "\n\"thumbnail480p\": \"thumbnail_480p_test\"," +
+                        "\n\"thumbnail360p\": \"thumbnail_360p_test\"," +
+                        "\n\"thumbnail240p\": \"thumbnail_240p_test\"," +
+                        "\n\"thumbnail144p\": \"thumbnail_144p_test\"," +
+                        "\n\"videoLengthSeconds\": 91," +
+                        "\n\"socialMediaVideo\": \"social_media_video_test\"," +
+
                         "\n\"processed\": \"0\"" +
+
                         "}")
                 .asString();
-        ContentObject content4 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content4.getContentPrice(), 1.33, 0.0);
 
-        /**
-         * Change all fields
-         */
+        assertEquals(stringResponse.getBody().contains("success"), true);
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
+        /** Get the object again and check **/
+
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n" +
-                        "\"contentTitle\": \"lastTitle\","+
-                        "\"contentDescription\": \"lastDesc\","+
-                        "\"contentPrice\": "+ 1.99 +
-                        ",\"userId\": "+ADMIN_UID +
-                        "}")
                 .asString();
-        ContentObject content5 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content5.getContentTitle(), "lastTitle");
-        assertEquals(content5.getContentDescription(), "lastDesc");
-        assertEquals(content5.getContentPrice(), 1.99, 0.0);
+        objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        assertEquals(objectToMorph.getContentTitle(), "title_test");
+        assertEquals(objectToMorph.getContentDescription(), "description_test");
+        assertEquals(objectToMorph.getContentPrice(), 1.33D, 0D);
+        assertEquals(objectToMorph.getCategoryId(), categories[0].getCategoryId());
+        assertEquals(objectToMorph.getContentUrl(), "url_test");
+
+        assertEquals(objectToMorph.getContentUrl1080p(), "url_1080p_test");
+        assertEquals(objectToMorph.getContentUrl720p(), "url_720p_test");
+        assertEquals(objectToMorph.getContentUrl480p(), "url_480p_test");
+        assertEquals(objectToMorph.getContentUrl360p(), "url_360p_test");
+        assertEquals(objectToMorph.getContentUrl240p(), "url_240p_test");
+        assertEquals(objectToMorph.getContentUrl144p(), "url_144p_test");
+
+
+        assertEquals(objectToMorph.getContentPreview1080p(), "preview_1080p_test");
+        assertEquals(objectToMorph.getContentPreview720p(), "preview_720p_test");
+        assertEquals(objectToMorph.getContentPreview480p(), "preview_480p_test");
+        assertEquals(objectToMorph.getContentPreview360p(), "preview_360p_test");
+        assertEquals(objectToMorph.getContentPreview240p(), "preview_240p_test");
+        assertEquals(objectToMorph.getContentPreview144p(), "preview_144p_test");
+
+
+        assertEquals(objectToMorph.getThumbnail1080p(), "thumbnail_1080p_test");
+        assertEquals(objectToMorph.getThumbnail720p(), "thumbnail_720p_test");
+        assertEquals(objectToMorph.getThumbnail480p(), "thumbnail_480p_test");
+        assertEquals(objectToMorph.getThumbnail360p(), "thumbnail_360p_test");
+        assertEquals(objectToMorph.getThumbnail240p(), "thumbnail_240p_test");
+        assertEquals(objectToMorph.getThumbnail144p(), "thumbnail_144p_test");
+        assertEquals(objectToMorph.getVideoLengthSeconds(), 91);
+        assertEquals(objectToMorph.getSocialMediaVideo(), "social_media_video_test");
+
+        assertEquals(objectToMorph.getProcessed(), 0);
+
     }
 
     @Test
-    public void test0033_UpdateEmailNotification() throws UnirestException{
+    public void test0033_UpdateEmailNotification() throws UnirestException {
 
         /**
          * Update the user's email notification status in the database.
@@ -2222,7 +2331,7 @@ public class IntegrationTests extends Server {
     }
 
     @Test
-    public void test0034_ContentHasAccessTest() throws UnirestException{
+    public void test0034_ContentHasAccessTest() throws UnirestException {
 
         /**
          * Upload content as the admin
@@ -2236,12 +2345,27 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"newest\",\n" +
                         "\"contentTitle\": \"new\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=newadmin\"," +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=newadmin1\"," +
                         "\"contentPrice\": 3.99," +
-                        "\"thumbnailUrl\": \"thumbnewadmin.com\"" +
+                        "\"thumbnailUrl\": \"thumbnewadmin.comz\"" +
                         "\n}")
                 .asString();
+        System.out.println(stringResponse.getBody());
         ContentObject content = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        System.out.println("content contentId: " + content.getContentId());
+
+        /**
+         * Ensure we do have access to this paid content, and the url is available in the response
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content.getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
+                .asString();
+
+        System.out.println("userAccess test content admin get: " + stringResponse.getBody());
+        ContentObject[] content0 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+        assertEquals(content0[0].hasAccess(), 1);
+        assertEquals(content0[0].getContentUrl(), "https://www.youtube.com/watch?v=newadmin1");
 
         /**
          * Ensure we don't have access to this paid content, and the url is null in the response
@@ -2251,7 +2375,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .asString();
 
-        System.out.println("userAccess test content1: "+stringResponse.getBody());
+        System.out.println("userAccess test content1: " + stringResponse.getBody());
         ContentObject[] content1 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content1[0].hasAccess(), 0);
         assertEquals(content1[0].getContentUrl(), null);
@@ -2281,11 +2405,11 @@ public class IntegrationTests extends Server {
         ContentObject[] content2 = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content2[0].hasAccess(), 1);
         assertEquals(content2[0].getUserId(), ADMIN_UID);
-        assertEquals(content2[0].getContentUrl(), "https://www.youtube.com/watch?v=newadmin");
+        assertEquals(content2[0].getContentUrl(), "https://www.youtube.com/watch?v=newadmin1");
     }
 
     @Test
-    public void test0035_ContentViewsTest() throws UnirestException{
+    public void test0035_ContentViewsTest() throws UnirestException {
 
         /**
          * Upload content as the admin
@@ -2305,6 +2429,7 @@ public class IntegrationTests extends Server {
                         "\n}")
                 .asString();
         ContentObject content = g.fromJson(stringResponse.getBody(), ContentObject.class);
+        System.out.println("content contentId: " + content.getContentId());
 
         /**
          * Ensure this content has 0 views
@@ -2437,6 +2562,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .asString();
+        System.out.println("content deleted stringresponse: " + stringResponse.getBody());
         assertEquals(stringResponse.getBody(), "[]");
 
         /**
@@ -2481,8 +2607,11 @@ public class IntegrationTests extends Server {
                 .asString();
 
         CommentObject[] co = g.fromJson(stringResponse.getBody(), CommentObject[].class);
-        for(int i = 0; i < co.length; i++) {
-            assertEquals(co[i].getContentId() != COMMENT_TEST_ID, true);
+
+        for (int i = 0; i < co.length; i++) {
+            System.out.println("contentCommentslist: " + co[i]);
+
+            assertEquals(co[i].getContentId() == COMMENT_TEST_ID, false);
         }
     }
 
@@ -2503,9 +2632,9 @@ public class IntegrationTests extends Server {
                         "\"publisherId\" : " + content[0].getPoster().getUserId() + ",\n" +
                         "\"buyerId\" :  " + TEST2_UID + ",\n" +
                         "\"contentId\" :  " + content[0].getContentId() + ",\n" +
-                        "\"currencyId\" :  "+1+",\n" +
+                        "\"currencyId\" :  " + 1 + ",\n" +
                         "\"buyerDetails\" :  \"details\",\n" +
-                        "\"orderOriginId\" :  "+1+"\n" +
+                        "\"orderOriginId\" :  " + 1 + "\n" +
                         "}")
                 .asString();
         System.out.println(stringResponse.getBody());
@@ -2549,6 +2678,8 @@ public class IntegrationTests extends Server {
          * Test logout
          */
 
+        System.out.println("Logout keys:" + TEST2_UID + " : " + TEST2_KEY);
+
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/logout")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
@@ -2563,8 +2694,6 @@ public class IntegrationTests extends Server {
 
         assertEquals(stringResponse.getStatus(), 401);
     }
-
-
 
 
     static String readFile(String path, Charset encoding)
@@ -2590,7 +2719,7 @@ public class IntegrationTests extends Server {
         StringBuilder response = new StringBuilder();
 
         while ((inputLine = in.readLine()) != null) {
-            if(inputLine.length() > 0) {
+            if (inputLine.length() > 0) {
                 response.append(inputLine);
             }
         }

@@ -3,6 +3,8 @@ package main.com.whitespell.peak;
 import main.com.whitespell.peak.logic.ApiThread;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.config.ServerProperties;
+import main.com.whitespell.peak.logic.exec.ShellExecution;
+import main.com.whitespell.peak.logic.health.HealthCheckThread;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
 import main.com.whitespell.peak.logic.notifications.NotificationThread;
@@ -10,27 +12,24 @@ import main.com.whitespell.peak.logic.notifications.NotificationThread;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 public class Server {
 
     private static ServerProperties systemProperties;
-    private static Calendar calendar = new GregorianCalendar();
 
     public static ServerProperties getServerProperties() {
         return systemProperties;
     }
 
-    public static Calendar getCalendar() {
-        return calendar;
-    }
-
     private static final ApiThread apiThread = new ApiThread();
     protected static final NotificationThread notificationThread = new NotificationThread();
+    protected static final HealthCheckThread healthCheckThread = new HealthCheckThread();
 
     public static void main(String[] args) throws Exception {
-       start();
+        start();
     }
 
     public static void start() {
@@ -40,13 +39,20 @@ public class Server {
         startApi();
         System.out.println("Starting notification thread");
         startNotifications();
+        System.out.println("Starting health check thread...");
+        startHealthCheck();
     }
 
     public static void startApi() {
         apiThread.start();
     }
+
     public static void startNotifications() {
         notificationThread.start();
+    }
+
+    public static void startHealthCheck() {
+        healthCheckThread.start();
     }
 
     public static class NotificationService {
@@ -56,9 +62,13 @@ public class Server {
     }
 
 
+
     public static void readConfigs() {
         systemProperties = new ServerProperties(Config.CONFIGURATION_FILE);
         ServerProperties.read();
+
+        Logging.log("RESTART", "--------------------------------------------------------------------");
+
         try {
             System.setErr(new PrintStream(new Logging.ErrorFile(), true));
         } catch (Exception e) {
@@ -72,9 +82,12 @@ public class Server {
                 System.err.close();
             }
         }
-        calendar.setTimeZone(TimeZone.getTimeZone(Config.SERVER_TIMEZONE));
-        Logging.log("RESTART", "--------------------------------------------------------------------");
 
+
+    }
+
+    public static long getMilliTime() {
+        return System.currentTimeMillis();
     }
 
 }

@@ -53,7 +53,7 @@ public class ContentLikeAction extends EndpointHandler {
         //local variables
         final int user_id = payload.get(PAYLOAD_USER_ID_KEY).getAsInt();
         final String action = payload.get(PAYLOAD_ACTION_KEY).getAsString();
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        final Timestamp now = new Timestamp(Server.getMilliTime());
 
         /**
          * Check that the action being performed is valid.
@@ -195,6 +195,7 @@ public class ContentLikeAction extends EndpointHandler {
             String json = g.toJson(likeActionObject);
             context.getResponse().getWriter().write(json);
         } else {
+
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }

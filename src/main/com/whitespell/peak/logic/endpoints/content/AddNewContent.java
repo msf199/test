@@ -4,12 +4,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
+import jdk.nashorn.tools.Shell;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.exec.ShellExecution;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.impl.ContentUploadedNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
@@ -27,9 +29,13 @@ import java.sql.Timestamp;
  */
 public class AddNewContent extends EndpointHandler {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `timestamp`) VALUES (?,?,?,?,?,?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`) VALUES (?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
-    private static final String GET_CONTENT_ID_QUERY = "SELECT `content_id` FROM `content` WHERE `content_url` = ? AND `timestamp` = ?";
+
+    private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
+    
+    private static final String GET_CONTENT_ID_QUERY = "SELECT LAST_INSERT_ID()";
+
 
     private static final String DELETE_FROM_CURATION = "DELETE FROM `content_curation` WHERE `content_url` = ?";
 
@@ -40,7 +46,6 @@ public class AddNewContent extends EndpointHandler {
     private static final String PAYLOAD_CONTENT_DESCRIPTION = "contentDescription";
     private static final String PAYLOAD_CONTENT_THUMBNAIL = "thumbnailUrl";
     private static final String PAYLOAD_CONTENT_PRICE = "contentPrice";
-
 
     private static final String URL_USER_ID_KEY = "userId";
 
@@ -58,6 +63,7 @@ public class AddNewContent extends EndpointHandler {
 
     @Override
     public void safeCall(RequestObject context) throws IOException {
+
         System.out.println("Received content call");
         JsonObject payload = context.getPayload().getAsJsonObject();
 
@@ -76,7 +82,7 @@ public class AddNewContent extends EndpointHandler {
             content_price[0] = 0.0;
         }
 
-        final Timestamp now = new Timestamp(Server.getCalendar().getTimeInMillis());
+        final Timestamp now = new Timestamp(Server.getMilliTime());
 
         int[] contentId = {0};
         int ADMIN_UID = -1;
@@ -111,7 +117,9 @@ public class AddNewContent extends EndpointHandler {
                 ps.setString(6, content_description);
                 ps.setString(7, thumbnail_url);
                 ps.setDouble(8, content_price[0]);
-                ps.setTimestamp(9, now);
+                // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
+                ps.setInt(9, Integer.parseInt(content_type) == StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE ? 0 : 1);
+                ps.setTimestamp(10, now);
 
                 int rows = ps.executeUpdate();
                 if (rows <= 0){
@@ -134,13 +142,33 @@ public class AddNewContent extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_ID_QUERY);
             executor.execute(ps -> {
-                ps.setString(1, content_url);
-                ps.setTimestamp(2, now);
 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
                 ResultSet r = ps.executeQuery();
                 if (r.next()){
-                    System.out.println("found the content");
-                    contentId[0] = r.getInt("content_id");
+                    contentId[0] = r.getInt("LAST_INSERT_ID()");
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_AVAILABLE_PROCESSING_INSTANCES);
+            final Timestamp min_15_ago = new Timestamp(Server.getMilliTime() - (60 * 1000 * 15)); // 15 mins max
+            executor.execute(ps -> {
+
+                ps.setTimestamp(1,min_15_ago);
+                ps.setTimestamp(2,min_15_ago);
+                ResultSet r = ps.executeQuery();
+                if (!r.next() && !Config.TESTING){
+                    Logging.log("INFO", "not enough video nodes, inserting one");
+                   // ShellExecution.createAndInsertVideoConverter();
+
+                } else {
+                    Logging.log("INFO", "we have enough video nodes");
                 }
             });
         } catch (SQLException e) {
@@ -223,23 +251,27 @@ public class AddNewContent extends EndpointHandler {
         }
 
         /**
-         * Send notifications to users for the ContentUpload if it's not a bundle (only when videos get added, could be inside bundle)
+         * Add the description as the first comment of the video.
          */
-
-
-        if(Integer.parseInt(content_type) != StaticRules.BUNDLE_CONTENT_TYPE) {
-             Server.NotificationService.offerNotification(new ContentUploadedNotification(user_id, new ContentObject(
-                    category_id,
-                    user_id,
-                    contentId[0],
-                    Integer.parseInt(content_type),
-                    content_title,
-                    content_url,
-                    content_description,
-                    thumbnail_url
-            )));
+        try {
+            HttpResponse<String> stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + contentId[0] + "/comments")
+                    .header("accept", "application/json")
+                    .header("X-Authentication", "" + a.getUserId() + "," + a.getKey() + "")
+                    .body("{\n" +
+                            "\"userId\": \"" + a.getUserId() + "\",\n" +
+                            "\"comment\": \"" + content_description + "\"\n" +
+                            "}")
+                    .asString();
+            System.out.println(stringResponse.getBody());
+        }catch(Exception e){
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            //do not throw error on client side
         }
 
+        /**
+         * Instead of sending notification when content is added, send notification when content has been processed.
+         */
 
         context.getResponse().setStatus(HttpStatus.OK_200);
         AddContentObject object = new AddContentObject();

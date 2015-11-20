@@ -6,6 +6,7 @@ import com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationExceptio
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.RandomGenerator;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.ExecutionBlock;
@@ -61,7 +62,7 @@ public class AuthenticationRequest extends EndpointHandler {
         final String username;
         final String password;
         String[] deviceName = {"unknown"};
-        String[] deviceUUID = {"unknown" + Server.getCalendar().getTimeInMillis()};
+        String[] deviceUUID = {"unknown" + Server.getMilliTime()};
         int[] deviceType = {-1};
         boolean device1 = false, device2 = false, device3 = false;
 
@@ -162,7 +163,7 @@ public class AuthenticationRequest extends EndpointHandler {
                             if (isVerified) {
                                 // initialize an authenticationobject and set the authentication key if verified
                                 final AuthenticationObject ao = new AuthenticationObject();
-                                ao.setKey(main.com.whitespell.peak.logic.SessionIdentifierGenerator.nextSessionId());
+                                ao.setKey(RandomGenerator.nextSessionId());
                                 ao.setUserId(s.getInt("user_id"));
 
                                 // insert the new authentication key into the database
@@ -201,9 +202,9 @@ public class AuthenticationRequest extends EndpointHandler {
                                         ps2.setInt(1, ao.getUserId());
                                         ps2.setString(2, ao.getKey());
                                         ps2.setString(3, finalDeviceUUID);
-                                        ps2.setTimestamp(4, new Timestamp(Server.getCalendar().getTimeInMillis()));
-                                        ps2.setTimestamp(5, new Timestamp(Server.getCalendar().getTimeInMillis() + (86400000 * 365 * 1)));
-                                        ps2.setTimestamp(6, new Timestamp(Server.getCalendar().getTimeInMillis()));
+                                        ps2.setTimestamp(4, new Timestamp(Server.getMilliTime()));
+                                        ps2.setTimestamp(5, new Timestamp(Server.getMilliTime() + (86400000 * 365 * 1)));
+                                        ps2.setTimestamp(6, new Timestamp(Server.getMilliTime()));
 
                                         ps2.executeUpdate();
                                     });

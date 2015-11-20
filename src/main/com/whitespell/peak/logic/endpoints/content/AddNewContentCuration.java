@@ -61,17 +61,19 @@ public class AddNewContentCuration extends EndpointHandler{
         final Timestamp now = new Timestamp(new Date().getTime());
 
         Gson g = new Gson();
+        int content_type_int = Integer.parseInt(content_type);
             try {
                 StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
                 executor.execute(ps -> {
                     ps.setString(1, String.valueOf(user_id));
                     ps.setInt(2, category_id);
-                    ps.setInt(3, Integer.parseInt(content_type));
+                    ps.setInt(3, content_type_int);
                     ps.setString(4, content_url);
                     ps.setString(5, content_title);
                     ps.setString(6, content_description);
                     ps.setString(7, thumbnail_url);
                     ps.setString(8, now.toString());
+
 
                     int rows = ps.executeUpdate();
                     if (rows <= 0) {

@@ -16,7 +16,7 @@ public class StaticRules {
     public static final int MIN_USERNAME_LENGTH = 1;
     public static final int MAX_USERNAME_LENGTH = 30;
     public static final int MIN_EMAIL_LENGTH = 6;
-    public static final int MAX_EMAIL_LENGTH = 512;
+    public static final int MAX_EMAIL_LENGTH = 255;
     public static final int MIN_PASSWORD_LENGTH = 6;
     public static final int MAX_PASSWORD_LENGTH = 512;
     public static final int MAX_CONTENT_TYPE_LENGTH = 10;
@@ -33,6 +33,8 @@ public class StaticRules {
 
     public static int BUNDLE_CONTENT_TYPE = 6;
 
+    public static int PLATFORM_UPLOAD_CONTENT_TYPE = 5;
+
     public enum ErrorCodes {
 
         //0-10 are unknown issues
@@ -46,6 +48,7 @@ public class StaticRules {
         INVALID_USERNAME_OR_PASS(104, "Invalid username or password", HttpStatus.UNAUTHORIZED_401),
         NOT_AUTHENTICATED(105, "User is not authenticated", HttpStatus.UNAUTHORIZED_401),
         NOT_AUTHORIZED(106, "Action is not authorized", HttpStatus.UNAUTHORIZED_401),
+        USERNAME_OR_EMAIL_TAKEN(107, "Username or email is taken, please try again", HttpStatus.UNAUTHORIZED_401),
 
         //110-120 is style error
         USERNAME_TOO_LONG(110, "Username is too long (" + StaticRules.MAX_USERNAME_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
@@ -89,7 +92,7 @@ public class StaticRules {
         COULD_NOT_COUNT_FOLLOWERS(148, "Unable to count category followers.", HttpStatus.NOT_FOUND_404),
         COULD_NOT_RETRIEVE_FACEBOOK(149, "Unable to retrieve user's facebook information.", HttpStatus.NOT_FOUND_404),
         PEAK_PASSWORD_REQUIRED(150, "The user's Peak password is required, please provide it.", HttpStatus.BAD_REQUEST_400),
-        COULD_NOT_PROCESS_FB_LOGIN(151, "Unable to process Peak authentication using Facebook", HttpStatus.NOT_FOUND_404),
+        COULD_NOT_PROCESS_FB_LOGIN(151, "Unable to process authentication using Facebook", HttpStatus.NOT_FOUND_404),
         CONTENT_FOLLOWER_EMAIL_NOT_SENT(152, "Unable to send an email to the follower of the uploading user regarding new content.", HttpStatus.NOT_FOUND_404),
         COULD_NOT_INSERT_FEEDBACK(153, "Unable to insert feedback for this user", HttpStatus.NOT_FOUND_404),
         COULD_NOT_ADD_REPORTING_TYPE(154, "Unable to add new reporting type", HttpStatus.NOT_FOUND_404),
@@ -137,9 +140,9 @@ public class StaticRules {
         REG_INT_REQUIRED_ZERO("int", true, -1,Integer.MAX_VALUE),
         REG_STRING_REQUIRED("string", true, 1,255),
         REG_STRING_REQUIRED_UNLIMITED("string", true, 1,Integer.MAX_VALUE),
-        REG_DOUBLE_REQUIRED("double", true, 1, Integer.MAX_VALUE),
-        REG_DOUBLE_OPTIONAL("double", false, 1, Integer.MAX_VALUE),
-        REG_INT_OPTIONAL("int", false, 1,Integer.MAX_VALUE),
+        REG_DOUBLE_REQUIRED("double", true, 0, Integer.MAX_VALUE),
+        REG_DOUBLE_OPTIONAL("double", false, 0, Integer.MAX_VALUE),
+        REG_INT_OPTIONAL("int", false, 0,Integer.MAX_VALUE),
         REG_INT_OPTIONAL_ZERO("int", false, -1, Integer.MAX_VALUE),
         REG_STRING_OPTIONAL("string", false, 1,255),
         JSON_ARRAY_REQUIRED("jsonarray", false, 1,10000);

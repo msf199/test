@@ -12,6 +12,7 @@ import org.eclipse.jetty.http.HttpStatus;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * @author Cory McAn(cmcan), Whitespell Inc.
@@ -19,8 +20,8 @@ import java.sql.SQLException;
  */
 public class DeleteComment extends EndpointHandler {
 
+    private static final String GET_NOTIFICATION_QUERY = "SELECT `notification_id` FROM `notification` where `notification_action` = ? AND `notification_text` LIKE '%comment%'";
     private static final String DELETE_CONTENT_COMMENT_QUERY = "DELETE FROM `content_comments` WHERE `comment_id` = ? AND `content_id` = ?";
-
     private static final String GET_COMMENT_USER_QUERY = "SELECT * FROM `content_comments` WHERE `comment_id` = ?";
 
     /**
@@ -31,6 +32,8 @@ public class DeleteComment extends EndpointHandler {
 
     private static final String COMMENT_USER_ID_KEY = "user_id";
     private static final String COMMENT_CONTENT_ID_KEY = "content_id";
+
+    private static final String DB_NOTIFICATION_ID = "notification_id";
 
     @Override
     protected void setUserInputs() {

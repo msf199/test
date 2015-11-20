@@ -15,10 +15,11 @@ public final class Config {
     CONFIG.PROP
      */
 
+    private static boolean dev;
+
     //General server information
     public static String SERVER_NAME = "API";
     public static int SERVER_VERSION = 1;
-    public static String SERVER_TIMEZONE = "UTC";
 
     //General mandrill mail information
     public static String MANDRILL_API_KEY = "_nuIwbGbVG1bvkxZo7LoiQ";
@@ -35,7 +36,7 @@ public final class Config {
     public static String GOOGLE_MESSAGING_API_KEY = "AIzaSyDTv7nfVlKXo73ykx-PYpecPWMMR9iIBXA";
 
     //APNS Push API information
-    public static String APNS_CERTIFICATE_LOCATION = "certificates/iosPushCertificate.p12";
+    public static String APNS_CERTIFICATE_LOCATION = "certificates/final-prod.p12";
     public static String APNS_PASSWORD_KEY = "Halo2";
 
     //AWS S3 API information
@@ -64,12 +65,6 @@ public final class Config {
 
     //Static ids and urls
     public static int INTRO_CONTENT_ID = 14131;
-    public static String PLATFORM_NAME = "UpFit";
-    public static String PLATFORM_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/peak_thumbnail.png";
-    public static String PLATFORM_VIEW_CONTENT_URL = "http://app.upfit.co/#/post/";
-    public static String PLATFORM_HOME_PAGE_URL = "http://www.upfit.co";
-    public static String PLATFORM_EMAIL_SEND_ADDRESS = "upfit@whitespell.com";
-    public static String PLATFORM_EMAIL_SEND_NAME = "Upfit by Whitespell";
 
     //Static order details
     public static int ORDER_ORIGIN_APPLE = 1;
@@ -79,12 +74,27 @@ public final class Config {
     public static int ORDER_TYPE_SUBSCRIPTION = 3;
     public static int ORDER_CURRENCY_USD = 1;
 
+    public static String PLATFORM_NAME = "Upfit";
+    public static String PLATFORM_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/upfit-og.png";
+    public static String PLATFORM_VIEW_CONTENT_URL = "https://app.upfit.co/#/post/";
+    public static String PLATFORM_HOME_PAGE_URL = "https://www.upfit.co";
+    public static String PLATFORM_EMAIL_SEND_ADDRESS = "upfit@whitespell.com";
+    public static String PLATFORM_EMAIL_SEND_NAME = "Upfit by Whitespell";
+
     //server.Server Ports
-    public static int API_PORT = 8000;
+    public static int API_PORT = 80;
 
     //security measures
     public static String ERROR_PATH = "/";
     public static int MAX_ERROR_FOLDER_SIZE_MB = 10;
 
 
+    public static void setDev(boolean devStatus) {
+        dev = devStatus;
+    }
+
+
+    public static boolean isDev() {
+        return dev;
+    }
 }

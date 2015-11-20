@@ -45,10 +45,14 @@ public class Authentication {
                 key = null;
             } else {
                 userId = Integer.parseInt(tempHeader[0]);
-                key = tempHeader[1];
+                key = tempHeader[1].replaceAll(" ", "");
             }
         }
 
+    }
+
+    public boolean isMaster() {
+        return isMasterKey(key);
     }
 
     /**
@@ -82,7 +86,7 @@ public class Authentication {
             executor.execute(ps -> {
                 ps.setInt(1, userId);
                 ps.setString(2, key);
-                ps.setTimestamp(3, new Timestamp(Server.getCalendar().getTimeInMillis()));
+                ps.setTimestamp(3, new Timestamp(Server.getMilliTime()));
                 final ResultSet s = ps.executeQuery();
 
                 // if we do find a result and it hasn't expired, we have been authenticated
@@ -104,8 +108,8 @@ public class Authentication {
 
             executor.execute(ps -> {
 
-                ps.setTimestamp(1, new Timestamp(Server.getCalendar().getTimeInMillis())); // set last activity to now
-                ps.setTimestamp(2, new Timestamp(Server.getCalendar().getTimeInMillis() + 86400000 * 60)); // set expires to 2 months from last auth
+                ps.setTimestamp(1, new Timestamp(Server.getMilliTime())); // set last activity to now
+                ps.setTimestamp(2, new Timestamp(Server.getMilliTime() + 86400000 * 60)); // set expires to 2 months from last auth
                 ps.setInt(3, userId);
                 ps.setString(4, key);
                 ps.executeUpdate();
