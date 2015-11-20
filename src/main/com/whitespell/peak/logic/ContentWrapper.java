@@ -16,7 +16,6 @@ import java.util.ArrayList;
  */
 public class ContentWrapper {
 
-
     /** content table keys */
     private static final String CONTENT_CATEGORY_ID = "category_id";
     private static final String CONTENT_ID_KEY = "content_id";
@@ -30,7 +29,6 @@ public class ContentWrapper {
     private static final String CONTENT_PRICE = "content_price";
     private static final String USER_ID_KEY = "user_id";
 
-
     /** user table keys **/
      private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
@@ -38,7 +36,6 @@ public class ContentWrapper {
     private static final String THUMBNAIL_KEY = "thumbnail";
     private static final String COVER_PHOTO_KEY = "cover_photo";
     private static final String SLOGAN_KEY = "slogan";
-
 
     private static final String GET_BUNDLE_CHILDREN =
             "SELECT * FROM bundle_match as bm" +
@@ -55,9 +52,8 @@ public class ContentWrapper {
     // get the access ids from the users views
     private static final String GET_USER_VIEW_QUERY = "SELECT `content_id` from `content_views` WHERE `user_id` = ?";
 
-    // get the access ids from the users views
+    // get the access ids from the users saved content
     private static final String GET_USER_SAVED_QUERY = "SELECT `content_id` from `content_saved` WHERE `user_id` = ?";
-
 
     private RequestObject context;
     private int requesterUserId;
@@ -196,11 +192,11 @@ public class ContentWrapper {
     }
 
 
-
     private ContentObject personalizeContent(ContentObject tempContent, UserObject tempPublisher, ResultSet currentObject) {
 
         int currentContentId = tempContent.getContentId();
         try {
+
             /**
              * Set content access. If free or the user is the publisher, user has access
              */

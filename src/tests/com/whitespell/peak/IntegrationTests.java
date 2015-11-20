@@ -79,9 +79,10 @@ public class IntegrationTests extends Server {
     static String ADMIN_USERNAME = "cory";
     static String ADMIN_PASSWORD = "3#$$$$$494949($(%*__''";
     static String ADMIN_EMAIL = "cory@whitespell.com";
-    static String ADMIN_DEVICE_UUID = "dxrStfyjzJI:APA91bFULn4RMTawNQr8Sg91LqKbog" +
-            "4AHxVtHbu-ZvcTgfCpfIujMtvob3AVPNKgDpcNQMdaZ4mr7Zma9tvzYq6Bcetpsx4YsDB" +
-            "MiERqeZ4cP7lxLUYaVcwBPtHoUDRqdoL27dRN84Ev";
+    static String ADMIN_DEVICE_UUID = "cl2CJhwLrbE:APA91bEyu6SrBtC6GTCm8NM0Lq" +
+            "K36og1PsAfGI3NolVxSOVFKsHKkwBtWXpbdS3l_Iqy8K" +
+            "WKXUcVaX-eCHXj1dJA3xeveSTA_6J1l_IB65mdBGV6-Bma" +
+            "up1ArvOWZo3QcOFM43TL2H0H";
     static String ADMIN_DEVICE_NAME = "cory's phone";
     static int ADMIN_DEVICE_TYPE = 1;
 
@@ -131,7 +132,6 @@ public class IntegrationTests extends Server {
         if (Config.DB_USER.equals("testpeak")) { // ensure we are on the test server
             // truncate peak_ci_test_ddl
 
-
             /**
              * CREATING THE TEST DATABASE
              */
@@ -174,6 +174,55 @@ public class IntegrationTests extends Server {
             // set the current database to the new database and re-initialize the Pool
             Config.DB = TEST_DB_NAME;
             Pool.initializePool();
+
+            /**
+             * Add the order type and origin values to the test DB
+             */
+
+            String INSERT_ORDER_TYPE = "INSERT INTO "+TEST_DB_NAME+".`order_type`(`order_type_id`, `order_type_name`) VALUES(?,?)";
+            String INSERT_ORDER_ORIGIN = "INSERT INTO "+TEST_DB_NAME+".`order_origin`(`order_origin_id`, `order_origin_name`) VALUES(?,?)";
+            ArrayList<String> types = new ArrayList<>();
+            types.add("video");
+            types.add("bundle");
+            types.add("subscription");
+            ArrayList<String> origins = new ArrayList<>();
+            origins.add("apple");
+            origins.add("google");
+            origins.add("web");
+            final int[] count = {1};
+
+            for (String s : types) {
+                try {
+                    StatementExecutor executor = new StatementExecutor(INSERT_ORDER_TYPE);
+                    executor.execute(ps -> {
+                        ps.setInt(1, count[0]);
+                        ps.setString(2, s);
+
+                        ps.executeUpdate();
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e);
+                    return;
+                }
+                count[0]++;
+            }
+
+            count[0] = 1;
+            for (String s : origins) {
+                try {
+                    StatementExecutor executor = new StatementExecutor(INSERT_ORDER_ORIGIN);
+                    executor.execute(ps -> {
+                        ps.setInt(1, count[0]);
+                        ps.setString(2, s);
+
+                        ps.executeUpdate();
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e);
+                    return;
+                }
+                count[0]++;
+            }
         }
     }
 
@@ -1771,8 +1820,6 @@ public class IntegrationTests extends Server {
     @Test
     public void test0031_PushNotificationTest() throws UnirestException {
 
-        Config.NOTIFICATION_TOGGLE = false;
-
         /**
          * Test that notifications are updated in DB
          */
@@ -2093,19 +2140,27 @@ public class IntegrationTests extends Server {
         ContentObject content3 = g.fromJson(stringResponse.getBody(), ContentObject.class);
         assertEquals(content3.getContentDescription(), "newDesc");
 
-        /**
-         * Change only price
-         **/
+
+        /** Update ALL values at once **/
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content1[0].getContentId())
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
-                .body("{\n\"contentPrice\": " + 0.99 +
-                        ",\"userId\": "+ADMIN_UID +
+                .body("{" +
+                        "\n\"contentTitle\": \"title_test\"," +
+                        "\n\"contentDescription\": \"description_test\"," +
+                        "\n\"contentPrice\": 1.33," +
+                        "\n\"categoryId\": " + categories[0].getCategoryId() + "," +
+                        "\n\"contentUrl\": \"url_test\"," +
+                        "\n\"contentUrl1080p\": \"url_1080p_test\"," +
+                        "\n\"contentUrl720p\": \"url_720p_test\"," +
+                        "\n\"contentUrl480p\": \"url_480p_test\"," +
+                        "\n\"contentPreview720p\": \"preview_720p_test\"," +
+                        "\n\"processed\": \"0\"" +
                         "}")
                 .asString();
         ContentObject content4 = g.fromJson(stringResponse.getBody(), ContentObject.class);
-        assertEquals(content4.getContentPrice(), 0.99, 0.0);
+        assertEquals(content4.getContentPrice(), 1.33, 0.0);
 
         /**
          * Change all fields
@@ -2435,14 +2490,15 @@ public class IntegrationTests extends Server {
     public void test0037_OrderTest() throws UnirestException {
 
         /**
-         * Test order system, inserting, (todo cmcan) updating and getting order details.
+         * Test order system, inserting, getting order details and (todo cmcan) updating the order.
          */
 
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/order")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
-                        "\"orderType\":1,\n" +
+                        "\"orderUUID\":\"27614847GDgvc.1\",\n" +
+                        "\"orderType\": 1,\n" +
                         "\"orderStatus\" : 1,\n" +
                         "\"publisherId\" : " + content[0].getPoster().getUserId() + ",\n" +
                         "\"buyerId\" :  " + TEST2_UID + ",\n" +
@@ -2453,9 +2509,32 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
         System.out.println(stringResponse.getBody());
-
         CreateOrder.CreateOrderResponse c = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
         assertEquals(c.isSuccess(), true);
+
+        /**
+         * Get the inserted order's details.
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/order?contentId=" + content[0].getContentId())
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        OrderObject o = g.fromJson(stringResponse.getBody(), OrderObject.class);
+        assertEquals(o.getOrderStatus(), "success");
+        assertEquals(o.getOrderType(), "video");
+        assertEquals(o.getOrderOrigin(), "apple");
+        assertEquals(o.getContentId(), content[0].getContentId());
+        assertEquals(o.getBuyerId(), TEST2_UID);
+        assertEquals(o.getPublisherId(), content[0].getPoster().getUserId());
+        assertEquals(o.getDelivered(), 0);
+
+        /**
+         * Update the order's delivered status (also the publisher and whitespell balances)
+         */
+
+
     }
 
 
