@@ -249,14 +249,14 @@ public class ContentWrapper {
                 tempContent.setContentPrice(0);
             }*/
 
-
             /**
              * AFTER BETA, UNCOMMENT BELOW:
              */
             /**
-             * Set content access. If free or the user is the publisher, user has access
+             * Set content access. If free or the user is the publisher, user has access (or if userId is master)
              */
-            if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempContent.getUserId()) {
+            if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempContent.getUserId()
+                    || requesterUserId == -1) {
                 tempContent.setHasAccess(1);
             } else if (userAccess.contains(currentContentId)) {
                 tempContent.setHasAccess(1);
