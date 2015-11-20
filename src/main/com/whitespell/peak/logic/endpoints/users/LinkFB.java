@@ -64,8 +64,8 @@ public class LinkFB extends EndpointHandler {
 
         int[] userId = {0};
         String facebookUserId = "";
-        String facebookCover = "";
-        String facebookProfilePic = "";
+        String facebookCover = null;
+        String facebookProfilePic = null;
         String[] authUsername ={null};
         String username = "test";
         String email = "test@test.test";
@@ -133,7 +133,7 @@ public class LinkFB extends EndpointHandler {
                     .setOAuthAppId(Config.FB_APP_ID)
                     .setOAuthAppSecret(Config.FB_APP_SECRET)
                     .setOAuthAccessToken(accessToken)
-                    .setOAuthPermissions("email,public_profile,cover,picture");
+                    .setOAuthPermissions("email,public_profile");
             FacebookFactory ff = new FacebookFactory(cb.build());
             Facebook facebook = ff.getInstance();
 
@@ -147,9 +147,12 @@ public class LinkFB extends EndpointHandler {
                 /**
                  * Get the profile pic and cover photo for automatic
                  */
-                if(user.getCover().getSource() != null && user.getPicture().getURL() != null){
-                    facebookProfilePic = facebook.users().getPictureURL(PictureSize.normal).toString();
+                if(user.getCover() != null){
                     facebookCover = user.getCover().getSource();
+                }
+
+                if(user.getPicture() != null){
+                    facebookProfilePic = facebook.users().getPictureURL(PictureSize.normal).toString();
                 }
 
                 facebookUserId = user.getId();
