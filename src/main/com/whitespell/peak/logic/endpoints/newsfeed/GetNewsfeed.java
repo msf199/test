@@ -181,6 +181,7 @@ public class GetNewsfeed extends EndpointHandler {
                         }
 
                         newsfeedContent = contentWrapper.wrapContent(results);
+
                         newsfeedId[0] = newsfeedContent.getContentId();
 
                         /**
