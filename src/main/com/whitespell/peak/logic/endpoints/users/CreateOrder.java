@@ -103,7 +103,7 @@ public class CreateOrder extends EndpointHandler {
 
         ContentObject orderContent;
         try{
-            orderContent = h.getContentById(contentId);
+            orderContent = h.getContentById(contentId, a.getUserId(), a.getKey());
         } catch(UnirestException e){
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);

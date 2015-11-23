@@ -206,7 +206,7 @@ public class GetNewsfeed extends EndpointHandler {
                                  * Get the parent of the current contentObject
                                  */
 
-                                ContentObject parent = g.getContentById(newsfeedContent.getParent());
+                                ContentObject parent = g.getContentById(newsfeedContent.getParent(), a.getUserId(), a.getKey());
 
                                 /**
                                  * Return the parent bundle on the newsfeed since it has been updated since it was

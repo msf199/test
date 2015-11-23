@@ -418,7 +418,7 @@ public class UpdateContent extends EndpointHandler {
         ContentHelper c = new ContentHelper();
         ContentObject content = null;
         try {
-            content = c.getContentById(final_content_id);
+            content = c.getContentById(final_content_id, a.getUserId(), a.getKey());
         }catch(Exception e){
             Logging.log("High", e);
             //don't throw client side error, this is only for email notifications
@@ -633,7 +633,7 @@ public class UpdateContent extends EndpointHandler {
                             try {
                                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + final_content_id)
                                          .header("accept", "application/json")
-                                         .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
+                                         .header("X-Authentication", +a.getUserId()+ "," + a.getKey() + "")
                                          .asString();
                             } catch (UnirestException e) {
                                 e.printStackTrace();

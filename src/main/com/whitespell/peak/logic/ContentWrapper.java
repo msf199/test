@@ -255,7 +255,10 @@ public class ContentWrapper {
             /**
              * Set content access. If free or the user is the publisher, user has access (or if userId is master)
              */
-        
+
+            System.out.println(requesterUserId);
+            System.out.println("contentId:" +tempContent.getContentId()+" wrapper userId: "+tempPublisher.getUserId());
+
             if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempPublisher.getUserId()
                     || requesterUserId == 134) {
                 tempContent.setHasAccess(1);

@@ -16,13 +16,13 @@ import main.com.whitespell.peak.model.UserObject;
  */
 public class ContentHelper {
 
-    public ContentObject getContentById(int contentId) throws UnirestException {
+    public ContentObject getContentById(int contentId, int requesterUserId, String authKey) throws UnirestException {
         Gson g = new Gson();
         HttpResponse<String> stringResponse;
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/?contentId="+contentId)
                 .header("accept", "application/json")
-                .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
+                .header("X-Authentication", requesterUserId+"," + authKey + "")
                 .asString();
 
         ContentObject c[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
