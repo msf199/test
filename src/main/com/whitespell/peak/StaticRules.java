@@ -29,6 +29,7 @@ public class StaticRules {
     public static final int DEFAULT_MIN_OFFSET = 0;
     public static final int DEFAULT_MAX_CEIL = -1;
     public static final String MASTER_KEY = "4ajerifjaierjf34ijfi34jij3a4ifj34ijf";
+    public static final String MASTER_PASS = "03Bt0T4HbY";
     public static final int MIN_FEEDBACK_LENGTH = 10;
 
     public static int BUNDLE_CONTENT_TYPE = 6;
