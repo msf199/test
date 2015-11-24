@@ -206,7 +206,7 @@ public class GetNewsfeed extends EndpointHandler {
                                  * Get the parent of the current contentObject
                                  */
 
-                                ContentObject parent = g.getContentById(newsfeedContent.getParent(), a.getUserId(), a.getKey());
+                                ContentObject parent = g.getContentById(context, newsfeedContent.getParent(), a.getUserId());
 
                                 /**
                                  * Return the parent bundle on the newsfeed since it has been updated since it was
@@ -236,7 +236,7 @@ public class GetNewsfeed extends EndpointHandler {
                                     }
                                 }
                             } catch (UnirestException e) {
-                                e.printStackTrace();
+                                Logging.log("High", e);
                             }
                         }
 

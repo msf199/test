@@ -60,7 +60,7 @@ public class DeleteContent extends EndpointHandler {
          * Check content poster and ensure content poster matches authentication (only publisher can delete content)
          */
         try {
-            toDelete = h.getContentById(contentId, a.getUserId(), a.getKey());
+            toDelete = h.getContentById(context, contentId, a.getUserId());
 
             if(toDelete == null){
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);

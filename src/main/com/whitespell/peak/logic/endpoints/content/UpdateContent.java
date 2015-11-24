@@ -418,7 +418,7 @@ public class UpdateContent extends EndpointHandler {
         ContentHelper c = new ContentHelper();
         ContentObject content = null;
         try {
-            content = c.getContentById(final_content_id, a.getUserId(), a.getKey());
+            content = c.getContentById(context, final_content_id, a.getUserId());
         }catch(Exception e){
             Logging.log("High", e);
             //don't throw client side error, this is only for email notifications

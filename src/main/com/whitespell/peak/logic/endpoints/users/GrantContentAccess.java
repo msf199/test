@@ -107,7 +107,7 @@ public class GrantContentAccess extends EndpointHandler {
         ContentObject c = null;
 
         try {
-            c = h.getContentById(content_id, a.getUserId(), a.getKey());
+            c = h.getContentById(context, content_id, a.getUserId());
             if (c == null) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
                 return;

@@ -103,7 +103,7 @@ public class CreateOrder extends EndpointHandler {
 
         ContentObject orderContent;
         try{
-            orderContent = h.getContentById(contentId, a.getUserId(), a.getKey());
+            orderContent = h.getContentById(context, contentId, a.getUserId());
         } catch(UnirestException e){
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
@@ -130,10 +130,10 @@ public class CreateOrder extends EndpointHandler {
         String[] orderTypeName = {""};
         String[] orderStatusName = {""};
         String[] orderOriginName = {""};
-        double netRevenue;
-        double peakShare;
+        final double netRevenue;
+        final double peakShare;
         double peakBalance;
-        double publisherShare;
+        final double publisherShare;
         double publisherBalance;
         String receiptHtml;
 

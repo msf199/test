@@ -6,8 +6,13 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -16,21 +21,30 @@ import main.com.whitespell.peak.model.UserObject;
  */
 public class ContentHelper {
 
-    public ContentObject getContentById(int contentId, int requesterUserId, String authKey) throws UnirestException {
-        Gson g = new Gson();
-        HttpResponse<String> stringResponse;
+    private static final String GET_CONTENT = "SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` = ? ";
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/?contentId="+contentId)
-                .header("accept", "application/json")
-                .header("X-Authentication", requesterUserId+"," + authKey + "")
-                .asString();
 
-        ContentObject c[] = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+    public ContentObject getContentById(RequestObject context,int contentId, int requesterUserId) throws UnirestException {
+        final ContentObject[] content = {null};
 
-        if(stringResponse.getBody().equals("[]")){
-            return null;
+        ContentWrapper contentWrapper = new ContentWrapper(context, requesterUserId);
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_CONTENT);
+
+            executor.execute(ps -> {
+                ps.setInt(1, contentId);
+
+                final ResultSet results = ps.executeQuery();
+
+                if (results.next()) {
+                    content[0] = contentWrapper.wrapContent(results);
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
         }
 
-        return c[0];
+        return content[0];
     }
 }
