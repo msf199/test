@@ -497,7 +497,6 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(CONTENT_URL_720P_DB)) {
-                        sendContentPreview = true;
                         ps.setString(count, final_url_720p);
                         System.out.println("Set string " + count + " to " + final_url_720p);
                         count++;
@@ -530,6 +529,7 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(CONTENT_PREVIEW_720P_DB)) {
+                        sendContentPreview = true;
                         ps.setString(count, final_preview_720p);
                         System.out.println("Set string " + count + " to " + final_preview_720p);
                         count++;
