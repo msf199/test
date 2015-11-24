@@ -457,6 +457,7 @@ public class UpdateContent extends EndpointHandler {
                     ContentObject content = null;
                     int count = 1;
                     boolean sendSocialMediaEmail = false;
+                    boolean sendContentPreview = false;
                     boolean editDescriptionComment = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
@@ -496,6 +497,7 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(CONTENT_URL_720P_DB)) {
+                        sendContentPreview = true;
                         ps.setString(count, final_url_720p);
                         System.out.println("Set string " + count + " to " + final_url_720p);
                         count++;
@@ -612,13 +614,13 @@ public class UpdateContent extends EndpointHandler {
                         //outputs only the updated user fields, others will be "" or -1
 
                         /**
-                         * If content was successfully updated and the social media link is ready, send email notification
+                         * If content was successfully updated and the social media link AND long contentPreview is ready, send email notification
                          * to publisher
                          */
-                        if(sendSocialMediaEmail){
+                        if(sendSocialMediaEmail && sendContentPreview){
                             if(publisherEmail[0] != null) {
                                 EmailSend.sendSocialMediaLinkNotificationEmail(
-                                        final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
+                                        final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video, final_preview_720p);
                             }
                         }
 

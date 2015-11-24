@@ -31,6 +31,7 @@ public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`) VALUES (?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
+    private static final String CHECK_DUPLICATE_CONTENT_QUERY = "SELECT `content_id` FROM `content` WHERE `user_id` = ? AND `content_url` = ?";
 
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     
@@ -99,6 +100,27 @@ public class AddNewContent extends EndpointHandler {
 
         if (!a.isAuthenticated() || !isMe) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            return;
+        }
+
+        /**
+         * Ensure this content hasn't been uploaded already by this user to avoid duplicates
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(CHECK_DUPLICATE_CONTENT_QUERY);
+            executor.execute(ps -> {
+                ps.setInt(1, user_id);
+                ps.setString(2, content_url);
+
+                ResultSet results = ps.executeQuery();
+                if (results.next()){
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_EXISTS);
+                    return;
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
 

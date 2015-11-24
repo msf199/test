@@ -109,7 +109,8 @@ public class StaticRules {
         CANNOT_FOLLOW_YOURSELF(162, "Cannot follow yourself", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_SUBMIT_ORDER(163, "Order could not be submitted, please try again", HttpStatus.NOT_FOUND_404),
         INCORRECT_ORDER_PAYLOAD(164, "Please check the payload ids for accuracy", HttpStatus.BAD_REQUEST_400),
-        CHILD_UPDATE_FAILED(165, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500);
+        CHILD_UPDATE_FAILED(165, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500),
+        CONTENT_ALREADY_EXISTS(166, "This contentUrl was already added by this user", HttpStatus.BAD_REQUEST_400);
 
 
         int errorId;
