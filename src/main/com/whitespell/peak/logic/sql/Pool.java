@@ -53,35 +53,4 @@ public class Pool {
         }
     }
 
-    public ResultSet query(String sql, Object... params) {
-        try {
-            PreparedStatement statement = ds.getConnection().prepareStatement(sql);
-            int i = 0;
-            for (Object param : params) {
-                i++;
-                statement.setObject(i, param);
-            }
-            return statement.executeQuery();
-        } catch (SQLException e) {
-            throw new SqlDatabaseException("Error executing SQL: " + sql, e);
-        }
-    }
-
-    public int update(String sql, Object... params) {
-        try {
-            PreparedStatement statement = ds.getConnection().prepareStatement(sql);
-            try {
-                int i = 0;
-                for (Object param : params) {
-                    i++;
-                    statement.setObject(i, param);
-                }
-                return statement.executeUpdate();
-            } finally {
-                statement.close();
-            }
-        } catch (SQLException e) {
-            throw new SqlDatabaseException("Error executing SQL: " + sql, e);
-        }
-    }
 }
