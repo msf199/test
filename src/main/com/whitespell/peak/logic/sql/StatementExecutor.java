@@ -13,31 +13,10 @@ public class StatementExecutor {
     private PreparedStatement statement;
 
     public StatementExecutor(String query) throws SQLException {
-        int retryCount = 5;
         this.connection = Pool.getConnection();
-        for(int i = 0; i < retryCount; i++) {
-            if(prepareStatement(query)) {
-             break;
-            }
-            if(i == 4) {
-                Logging.log("HIGH", "unable to establish database connection");
-            }
-        }
-
+        this.statement = this.connection.prepareStatement(query);
     }
 
-    public boolean prepareStatement(String query) throws SQLException {
-
-        try {
-            if (connection == null || connection.isClosed()) {
-                connection = Pool.getConnection();
-            }
-            this.statement = this.connection.prepareStatement(query);
-        } catch(Exception e) {
-            return false;
-        }
-        return true;
-    }
     public void execute(ExecutionBlock block) throws SQLException {
         try {
             block.process(this.statement);
