@@ -371,8 +371,8 @@ public class UpdateContent extends EndpointHandler {
          * Ensure user attempting to update content is the uploader
          */
         int[] publisherUserId = {-1};
-        String[] publisherEmail = {""};
-        String[] publisherName = {""};
+        String[] publisherEmail = {null};
+        String[] publisherName = {null};
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_QUERY);
 
@@ -457,7 +457,6 @@ public class UpdateContent extends EndpointHandler {
                     ContentObject content = null;
                     int count = 1;
                     boolean sendSocialMediaEmail = false;
-                    boolean sendContentPreview = false;
                     boolean editDescriptionComment = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
@@ -529,7 +528,6 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(CONTENT_PREVIEW_720P_DB)) {
-                        sendContentPreview = true;
                         ps.setString(count, final_preview_720p);
                         System.out.println("Set string " + count + " to " + final_preview_720p);
                         count++;
@@ -614,13 +612,27 @@ public class UpdateContent extends EndpointHandler {
                         //outputs only the updated user fields, others will be "" or -1
 
                         /**
-                         * If content was successfully updated and the social media link AND long contentPreview is ready, send email notification
+                         * If content social media link AND long contentPreview is ready, send email notification
                          * to publisher
                          */
-                        if(sendSocialMediaEmail && sendContentPreview){
-                            if(publisherEmail[0] != null) {
-                                EmailSend.sendSocialMediaLinkNotificationEmail(
-                                        final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video, final_preview_720p);
+                        /**
+                         * Only check for the 720p if the SocialMediaPreview is being updated.
+                         */
+                        if(sendSocialMediaEmail) {
+                            ContentHelper h = new ContentHelper();
+                            try {
+                                ContentObject c = h.getContentById(context, final_content_id, a.getUserId());
+                                if (c != null
+                                        && c.getThumbnail720p() != null && c.getContentTitle() != null
+                                        && c.getContentPreview720p() != null && c.getSocialMediaVideo() != null) {
+                                    if (publisherEmail[0] != null && publisherName[0] != null) {
+                                        EmailSend.sendSocialMediaLinkNotificationEmail(
+                                                c.getThumbnail720p(), publisherEmail[0], publisherName[0],
+                                                c.getContentTitle(), c.getSocialMediaVideo(), c.getContentUrl720p());
+                                    }
+                                }
+                            } catch (UnirestException e) {
+                                Logging.log("Low", e);
                             }
                         }
 
@@ -638,7 +650,7 @@ public class UpdateContent extends EndpointHandler {
                                          .header("X-Authentication", +a.getUserId()+ "," + a.getKey() + "")
                                          .asString();
                             } catch (UnirestException e) {
-                                e.printStackTrace();
+                                Logging.log("Low", e);
                             }
                             content = g.fromJson(stringResponse.getBody(), ContentObject.class);
                             if(content != null && content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE) {
