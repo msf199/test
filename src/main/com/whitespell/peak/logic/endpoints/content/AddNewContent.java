@@ -70,7 +70,7 @@ public class AddNewContent extends EndpointHandler {
 
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID_KEY));
         final int category_id = payload.get(PAYLOAD_CATEGORY_ID).getAsInt();
-        final String content_type = payload.get(PAYLOAD_CONTENT_TYPE_ID).getAsString();
+        final int content_type = payload.get(PAYLOAD_CONTENT_TYPE_ID).getAsInt();
         final String content_url = payload.get(PAYLOAD_CONTENT_URL).getAsString();
         final String content_title = payload.get(PAYLOAD_CONTENT_TITLE).getAsString();
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
@@ -104,24 +104,26 @@ public class AddNewContent extends EndpointHandler {
         }
 
         /**
-         * Ensure this content hasn't been uploaded already by this user to avoid duplicates
+         * Ensure this content hasn't been uploaded already by this user to avoid duplicates (only check non-bundles)
          */
-        try {
-            StatementExecutor executor = new StatementExecutor(CHECK_DUPLICATE_CONTENT_QUERY);
-            executor.execute(ps -> {
-                ps.setInt(1, user_id);
-                ps.setString(2, content_url);
+        if(content_type != (StaticRules.BUNDLE_CONTENT_TYPE)) {
+            try {
+                StatementExecutor executor = new StatementExecutor(CHECK_DUPLICATE_CONTENT_QUERY);
+                executor.execute(ps -> {
+                    ps.setInt(1, user_id);
+                    ps.setString(2, content_url);
 
-                ResultSet results = ps.executeQuery();
-                if (results.next()){
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_EXISTS);
-                    return;
-                }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
+                    ResultSet results = ps.executeQuery();
+                    if (results.next()) {
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_EXISTS);
+                        return;
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
         }
 
         /**
@@ -133,14 +135,14 @@ public class AddNewContent extends EndpointHandler {
             executor.execute(ps -> {
                 ps.setString(1, String.valueOf(user_id));
                 ps.setInt(2, category_id);
-                ps.setInt(3, Integer.parseInt(content_type));
+                ps.setInt(3, content_type);
                 ps.setString(4, content_url);
                 ps.setString(5, content_title);
                 ps.setString(6, content_description);
                 ps.setString(7, thumbnail_url);
                 ps.setDouble(8, content_price[0]);
                 // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
-                ps.setInt(9, Integer.parseInt(content_type) == StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE ? 0 : 1);
+                ps.setInt(9, content_type == StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE ? 0 : 1);
                 ps.setTimestamp(10, now);
 
                 int rows = ps.executeUpdate();
