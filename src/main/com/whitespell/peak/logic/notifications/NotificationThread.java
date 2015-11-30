@@ -55,9 +55,9 @@ public class NotificationThread extends Thread {
 
         PushNotificationPayload payload = PushNotificationPayload.complex();
         try {
-            payload.addAlert("test message for alex");
+            payload.addAlert("test message for arielle");
             Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
-                    Config.APNS_PASSWORD_KEY, false, "b1fa786c44056d8ac129067ca68d64cdd1e12a2a736d7c07b4a80446a3aebe8c");
+                    Config.APNS_PASSWORD_KEY, true, "6f32e69a586a5bb7df100209586fa45929f66ec62b6df1330dfb88cd7ee1bdf2");
         }catch(Exception e){
             Logging.log("High",e);
         }
