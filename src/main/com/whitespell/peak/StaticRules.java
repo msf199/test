@@ -19,10 +19,16 @@ public class StaticRules {
     public static final int MAX_EMAIL_LENGTH = 255;
     public static final int MIN_PASSWORD_LENGTH = 6;
     public static final int MAX_PASSWORD_LENGTH = 512;
+
+    public static final int MAX_CONTENT_TITLE_LENGTH = 45;
+    public static final int MAX_CONTENT_DESCRIPTION_LENGTH = 100;
+    public static final int MAX_CONTENT_URL_LENGTH = 255;
+    public static final int MAX_CONTENT_PREVIEW_LENGTH = 255;
+    public static final int MAX_THUMBNAIL_URL_LENGTH = 255;
+    public static final int MAX_CONTENT_TYPE_ID_LENGTH = 2;
+
     public static final int MAX_CONTENT_TYPE_LENGTH = 10;
     public static final int MAX_CATEGORY_LENGTH = 45;
-    public static final int MAX_THUMBNAIL_URL_LENGTH = 255;
-    public static final int MAX_CONTENT_DESCRIPTION_LENGTH = 100;
     public static final int MIN_AUTHENTICATION_HEADER_LENGTH = 1;
     public static final int MAX_AUTHENTICATION_HEADER_LENGTH = 255;
     public static final int DEFAULT_MAX_LIMIT = 50;
@@ -110,7 +116,11 @@ public class StaticRules {
         COULD_NOT_SUBMIT_ORDER(163, "Order could not be submitted, please try again", HttpStatus.NOT_FOUND_404),
         INCORRECT_ORDER_PAYLOAD(164, "Please check the payload ids for accuracy", HttpStatus.BAD_REQUEST_400),
         CHILD_UPDATE_FAILED(165, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500),
-        CONTENT_ALREADY_EXISTS(166, "This contentUrl was already added by this user", HttpStatus.BAD_REQUEST_400);
+        CONTENT_ALREADY_EXISTS(166, "This contentUrl was already added by this user", HttpStatus.BAD_REQUEST_400),
+        CONTENT_PREVIEW_TOO_LONG(167, "Content Preview Url is too long (" + StaticRules.MAX_CONTENT_PREVIEW_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_TITLE_TOO_LONG(168, "Content Title is too long (" + StaticRules.MAX_CONTENT_TITLE_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_URL_TOO_LONG(169, "Content Url is too long (" + StaticRules.MAX_CONTENT_URL_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_TYPE_ID_TOO_LONG(170, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401);
 
 
         int errorId;

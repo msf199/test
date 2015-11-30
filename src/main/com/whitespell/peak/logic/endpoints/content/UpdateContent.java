@@ -357,6 +357,43 @@ public class UpdateContent extends EndpointHandler {
         final int final_processed = temp_processed;
 
         /**
+         * Define data constraints
+         */
+
+        boolean longTitle =
+                final_title.length() > StaticRules.MAX_CONTENT_TITLE_LENGTH;
+
+        boolean longDescription =
+                final_description.length() > StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH;
+
+        boolean longThumbUrl =
+                final_thumbnail.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_144p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_240p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_360p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_480p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_720p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_1080p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH;
+
+        boolean longVideoUrl =
+                final_url.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_144p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_240p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_360p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_480p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_720p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_1080p.length() > StaticRules.MAX_CONTENT_URL_LENGTH;
+
+        boolean longPreviewUrl =
+                final_preview_144p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_240p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_360p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_480p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_720p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_1080p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH;
+
+
+        /**
          * Ensure that the user is authenticated properly
          */
 
@@ -364,6 +401,26 @@ public class UpdateContent extends EndpointHandler {
 
         if (!a.isAuthenticated()) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            return;
+        }
+
+        /**
+         * Ensure content details are of appropriate length
+         */
+        if(longTitle){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TITLE_TOO_LONG);
+            return;
+        }else if(longVideoUrl){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_URL_TOO_LONG);
+            return;
+        }else if(longDescription){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_DESCRIPTION_TOO_LONG);
+            return;
+        }else if(longThumbUrl){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.THUMBNAIL_URL_TOO_LONG);
+            return;
+        }else if(longPreviewUrl){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_PREVIEW_TOO_LONG);
             return;
         }
 

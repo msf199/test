@@ -373,4 +373,28 @@ public class ContentObject {
     public void setContentUrl(String contentUrl) {
         this.contentUrl = contentUrl;
     }
+
+    public void setContentUrl144p(String contentUrl144p) {
+        this.contentUrl144p = contentUrl144p;
+    }
+
+    public void setContentUrl1080p(String contentUrl1080p) {
+        this.contentUrl1080p = contentUrl1080p;
+    }
+
+    public void setContentUrl720p(String contentUrl720p) {
+        this.contentUrl720p = contentUrl720p;
+    }
+
+    public void setContentUrl480p(String contentUrl480p) {
+        this.contentUrl480p = contentUrl480p;
+    }
+
+    public void setContentUrl360p(String contentUrl360p) {
+        this.contentUrl360p = contentUrl360p;
+    }
+
+    public void setContentUrl240p(String contentUrl240p) {
+        this.contentUrl240p = contentUrl240p;
+    }
 }

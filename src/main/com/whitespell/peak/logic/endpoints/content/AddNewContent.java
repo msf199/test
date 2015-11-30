@@ -83,6 +83,7 @@ public class AddNewContent extends EndpointHandler {
             content_price[0] = 0.0;
         }
 
+
         final Timestamp now = new Timestamp(Server.getMilliTime());
 
         int[] contentId = {0};
@@ -100,6 +101,26 @@ public class AddNewContent extends EndpointHandler {
 
         if (!a.isAuthenticated() || !isMe) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
+            return;
+        }
+
+        /**
+         * Ensure content details are of appropriate length
+         */
+        if(content_title.length() > StaticRules.MAX_CONTENT_TITLE_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TITLE_TOO_LONG);
+            return;
+        }else if(content_url.length() > StaticRules.MAX_CONTENT_URL_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_URL_TOO_LONG);
+            return;
+        }else if(content_description.length() > StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_DESCRIPTION_TOO_LONG);
+            return;
+        }else if(thumbnail_url.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.THUMBNAIL_URL_TOO_LONG);
+            return;
+        }else if(String.valueOf(content_type).length() > StaticRules.MAX_CONTENT_TYPE_ID_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_ID_TOO_LONG);
             return;
         }
 

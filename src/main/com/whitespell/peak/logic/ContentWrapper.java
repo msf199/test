@@ -267,6 +267,12 @@ public class ContentWrapper {
             } else {
                 tempContent.setHasAccess(0);
                 tempContent.setContentUrl(null);
+                tempContent.setContentUrl144p(null);
+                tempContent.setContentUrl240p(null);
+                tempContent.setContentUrl360p(null);
+                tempContent.setContentUrl480p(null);
+                tempContent.setContentUrl720p(null);
+                tempContent.setContentUrl1080p(null);
             }
 
             /** Construct the poster **/
