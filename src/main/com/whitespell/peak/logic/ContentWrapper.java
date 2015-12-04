@@ -84,7 +84,7 @@ public class ContentWrapper {
             " WHERE bm.parent_content_id = ?";
 
     //get aggregated likes for the day on this content
-    private static final String GET_TODAYS_LIKES_QUERY = "SELECT * from `content_likes` WHERE `like_datetime` >= CURDATE() AND `content_id` = ?";
+    private static final String GET_TODAYS_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `like_datetime` >= CURDATE() AND `content_id` = ?";
 
     // get the content ids of the user's likes
     private static final String GET_USER_LIKED_QUERY = "SELECT `content_id` from `content_likes` WHERE `user_id` = ?";
