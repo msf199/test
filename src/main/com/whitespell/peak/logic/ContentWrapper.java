@@ -83,6 +83,9 @@ public class ContentWrapper {
             " INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id`" +
             " WHERE bm.parent_content_id = ?";
 
+    //get aggregated likes for the day on this content
+    private static final String GET_TODAYS_LIKES_QUERY = "SELECT COUNT(1) from `content_likes` WHERE `like_datetime` >= CURDATE() AND `content_id` = ?";
+
     // get the content ids of the user's likes
     private static final String GET_USER_LIKED_QUERY = "SELECT `content_id` from `content_likes` WHERE `user_id` = ?";
 
@@ -98,6 +101,7 @@ public class ContentWrapper {
 
     private RequestObject context;
     private int requesterUserId;
+    private ArrayList<Integer> todaysLikes;
     private ArrayList<Integer> userLikes;
     private ArrayList<Integer> userAccess;
     private ArrayList<Integer> userViewed;
@@ -123,6 +127,32 @@ public class ContentWrapper {
      * JOIN with user for every single content call
      */
 
+    private int getTodaysLikes(int content_id) {
+
+        final int[] tempLikes = {0};
+        /**
+         * Get all the content this user has liked
+         */
+        try {
+            StatementExecutor executor1 = new StatementExecutor(GET_TODAYS_LIKES_QUERY);
+            executor1.execute(ps2 -> {
+                ps2.setInt(1, content_id);
+
+                ResultSet results1 = ps2.executeQuery();
+
+                //display results
+                while (results1.next()) {
+                    tempLikes[0]++;
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            return -1;
+        }
+
+        return tempLikes[0];
+
+    }
 
     private ArrayList<Integer> getContentLiked(int userId) {
 
@@ -278,6 +308,7 @@ public class ContentWrapper {
             /** Construct the poster **/
 
             tempContent.setPoster(tempPublisher);
+            tempContent.setTodaysLikes(getTodaysLikes(tempContent.getContentId()));
             tempContent.setLikes(currentObject.getInt(CONTENT_LIKES_KEY));
             tempContent.setViews(currentObject.getInt(CONTENT_VIEWS_KEY));
             tempContent.setUserLiked(userLikes.contains(currentContentId) ? 1 : 0);

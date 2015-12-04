@@ -164,6 +164,8 @@ public class GetNewsfeed extends EndpointHandler {
             try {
                 ArrayList<Integer> bundleContentIds = new ArrayList<>();
                 int[] newsfeedId = {0};
+                ContentObject[] popularBundle = {null};
+                int[] mostDailyLikes = {0};
                 StatementExecutor executor = new StatementExecutor(GET_FOLLOWERS_CONTENT_QUERY);
                 executor.execute(ps -> {
                     ContentObject newsfeedContent;
@@ -196,7 +198,7 @@ public class GetNewsfeed extends EndpointHandler {
                             /**
                              * We already checked this bundle
                              */
-                            if(bundleContentIds.contains(newsfeedContent.getParent())){
+                            if (bundleContentIds.contains(newsfeedContent.getParent())) {
                                 continue;
                             }
 
@@ -219,8 +221,25 @@ public class GetNewsfeed extends EndpointHandler {
                                  * save the largest child and use that contentId to represent the bundle,
                                  * therefore moving it up in the newsfeed list (and maintaining offset order).
                                  */
+                                int[] currentBundleDailyLikes = {0};
                                 for (ContentObject i : parent.getChildren()) {
                                     if (i.getContentId() > parent.getContentId()) {
+
+                                        /**
+                                         * Aggregate the daily likes for the bundle content,
+                                         * save the most popular bundle based on daily likes
+                                         */
+                                        currentBundleDailyLikes[0] += i.getTodaysLikes();
+
+                                        /**
+                                         * Save bundle with largest daily likes as popular bundle
+                                         */
+                                        if (currentBundleDailyLikes[0] > mostDailyLikes[0]) {
+                                            System.out.println("currentBundleDailyLikes: " + currentBundleDailyLikes[0]);
+                                            mostDailyLikes[0] = currentBundleDailyLikes[0];
+                                            System.out.println("mostDailyLikes: " + mostDailyLikes[0]);
+                                            popularBundle[0] = parent;
+                                        }
 
                                         /**
                                          * Save the largest contentId in the bundle for updating the newsfeedId.
@@ -251,6 +270,13 @@ public class GetNewsfeed extends EndpointHandler {
                             // send notification to add videos to bundle todo(cmcan) to publisher
                         } else {
                             newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
+
+                            /**
+                             * If this is the last content in the newsfeed, add the popular bundle
+                             */
+                            if (!results.isBeforeFirst()) {
+                                newsfeedResponse.add(new NewsfeedObject(1, popularBundle[0]));
+                            }
 
                             /**
                              * Add the bundle to the bundle list to prevent duplicates.
