@@ -235,10 +235,9 @@ public class GetNewsfeed extends EndpointHandler {
                                          * Save bundle with largest daily likes as popular bundle
                                          */
                                         if (currentBundleDailyLikes[0] > mostDailyLikes[0]) {
-                                            System.out.println("currentBundleDailyLikes: " + currentBundleDailyLikes[0]);
                                             mostDailyLikes[0] = currentBundleDailyLikes[0];
-                                            System.out.println("mostDailyLikes: " + mostDailyLikes[0]);
                                             popularBundle[0] = parent;
+                                            popularBundle[0].setTodaysLikes(mostDailyLikes[0]);
                                         }
 
                                         /**
@@ -269,13 +268,17 @@ public class GetNewsfeed extends EndpointHandler {
                         if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE && newsfeedContent.getChildren().isEmpty()) {
                             // send notification to add videos to bundle todo(cmcan) to publisher
                         } else {
-                            newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
-
                             /**
-                             * If this is the last content in the newsfeed, add the popular bundle
+                             * Allow videos/bundles in newsfeed based on video toggle.
                              */
-                            if (!results.isBeforeFirst()) {
-                                newsfeedResponse.add(new NewsfeedObject(1, popularBundle[0]));
+                            /**
+                             * If bundle type, add. OR if videos allowed in newsfeed AND NOT bundle type add.
+                             */
+                            if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE ||
+                                    (Config.VIDEOS_IN_NEWSFEED && newsfeedContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE)) {
+                                newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
+                            } else {
+                                continue;
                             }
 
                             /**
@@ -286,6 +289,15 @@ public class GetNewsfeed extends EndpointHandler {
                             }
                         }
                     }
+
+                    /**
+                     * If this is the last content in the newsfeed, add the popular bundle
+                     */
+                    if (popularBundle[0] != null) {
+                        System.out.println("popularBundleId: "+popularBundle[0].getContentId());
+                        newsfeedResponse.add(new NewsfeedObject(1, popularBundle[0]));
+                    }
+
                 });
             } catch (SQLException e) {
                 Logging.log("High", e);
