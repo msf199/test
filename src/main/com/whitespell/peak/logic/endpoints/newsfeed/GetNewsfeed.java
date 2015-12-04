@@ -86,7 +86,6 @@ public class GetNewsfeed extends EndpointHandler {
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
                     followerIds.add(results.getInt("following_id"));
-                    System.out.println("add userFollowing: " +results.getInt("following_id"));
                 }
             });
         } catch (SQLException e) {
@@ -294,7 +293,6 @@ public class GetNewsfeed extends EndpointHandler {
                      * If this is the last content in the newsfeed, add the popular bundle
                      */
                     if (popularBundle[0] != null) {
-                        System.out.println("popularBundleId: "+popularBundle[0].getContentId());
                         newsfeedResponse.add(new NewsfeedObject(1, popularBundle[0]));
                     }
 
