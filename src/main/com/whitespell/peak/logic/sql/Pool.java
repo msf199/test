@@ -13,6 +13,8 @@ import java.sql.SQLException;
 
 public class Pool {
     private static DataSource ds;
+    static DriverAdapterCPDS cpds = null;
+    static SharedPoolDataSource tds = null;
 
     static {
         Pool.initializePool();
@@ -28,7 +30,17 @@ public class Pool {
     }
 
     public static void initializePool() {
-        DriverAdapterCPDS cpds = new DriverAdapterCPDS();
+
+        if(tds != null ) {
+            try {
+                tds.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        cpds = new DriverAdapterCPDS();
+
         try {
             cpds.setDriver("org.gjt.mm.mysql.Driver");
         } catch (ClassNotFoundException e) {
@@ -37,9 +49,9 @@ public class Pool {
         cpds.setUrl("jdbc:mysql://"+Config.DB_HOST+":"+Config.DB_PORT+"/"+Config.DB+"?autoreconnect=true");
         cpds.setUser(Config.DB_USER);
         cpds.setPassword(Config.DB_PASS);
-        SharedPoolDataSource tds = new SharedPoolDataSource();
+        tds = new SharedPoolDataSource();
         tds.setConnectionPoolDataSource(cpds);
-        tds.setMaxTotal(12);
+        tds.setMaxTotal(250);
         tds.setDefaultMaxWaitMillis(15000);
         tds.setValidationQuery("SELECT 1");
         tds.setDefaultMaxIdle(10);
