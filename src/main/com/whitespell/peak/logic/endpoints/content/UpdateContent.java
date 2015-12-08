@@ -470,18 +470,6 @@ public class UpdateContent extends EndpointHandler {
         publisherName[0] = publisher.getUserName();
 
         /**
-         * Get the content's info to allow email notification for content upload (processed == 1)
-         */
-        ContentHelper c = new ContentHelper();
-        ContentObject content = null;
-        try {
-            content = c.getContentById(context, final_content_id, a.getUserId());
-        }catch(Exception e){
-            Logging.log("High", e);
-            //don't throw client side error, this is only for email notifications
-        }
-
-        /**
          * Construct the SET string based on the fields the user wants to update.
          */
 
@@ -499,6 +487,12 @@ public class UpdateContent extends EndpointHandler {
             }
             count++;
         }
+        /**
+         * Add processed to update if updating thumbnail_url
+         */
+        if(updateKeys.contains(THUMBNAIL_ID_DB) && !updateKeys.contains(PROCESSED)){
+            setString.append(", `processed` = ? ");
+        }
         setString.append("WHERE `content_id` = ?");
         final String UPDATE_CONTENT = setString.toString();
 
@@ -515,6 +509,7 @@ public class UpdateContent extends EndpointHandler {
                     int count = 1;
                     boolean sendSocialMediaEmail = false;
                     boolean editDescriptionComment = false;
+                    boolean editContentThumbnail = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
                         ps.setString(count, final_title);
@@ -543,6 +538,7 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(THUMBNAIL_ID_DB)) {
+                        editContentThumbnail = true;
                         ps.setString(count, final_thumbnail);
                         System.out.println("Set string " + count + " to " + final_thumbnail);
                         count++;
@@ -653,8 +649,16 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
 
-                    if (updateKeys.contains(PROCESSED)) {
-                        ps.setInt(count, final_processed);
+                    if (updateKeys.contains(PROCESSED) || editContentThumbnail) {
+                        /**
+                         * If we edited the contentThumbnail on client side, process the thumbnails.
+                         */
+                        if(editContentThumbnail){
+                            ps.setInt(count, 0);
+                        }else{
+                            ps.setInt(count, final_processed);
+                        }
+
                         System.out.println("Set int " + count + " to " + final_processed);
                         count++;
                     }
