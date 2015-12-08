@@ -79,7 +79,15 @@ public class GetUserSavedContent extends EndpointHandler {
 
                             if (results2.next()) {
                                 ContentObject content = contentWrapper.wrapContent(results2);
-                                getSavedContent.addToSavedContent(content);
+
+                                /**
+                                 * If content has a parent and isn't a bundle, don't add to contentList
+                                 */
+                                if(content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE && content.getParent() > 0){
+
+                                } else {
+                                    getSavedContent.addToSavedContent(content);
+                                }
                             }
                         });
                     } catch (SQLException e) {
