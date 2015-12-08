@@ -1999,7 +1999,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .body("{\n" +
                         "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
-                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"admincontent\",\n" +
                         "\"contentTitle\": \"admincontent\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=admin\"," +
@@ -2014,7 +2014,7 @@ public class IntegrationTests extends Server {
                 .asString();
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         int contentId = content[0].getContentId();
-        assertEquals(content[0].getContentPrice(), 0, 0.0);
+        assertEquals(content[0].getContentPrice(), 1.99, 0.0);
 
         /**
          * Have both followers like the uploaded content
@@ -2223,7 +2223,7 @@ public class IntegrationTests extends Server {
         objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
         assertEquals(objectToMorph.getContentTitle(), "title_test");
         assertEquals(objectToMorph.getContentDescription(), "description_test");
-        assertEquals(objectToMorph.getContentPrice(), 0, 0D);
+        assertEquals(objectToMorph.getContentPrice(), 1.33, 0D);
         assertEquals(objectToMorph.getCategoryId(), categories[0].getCategoryId());
         assertEquals(objectToMorph.getContentUrl(), "url_test");
 
