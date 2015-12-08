@@ -87,7 +87,9 @@ public class ContentWrapper {
     private static final String GET_USER_LIKED_QUERY = "SELECT `content_id` from `content_likes` WHERE `user_id` = ?";
 
     // get the access ids from the users access
-    private static final String GET_USER_ACCESS_QUERY = "SELECT `content_id` from `content_access` WHERE `user_id` = ?";
+    private static final String GET_USER_ACCESS_QUERY = "SELECT ca.`content_id` from `content_access`" +
+            " as ca INNER JOIN `content` as ct ON ca.`content_id` = ct.`content_id` WHERE " +
+            "ca.`user_id` = ? AND ct.`content_type` = " + StaticRules.BUNDLE_CONTENT_TYPE;
 
     // get the access ids from the users views
     private static final String GET_USER_VIEW_QUERY = "SELECT `content_id` from `content_views` WHERE `user_id` = ?";
@@ -259,10 +261,12 @@ public class ContentWrapper {
             System.out.println(requesterUserId);
             System.out.println("contentId:" +tempContent.getContentId()+" wrapper userId: "+tempPublisher.getUserId());
 
-            if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempPublisher.getUserId()
+            if ((currentObject.getDouble(CONTENT_PRICE) ==
+                    0.00 && tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE)
+                    || requesterUserId == tempPublisher.getUserId()
                     || requesterUserId == 134) {
                 tempContent.setHasAccess(1);
-            } else if (userAccess.contains(currentContentId)) {
+            } else if (userAccess.contains(currentContentId) || userAccess.contains(tempContent.getParent())) {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
