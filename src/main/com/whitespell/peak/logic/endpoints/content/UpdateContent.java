@@ -470,18 +470,6 @@ public class UpdateContent extends EndpointHandler {
         publisherName[0] = publisher.getUserName();
 
         /**
-         * Get the content's info to allow email notification for content upload (processed == 1)
-         */
-        ContentHelper c = new ContentHelper();
-        ContentObject content = null;
-        try {
-            content = c.getContentById(context, final_content_id, a.getUserId());
-        }catch(Exception e){
-            Logging.log("High", e);
-            //don't throw client side error, this is only for email notifications
-        }
-
-        /**
          * Construct the SET string based on the fields the user wants to update.
          */
 

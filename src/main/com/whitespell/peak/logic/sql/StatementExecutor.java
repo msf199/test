@@ -15,6 +15,7 @@ public class StatementExecutor {
     public StatementExecutor(String query) throws SQLException {
         this.connection = Pool.getConnection();
         if(this.connection == null || this.connection.isClosed()) {
+            Pool.initializePool();
             throw new SQLException("Connection was "+this.connection == null? "null" : "closed");
         }
         this.statement = this.connection.prepareStatement(query);

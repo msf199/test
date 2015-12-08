@@ -115,6 +115,7 @@ public class ContentObject {
 
     String contentDescription;
     int likes = 0;
+    int todaysLikes = 0;
     int views = 0;
     String thumbnailUrl;
     int userLiked = 0;
@@ -396,5 +397,13 @@ public class ContentObject {
 
     public void setContentUrl240p(String contentUrl240p) {
         this.contentUrl240p = contentUrl240p;
+    }
+
+    public int getTodaysLikes() {
+        return todaysLikes;
+    }
+
+    public void setTodaysLikes(int todaysLikes) {
+        this.todaysLikes = todaysLikes;
     }
 }
