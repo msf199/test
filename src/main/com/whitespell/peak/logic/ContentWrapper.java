@@ -92,7 +92,7 @@ public class ContentWrapper {
     // get the access ids from the users access
     private static final String GET_USER_ACCESS_QUERY = "SELECT ca.`content_id` from `content_access`" +
             " as ca INNER JOIN `content` as ct ON ca.`content_id` = ct.`content_id` WHERE " +
-            "ca.`user_id` = ? AND ct.`content_type` = " + StaticRules.BUNDLE_CONTENT_TYPE;
+            "ca.`user_id` = ? ";
 
     // get the access ids from the users views
     private static final String GET_USER_VIEW_QUERY = "SELECT `content_id` from `content_views` WHERE `user_id` = ?";
@@ -423,9 +423,14 @@ public class ContentWrapper {
 
             tempContent = this.personalizeContent(tempContent, tempPublisher, currentObject);
 
+            /**
+             * If the video is not BUNDLE CONTENT TYPE, set the price to 0. Only bundles have prices.
+             */
             if (tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                 // we are entering a nested recursiveGetChildren loop
                 tempContent.setChildren(this.recursiveGetChildren(tempContent, context));
+            } else {
+                tempContent.setContentPrice(0);
             }
 
         } catch (SQLException e) {
