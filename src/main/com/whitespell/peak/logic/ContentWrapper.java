@@ -90,7 +90,9 @@ public class ContentWrapper {
     private static final String GET_USER_LIKED_QUERY = "SELECT `content_id` from `content_likes` WHERE `user_id` = ?";
 
     // get the access ids from the users access
-    private static final String GET_USER_ACCESS_QUERY = "SELECT `content_id` from `content_access` WHERE `user_id` = ?";
+    private static final String GET_USER_ACCESS_QUERY = "SELECT ca.`content_id` from `content_access`" +
+            " as ca INNER JOIN `content` as ct ON ca.`content_id` = ct.`content_id` WHERE " +
+            "ca.`user_id` = ? ";
 
     // get the access ids from the users views
     private static final String GET_USER_VIEW_QUERY = "SELECT `content_id` from `content_views` WHERE `user_id` = ?";
@@ -285,10 +287,15 @@ public class ContentWrapper {
              * Set content access. If free or the user is the publisher, user has access (or if userId is master)
              */
 
-            if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempPublisher.getUserId()
+            System.out.println(requesterUserId);
+            System.out.println("contentId:" +tempContent.getContentId()+" wrapper userId: "+tempPublisher.getUserId());
+
+            if ((currentObject.getDouble(CONTENT_PRICE) ==
+                    0.00 && tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE)
+                    || requesterUserId == tempPublisher.getUserId()
                     || requesterUserId == 134) {
                 tempContent.setHasAccess(1);
-            } else if (userAccess.contains(currentContentId)) {
+            } else if (userAccess.contains(currentContentId) || userAccess.contains(tempContent.getParent())) {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
@@ -416,9 +423,14 @@ public class ContentWrapper {
 
             tempContent = this.personalizeContent(tempContent, tempPublisher, currentObject);
 
+            /**
+             * If the video is not BUNDLE CONTENT TYPE, set the price to 0. Only bundles have prices.
+             */
             if (tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                 // we are entering a nested recursiveGetChildren loop
                 tempContent.setChildren(this.recursiveGetChildren(tempContent, context));
+            } else {
+                tempContent.setContentPrice(0);
             }
 
         } catch (SQLException e) {
