@@ -279,12 +279,6 @@ public class ContentWrapper {
              * AFTER BETA, UNCOMMENT BELOW:
              */
             /**
-<<<<<<< HEAD
-             * Set content access. If free or the user is the publisher, user has access (or if user is master)
-             */
-            if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempContent.getUserId()
-                    || requesterUserId == -1) {
-=======
              * Set content access. If free or the user is the publisher, user has access (or if userId is master)
              */
 
@@ -295,7 +289,6 @@ public class ContentWrapper {
                     0.00 && tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE)
                     || requesterUserId == tempPublisher.getUserId()
                     || requesterUserId == 134) {
->>>>>>> 925bb034862978f78f8a3ff97650dbf83f8be250
                 tempContent.setHasAccess(1);
             } else if (userAccess.contains(currentContentId) || userAccess.contains(tempContent.getParent())) {
                 tempContent.setHasAccess(1);
