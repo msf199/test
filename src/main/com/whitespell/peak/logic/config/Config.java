@@ -69,10 +69,11 @@ public final class Config {
     //Static order details
     public static int ORDER_ORIGIN_APPLE = 1;
     public static int ORDER_ORIGIN_GOOGLE = 2;
-    public static int ORDER_TYPE_VIDEO = 1;
-    public static int ORDER_TYPE_BUNDLE = 2;
-    public static int ORDER_TYPE_SUBSCRIPTION = 3;
+    public static int ORDER_ORIGIN_WEB = 3;
+    public static int ORDER_TYPE_BUNDLE = 1;
+    public static int ORDER_TYPE_SUBSCRIPTION = 2;
     public static int ORDER_CURRENCY_USD = 1;
+    public static double ORDER_SUBSCRIPTION_PRICE = 3.99;
 
     public static String PLATFORM_NAME = "Upfit";
     public static String PLATFORM_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/upfit-og.png";

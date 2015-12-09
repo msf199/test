@@ -109,7 +109,9 @@ public class StaticRules {
         COULD_NOT_SUBMIT_ORDER(163, "Order could not be submitted, please try again", HttpStatus.NOT_FOUND_404),
         INCORRECT_ORDER_PAYLOAD(164, "Please check the payload ids for accuracy", HttpStatus.BAD_REQUEST_400),
         CHILD_UPDATE_FAILED(165, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500),
-        ORDER_NOT_FOUND(166, "Could not retrieve order for this content and user.", HttpStatus.NOT_FOUND_404);
+        ORDER_NOT_FOUND(166, "Could not retrieve order for this content and user.", HttpStatus.NOT_FOUND_404),
+        INCORRECT_ORDER_TYPE(167, "Invalid orderType", HttpStatus.BAD_REQUEST_400),
+        INCORRECT_ORDER_ORIGIN(168, "Invalid orderOrigin", HttpStatus.BAD_REQUEST_400);
 
         int errorId;
         String errorMessage;

@@ -58,9 +58,9 @@ public class CreateOrder extends EndpointHandler {
     protected void setUserInputs() {
         payloadInput.put(PAYLOAD_ORDER_UUID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED_UNLIMITED);
         payloadInput.put(PAYLOAD_ORDER_TYPE_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_PUBLISHER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_PUBLISHER_ID_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(PAYLOAD_BUYER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_CONTENT_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_ID_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(PAYLOAD_ORDER_ORIGIN_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
@@ -78,11 +78,44 @@ public class CreateOrder extends EndpointHandler {
         //payload variables
         final String orderUUID = j.get(PAYLOAD_ORDER_UUID_KEY).getAsString();
         final int orderType = j.get(PAYLOAD_ORDER_TYPE_KEY).getAsInt();
-        final int publisherId = j.get(PAYLOAD_PUBLISHER_ID_KEY).getAsInt();
+        final int[] publisherId = {-1};
+        if(j.get(PAYLOAD_PUBLISHER_ID_KEY) != null){
+            publisherId[0] = j.get(PAYLOAD_PUBLISHER_ID_KEY).getAsInt();
+        }
         final int buyerId = j.get(PAYLOAD_BUYER_ID_KEY).getAsInt();
-        final int contentId = j.get(PAYLOAD_CONTENT_ID_KEY).getAsInt();
+
+        final int[] contentId = {-1};
+        if(j.get(PAYLOAD_CONTENT_ID_KEY) != null){
+            contentId[0] = j.get(PAYLOAD_CONTENT_ID_KEY).getAsInt();
+        }
         final int orderOriginId = j.get(PAYLOAD_ORDER_ORIGIN_KEY).getAsInt();
         final Timestamp now = new Timestamp(Server.getMilliTime());
+
+        /**
+         * If orderType bundle, ensure contentId and publisherId specified
+         */
+        if(orderType == Config.ORDER_TYPE_BUNDLE){
+            if(contentId[0] == -1 || publisherId[0] == -1){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+                return;
+            }
+        }
+
+        /**
+         * If invalid orderType throw error
+         */
+        if(orderType != Config.ORDER_TYPE_BUNDLE && orderType != Config.ORDER_TYPE_SUBSCRIPTION){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_TYPE);
+            return;
+        }
+
+        /**
+         * If invalid orderOrigin throw error
+         */
+        if(orderOriginId != Config.ORDER_ORIGIN_GOOGLE && orderOriginId != Config.ORDER_ORIGIN_APPLE && orderOriginId != Config.ORDER_ORIGIN_WEB){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_ORIGIN);
+            return;
+        }
 
         /**
          * Ensure the user is authenticated properly
@@ -105,7 +138,13 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Apple endpoint call to verify receipt data
          */
-        if(orderOriginId == Config.ORDER_ORIGIN_APPLE) {
+
+        /**
+         * (todo) Complete validation once iOS app is ready.
+         */
+
+
+        /*if(orderOriginId == Config.ORDER_ORIGIN_APPLE) {
             try {
                 HttpResponse<String> stringResponse = Unirest.post("https://sandbox.itunes.apple.com/verifyReceipt")
                         .header("accept", "application/json")
@@ -115,9 +154,9 @@ public class CreateOrder extends EndpointHandler {
                         .asString();
                 System.out.println(stringResponse.getBody());
             } catch (Exception e) {
-                /**
+                *
                  * Update order status to FAIL
-                 */
+
                 try {
                     StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
                     executor2.execute(ps2 -> {
@@ -138,7 +177,7 @@ public class CreateOrder extends EndpointHandler {
             }
         } else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE){
 
-        }
+        }*/
 
 
         /**
@@ -146,29 +185,42 @@ public class CreateOrder extends EndpointHandler {
          */
         ContentHelper h = new ContentHelper();
 
-        ContentObject orderContent;
-        try{
-            orderContent = h.getContentById(contentId);
-        } catch(UnirestException e){
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-            return;
-        }
+        ContentObject orderContent = null;
 
         /**
-         * Ensure content publisher matches payload
+         * Only get content if order is a bundle
          */
+        if(orderType == Config.ORDER_TYPE_BUNDLE) {
+            try {
+                orderContent = h.getContentById(contentId[0]);
+            } catch (UnirestException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                return;
+            }
 
-        if(orderContent != null && orderContent.getPoster().getUserId() != publisherId){
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
-            return;
+            /**
+             * Ensure content publisher matches payload
+             */
+
+            if (orderContent != null && orderContent.getPoster().getUserId() != publisherId[0]) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+                return;
+            }
         }
-
         /**
          * Get the price of this content to calculate revenue and shares
          */
 
-        double price = orderContent.getContentPrice();
+
+        double price;
+
+        if(orderType == Config.ORDER_TYPE_BUNDLE && orderContent != null){
+            price = orderContent.getContentPrice();
+        }else{
+            price = Config.ORDER_SUBSCRIPTION_PRICE;
+        }
+
 
         //determined variables
         String[] orderTypeName = {""};
@@ -257,9 +309,9 @@ public class CreateOrder extends EndpointHandler {
                 ps.setString(1, orderUUID);
                 ps.setInt(2, orderType);
                 ps.setInt(3, orderOriginId);
-                ps.setInt(4, publisherId);
+                ps.setInt(4, publisherId[0]);
                 ps.setInt(5, buyerId);
-                ps.setInt(6, contentId);
+                ps.setInt(6, contentId[0]);
                 ps.setDouble(7, price);
                 ps.setDouble(8, netRevenue);
                 ps.setInt(9, orderCurrency);

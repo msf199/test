@@ -184,7 +184,6 @@ public class IntegrationTests extends Server {
             String INSERT_ORDER_TYPE = "INSERT INTO "+TEST_DB_NAME+".`order_type`(`order_type_id`, `order_type_name`) VALUES(?,?)";
             String INSERT_ORDER_ORIGIN = "INSERT INTO "+TEST_DB_NAME+".`order_origin`(`order_origin_id`, `order_origin_name`) VALUES(?,?)";
             ArrayList<String> types = new ArrayList<>();
-            types.add("video");
             types.add("bundle");
             types.add("subscription");
             ArrayList<String> origins = new ArrayList<>();
@@ -2627,14 +2626,12 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
                         "\"orderUUID\":\"27614847GDgvc.1\",\n" +
-                        "\"orderType\": 1,\n" +
-                        "\"orderStatus\" : 1,\n" +
+                        "\"orderType\": "+Config.ORDER_TYPE_BUNDLE+",\n" +
                         "\"publisherId\" : " + content[0].getPoster().getUserId() + ",\n" +
                         "\"buyerId\" :  " + TEST2_UID + ",\n" +
                         "\"contentId\" :  " + content[0].getContentId() + ",\n" +
-                        "\"currencyId\" :  " + 1 + ",\n" +
-                        "\"buyerDetails\" :  \"details\",\n" +
-                        "\"orderOriginId\" :  " + 1 + "\n" +
+                        "\"currencyId\" :  " + Config.ORDER_CURRENCY_USD + ",\n" +
+                        "\"orderOriginId\" :  " + Config.ORDER_ORIGIN_APPLE + "\n" +
                         "}")
                 .asString();
         System.out.println(stringResponse.getBody());
@@ -2652,7 +2649,7 @@ public class IntegrationTests extends Server {
         System.out.println(stringResponse.getBody());
         OrderObject o = g.fromJson(stringResponse.getBody(), OrderObject.class);
         assertEquals(o.getOrderStatus(), "success");
-        assertEquals(o.getOrderType(), "video");
+        assertEquals(o.getOrderType(), "bundle");
         assertEquals(o.getOrderOrigin(), "apple");
         assertEquals(o.getContentId(), content[0].getContentId());
         assertEquals(o.getBuyerId(), TEST2_UID);
