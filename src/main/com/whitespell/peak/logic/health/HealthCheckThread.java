@@ -25,7 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class HealthCheckThread extends Thread {
 
 
-    private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) as ct FROM `content` WHERE `processed` = 0";
+    private static final String GET_CONTENT_PROCESSED = "SELECT COUNT(1) as ct FROM `content` WHERE `processed` = 0 AND `content_type` = "+StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE+"";
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT COUNT(1) as ct FROM `avcpvm_monitoring` WHERE `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     private static final String DELETE_NODES = "SELECT `instance_id` FROM `avcpvm_monitoring` WHERE `shutdown_reported` = 1 OR `last_ping` IS NULL OR (`creation_time` < ? AND `last_ping` < ?)";
     private static final String DELETE_OLD_NODE = "DELETE FROM `avcpvm_monitoring` WHERE `instance_id` = ?";
