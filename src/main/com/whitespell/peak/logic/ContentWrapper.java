@@ -80,11 +80,16 @@ public class ContentWrapper {
             " INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id`" +
             " WHERE bm.parent_content_id = ?";
 
+    //get aggregated likes for the day on this content
+    private static final String GET_TODAYS_LIKES_QUERY = "SELECT `user_id` from `content_likes` WHERE `like_datetime` >= CURDATE() AND `content_id` = ?";
+
     // get the content ids of the user's likes
     private static final String GET_USER_LIKED_QUERY = "SELECT `content_id` from `content_likes` WHERE `user_id` = ?";
 
     // get the access ids from the users access
-    private static final String GET_USER_ACCESS_QUERY = "SELECT `content_id` from `content_access` WHERE `user_id` = ?";
+    private static final String GET_USER_ACCESS_QUERY = "SELECT ca.`content_id` from `content_access`" +
+            " as ca INNER JOIN `content` as ct ON ca.`content_id` = ct.`content_id` WHERE " +
+            "ca.`user_id` = ? ";
 
     // get the access ids from the users views
     private static final String GET_USER_VIEW_QUERY = "SELECT `content_id` from `content_views` WHERE `user_id` = ?";
@@ -119,6 +124,32 @@ public class ContentWrapper {
      * JOIN with user for every single content call
      */
 
+    private int getTodaysLikes(int content_id) {
+
+        final int[] tempLikes = {0};
+        /**
+         * Get all the content this user has liked
+         */
+        try {
+            StatementExecutor executor1 = new StatementExecutor(GET_TODAYS_LIKES_QUERY);
+            executor1.execute(ps2 -> {
+                ps2.setInt(1, content_id);
+
+                ResultSet results1 = ps2.executeQuery();
+
+                //display results
+                while (results1.next()) {
+                    tempLikes[0]++;
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            return -1;
+        }
+
+        return tempLikes[0];
+
+    }
 
     private ArrayList<Integer> getContentLiked(int userId) {
 
@@ -244,26 +275,45 @@ public class ContentWrapper {
                 tempContent.setContentPrice(0);
             }*/
 
-
             /**
              * AFTER BETA, UNCOMMENT BELOW:
              */
             /**
+<<<<<<< HEAD
              * Set content access. If free or the user is the publisher, user has access (or if user is master)
              */
             if (currentObject.getDouble(CONTENT_PRICE) == 0.00 || requesterUserId == tempContent.getUserId()
                     || requesterUserId == -1) {
+=======
+             * Set content access. If free or the user is the publisher, user has access (or if userId is master)
+             */
+
+            System.out.println(requesterUserId);
+            System.out.println("contentId:" +tempContent.getContentId()+" wrapper userId: "+tempPublisher.getUserId());
+
+            if ((currentObject.getDouble(CONTENT_PRICE) ==
+                    0.00 && tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE)
+                    || requesterUserId == tempPublisher.getUserId()
+                    || requesterUserId == 134) {
+>>>>>>> 925bb034862978f78f8a3ff97650dbf83f8be250
                 tempContent.setHasAccess(1);
-            } else if (userAccess.contains(currentContentId)) {
+            } else if (userAccess.contains(currentContentId) || userAccess.contains(tempContent.getParent())) {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
                 tempContent.setContentUrl(null);
+                tempContent.setContentUrl144p(null);
+                tempContent.setContentUrl240p(null);
+                tempContent.setContentUrl360p(null);
+                tempContent.setContentUrl480p(null);
+                tempContent.setContentUrl720p(null);
+                tempContent.setContentUrl1080p(null);
             }
 
             /** Construct the poster **/
 
             tempContent.setPoster(tempPublisher);
+            tempContent.setTodaysLikes(getTodaysLikes(tempContent.getContentId()));
             tempContent.setLikes(currentObject.getInt(CONTENT_LIKES_KEY));
             tempContent.setViews(currentObject.getInt(CONTENT_VIEWS_KEY));
             tempContent.setUserLiked(userLikes.contains(currentContentId) ? 1 : 0);
@@ -375,9 +425,14 @@ public class ContentWrapper {
 
             tempContent = this.personalizeContent(tempContent, tempPublisher, currentObject);
 
+            /**
+             * If the video is not BUNDLE CONTENT TYPE, set the price to 0. Only bundles have prices.
+             */
             if (tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                 // we are entering a nested recursiveGetChildren loop
                 tempContent.setChildren(this.recursiveGetChildren(tempContent, context));
+            } else {
+                tempContent.setContentPrice(0);
             }
 
         } catch (SQLException e) {

@@ -86,7 +86,6 @@ public class GetNewsfeed extends EndpointHandler {
                 ResultSet results = ps.executeQuery();
                 while (results.next()) {
                     followerIds.add(results.getInt("following_id"));
-                    System.out.println("add userFollowing: " +results.getInt("following_id"));
                 }
             });
         } catch (SQLException e) {
@@ -164,6 +163,8 @@ public class GetNewsfeed extends EndpointHandler {
             try {
                 ArrayList<Integer> bundleContentIds = new ArrayList<>();
                 int[] newsfeedId = {0};
+                ContentObject[] popularBundle = {null};
+                int[] mostDailyLikes = {0};
                 StatementExecutor executor = new StatementExecutor(GET_FOLLOWERS_CONTENT_QUERY);
                 executor.execute(ps -> {
                     ContentObject newsfeedContent;
@@ -181,6 +182,7 @@ public class GetNewsfeed extends EndpointHandler {
                         }
 
                         newsfeedContent = contentWrapper.wrapContent(results);
+
                         newsfeedId[0] = newsfeedContent.getContentId();
 
                         /**
@@ -195,7 +197,7 @@ public class GetNewsfeed extends EndpointHandler {
                             /**
                              * We already checked this bundle
                              */
-                            if(bundleContentIds.contains(newsfeedContent.getParent())){
+                            if (bundleContentIds.contains(newsfeedContent.getParent())) {
                                 continue;
                             }
 
@@ -205,7 +207,7 @@ public class GetNewsfeed extends EndpointHandler {
                                  * Get the parent of the current contentObject
                                  */
 
-                                ContentObject parent = g.getContentById(newsfeedContent.getParent());
+                                ContentObject parent = g.getContentById(context, newsfeedContent.getParent(), a.getUserId());
 
                                 /**
                                  * Return the parent bundle on the newsfeed since it has been updated since it was
@@ -218,8 +220,24 @@ public class GetNewsfeed extends EndpointHandler {
                                  * save the largest child and use that contentId to represent the bundle,
                                  * therefore moving it up in the newsfeed list (and maintaining offset order).
                                  */
+                                int[] currentBundleDailyLikes = {0};
                                 for (ContentObject i : parent.getChildren()) {
                                     if (i.getContentId() > parent.getContentId()) {
+
+                                        /**
+                                         * Aggregate the daily likes for the bundle content,
+                                         * save the most popular bundle based on daily likes
+                                         */
+                                        currentBundleDailyLikes[0] += i.getTodaysLikes();
+
+                                        /**
+                                         * Save bundle with largest daily likes as popular bundle
+                                         */
+                                        if (currentBundleDailyLikes[0] > mostDailyLikes[0]) {
+                                            mostDailyLikes[0] = currentBundleDailyLikes[0];
+                                            popularBundle[0] = parent;
+                                            popularBundle[0].setTodaysLikes(mostDailyLikes[0]);
+                                        }
 
                                         /**
                                          * Save the largest contentId in the bundle for updating the newsfeedId.
@@ -235,30 +253,52 @@ public class GetNewsfeed extends EndpointHandler {
                                     }
                                 }
                             } catch (UnirestException e) {
-                                e.printStackTrace();
+                                Logging.log("High", e);
                             }
                         }
 
                         /**
                          * Only show content that is standalone or a bundle. Show each content only once.
                          */
+                        System.out.println("newsfeedContentParent: " + newsfeedContent.getParent());
                         if (newsfeedContent.getParent() > 0 || bundleContentIds.contains(newsfeedContent.getContentId())) {
+                            System.out.println("continue... " + newsfeedContent.getContentType());
                             continue;
+                        }
+
+                        /**
+                         * Add the bundle to the bundle list to prevent duplicates.
+                         */
+                        if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                            bundleContentIds.add(newsfeedContent.getContentId());
                         }
 
                         if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE && newsfeedContent.getChildren().isEmpty()) {
                             // send notification to add videos to bundle todo(cmcan) to publisher
                         } else {
-                            newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
-
                             /**
-                             * Add the bundle to the bundle list to prevent duplicates.
+                             * Allow videos/bundles in newsfeed based on video toggle.
                              */
-                            if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                                bundleContentIds.add(newsfeedContent.getContentId());
+                            /**
+                             * If bundle type, add. OR if videos allowed in newsfeed AND NOT bundle type add.
+                             */
+                            if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE ||
+                                    (Config.VIDEOS_IN_NEWSFEED && newsfeedContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE)) {
+                                newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
+                            } else {
+                                System.out.println("continue... " + newsfeedContent.getContentType());
+                                continue;
                             }
                         }
                     }
+
+                    /**
+                     * If this is the last content in the newsfeed, add the popular bundle
+                     */
+                    if (popularBundle[0] != null) {
+                        newsfeedResponse.add(new NewsfeedObject(1, popularBundle[0]));
+                    }
+
                 });
             } catch (SQLException e) {
                 Logging.log("High", e);

@@ -31,6 +31,7 @@ public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`) VALUES (?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
+    private static final String CHECK_DUPLICATE_CONTENT_QUERY = "SELECT `content_id` FROM `content` WHERE `user_id` = ? AND `content_url` = ?";
 
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     
@@ -69,7 +70,7 @@ public class AddNewContent extends EndpointHandler {
 
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID_KEY));
         final int category_id = payload.get(PAYLOAD_CATEGORY_ID).getAsInt();
-        final String content_type = payload.get(PAYLOAD_CONTENT_TYPE_ID).getAsString();
+        final int content_type = payload.get(PAYLOAD_CONTENT_TYPE_ID).getAsInt();
         final String content_url = payload.get(PAYLOAD_CONTENT_URL).getAsString();
         final String content_title = payload.get(PAYLOAD_CONTENT_TITLE).getAsString();
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
@@ -81,6 +82,7 @@ public class AddNewContent extends EndpointHandler {
         else{
             content_price[0] = 0.0;
         }
+
 
         final Timestamp now = new Timestamp(Server.getMilliTime());
 
@@ -103,6 +105,49 @@ public class AddNewContent extends EndpointHandler {
         }
 
         /**
+         * Ensure content details are of appropriate length
+         */
+        if(content_title.length() > StaticRules.MAX_CONTENT_TITLE_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TITLE_TOO_LONG);
+            return;
+        }else if(content_url.length() > StaticRules.MAX_CONTENT_URL_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_URL_TOO_LONG);
+            return;
+        }else if(content_description.length() > StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_DESCRIPTION_TOO_LONG);
+            return;
+        }else if(thumbnail_url.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.THUMBNAIL_URL_TOO_LONG);
+            return;
+        }else if(String.valueOf(content_type).length() > StaticRules.MAX_CONTENT_TYPE_ID_LENGTH){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TYPE_ID_TOO_LONG);
+            return;
+        }
+
+        /**
+         * Ensure this content hasn't been uploaded already by this user to avoid duplicates (only check non-bundles)
+         */
+        if(content_type != (StaticRules.BUNDLE_CONTENT_TYPE)) {
+            try {
+                StatementExecutor executor = new StatementExecutor(CHECK_DUPLICATE_CONTENT_QUERY);
+                executor.execute(ps -> {
+                    ps.setInt(1, user_id);
+                    ps.setString(2, content_url);
+
+                    ResultSet results = ps.executeQuery();
+                    if (results.next()) {
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_EXISTS);
+                        return;
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+        }
+
+        /**
          * Insert the content into the database
          */
 
@@ -111,14 +156,14 @@ public class AddNewContent extends EndpointHandler {
             executor.execute(ps -> {
                 ps.setString(1, String.valueOf(user_id));
                 ps.setInt(2, category_id);
-                ps.setInt(3, Integer.parseInt(content_type));
+                ps.setInt(3, content_type);
                 ps.setString(4, content_url);
                 ps.setString(5, content_title);
                 ps.setString(6, content_description);
                 ps.setString(7, thumbnail_url);
                 ps.setDouble(8, content_price[0]);
                 // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
-                ps.setInt(9, Integer.parseInt(content_type) == StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE ? 0 : 1);
+                ps.setInt(9, content_type == StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE ? 0 : 1);
                 ps.setTimestamp(10, now);
 
                 int rows = ps.executeUpdate();

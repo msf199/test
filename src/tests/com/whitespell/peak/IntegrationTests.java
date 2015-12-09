@@ -555,7 +555,7 @@ public class IntegrationTests extends Server {
         assertEquals(contentTypes[0].getContentTypeName(), "bundle");
 
         StaticRules.BUNDLE_CONTENT_TYPE = contentTypes[0].getContentTypeId();
-        StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE = -1; // todo(do a video with peak content type and set this to the actual one)
+        StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE = contentTypes[1].getContentTypeId(); // todo(do a video with peak content type and set this to the actual one)
     }
 
     @Test
@@ -595,7 +595,7 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"We have excuse-proofed your fitness routine with our latest Class FitSugar.\",\n" +
                         "\"contentTitle\": \"10-Minute No-Equipment Home Workout\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentUrl\": \"doesnt matter\"," +
                         "\"contentPrice\": 1.99," +
                         "\"thumbnailUrl\": \"thumbguy.com\"" +
                         "\n}")
@@ -606,11 +606,11 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
                         "\"categoryId\": \"" + categories[0].getCategoryId() + "\",\n" +
-                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"This one's hot!\",\n" +
                         "\"contentTitle\": \"Another Video!\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
-                        "\"contentPrice\": 1.99," +
+                        "\"contentUrl\": \"doesnt matter\"," +
+                        "\"contentPrice\": 0," +
                         "\"thumbnailUrl\": \"thumbguy.com\"" +
                         "\n}")
                 .asString();
@@ -620,14 +620,16 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
                         "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
-                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"content2\",\n" +
                         "\"contentTitle\": \"content2\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=content2\"," +
-                        "\"contentPrice\": 1.99," +
+                        "\"contentUrl\": \"doesnt matter\"," +
+                        "\"contentPrice\": 0," +
                         "\"thumbnailUrl\": \"thumbguy.com\"" +
                         "\n}")
                 .asString();
+
+
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + TEST_UID)
                 .header("accept", "application/json")
@@ -637,11 +639,19 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
-        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
+        assertEquals(content[0].getContentUrl() != null, true);
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumbguy.com");
         assertEquals(content[0].getContentPrice(), 1.99, 0.0);
         assertEquals(content[0].getUserId(), TEST_UID);
+
+        Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/add_child")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"childId\": \"" + content[1].getContentId() + "\"" +
+                        "\n}")
+                .asString();
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content[0].getContentId())
                 .header("accept", "application/json")
@@ -652,7 +662,7 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
-        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
+        assertEquals(content[0].getContentUrl() != null, true);
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumbguy.com");
         assertEquals(content[0].getContentPrice(), 1.99, 0.0);
@@ -666,7 +676,7 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
-        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
+        assertEquals(content[0].getContentUrl() != null, true);
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumbguy.com");
         assertEquals(content[0].getContentPrice(), 1.99, 0.0);
@@ -680,7 +690,7 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
-        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
+        assertEquals(content[0].getContentUrl() != null, true);
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumbguy.com");
         assertEquals(content[0].getContentPrice(), 1.99, 0.0);
@@ -694,7 +704,7 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
-        assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
+        assertEquals(content[0].getContentUrl() != null, true);
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getContentPrice(), 1.99, 0.0);
         assertEquals(content[0].getThumbnailUrl(), "thumbguy.com");
@@ -1017,15 +1027,13 @@ public class IntegrationTests extends Server {
 
         for (int i = 0; i < n.length; i++) {
             if (i == 0) {
-                assertEquals(n[i].getNewsfeedId(), content[2].getContentId());
-                assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST2_UID);
-                assertEquals(n[i].getNewsfeedContent().getContentTitle(), "content2");
-            } else if (i == 1) {
-                assertEquals(n[i].getNewsfeedId(), content[i].getContentId());
+                System.out.println(content[0].getContentId());
+                System.out.println(content[1].getContentId());
+                System.out.println(content[2].getContentId());
+
+                assertEquals(n[i].getNewsfeedContent().getContentId(), content[0].getContentId());
                 assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
-            } else if (i == 2) {
-                assertEquals(n[i].getNewsfeedId(), content[0].getContentId());
-                assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
+                assertEquals(n[i].getNewsfeedContent().getContentTitle(), "10-Minute No-Equipment Home Workout");
             }
         }
 
@@ -1037,7 +1045,7 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"new content for bundle update test\",\n" +
                         "\"contentTitle\": \"testerino\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=82377fhU\"," +
                         "\"contentPrice\": 1.99," +
                         "\"thumbnailUrl\": \"thumbguy.com\"" +
                         "\n}")
@@ -1067,7 +1075,7 @@ public class IntegrationTests extends Server {
         NewsfeedObject[] n2 = g.fromJson(stringResponse.getBody(), NewsfeedObject[].class);
         assertEquals(n2[0].getNewsfeedId(), child.getContentId());
         assertEquals(n2[0].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
-        assertEquals(n2[0].getNewsfeedContent().getChildren().get(0).getContentTitle(), "testerino");
+        assertEquals(n2[0].getNewsfeedContent().getChildren().get(1).getContentTitle(), "testerino");
     }
 
     @Test
@@ -1698,7 +1706,7 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"This is the root bundle.\",\n" +
                         "\"contentTitle\": \"Child 1 of root bundle (yt video)\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=8277fhU\"," +
                         "\"contentPrice\": 1.99," +
                         "\"thumbnailUrl\": \"thumburl.com\"" +
                         "\n}")
@@ -1712,7 +1720,7 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
                         "\"contentDescription\": \"This is the root bundle.\",\n" +
                         "\"contentTitle\": \"Child 2 of root bundle (yt video)\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=8273hU\"," +
                         "\"contentPrice\": 1.99," +
                         "\"thumbnailUrl\": \"thumburl.com\"" +
                         "\n}")
@@ -1741,7 +1749,7 @@ public class IntegrationTests extends Server {
                         "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +//contentypes[0] is alwasy bundle
                         "\"contentDescription\": \"This is the root bundle.\",\n" +
                         "\"contentTitle\": \"Video of Child bundle\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=827377fhU\"," +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=77fhU\"," +
                         "\"contentPrice\": 1.99," +
                         "\"thumbnailUrl\": \"thumburl.com\"" +
                         "\n}")
@@ -1882,10 +1890,10 @@ public class IntegrationTests extends Server {
             if (content3[0].getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                 assertEquals(content3[0].getContentUrl(), "doesnt matter");
             } else {
-                assertEquals(content3[0].getContentUrl(), "https://www.youtube.com/watch?v=827377fhU");
+                assertEquals(content3[0].getContentUrl().equals("doesnt matter"), false);
             }
         }
-        assertEquals(finalBundleResponse.getChildren().size(), 5);
+        assertEquals(finalBundleResponse.getChildren().size(), 6);
     }
 
 
@@ -2037,7 +2045,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + ADMIN_UID + "," + ADMIN_KEY + "")
                 .body("{\n" +
                         "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
-                        "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
+                        "\"contentType\": \"" + contentTypes[0].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"admincontent\",\n" +
                         "\"contentTitle\": \"admincontent\",\n" +
                         "\"contentUrl\": \"https://www.youtube.com/watch?v=admin\"," +
@@ -2248,6 +2256,10 @@ public class IntegrationTests extends Server {
 
         assertEquals(stringResponse.getBody().contains("success"), true);
 
+
+        System.out.println("objectToMorphContentType: " + content[0].getContentType());
+
+
         /** Get the object again and check **/
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId())
@@ -2257,7 +2269,7 @@ public class IntegrationTests extends Server {
         objectToMorph = g.fromJson(stringResponse.getBody(), ContentObject.class);
         assertEquals(objectToMorph.getContentTitle(), "title_test");
         assertEquals(objectToMorph.getContentDescription(), "description_test");
-        assertEquals(objectToMorph.getContentPrice(), 1.33D, 0D);
+        assertEquals(objectToMorph.getContentPrice(), 1.33, 0D);
         assertEquals(objectToMorph.getCategoryId(), categories[0].getCategoryId());
         assertEquals(objectToMorph.getContentUrl(), "url_test");
 

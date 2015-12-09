@@ -125,13 +125,13 @@ public class EmailSend {
                 sendContentNotificationTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
                         Config.PLATFORM_EMAIL_SEND_NAME,
                         publisherName + " uploaded a new video!", Config.PLATFORM_HOME_PAGE_URL,
-                        publisherName,  contentName, contentUrl,
+                        publisherName,  contentName, contentUrl, null,
                         "content-follower-notification", userThumb, email);
 
         return sent[0];
     }
 
-    public static boolean sendSocialMediaLinkNotificationEmail(String contentThumb, String email, String publisherName, String contentName, String contentUrl){
+    public static boolean sendSocialMediaLinkNotificationEmail(String contentThumb, String email, String publisherName, String contentName, String contentUrl, String contentUrl2){
         /**
          * Send a social media link notification to the publisher after their video processes
          */
@@ -142,7 +142,7 @@ public class EmailSend {
                 sendContentNotificationTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
                         Config.PLATFORM_EMAIL_SEND_NAME,
                         "Share "+contentName+" on social media!", Config.PLATFORM_HOME_PAGE_URL,
-                        publisherName,  contentName, contentUrl,
+                        publisherName,  contentName, contentUrl, contentUrl2,
                         "social-media-link-notification", contentThumb, email);
 
         return sent[0];

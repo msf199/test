@@ -186,13 +186,22 @@ public class CreateOrder extends EndpointHandler {
         ContentHelper h = new ContentHelper();
 
         ContentObject orderContent = null;
+        try{
+            orderContent = h.getContentById(context, contentId[0], a.getUserId());
+        } catch(UnirestException e){
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+            return;
+        }
+
+        System.out.println("orderContent: " +orderContent);
 
         /**
          * Only get content if order is a bundle
          */
         if(orderType == Config.ORDER_TYPE_BUNDLE) {
             try {
-                orderContent = h.getContentById(contentId[0]);
+                orderContent = h.getContentById(context, contentId[0], a.getUserId());
             } catch (UnirestException e) {
                 Logging.log("High", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);

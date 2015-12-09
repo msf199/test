@@ -109,7 +109,7 @@ public class MandrillMailer {
             return false;
         }
     }
-    public static boolean sendContentNotificationTemplatedMessage(String fromEmail, String fromName, String subject, String host, String username, String contentName, String contentUrl, String templateName, String thumbnailUrl, String toEmail) {
+    public static boolean sendContentNotificationTemplatedMessage(String fromEmail, String fromName, String subject, String host, String username, String contentName, String contentUrl, String contentUrl2, String templateName, String thumbnailUrl, String toEmail) {
         MandrillTemplatedMessageRequest request = new MandrillTemplatedMessageRequest();
         MandrillMessage message = new MandrillMessage();
         Map<String, String> headers = new HashMap<>();
@@ -134,6 +134,7 @@ public class MandrillMailer {
         globalMergeVars.add(new MergeVar("UPLOADER_THUMB", thumbnailUrl));
         globalMergeVars.add(new MergeVar("VIDEO_NAME", contentName));
         globalMergeVars.add(new MergeVar("CONTENT_URL", contentUrl));
+        globalMergeVars.add(new MergeVar("CONTENT_URL2", contentUrl2));
         message.setGlobal_merge_vars(globalMergeVars);
 
         try {

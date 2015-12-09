@@ -62,6 +62,7 @@ public final class Config {
 
     //External Functionality Toggles
     public static boolean NOTIFICATION_TOGGLE = true;
+    public static boolean VIDEOS_IN_NEWSFEED = false;
 
     //Static ids and urls
     public static int INTRO_CONTENT_ID = 14131;

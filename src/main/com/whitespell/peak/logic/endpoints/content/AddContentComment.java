@@ -74,6 +74,7 @@ public class AddContentComment extends EndpointHandler {
                      */
                     Server.NotificationService.offerNotification(new ContentCommentNotification(user_id, content_id));
 
+                    commentAdded.setComment(comment);
                     commentAdded.setCommentAdded(true);
                     Gson g = new Gson();
                     String response = g.toJson(commentAdded);
@@ -104,6 +105,15 @@ public class AddContentComment extends EndpointHandler {
         }
 
         private boolean commentAdded;
+        private String comment;
+
+        public String getComment() {
+            return comment;
+        }
+
+        public void setComment(String comment) {
+            this.comment = comment;
+        }
 
         public boolean isCommentAdded() {
             return commentAdded;

@@ -50,7 +50,7 @@ public class CreateInstance extends EndpointHandler {
 
         final Authentication a = new Authentication(context.getRequest().getHeader("X-Authentication"));
 
-        if (!a.isAuthenticated() || a.getUserId() != -1) { // admin
+        if (!a.isAuthenticated() || a.getUserId() != 134) { // admin
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }

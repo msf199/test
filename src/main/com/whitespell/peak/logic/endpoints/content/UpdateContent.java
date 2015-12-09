@@ -357,6 +357,43 @@ public class UpdateContent extends EndpointHandler {
         final int final_processed = temp_processed;
 
         /**
+         * Define data constraints
+         */
+
+        boolean longTitle =
+                final_title.length() > StaticRules.MAX_CONTENT_TITLE_LENGTH;
+
+        boolean longDescription =
+                final_description.length() > StaticRules.MAX_CONTENT_DESCRIPTION_LENGTH;
+
+        boolean longThumbUrl =
+                final_thumbnail.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_144p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_240p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_360p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_480p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_720p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH ||
+                final_thumbnail_1080p.length() > StaticRules.MAX_THUMBNAIL_URL_LENGTH;
+
+        boolean longVideoUrl =
+                final_url.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_144p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_240p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_360p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_480p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_720p.length() > StaticRules.MAX_CONTENT_URL_LENGTH ||
+                final_url_1080p.length() > StaticRules.MAX_CONTENT_URL_LENGTH;
+
+        boolean longPreviewUrl =
+                final_preview_144p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_240p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_360p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_480p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_720p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH ||
+                final_preview_1080p.length() > StaticRules.MAX_CONTENT_PREVIEW_LENGTH;
+
+
+        /**
          * Ensure that the user is authenticated properly
          */
 
@@ -368,11 +405,31 @@ public class UpdateContent extends EndpointHandler {
         }
 
         /**
+         * Ensure content details are of appropriate length
+         */
+        if(longTitle){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_TITLE_TOO_LONG);
+            return;
+        }else if(longVideoUrl){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_URL_TOO_LONG);
+            return;
+        }else if(longDescription){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_DESCRIPTION_TOO_LONG);
+            return;
+        }else if(longThumbUrl){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.THUMBNAIL_URL_TOO_LONG);
+            return;
+        }else if(longPreviewUrl){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_PREVIEW_TOO_LONG);
+            return;
+        }
+
+        /**
          * Ensure user attempting to update content is the uploader
          */
         int[] publisherUserId = {-1};
-        String[] publisherEmail = {""};
-        String[] publisherName = {""};
+        String[] publisherEmail = {null};
+        String[] publisherName = {null};
         try {
             StatementExecutor executor = new StatementExecutor(GET_CONTENT_QUERY);
 
@@ -384,7 +441,7 @@ public class UpdateContent extends EndpointHandler {
                 if(results.next()){
                     publisherUserId[0] = results.getInt("user_id");
 
-                    if(!a.isMaster() && publisherUserId[0] != a.getUserId()){
+                    if(!a.isMaster() && publisherUserId[0] != a.getUserId() && a.getUserId() != 134){
                         System.out.println(a.getUserId());
                         System.out.println("key:" + a.getKey());
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
@@ -413,18 +470,6 @@ public class UpdateContent extends EndpointHandler {
         publisherName[0] = publisher.getUserName();
 
         /**
-         * Get the content's info to allow email notification for content upload (processed == 1)
-         */
-        ContentHelper c = new ContentHelper();
-        ContentObject content = null;
-        try {
-            content = c.getContentById(final_content_id);
-        }catch(Exception e){
-            Logging.log("High", e);
-            //don't throw client side error, this is only for email notifications
-        }
-
-        /**
          * Construct the SET string based on the fields the user wants to update.
          */
 
@@ -442,6 +487,12 @@ public class UpdateContent extends EndpointHandler {
             }
             count++;
         }
+        /**
+         * Add processed to update if updating thumbnail_url
+         */
+        if(updateKeys.contains(THUMBNAIL_ID_DB) && !updateKeys.contains(PROCESSED)){
+            setString.append(", `processed` = ? ");
+        }
         setString.append("WHERE `content_id` = ?");
         final String UPDATE_CONTENT = setString.toString();
 
@@ -458,6 +509,7 @@ public class UpdateContent extends EndpointHandler {
                     int count = 1;
                     boolean sendSocialMediaEmail = false;
                     boolean editDescriptionComment = false;
+                    boolean editContentThumbnail = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
                         ps.setString(count, final_title);
@@ -486,6 +538,7 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(THUMBNAIL_ID_DB)) {
+                        editContentThumbnail = true;
                         ps.setString(count, final_thumbnail);
                         System.out.println("Set string " + count + " to " + final_thumbnail);
                         count++;
@@ -596,8 +649,16 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
 
-                    if (updateKeys.contains(PROCESSED)) {
-                        ps.setInt(count, final_processed);
+                    if (updateKeys.contains(PROCESSED) || editContentThumbnail) {
+                        /**
+                         * If we edited the contentThumbnail on client side, process the thumbnails.
+                         */
+                        if(editContentThumbnail){
+                            ps.setInt(count, 0);
+                        }else{
+                            ps.setInt(count, final_processed);
+                        }
+
                         System.out.println("Set int " + count + " to " + final_processed);
                         count++;
                     }
@@ -612,13 +673,27 @@ public class UpdateContent extends EndpointHandler {
                         //outputs only the updated user fields, others will be "" or -1
 
                         /**
-                         * If content was successfully updated and the social media link is ready, send email notification
+                         * If content social media link AND long contentPreview is ready, send email notification
                          * to publisher
                          */
-                        if(sendSocialMediaEmail){
-                            if(publisherEmail[0] != null) {
-                                EmailSend.sendSocialMediaLinkNotificationEmail(
-                                        final_thumbnail, publisherEmail[0], publisherName[0], final_title, final_social_media_video);
+                        /**
+                         * Only check for the 720p if the SocialMediaPreview is being updated.
+                         */
+                        if(sendSocialMediaEmail) {
+                            ContentHelper h = new ContentHelper();
+                            try {
+                                ContentObject c = h.getContentById(context, final_content_id, a.getUserId());
+                                if (c != null
+                                        && c.getThumbnail720p() != null && c.getContentTitle() != null
+                                        && c.getContentPreview720p() != null && c.getSocialMediaVideo() != null) {
+                                    if (publisherEmail[0] != null && publisherName[0] != null) {
+                                        EmailSend.sendSocialMediaLinkNotificationEmail(
+                                                c.getThumbnail720p(), publisherEmail[0], publisherName[0],
+                                                c.getContentTitle(), c.getSocialMediaVideo(), c.getContentUrl720p());
+                                    }
+                                }
+                            } catch (UnirestException e) {
+                                Logging.log("Low", e);
                             }
                         }
 
@@ -633,10 +708,10 @@ public class UpdateContent extends EndpointHandler {
                             try {
                                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content/" + final_content_id)
                                          .header("accept", "application/json")
-                                         .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
+                                         .header("X-Authentication", +a.getUserId()+ "," + a.getKey() + "")
                                          .asString();
                             } catch (UnirestException e) {
-                                e.printStackTrace();
+                                Logging.log("Low", e);
                             }
                             content = g.fromJson(stringResponse.getBody(), ContentObject.class);
                             if(content != null && content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE) {

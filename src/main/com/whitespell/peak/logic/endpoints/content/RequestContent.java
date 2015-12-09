@@ -50,12 +50,15 @@ public class RequestContent extends EndpointHandler {
                 temp_category_id = -1,
                 temp_processed=1,
                 temp_parent=-1;
+        final boolean[] getUserVideos = {false};
+        final boolean[] getCategoryVideos = {false};
 
         ArrayList<String> queryKeys = new ArrayList<>();
         Map<String, String[]> urlQueryString = context.getQueryString();
 
 
         if (urlQueryString.get(QS_USER_ID) != null) {
+            getUserVideos[0] = true;
             if (Safety.isInteger(urlQueryString.get(QS_USER_ID)[0])
                     && Integer.parseInt(urlQueryString.get(QS_USER_ID)[0]) > 0) {
                 temp_user_id = Integer.parseInt(urlQueryString.get(QS_USER_ID)[0]);
@@ -77,6 +80,7 @@ public class RequestContent extends EndpointHandler {
             }
         }
         if (urlQueryString.get(QS_CATEGORY_ID) != null) {
+            getCategoryVideos[0] = true;
             if (Safety.isInteger(urlQueryString.get(QS_CATEGORY_ID)[0])
                     && Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]) > 0) {
                 temp_category_id = Integer.parseInt(urlQueryString.get(QS_CATEGORY_ID)[0]);
@@ -200,7 +204,12 @@ public class RequestContent extends EndpointHandler {
                 while (results.next()) {
 
                     ContentObject content = contentWrapper.wrapContent(results);
-                    contents.add(content);
+
+                    if((getUserVideos[0] || getCategoryVideos[0]) && content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE){
+                        continue;
+                    }else{
+                        contents.add(content);
+                    }
                 }
 
                 Gson g = new Gson();
