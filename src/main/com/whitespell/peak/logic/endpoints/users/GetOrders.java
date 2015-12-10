@@ -9,9 +9,11 @@ import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.OrderObject;
 
+import javax.jdo.annotations.Order;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -19,19 +21,23 @@ import java.sql.SQLException;
  *         whitespell.model
  */
 
-public class GetOrder extends EndpointHandler {
+public class GetOrders extends EndpointHandler {
 
     //DB Get Queries
+    private static final String GET_ORDER_DETAILS_QUERY = "SELECT `order_id`, `order_uuid`, `order_type`," +
+            " `order_status`, `order_origin`, `content_id`, `publisher_id`," +
+            " `receipt_html`, `email_sent`," +
+            " `delivered` FROM `order` WHERE `buyer_id` = ?";
+
     private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` FROM `order_origin` WHERE `order_origin_id` = ?";
     private static final String GET_ORDER_STATUS_NAME_QUERY = "SELECT `order_status_name` FROM `order_status` WHERE `order_UUID` = ?";
     private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` FROM `order_type` WHERE `order_type_id` = ?";
 
     private static final String URL_USER_ID = "userId";
 
-    private static final String QUERY_CONTENT_ID = "contentId";
-
     //db enums
     private static final String DB_ORDER_ID_KEY = "order_id";
+    private static final String DB_CONTENT_ID_KEY = "content_id";
     private static final String DB_ORDER_ORIGIN_KEY = "order_origin";
     private static final String DB_ORDER_TYPE_KEY = "order_type";
     private static final String DB_ORDER_UUID_KEY = "order_uuid";
@@ -42,7 +48,6 @@ public class GetOrder extends EndpointHandler {
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
-        queryStringInput.put(QUERY_CONTENT_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
     @Override
@@ -51,10 +56,6 @@ public class GetOrder extends EndpointHandler {
         int userId = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         int contentId = -1;
         boolean[] contentOrder = {false};
-        if(context.getQueryString().get(QUERY_CONTENT_ID) != null){
-            contentId = Integer.parseInt(context.getQueryString().get(QUERY_CONTENT_ID)[0]);
-            contentOrder[0] = true;
-        }
 
         String[] orderTypeName = {""};
         String[] orderStatusName = {""};
@@ -73,21 +74,11 @@ public class GetOrder extends EndpointHandler {
             return;
         }
 
-        String contentString = "";
-
-        if(contentOrder[0]) {
-            contentString = " AND `content_id` = ?";
-        }
-
-        String GET_ORDER_DETAILS_QUERY = "SELECT `order_id`, `order_uuid`, `order_type`," +
-                " `order_status`, `order_origin`, `publisher_id`," +
-                " `receipt_html`, `email_sent`," +
-                " `delivered` FROM `order` WHERE `buyer_id` = ? " + contentString;
-
         /**
          * Get all the order details to allow the client side to verify if the current user has ordered the content
          * they are trying to view. If so, they will update 'delivered' in database using the updateOrder endpoint.
          */
+        ArrayList<OrderObject> orders = new ArrayList<>();
         try {
             StatementExecutor executor = new StatementExecutor(GET_ORDER_DETAILS_QUERY);
             final int finalUserId = userId;
@@ -98,12 +89,13 @@ public class GetOrder extends EndpointHandler {
 
                 ps.setInt(1, finalUserId);
                 if(contentOrder[0]) {
-                    ps.setInt(2, finalContentId);
+                    ps.setInt(2, finalUserId);
+                    ps.setInt(3, finalContentId);
                 }
 
                 final ResultSet results = ps.executeQuery();
 
-                if (results.next()) {
+                while (results.next()) {
 
                     /**
                      * Get order type, origin and order status from tables
@@ -165,20 +157,23 @@ public class GetOrder extends EndpointHandler {
                     order.setOrderType(orderTypeName[0]);
                     order.setOrderOrigin(orderOriginName[0]);
                     order.setBuyerId(finalUserId);
-                    order.setContentId(finalContentId);
+                    order.setContentId(results.getInt(DB_CONTENT_ID_KEY));
                     order.setOrderId(results.getInt(DB_ORDER_ID_KEY));
                     order.setOrderUUID(results.getString(DB_ORDER_UUID_KEY));
                     order.setPublisherId(results.getInt(DB_PUBLISHER_ID_KEY));
                     order.setEmailSent(results.getInt(DB_ORDER_EMAIL_SENT_KEY));
                     order.setDelivered(results.getInt(DB_ORDER_DELIVERED_KEY));
+                    orders.add(order);
 
-                } else {
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_NOT_FOUND);
+                }
+
+                if(orders.size() == 0) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDERS_NOT_FOUND);
                     return;
                 }
 
                 Gson g = new Gson();
-                String response = g.toJson(order);
+                String response = g.toJson(orders);
                 context.getResponse().setStatus(200);
                 try {
                     context.getResponse().getWriter().write(response);

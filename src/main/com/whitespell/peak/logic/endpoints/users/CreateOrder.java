@@ -1,7 +1,10 @@
 package main.com.whitespell.peak.logic.endpoints.users;
 
+import com.google.api.services.sqladmin.SQLAdmin;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
@@ -13,7 +16,15 @@ import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Collections;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.sqladmin.SQLAdminScopes;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -159,8 +170,11 @@ public class CreateOrder extends EndpointHandler {
                         .asString();
                 System.out.println(stringResponse.getBody());
             } catch (Exception e) {
-                *
+
+                *//**
                  * Update order status to FAIL
+                 *//*
+
 
                 try {
                     StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
@@ -181,6 +195,48 @@ public class CreateOrder extends EndpointHandler {
                 return;
             }
         } else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE){
+            try {
+
+                String emailAddress = "123456789000-abc123def456@developer.gserviceaccount.com";
+                JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+                HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+                GoogleCredential credential = new GoogleCredential.Builder()
+                        .setTransport(httpTransport)
+                        .setJsonFactory(JSON_FACTORY)
+                        .setServiceAccountId(emailAddress)
+                        .setServiceAccountPrivateKeyFromP12File(new File("certificates/MyProject.p12"))
+                        .setServiceAccountScopes(Collections.singleton(SQLAdminScopes.SQLSERVICE_ADMIN))
+                        .build();
+
+                SQLAdmin sqladmin =
+                        new SQLAdmin.Builder(httpTransport, JSON_FACTORY, credential).build();
+
+            } catch (Exception e) {
+
+                *//**
+                 * Update order status to FAIL
+                 *//*
+
+
+                try {
+                    StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
+                    executor2.execute(ps2 -> {
+                        ps2.setString(1, orderUUID);
+                        ps2.setString(2, "fail");
+
+                        ps2.executeUpdate();
+                    });
+                } catch (SQLException s) {
+                    Logging.log("High", s);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
+
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+
 
         }*/
 

@@ -2667,6 +2667,25 @@ public class IntegrationTests extends Server {
         assertEquals(c.isSuccess(), true);
 
         /**
+         * Test for bundle order.
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/order")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"orderUUID\":\"27614847GDgvc.231234441\",\n" +
+                        "\"orderType\": "+Config.ORDER_TYPE_BUNDLE+",\n" +
+                        "\"publisherId\" : " + content[0].getPoster().getUserId() + ",\n" +
+                        "\"buyerId\" :  " + TEST_UID + ",\n" +
+                        "\"contentId\" :  " + content[0].getContentId() + ",\n" +
+                        "\"orderOriginId\" :  " + Config.ORDER_ORIGIN_APPLE + "\n" +
+                        "}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        CreateOrder.CreateOrderResponse c2 = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
+        assertEquals(c2.isSuccess(), true);
+
+        /**
          * Test for subscription order.
          */
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/order")
@@ -2680,8 +2699,8 @@ public class IntegrationTests extends Server {
                         "}")
                 .asString();
         System.out.println(stringResponse.getBody());
-        CreateOrder.CreateOrderResponse c2 = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
-        assertEquals(c2.isSuccess(), true);
+        CreateOrder.CreateOrderResponse c3 = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
+        assertEquals(c3.isSuccess(), true);
 
         /**
          * Get the inserted bundle order's details.
@@ -2692,14 +2711,14 @@ public class IntegrationTests extends Server {
                 .asString();
 
         System.out.println(stringResponse.getBody());
-        OrderObject o = g.fromJson(stringResponse.getBody(), OrderObject.class);
-        assertEquals(o.getOrderStatus(), "success");
-        assertEquals(o.getOrderType(), "bundle");
-        assertEquals(o.getOrderOrigin(), "apple");
-        assertEquals(o.getContentId(), content[0].getContentId());
-        assertEquals(o.getBuyerId(), TEST2_UID);
-        assertEquals(o.getPublisherId(), content[0].getPoster().getUserId());
-        assertEquals(o.getDelivered(), 0);
+        OrderObject[] o = g.fromJson(stringResponse.getBody(), OrderObject[].class);
+        assertEquals(o[0].getOrderStatus(), "success");
+        assertEquals(o[0].getOrderType(), "bundle");
+        assertEquals(o[0].getOrderOrigin(), "apple");
+        assertEquals(o[0].getContentId(), content[0].getContentId());
+        assertEquals(o[0].getBuyerId(), TEST2_UID);
+        assertEquals(o[0].getPublisherId(), content[0].getPoster().getUserId());
+        assertEquals(o[0].getDelivered(), 0);
 
         /**
          * Get the inserted subscription order's details.
@@ -2710,14 +2729,22 @@ public class IntegrationTests extends Server {
                 .asString();
 
         System.out.println(stringResponse.getBody());
-        OrderObject o2 = g.fromJson(stringResponse.getBody(), OrderObject.class);
-        assertEquals(o2.getOrderStatus(), "success");
-        assertEquals(o2.getOrderType(), "subscription");
-        assertEquals(o2.getOrderOrigin(), "google");
-        assertEquals(o2.getContentId(), -1);
-        assertEquals(o2.getBuyerId(), TEST_UID);
-        assertEquals(o2.getPublisherId(), -1);
-        assertEquals(o2.getDelivered(), 0);
+        OrderObject[] o2 = g.fromJson(stringResponse.getBody(), OrderObject[].class);
+        assertEquals(o2[0].getOrderStatus(), "success");
+        assertEquals(o2[0].getOrderType(), "bundle");
+        assertEquals(o2[0].getOrderOrigin(), "apple");
+        assertEquals(o2[0].getContentId(), content[0].getContentId());
+        assertEquals(o2[0].getBuyerId(), TEST_UID);
+        assertEquals(o2[0].getPublisherId(), content[0].getPoster().getUserId());
+        assertEquals(o2[0].getDelivered(), 0);
+
+        assertEquals(o2[1].getOrderStatus(), "success");
+        assertEquals(o2[1].getOrderType(), "subscription");
+        assertEquals(o2[1].getOrderOrigin(), "google");
+        assertEquals(o2[1].getContentId(), -1);
+        assertEquals(o2[1].getBuyerId(), TEST_UID);
+        assertEquals(o2[1].getPublisherId(), -1);
+        assertEquals(o2[1].getDelivered(), 0);
 
         /**
          * Ensure this user now has access to any content.

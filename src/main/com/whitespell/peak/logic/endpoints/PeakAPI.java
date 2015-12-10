@@ -149,7 +149,7 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new CreateOrder(), "/users/$/order", "userId");
 
         //Get an order for a user to ensure an ordered content was delivered
-        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetOrder(), "/users/$/order", "userId");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetOrders(), "/users/$/order", "userId");
 
         /**
          * STATISTICS
