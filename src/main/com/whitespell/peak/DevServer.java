@@ -13,7 +13,7 @@ public class DevServer {
 
     public static void main(String[] args) throws Exception {
 
-        Config.CONFIGURATION_FILE = "config-dev.prop";
+        Config.CONFIGURATION_FILE = "config.prop";
         Server.start();
     }
 

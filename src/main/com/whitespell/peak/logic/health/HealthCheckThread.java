@@ -35,6 +35,7 @@ public class HealthCheckThread extends Thread {
 
 
         if(Config.isDev()) {
+            System.out.println("IN DEV MODE");
             return;
         }
 

@@ -18,7 +18,8 @@ public class UserHelper {
         Gson g = new Gson();
         HttpResponse<String> stringResponse;
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + userId)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + userId + "?includeFollowing=1&includeCategories=1" +
+                "&includePublishing=1&includeFollowers=1")
                 .header("accept", "application/json")
                 .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
                 .asString();

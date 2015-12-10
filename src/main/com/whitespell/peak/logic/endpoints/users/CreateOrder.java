@@ -1,7 +1,10 @@
 package main.com.whitespell.peak.logic.endpoints.users;
 
+import com.google.api.services.sqladmin.SQLAdmin;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
@@ -9,10 +12,19 @@ import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.ContentHelper;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Collections;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.sqladmin.SQLAdminScopes;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,24 +38,32 @@ import java.sql.Timestamp;
 
 public class CreateOrder extends EndpointHandler {
 
-    private static final String INSERT_ORDER_UPDATE = "INSERT INTO `order`(" +
-            "`order_type`, `order_status`, `publisher_id`, `buyer_id`, `content_id`," +
+    private static final String INSERT_ORDER_UPDATE = "INSERT INTO `order`(`order_uuid`," +
+            " `order_type`, `order_origin`, `publisher_id`, `buyer_id`, `content_id`," +
             " `price`, `net_revenue`, `currency_id`, `publisher_share`, `peak_share`," +
-            " `publisher_balance`, `peak_balance`, `receipt_html`, `email_sent`, `buyer_details`," +
-            " `delivered`, `timestamp`) " +
+            " `publisher_balance`, `peak_balance`, `receipt_html`, `email_sent`, `delivered`," +
+            " `timestamp`) " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
-    private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` from `order_type` where `order_type_id` = ?";
-    private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` from `order_origin` where `order_origin_id` = ?";
+    private static final String INSERT_USER_SUBSCRIPTION_UPDATE = "INSERT INTO `user_subscriptions`(`user_id`," +
+            " `subscription_start`, `subscription_end`, `subscription_renew_day`, " +
+            "`subscription_price`, `subscription_type`, `subscription_token`) " +
+            "VALUES (?,?,?,?,?,?,?)";
+
+    private static final String INSERT_SUBSCRIBER_UPDATE = "UPDATE `user` SET `subscriber` = 1 WHERE `user_id` = ?";
+
+    private static final String INSERT_ORDER_STATUS_UPDATE = "INSERT INTO `order_status`(`order_uuid`,`order_status_name`) " +
+            "VALUES (?,?)";
+
+    private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` FROM `order_type` WHERE `order_type_id` = ?";
+    private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` FROM `order_origin` WHERE `order_origin_id` = ?";
 
     //payload enums
+    private static final String PAYLOAD_ORDER_UUID_KEY = "orderUUID";
     private static final String PAYLOAD_ORDER_TYPE_KEY = "orderType";
-    private static final String PAYLOAD_ORDER_STATUS_KEY = "orderStatus";
     private static final String PAYLOAD_PUBLISHER_ID_KEY = "publisherId";
     private static final String PAYLOAD_BUYER_ID_KEY = "buyerId";
     private static final String PAYLOAD_CONTENT_ID_KEY = "contentId";
-    private static final String PAYLOAD_CURRENCY_ID_KEY = "currencyId";
-    private static final String PAYLOAD_BUYER_DETAILS_KEY = "buyerDetails";
     private static final String PAYLOAD_ORDER_ORIGIN_KEY = "orderOriginId";
 
     //db enums
@@ -52,37 +72,66 @@ public class CreateOrder extends EndpointHandler {
 
     @Override
     protected void setUserInputs() {
+        payloadInput.put(PAYLOAD_ORDER_UUID_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED_UNLIMITED);
         payloadInput.put(PAYLOAD_ORDER_TYPE_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_ORDER_STATUS_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_PUBLISHER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
+        payloadInput.put(PAYLOAD_PUBLISHER_ID_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(PAYLOAD_BUYER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_CONTENT_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_CURRENCY_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
-        payloadInput.put(PAYLOAD_BUYER_DETAILS_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_ID_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(PAYLOAD_ORDER_ORIGIN_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
     }
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
-        //check order_origin, do calculation based on that.
-        //google/apple take .3, web is price === net_rev
-        //net_revenue = price - (price * .3)
-        //handle price, net revenue, publisherShare, peakShare, publisherBalance = 0, receipt_html ... , email_sent -> method,
-        //delivered = 0
+        //todo(cmcan)
+        /**
+         * If fail, make sure to update 'orderStatus' with order_status_name = FAIL and orderUUID, if success
+         * update `orderStatus` with success and orderUUID
+         */
 
         JsonObject j = context.getPayload().getAsJsonObject();
 
         //payload variables
+        final String orderUUID = j.get(PAYLOAD_ORDER_UUID_KEY).getAsString();
         final int orderType = j.get(PAYLOAD_ORDER_TYPE_KEY).getAsInt();
-        final int orderStatus = j.get(PAYLOAD_ORDER_STATUS_KEY).getAsInt();
-        final int publisherId = j.get(PAYLOAD_PUBLISHER_ID_KEY).getAsInt();
         final int buyerId = j.get(PAYLOAD_BUYER_ID_KEY).getAsInt();
-        final int contentId = j.get(PAYLOAD_CONTENT_ID_KEY).getAsInt();
-        final int currencyId = j.get(PAYLOAD_CURRENCY_ID_KEY).getAsInt();
-        final String buyerDetails = j.get(PAYLOAD_BUYER_DETAILS_KEY).getAsString();
+
+        final int[] publisherId = {-1};
+        if(j.get(PAYLOAD_PUBLISHER_ID_KEY) != null){
+            publisherId[0] = j.get(PAYLOAD_PUBLISHER_ID_KEY).getAsInt();
+        }
+        final int[] contentId = {-1};
+        if(j.get(PAYLOAD_CONTENT_ID_KEY) != null){
+            contentId[0] = j.get(PAYLOAD_CONTENT_ID_KEY).getAsInt();
+
+        }
         final int orderOriginId = j.get(PAYLOAD_ORDER_ORIGIN_KEY).getAsInt();
-        final Timestamp now = new Timestamp(Server.getMilliTime());
+        final long currTime = Server.getMilliTime();
+        final Timestamp now = new Timestamp(currTime);
+
+        /**
+         * If orderType bundle, ensure contentId and publisherId specified
+         */
+        if(orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+            return;
+        }
+
+        /**
+         * If invalid orderType throw error
+         */
+        if(orderType != Config.ORDER_TYPE_BUNDLE && orderType != Config.ORDER_TYPE_SUBSCRIPTION){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_TYPE);
+            return;
+        }
+
+        /**
+         * If invalid orderOrigin throw error
+         */
+        if(orderOriginId != Config.ORDER_ORIGIN_GOOGLE && orderOriginId != Config.ORDER_ORIGIN_APPLE && orderOriginId != Config.ORDER_ORIGIN_WEB){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_ORIGIN);
+            return;
+        }
 
         /**
          * Ensure the user is authenticated properly
@@ -96,49 +145,162 @@ public class CreateOrder extends EndpointHandler {
             return;
         }
 
+        //(todo) cmcan fix apple pay verification, could be malformed orderUUID
+        /**
+         * Use Google and Apple Requests to check that order information is valid and that order was submitted. Otherwise
+         * reject order creation
+         */
+
+        /**
+         * Apple endpoint call to verify receipt data
+         */
+
+        /**
+         * (todo) Complete validation once iOS app is ready.
+         */
+
+
+        /*if(orderOriginId == Config.ORDER_ORIGIN_APPLE) {
+            try {
+                HttpResponse<String> stringResponse = Unirest.post("https://sandbox.itunes.apple.com/verifyReceipt")
+                        .header("accept", "application/json")
+                        .body("{\n" +
+                                "\"receipt-data\":" + orderUUID + "\n" +
+                                "}")
+                        .asString();
+                System.out.println(stringResponse.getBody());
+            } catch (Exception e) {
+
+                *//**
+                 * Update order status to FAIL
+                 *//*
+
+
+                try {
+                    StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
+                    executor2.execute(ps2 -> {
+                        ps2.setString(1, orderUUID);
+                        ps2.setString(2, "fail");
+
+                        ps2.executeUpdate();
+                    });
+                } catch (SQLException s) {
+                    Logging.log("High", s);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
+
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+        } else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE){
+            try {
+
+                String emailAddress = "123456789000-abc123def456@developer.gserviceaccount.com";
+                JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
+                HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
+                GoogleCredential credential = new GoogleCredential.Builder()
+                        .setTransport(httpTransport)
+                        .setJsonFactory(JSON_FACTORY)
+                        .setServiceAccountId(emailAddress)
+                        .setServiceAccountPrivateKeyFromP12File(new File("certificates/MyProject.p12"))
+                        .setServiceAccountScopes(Collections.singleton(SQLAdminScopes.SQLSERVICE_ADMIN))
+                        .build();
+
+                SQLAdmin sqladmin =
+                        new SQLAdmin.Builder(httpTransport, JSON_FACTORY, credential).build();
+
+            } catch (Exception e) {
+
+                *//**
+                 * Update order status to FAIL
+                 *//*
+
+
+                try {
+                    StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
+                    executor2.execute(ps2 -> {
+                        ps2.setString(1, orderUUID);
+                        ps2.setString(2, "fail");
+
+                        ps2.executeUpdate();
+                    });
+                } catch (SQLException s) {
+                    Logging.log("High", s);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
+
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+
+
+        }*/
+
+
         /**
          * Get the contentObject that is being ordered
          */
         ContentHelper h = new ContentHelper();
 
-        ContentObject orderContent;
+        ContentObject orderContent = null;
         try{
-            orderContent = h.getContentById(context, contentId, a.getUserId());
+            orderContent = h.getContentById(context, contentId[0], a.getUserId());
         } catch(UnirestException e){
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
             return;
         }
 
-        System.out.println("orderContent: " +orderContent);
-
         /**
-         * Ensure content publisher matches payload
+         * Only get content if order is a bundle
          */
-        if(orderContent != null && orderContent.getPoster().getUserId() != publisherId){
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
-            return;
-        }
+        if(orderType == Config.ORDER_TYPE_BUNDLE) {
+            try {
+                orderContent = h.getContentById(context, contentId[0], a.getUserId());
+            } catch (UnirestException e) {
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                return;
+            }
 
+            /**
+             * Ensure content publisher matches payload
+             */
+
+            if (orderContent != null && orderContent.getPoster().getUserId() != publisherId[0]) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+                return;
+            }
+        }
         /**
          * Get the price of this content to calculate revenue and shares
          */
 
-        double price = orderContent.getContentPrice();
+
+        double price;
+
+        if(orderType == Config.ORDER_TYPE_BUNDLE && orderContent != null){
+            price = orderContent.getContentPrice();
+        }else{
+            price = Config.ORDER_SUBSCRIPTION_PRICE;
+        }
+
 
         //determined variables
         String[] orderTypeName = {""};
-        String[] orderStatusName = {""};
         String[] orderOriginName = {""};
-        final double netRevenue;
-        final double peakShare;
-        double peakBalance;
-        final double publisherShare;
-        double publisherBalance;
-        String receiptHtml;
+        int orderCurrency = Config.ORDER_CURRENCY_USD;
+        double netRevenue;
+        double whitespellShare;
+        double publisherShare;
 
-        //need to update
-        int delivered;
+        //will create a receipt with developerPayload received from transaction (android)
+        //will create a receipt TBD (apple).
+        String receiptHtml;
 
         /**
          * Get orderTypeName
@@ -187,7 +349,7 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Google or apple takes 30%
          */
-        if(orderOriginName[0].equalsIgnoreCase("google") || orderOriginName[0].equalsIgnoreCase("apple")){
+        if(orderOriginName[0].equals("google") || orderOriginName[0].equals("apple")){
             netRevenue = price - (price*(.3));
         }else{
             netRevenue = price;
@@ -200,10 +362,10 @@ public class CreateOrder extends EndpointHandler {
         publisherShare = netRevenue * (.7);
 
         /**
-         * Peak gets the remainder
+         * Whitespell gets the remainder
          */
 
-        peakShare = netRevenue - publisherShare;
+        whitespellShare = netRevenue - publisherShare;
 
         /**
          * Insert the order in the database and return the receipt on success, fail with 500 if it fails
@@ -212,36 +374,96 @@ public class CreateOrder extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_ORDER_UPDATE);
             executor.execute(ps -> {
-                ps.setInt(1, orderType);
-                ps.setInt(2, orderStatus);
-                ps.setInt(3, publisherId);
-                ps.setInt(4, buyerId);
-                ps.setInt(5, contentId);
-                ps.setDouble(6, price);
-                ps.setDouble(7, netRevenue);
-                ps.setInt(8, currencyId);
-                ps.setDouble(9, publisherShare);
-                ps.setDouble(10, peakShare);
-                //11 = pubBalance
-                ps.setDouble(11, 0);
-                //12 = peakBalance
-                ps.setDouble(12, 0);
-                //13 = receiptHtml
-                ps.setString(13, "receipt");
-                //14 = emailSent
-                ps.setInt(14, 0);
-                ps.setString(15, buyerDetails);
-                //16 = delivered
+                ps.setString(1, orderUUID);
+                ps.setInt(2, orderType);
+                ps.setInt(3, orderOriginId);
+                ps.setInt(4, publisherId[0]);
+                ps.setInt(5, buyerId);
+                ps.setInt(6, contentId[0]);
+                ps.setDouble(7, price);
+                ps.setDouble(8, netRevenue);
+                ps.setInt(9, orderCurrency);
+                ps.setDouble(10, publisherShare);
+                ps.setDouble(11, whitespellShare);
+                //13 = pubBalance. Will be updated when the order has been successfully processed
+                ps.setDouble(12, publisherShare);
+                //14 = whitespellBalance. Will be updated when the order has been successfully processed
+                ps.setDouble(13, whitespellShare);
+                //15 = receiptHtml. Will be updated based on orderOrigin.
+                ps.setString(14, "receipt");
+                //16 = emailSent. Will be updated in the emailSend method for orders.
+                ps.setInt(15, 0);
+                //18 = delivered. 0 initially, will be updated when user views content in app.
                 ps.setInt(16, 0);
                 ps.setTimestamp(17, now);
 
                 int rows = ps.executeUpdate();
 
                 if (rows > 0) {
+                    /**
+                     * Update order_status table with orderUUID and success (order has succeeded if it reached this point)
+                     */
+                    try {
+                        StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
+                        executor2.execute(ps2 -> {
+                            ps2.setString(1, orderUUID);
+                            ps2.setString(2, "success");
+
+                            ps2.executeUpdate();
+                        });
+                    } catch (SQLException e) {
+                        Logging.log("High", e);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
+                    }
+
                     System.out.println("order successfully inserted for userId " + buyerId);
+
+                    /**
+                     * If order is a subscription, add user to subscriber's table
+                     */
+                    if(orderType == Config.ORDER_TYPE_SUBSCRIPTION){
+                        try {
+                            StatementExecutor executor2 = new StatementExecutor(INSERT_USER_SUBSCRIPTION_UPDATE);
+                            executor2.execute(ps2 -> {
+                                ps2.setInt(1, buyerId);
+                                ps2.setTimestamp(2, now);
+                                ps2.setTimestamp(3, new Timestamp(currTime + (StaticRules.MS_ONE_DAY * StaticRules.DAYS_IN_A_MONTH)));
+                                ps2.setTimestamp(4, new Timestamp(Server.getMilliDay() + (StaticRules.MS_ONE_DAY * StaticRules.DAYS_IN_A_MONTH)));
+                                ps2.setDouble(5, Config.ORDER_SUBSCRIPTION_PRICE);
+                                ps2.setInt(6, 1);
+                                ps2.setString(7, "token");
+
+                                ps2.executeUpdate();
+                            });
+                        } catch (SQLException e) {
+                            Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                            return;
+                        }
+
+                        /**
+                         * Make the user a subscriber in the user table
+                         */
+                        try {
+                            StatementExecutor executor2 = new StatementExecutor(INSERT_SUBSCRIBER_UPDATE);
+                            executor2.execute(ps2 -> {
+                                ps2.setInt(1, buyerId);
+
+                                ps2.executeUpdate();
+                            });
+                        } catch (SQLException e) {
+                            Logging.log("High", e);
+                            //don't throw client side error
+
+                        }
+
+                        System.out.println("subscription successfully placed for userId " + buyerId);
+                    }
 
                     CreateOrderResponse or = new CreateOrderResponse();
                     or.setSuccess(true);
+                    or.setOrderType(orderType);
                     Gson g = new Gson();
                     String response = g.toJson(or);
                     context.getResponse().setStatus(200);
@@ -284,6 +506,16 @@ public class CreateOrder extends EndpointHandler {
             this.success = success;
         }
 
+        public int getOrderType() {
+            return orderType;
+        }
+
+        public void setOrderType(int orderType) {
+            this.orderType = orderType;
+        }
+
+        int orderType = -1;
         boolean success = false;
+
     }
 }
