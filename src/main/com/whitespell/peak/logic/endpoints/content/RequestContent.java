@@ -69,6 +69,13 @@ public class RequestContent extends EndpointHandler {
             if (Safety.isInteger(urlQueryString.get(QS_CONTENT_ID)[0])
                     && Integer.parseInt(urlQueryString.get(QS_CONTENT_ID)[0]) > 0) {
                 temp_content_id = Integer.parseInt(urlQueryString.get(QS_CONTENT_ID)[0]);
+                /**
+                 * ContentId 0 doesn't exist and would cause unusual behavior.
+                 */
+                if(temp_content_id == 0){
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ID_0_DOESNT_EXIST);
+                    return;
+                }
                 queryKeys.add("content_id");
             }
         }

@@ -119,7 +119,8 @@ public class StaticRules {
         CONTENT_PREVIEW_TOO_LONG(167, "Content Preview Url is too long (" + StaticRules.MAX_CONTENT_PREVIEW_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_TITLE_TOO_LONG(168, "Content Title is too long (" + StaticRules.MAX_CONTENT_TITLE_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_URL_TOO_LONG(169, "Content Url is too long (" + StaticRules.MAX_CONTENT_URL_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
-        CONTENT_TYPE_ID_TOO_LONG(170, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401);
+        CONTENT_TYPE_ID_TOO_LONG(170, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_ID_0_DOESNT_EXIST(171, "Content Id 0 is invalid", HttpStatus.BAD_REQUEST_400);
 
 
         int errorId;
