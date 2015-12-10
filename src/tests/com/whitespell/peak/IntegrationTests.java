@@ -92,6 +92,7 @@ public class IntegrationTests extends Server {
     static String SKYDIVER_PASSWORD = "3#$$$$$494949($(%*__''";
     static String SKYDIVER_EMAIL = "skydiver10@testy.com";
     static int SKYDIVER_UID;
+    static String SKYDIVER_KEY;
 
     static String ROLLERSKATER_USERNAME = "rollerskater10";
     static String ROLLERSKATER_PASSWORD = "3#$$$$$494949($(%*__''";
@@ -523,6 +524,19 @@ public class IntegrationTests extends Server {
 
         UserObject skydiver = g.fromJson(stringResponse.getBody(), UserObject.class);
         SKYDIVER_UID = skydiver.getUserId();
+
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
+                .header("accept", "application/json")
+                .body("{\n" +
+                        "\"userName\":\"" + SKYDIVER_USERNAME + "\",\n" +
+                        "\"password\" : \"" + SKYDIVER_PASSWORD + "\",\n" +
+                        "\"deviceUUID\" : \"unknown\",\n" +
+                        "\"deviceName\" : \"test device\",\n" +
+                        "\"deviceType\" : " + 1 + "\n" +
+                        "}")
+                .asString();
+        AuthenticationObject ao = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
+        SKYDIVER_KEY = ao.getKey();
 
         //todo(pim) authenticate as user
         //todo(pim) safeCall to publish in this category
@@ -2580,9 +2594,9 @@ public class IntegrationTests extends Server {
          * Test user delete test
          */
 
-        stringResponse = Unirest.delete("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+        stringResponse = Unirest.delete("http://localhost:" + Config.API_PORT + "/users/" + SKYDIVER_UID)
                 .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .header("X-Authentication", "" + SKYDIVER_UID + "," + SKYDIVER_KEY + "")
                 .asString();
         DeleteUser.DeleteUserResponse u = g.fromJson(stringResponse.getBody(), DeleteUser.DeleteUserResponse.class);
         assertEquals(u.userDeleted(), true);
@@ -2591,7 +2605,7 @@ public class IntegrationTests extends Server {
          * Try to access user as another user
          */
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID)
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + SKYDIVER_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .asString();
@@ -2633,6 +2647,9 @@ public class IntegrationTests extends Server {
          * Test order system, inserting, getting order details and (todo cmcan) updating the order.
          */
 
+        /**
+         * Test for bundle order.
+         */
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/order")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
@@ -2642,7 +2659,6 @@ public class IntegrationTests extends Server {
                         "\"publisherId\" : " + content[0].getPoster().getUserId() + ",\n" +
                         "\"buyerId\" :  " + TEST2_UID + ",\n" +
                         "\"contentId\" :  " + content[0].getContentId() + ",\n" +
-                        "\"currencyId\" :  " + Config.ORDER_CURRENCY_USD + ",\n" +
                         "\"orderOriginId\" :  " + Config.ORDER_ORIGIN_APPLE + "\n" +
                         "}")
                 .asString();
@@ -2651,7 +2667,24 @@ public class IntegrationTests extends Server {
         assertEquals(c.isSuccess(), true);
 
         /**
-         * Get the inserted order's details.
+         * Test for subscription order.
+         */
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/order")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"orderUUID\":\"27614847GDgvc3123123.1\",\n" +
+                        "\"orderType\": "+Config.ORDER_TYPE_SUBSCRIPTION+",\n" +
+                        "\"buyerId\" :  " + TEST_UID + ",\n" +
+                        "\"orderOriginId\" :  " + Config.ORDER_ORIGIN_GOOGLE + "\n" +
+                        "}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        CreateOrder.CreateOrderResponse c2 = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
+        assertEquals(c2.isSuccess(), true);
+
+        /**
+         * Get the inserted bundle order's details.
          */
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/order?contentId=" + content[0].getContentId())
                 .header("accept", "application/json")
@@ -2667,6 +2700,42 @@ public class IntegrationTests extends Server {
         assertEquals(o.getBuyerId(), TEST2_UID);
         assertEquals(o.getPublisherId(), content[0].getPoster().getUserId());
         assertEquals(o.getDelivered(), 0);
+
+        /**
+         * Get the inserted subscription order's details.
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/order")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+
+        System.out.println(stringResponse.getBody());
+        OrderObject o2 = g.fromJson(stringResponse.getBody(), OrderObject.class);
+        assertEquals(o2.getOrderStatus(), "success");
+        assertEquals(o2.getOrderType(), "subscription");
+        assertEquals(o2.getOrderOrigin(), "google");
+        assertEquals(o2.getContentId(), -1);
+        assertEquals(o2.getBuyerId(), TEST_UID);
+        assertEquals(o2.getPublisherId(), -1);
+        assertEquals(o2.getDelivered(), 0);
+
+        /**
+         * Ensure this user now has access to any content.
+         */
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .asString();
+        content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
+
+        for(int i = 0; i < content.length; i++){
+            if(content[i].getContentType() == StaticRules.BUNDLE_CONTENT_TYPE){
+                for(ContentObject j : content[i].getChildren()){
+                    assertEquals(j.getContentUrl() != null, true);
+                    assertEquals(j.getHasAccess(), 1);
+                }
+            }
+        }
 
         /**
          * Update the order's delivered status (also the publisher and whitespell balances)

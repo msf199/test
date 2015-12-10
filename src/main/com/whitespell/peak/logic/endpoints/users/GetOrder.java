@@ -22,18 +22,13 @@ import java.sql.SQLException;
 public class GetOrder extends EndpointHandler {
 
     //DB Get Queries
-    private static final String GET_ORDER_DETAILS_QUERY = "SELECT `order_id`, `order_uuid`, `order_type`," +
-            " `order_status`, `order_origin`, `publisher_id`," +
-            " `receipt_html`, `email_sent`," +
-            " `delivered` FROM `order` WHERE `buyer_id` = ? AND `content_id` = ?";
-
     private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` FROM `order_origin` WHERE `order_origin_id` = ?";
     private static final String GET_ORDER_STATUS_NAME_QUERY = "SELECT `order_status_name` FROM `order_status` WHERE `order_UUID` = ?";
     private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` FROM `order_type` WHERE `order_type_id` = ?";
 
     private static final String URL_USER_ID = "userId";
 
-    private static final String URL_CONTENT_ID = "contentId";
+    private static final String QUERY_CONTENT_ID = "contentId";
 
     //db enums
     private static final String DB_ORDER_ID_KEY = "order_id";
@@ -47,14 +42,19 @@ public class GetOrder extends EndpointHandler {
     @Override
     protected void setUserInputs() {
         urlInput.put(URL_USER_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
-        queryStringInput.put(URL_CONTENT_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
+        queryStringInput.put(QUERY_CONTENT_ID, StaticRules.InputTypes.REG_INT_OPTIONAL);
     }
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
         int userId = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
-        int contentId = Integer.parseInt(context.getQueryString().get(URL_CONTENT_ID)[0]);
+        int contentId = -1;
+        boolean[] contentOrder = {false};
+        if(context.getQueryString().get(QUERY_CONTENT_ID) != null){
+            contentId = Integer.parseInt(context.getQueryString().get(QUERY_CONTENT_ID)[0]);
+            contentOrder[0] = true;
+        }
 
         String[] orderTypeName = {""};
         String[] orderStatusName = {""};
@@ -73,6 +73,17 @@ public class GetOrder extends EndpointHandler {
             return;
         }
 
+        String contentString = "";
+
+        if(contentOrder[0]) {
+            contentString = " AND `content_id` = ?";
+        }
+
+        String GET_ORDER_DETAILS_QUERY = "SELECT `order_id`, `order_uuid`, `order_type`," +
+                " `order_status`, `order_origin`, `publisher_id`," +
+                " `receipt_html`, `email_sent`," +
+                " `delivered` FROM `order` WHERE `buyer_id` = ? " + contentString;
+
         /**
          * Get all the order details to allow the client side to verify if the current user has ordered the content
          * they are trying to view. If so, they will update 'delivered' in database using the updateOrder endpoint.
@@ -86,7 +97,9 @@ public class GetOrder extends EndpointHandler {
                 OrderObject order = null;
 
                 ps.setInt(1, finalUserId);
-                ps.setInt(2, finalContentId);
+                if(contentOrder[0]) {
+                    ps.setInt(2, finalContentId);
+                }
 
                 final ResultSet results = ps.executeQuery();
 
@@ -151,8 +164,8 @@ public class GetOrder extends EndpointHandler {
                     order.setOrderStatus(orderStatusName[0]);
                     order.setOrderType(orderTypeName[0]);
                     order.setOrderOrigin(orderOriginName[0]);
-                    order.setBuyerId(userId);
-                    order.setContentId(contentId);
+                    order.setBuyerId(finalUserId);
+                    order.setContentId(finalContentId);
                     order.setOrderId(results.getInt(DB_ORDER_ID_KEY));
                     order.setOrderUUID(results.getString(DB_ORDER_UUID_KEY));
                     order.setPublisherId(results.getInt(DB_PUBLISHER_ID_KEY));

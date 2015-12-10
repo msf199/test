@@ -41,6 +41,9 @@ public class StaticRules {
     public static int BUNDLE_CONTENT_TYPE = 6;
     public static int PLATFORM_UPLOAD_CONTENT_TYPE = 5;
 
+    public static int MS_ONE_DAY = 86400000;
+    public static int DAYS_IN_A_MONTH = 31;
+
     public enum ErrorCodes {
 
         //0-10 are unknown issues
@@ -122,7 +125,8 @@ public class StaticRules {
         CONTENT_PREVIEW_TOO_LONG(170, "Content Preview Url is too long (" + StaticRules.MAX_CONTENT_PREVIEW_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_TITLE_TOO_LONG(171, "Content Title is too long (" + StaticRules.MAX_CONTENT_TITLE_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_URL_TOO_LONG(172, "Content Url is too long (" + StaticRules.MAX_CONTENT_URL_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
-        CONTENT_TYPE_ID_TOO_LONG(173, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401);
+        CONTENT_TYPE_ID_TOO_LONG(173, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        SUBSCRIPTION_FAILED(174, "Subscription failed, try again later", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;

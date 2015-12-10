@@ -20,6 +20,7 @@ CREATE TABLE `user` (
   `fb_link` int(1) DEFAULT '0',
   `email_notifications` int(1) DEFAULT '1',
   `fb_user_id` varchar(50) DEFAULT NULL,
+  `subscriber` int(1) DEFAULT NULL,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `id_UNIQUE` (`user_id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
@@ -202,6 +203,18 @@ CREATE TABLE `user` (
   `timestamp` datetime DEFAULT NULL,
   PRIMARY KEY (`order_id`),
   UNIQUE KEY `order_uuid_UNIQUE` (`order_uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `user_subscriptions` (
+  `subscription_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `subscription_start` datetime DEFAULT NULL,
+  `subscription_end` datetime DEFAULT NULL,
+  `subscription_renew_day` datetime DEFAULT NULL,
+  `subscription_price` decimal(10,2) DEFAULT NULL,
+  `subscription_type` int(2) DEFAULT NULL,
+  `subscription_token` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`subscription_id`),
+  KEY `fk_subscription_user_id_idx` (`user_id`),
+  CONSTRAINT `fk_subscription_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;CREATE TABLE `user_following` (
   `user_id` int(11) NOT NULL,
   `following_id` int(11) NOT NULL,
@@ -249,7 +262,7 @@ CREATE TABLE `user` (
   KEY `FK_authentication_device_uuid_idx` (`device_uuid`),
   CONSTRAINT `FK_authentication_device_uuid` FOREIGN KEY (`device_uuid`) REFERENCES `device` (`device_uuid`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK_authentication_user_id` FOREIGN KEY (`user_id`) REFERENCES `user` (`user_id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=30916 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
+) ENGINE=InnoDB AUTO_INCREMENT=30919 DEFAULT CHARSET=utf8;CREATE TABLE `bundle_match` (
   `bundle_match_id` int(11) NOT NULL AUTO_INCREMENT,
   `parent_content_id` int(11) DEFAULT '0',
   `child_content_id` int(11) DEFAULT '0',

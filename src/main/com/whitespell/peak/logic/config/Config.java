@@ -15,7 +15,7 @@ public final class Config {
     CONFIG.PROP
      */
 
-    private static boolean dev;
+    private static boolean dev = true;
 
     //General server information
     public static String SERVER_NAME = "API";

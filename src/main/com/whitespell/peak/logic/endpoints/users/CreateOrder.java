@@ -2,8 +2,6 @@ package main.com.whitespell.peak.logic.endpoints.users;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
@@ -35,6 +33,13 @@ public class CreateOrder extends EndpointHandler {
             " `publisher_balance`, `peak_balance`, `receipt_html`, `email_sent`, `delivered`," +
             " `timestamp`) " +
             "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+
+    private static final String INSERT_USER_SUBSCRIPTION_UPDATE = "INSERT INTO `user_subscriptions`(`user_id`," +
+            " `subscription_start`, `subscription_end`, `subscription_renew_day`, " +
+            "`subscription_price`, `subscription_type`, `subscription_token`) " +
+            "VALUES (?,?,?,?,?,?,?)";
+
+    private static final String INSERT_SUBSCRIBER_UPDATE = "UPDATE `user` SET `subscriber` = 1 WHERE `user_id` = ?";
 
     private static final String INSERT_ORDER_STATUS_UPDATE = "INSERT INTO `order_status`(`order_uuid`,`order_status_name`) " +
             "VALUES (?,?)";
@@ -78,27 +83,27 @@ public class CreateOrder extends EndpointHandler {
         //payload variables
         final String orderUUID = j.get(PAYLOAD_ORDER_UUID_KEY).getAsString();
         final int orderType = j.get(PAYLOAD_ORDER_TYPE_KEY).getAsInt();
+        final int buyerId = j.get(PAYLOAD_BUYER_ID_KEY).getAsInt();
+
         final int[] publisherId = {-1};
         if(j.get(PAYLOAD_PUBLISHER_ID_KEY) != null){
             publisherId[0] = j.get(PAYLOAD_PUBLISHER_ID_KEY).getAsInt();
         }
-        final int buyerId = j.get(PAYLOAD_BUYER_ID_KEY).getAsInt();
-
         final int[] contentId = {-1};
         if(j.get(PAYLOAD_CONTENT_ID_KEY) != null){
             contentId[0] = j.get(PAYLOAD_CONTENT_ID_KEY).getAsInt();
+
         }
         final int orderOriginId = j.get(PAYLOAD_ORDER_ORIGIN_KEY).getAsInt();
-        final Timestamp now = new Timestamp(Server.getMilliTime());
+        final long currTime = Server.getMilliTime();
+        final Timestamp now = new Timestamp(currTime);
 
         /**
          * If orderType bundle, ensure contentId and publisherId specified
          */
-        if(orderType == Config.ORDER_TYPE_BUNDLE){
-            if(contentId[0] == -1 || publisherId[0] == -1){
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
-                return;
-            }
+        if(orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+            return;
         }
 
         /**
@@ -194,8 +199,6 @@ public class CreateOrder extends EndpointHandler {
             return;
         }
 
-        System.out.println("orderContent: " +orderContent);
-
         /**
          * Only get content if order is a bundle
          */
@@ -290,7 +293,7 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Google or apple takes 30%
          */
-        if(orderOriginName[0].equalsIgnoreCase("google") || orderOriginName[0].equalsIgnoreCase("apple")){
+        if(orderOriginName[0].equals("google") || orderOriginName[0].equals("apple")){
             netRevenue = price - (price*(.3));
         }else{
             netRevenue = price;
@@ -360,8 +363,51 @@ public class CreateOrder extends EndpointHandler {
 
                     System.out.println("order successfully inserted for userId " + buyerId);
 
+                    /**
+                     * If order is a subscription, add user to subscriber's table
+                     */
+                    if(orderType == Config.ORDER_TYPE_SUBSCRIPTION){
+                        try {
+                            StatementExecutor executor2 = new StatementExecutor(INSERT_USER_SUBSCRIPTION_UPDATE);
+                            executor2.execute(ps2 -> {
+                                ps2.setInt(1, buyerId);
+                                ps2.setTimestamp(2, now);
+                                ps2.setTimestamp(3, new Timestamp(currTime + (StaticRules.MS_ONE_DAY * StaticRules.DAYS_IN_A_MONTH)));
+                                ps2.setTimestamp(4, new Timestamp(Server.getMilliDay() + (StaticRules.MS_ONE_DAY * StaticRules.DAYS_IN_A_MONTH)));
+                                ps2.setDouble(5, Config.ORDER_SUBSCRIPTION_PRICE);
+                                ps2.setInt(6, 1);
+                                ps2.setString(7, "token");
+
+                                ps2.executeUpdate();
+                            });
+                        } catch (SQLException e) {
+                            Logging.log("High", e);
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                            return;
+                        }
+
+                        /**
+                         * Make the user a subscriber in the user table
+                         */
+                        try {
+                            StatementExecutor executor2 = new StatementExecutor(INSERT_SUBSCRIBER_UPDATE);
+                            executor2.execute(ps2 -> {
+                                ps2.setInt(1, buyerId);
+
+                                ps2.executeUpdate();
+                            });
+                        } catch (SQLException e) {
+                            Logging.log("High", e);
+                            //don't throw client side error
+
+                        }
+
+                        System.out.println("subscription successfully placed for userId " + buyerId);
+                    }
+
                     CreateOrderResponse or = new CreateOrderResponse();
                     or.setSuccess(true);
+                    or.setOrderType(orderType);
                     Gson g = new Gson();
                     String response = g.toJson(or);
                     context.getResponse().setStatus(200);
@@ -404,6 +450,16 @@ public class CreateOrder extends EndpointHandler {
             this.success = success;
         }
 
+        public int getOrderType() {
+            return orderType;
+        }
+
+        public void setOrderType(int orderType) {
+            this.orderType = orderType;
+        }
+
+        int orderType = -1;
         boolean success = false;
+
     }
 }

@@ -25,7 +25,6 @@ public class ContentWrapper {
     private static final String CONTENT_VIEWS_KEY = "content_views";
     private static final String CONTENT_URL = "content_url";
 
-
     // content urls
     private static final String CONTENT_URL_1080P = "content_url_1080p";
     private static final String CONTENT_URL_720P = "content_url_720p";
@@ -52,12 +51,6 @@ public class ContentWrapper {
 
     private static final String SOCIAL_MEDIA_VIDEO = "social_media_video";
     private static final String VIDEO_LENGTH_SECONDS = "video_length_seconds";
-
-
-
-
-
-
 
     private static final String CONTENT_DESCRIPTION = "content_description";
     private static final String CONTENT_THUMBNAIL = "thumbnail_url";
@@ -88,8 +81,9 @@ public class ContentWrapper {
 
     // get the access ids from the users access
     private static final String GET_USER_ACCESS_QUERY = "SELECT ca.`content_id` from `content_access`" +
-            " as ca INNER JOIN `content` as ct ON ca.`content_id` = ct.`content_id` WHERE " +
-            "ca.`user_id` = ? ";
+            " as ca INNER JOIN `content` as ct ON ca.`content_id` = ct.`content_id`" +
+            " WHERE" +
+            " ca.`user_id` = ? ";
 
     // get the access ids from the users views
     private static final String GET_USER_VIEW_QUERY = "SELECT `content_id` from `content_views` WHERE `user_id` = ?";
@@ -97,8 +91,12 @@ public class ContentWrapper {
     // get the access ids from the users saved content
     private static final String GET_USER_SAVED_QUERY = "SELECT `content_id` from `content_saved` WHERE `user_id` = ?";
 
+    // get the access ids from the users saved content
+    private static final String GET_USER_SUBSCRIBER_QUERY = "SELECT `subscriber` from `user` WHERE `user_id` = ?";
+
     private RequestObject context;
     private int requesterUserId;
+    private int subscriber;
     private ArrayList<Integer> userLikes;
     private ArrayList<Integer> userAccess;
     private ArrayList<Integer> userViewed;
@@ -112,6 +110,7 @@ public class ContentWrapper {
         this.userAccess = this.getContentAccess(this.requesterUserId);
         this.userViewed = this.getContentViewed(this.requesterUserId);
         this.userSaved = this.getContentSaved(this.requesterUserId);
+        this.subscriber = this.getSubscriber(this.requesterUserId);
     }
 
     /**
@@ -124,11 +123,37 @@ public class ContentWrapper {
      * JOIN with user for every single content call
      */
 
+    private int getSubscriber(int requesterUserId) {
+
+        final int[] subscriber = {0};
+        /**
+         * Get user's subscriber status
+         */
+        try {
+            StatementExecutor executor1 = new StatementExecutor(GET_USER_SUBSCRIBER_QUERY);
+            executor1.execute(ps2 -> {
+                ps2.setInt(1, requesterUserId);
+
+                ResultSet results1 = ps2.executeQuery();
+
+                //display results
+                while (results1.next()) {
+                    subscriber[0] = results1.getInt("subscriber");
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            return -1;
+        }
+
+        return subscriber[0];
+    }
+
     private int getTodaysLikes(int content_id) {
 
         final int[] tempLikes = {0};
         /**
-         * Get all the content this user has liked
+         * Get an aggregate of today's likes on the newsfeed to pick the popular bundle
          */
         try {
             StatementExecutor executor1 = new StatementExecutor(GET_TODAYS_LIKES_QUERY);
@@ -282,15 +307,12 @@ public class ContentWrapper {
              * Set content access. If free or the user is the publisher, user has access (or if userId is master)
              */
 
-            System.out.println(requesterUserId);
-            System.out.println("contentId:" +tempContent.getContentId()+" wrapper userId: "+tempPublisher.getUserId());
-
-            if ((currentObject.getDouble(CONTENT_PRICE) ==
-                    0.00 && tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE)
+            if (subscriber == 1
+                    ||  (currentObject.getDouble(CONTENT_PRICE) == 0.00 && tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE)
                     || requesterUserId == tempPublisher.getUserId()
-                    || requesterUserId == 134) {
-                tempContent.setHasAccess(1);
-            } else if (userAccess.contains(currentContentId) || userAccess.contains(tempContent.getParent())) {
+                    || requesterUserId == 134
+                    || userAccess.contains(currentContentId)
+                    || userAccess.contains(tempContent.getParent())) {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
@@ -501,7 +523,7 @@ public class ContentWrapper {
 
                     child = this.personalizeContent(child, tempPublisher, results);
 
-                /** personalize the child **/
+                    /** personalize the child **/
 
                     if (child.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
                         child.setChildren(recursiveGetChildren(child, context));
