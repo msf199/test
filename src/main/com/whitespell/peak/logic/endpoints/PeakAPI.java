@@ -251,7 +251,7 @@ public class PeakAPI extends WhitespellAPI {
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ShutdownInstance(), "/videoprocessing/shutdowninstance");
 
         /** RESTORE ORDERS **/
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new RestorePurchases(), "/users/$/restore");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new RestorePurchases(), "/users/$/restore", "userId");
     }
 
 }
