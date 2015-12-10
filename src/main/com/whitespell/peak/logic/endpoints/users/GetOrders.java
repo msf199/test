@@ -9,7 +9,6 @@ import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.OrderObject;
 
-import javax.jdo.annotations.Order;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
