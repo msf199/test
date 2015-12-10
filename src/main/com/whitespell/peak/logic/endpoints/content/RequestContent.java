@@ -205,7 +205,8 @@ public class RequestContent extends EndpointHandler {
 
                     ContentObject content = contentWrapper.wrapContent(results);
 
-                    if((getUserVideos[0] || getCategoryVideos[0]) && content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE){
+                    if(((getUserVideos[0] && a.getUserId() != content.getUserId()) || getCategoryVideos[0])
+                            && content.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE){
                         continue;
                     }else{
                         contents.add(content);
