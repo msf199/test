@@ -15,7 +15,7 @@ public final class Config {
     CONFIG.PROP
      */
 
-    private static boolean dev;
+    private static boolean dev = true;
 
     //General server information
     public static String SERVER_NAME = "API";
@@ -66,6 +66,16 @@ public final class Config {
 
     //Static ids and urls
     public static int INTRO_CONTENT_ID = 14131;
+
+    //Static order details
+    public static int ORDER_ORIGIN_APPLE = 1;
+    public static int ORDER_ORIGIN_GOOGLE = 2;
+    public static int ORDER_ORIGIN_WEB = 3;
+    public static int ORDER_TYPE_BUNDLE = 1;
+    public static int ORDER_TYPE_SUBSCRIPTION = 2;
+    public static int ORDER_CURRENCY_USD = 1;
+    public static double ORDER_SUBSCRIPTION_PRICE = 3.99;
+
     public static String PLATFORM_NAME = "Upfit";
     public static String PLATFORM_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/upfit-og.png";
     public static String PLATFORM_VIEW_CONTENT_URL = "https://app.upfit.co/#/post/";

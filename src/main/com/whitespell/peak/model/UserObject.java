@@ -32,6 +32,7 @@ public class UserObject {
     int publisher;
     int emailVerified;
     int emailNotifications;
+    int subscriber;
     String userName;
     String displayName;
     String email;
@@ -48,6 +49,7 @@ public class UserObject {
         this.coverPhoto = null;
         this.slogan = null;
         this.publisher = 0;
+        this.subscriber = 0;
     }
 
     public UserObject(ArrayList<Integer> categoryFollowing, ArrayList<Integer> userFollowers, ArrayList<Integer> userFollowing, ArrayList<Integer> categoryPublishing, int userId, String userName, String displayName, String email, String thumbnail, String cover_photo, String slogan, int publisher) {
@@ -146,6 +148,14 @@ public class UserObject {
 
     public void setEmailNotifications(int emailNotifications) {
         this.emailNotifications = emailNotifications;
+    }
+
+    public int getSubscriber() {
+        return subscriber;
+    }
+
+    public void setSubscriber(int subscriber) {
+        this.subscriber = subscriber;
     }
 
     public ArrayList<Integer> getUserFollowing() { return userFollowing; }

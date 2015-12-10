@@ -50,6 +50,7 @@ public class ImportDDL {
         tables.add("notification");
         //requires backticks, `order` is reserved
         tables.add("`order`");
+        tables.add("user_subscriptions");
 
         // add reference tables
         tables.add("user_following");

@@ -260,9 +260,7 @@ public class GetNewsfeed extends EndpointHandler {
                         /**
                          * Only show content that is standalone or a bundle. Show each content only once.
                          */
-                        System.out.println("newsfeedContentParent: " + newsfeedContent.getParent());
                         if (newsfeedContent.getParent() > 0 || bundleContentIds.contains(newsfeedContent.getContentId())) {
-                            System.out.println("continue... " + newsfeedContent.getContentType());
                             continue;
                         }
 
@@ -275,6 +273,7 @@ public class GetNewsfeed extends EndpointHandler {
 
                         if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE && newsfeedContent.getChildren().isEmpty()) {
                             // send notification to add videos to bundle todo(cmcan) to publisher
+
                         } else {
                             /**
                              * Allow videos/bundles in newsfeed based on video toggle.
@@ -286,7 +285,6 @@ public class GetNewsfeed extends EndpointHandler {
                                     (Config.VIDEOS_IN_NEWSFEED && newsfeedContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE)) {
                                 newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
                             } else {
-                                System.out.println("continue... " + newsfeedContent.getContentType());
                                 continue;
                             }
                         }

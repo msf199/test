@@ -41,6 +41,9 @@ public class StaticRules {
     public static int BUNDLE_CONTENT_TYPE = 6;
     public static int PLATFORM_UPLOAD_CONTENT_TYPE = 5;
 
+    public static int MS_ONE_DAY = 86400000;
+    public static int DAYS_IN_A_MONTH = 31;
+
     public enum ErrorCodes {
 
         //0-10 are unknown issues
@@ -115,13 +118,16 @@ public class StaticRules {
         COULD_NOT_SUBMIT_ORDER(163, "Order could not be submitted, please try again", HttpStatus.NOT_FOUND_404),
         INCORRECT_ORDER_PAYLOAD(164, "Please check the payload ids for accuracy", HttpStatus.BAD_REQUEST_400),
         CHILD_UPDATE_FAILED(165, "Couldn't update child for content", HttpStatus.INTERNAL_SERVER_ERROR_500),
-        CONTENT_ALREADY_EXISTS(166, "This contentUrl was already added by this user", HttpStatus.BAD_REQUEST_400),
-        CONTENT_PREVIEW_TOO_LONG(167, "Content Preview Url is too long (" + StaticRules.MAX_CONTENT_PREVIEW_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
-        CONTENT_TITLE_TOO_LONG(168, "Content Title is too long (" + StaticRules.MAX_CONTENT_TITLE_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
-        CONTENT_URL_TOO_LONG(169, "Content Url is too long (" + StaticRules.MAX_CONTENT_URL_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
-        CONTENT_TYPE_ID_TOO_LONG(170, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
-        CONTENT_ID_0_DOESNT_EXIST(171, "Content Id 0 is invalid", HttpStatus.BAD_REQUEST_400);
-
+        ORDERS_NOT_FOUND(166, "Could not retrieve orders for this user.", HttpStatus.NOT_FOUND_404),
+        INCORRECT_ORDER_TYPE(167, "Invalid orderType", HttpStatus.BAD_REQUEST_400),
+        INCORRECT_ORDER_ORIGIN(168, "Invalid orderOrigin", HttpStatus.BAD_REQUEST_400),
+        CONTENT_ALREADY_EXISTS(169, "This contentUrl was already added by this user", HttpStatus.BAD_REQUEST_400),
+        CONTENT_PREVIEW_TOO_LONG(170, "Content Preview Url is too long (" + StaticRules.MAX_CONTENT_PREVIEW_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_TITLE_TOO_LONG(171, "Content Title is too long (" + StaticRules.MAX_CONTENT_TITLE_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_URL_TOO_LONG(172, "Content Url is too long (" + StaticRules.MAX_CONTENT_URL_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_TYPE_ID_TOO_LONG(173, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
+        CONTENT_ID_0_DOESNT_EXIST(174, "Content Id 0 is invalid", HttpStatus.BAD_REQUEST_400),
+        SUBSCRIPTION_FAILED(175, "Subscription failed, try again later", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;

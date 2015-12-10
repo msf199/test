@@ -64,8 +64,8 @@ public class LinkFB extends EndpointHandler {
 
         int[] userId = {0};
         String facebookUserId = "";
-        String facebookCover = "";
-        String facebookProfilePic = "";
+        String facebookCover = null;
+        String facebookProfilePic = null;
         String[] authUsername ={null};
         String username = "test";
         String email = "test@test.test";
@@ -133,7 +133,7 @@ public class LinkFB extends EndpointHandler {
                     .setOAuthAppId(Config.FB_APP_ID)
                     .setOAuthAppSecret(Config.FB_APP_SECRET)
                     .setOAuthAccessToken(accessToken)
-                    .setOAuthPermissions("email,public_profile,cover,picture");
+                    .setOAuthPermissions("email,public_profile");
             FacebookFactory ff = new FacebookFactory(cb.build());
             Facebook facebook = ff.getInstance();
 
@@ -147,9 +147,12 @@ public class LinkFB extends EndpointHandler {
                 /**
                  * Get the profile pic and cover photo for automatic
                  */
-                if(user.getCover().getSource() != null && user.getPicture().getURL() != null){
-                    facebookProfilePic = facebook.users().getPictureURL(PictureSize.normal).toString();
+                if(user.getCover() != null){
                     facebookCover = user.getCover().getSource();
+                }
+
+                if(user.getPicture() != null){
+                    facebookProfilePic = facebook.users().getPictureURL(PictureSize.normal).toString();
                 }
 
                 facebookUserId = user.getId();
@@ -177,15 +180,11 @@ public class LinkFB extends EndpointHandler {
                     userId[0] = s.getInt("user_id");
                     authUsername[0] = s.getString("username");
                     userEmail[0] = s.getString("email");
-
-                    System.out.println("user exists");
                 } else {
                     /**
                      * Create new account
                      */
-                    newUser[0] = true;
-                    System.out.println("new user");
-                }
+                    newUser[0] = true;}
             });
         } catch (SQLException e) {
             Logging.log("High", e);
@@ -243,7 +242,6 @@ public class LinkFB extends EndpointHandler {
                     /**
                      * User inserted with email, 'password' and username
                      */
-                    System.out.println("create a new user");
                     if (rows <= 0) {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_PROCESS_FB_LOGIN);
                         return;
@@ -267,7 +265,6 @@ public class LinkFB extends EndpointHandler {
                     if (s.next()) {
                         userId[0] = s.getInt("user_id");
                         authUsername[0] = s.getString("username");
-                        System.out.println("user found, get user_id");
                     }
                 });
             } catch (Exception e) {
@@ -290,7 +287,6 @@ public class LinkFB extends EndpointHandler {
 
                 if (!s.next()) {
                     newFbUser[0] = true;
-                    System.out.println("facebook user not found");
                 }
             });
         } catch (SQLException e) {
@@ -324,7 +320,6 @@ public class LinkFB extends EndpointHandler {
                     /**
                      * User inserted into fb_users table
                      */
-                    System.out.println("inserting fb user");
                     if (rows <= 0) {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                         return;
@@ -349,7 +344,6 @@ public class LinkFB extends EndpointHandler {
                     ps.setString(1, finalPassword);
                     ps.setInt(2, userId[0]);
                     int rows = ps.executeUpdate();
-                    System.out.println("user pass updated in db");
 
                     /**
                      * User password updated to accessToken because they are a merged account
@@ -377,7 +371,6 @@ public class LinkFB extends EndpointHandler {
                 ps.setString(2, finalFBId);
                 ps.setInt(3, userId[0]);
                 int rows = ps.executeUpdate();
-                System.out.println("fbLink updated in db");
 
                 /**
                  * fb_link updated in user table
@@ -398,8 +391,6 @@ public class LinkFB extends EndpointHandler {
          * use provided Peak password to authenticate.
          */
 
-        System.out.println("attempt auth");
-
         if(payloadPass != null && (!newUser[0] && newFbUser[0])){
             try {
                 stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/authentication")
@@ -415,7 +406,6 @@ public class LinkFB extends EndpointHandler {
 
                 Gson g = new Gson();
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
-                System.out.println("auth1:"+a.getKey());
 
                 if(a.getKey() == null){
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
@@ -493,7 +483,6 @@ public class LinkFB extends EndpointHandler {
                 Gson g = new Gson();
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
 
-                System.out.println("auth2:"+a.getKey());
                 if(a.getKey() == null){
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
                     return;

@@ -307,7 +307,6 @@ public class AddNewContent extends EndpointHandler {
                             "\"comment\": \"" + content_description + "\"\n" +
                             "}")
                     .asString();
-            System.out.println(stringResponse.getBody());
         }catch(Exception e){
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
