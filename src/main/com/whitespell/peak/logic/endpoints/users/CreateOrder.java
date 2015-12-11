@@ -87,10 +87,12 @@ public class CreateOrder extends EndpointHandler {
         JsonObject j = context.getPayload().getAsJsonObject();
 
         //payload variables
-        String orderUUID = j.get(PAYLOAD_ORDER_UUID_KEY).getAsString();
-        if(orderUUID.length() <= 1) {
-            orderUUID = "fail-"+System.currentTimeMillis();
+        String orderUUID = "fail-"+System.currentTimeMillis();
+        if(j.get(PAYLOAD_ORDER_UUID_KEY) != null){
+            orderUUID = j.get(PAYLOAD_ORDER_UUID_KEY).getAsString();
         }
+
+
         final int orderType = j.get(PAYLOAD_ORDER_TYPE_KEY).getAsInt();
         final int buyerId = j.get(PAYLOAD_BUYER_ID_KEY).getAsInt();
         final String orderPayload = j.get(PAYLOAD_ORDER_PAYLOAD).getAsString();
@@ -187,7 +189,8 @@ public class CreateOrder extends EndpointHandler {
 
 
             } catch (Exception e) {
-                //couldnt get UUID, store receipt locally?
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+                return;
             }
         } /*else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE){
 
