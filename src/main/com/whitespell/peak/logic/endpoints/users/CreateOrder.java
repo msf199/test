@@ -172,7 +172,8 @@ public class CreateOrder extends EndpointHandler {
                     HttpResponse<String> stringResponse = Unirest.post("https://sandbox.itunes.apple.com/verifyReceipt")
                             .header("accept", "application/json")
                             .body("{\n" +
-                                    "\"receipt-data\":" + "\"" +orderPayload+ "\"" +
+                                    "\"receipt-data\":" + "\"" +orderPayload+ "\"," +
+                                    "\"password\":" + "\"4b2c76541cb641359bc5a981c1d36349\"" +
                                     "}")
                             .asString();
 
@@ -190,14 +191,14 @@ public class CreateOrder extends EndpointHandler {
                     }
                 } else {
                     Logging.log("High", "Error with payload: " + stringResponse.getBody() + " with payload" + orderPayload);
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
                    return;
                 }
 
 
             } catch (Exception e) {
                 Logging.log("HIGH", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
                 return;
             }
         } /*else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE){
