@@ -183,12 +183,14 @@ public class CreateOrder extends EndpointHandler {
                         }
                     }
                 } else {
+                    Logging.log("High", "Error with payload: " + stringResponse.getBody());
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
                    return;
                 }
 
 
             } catch (Exception e) {
+                Logging.log("HIGH", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
                 return;
             }
