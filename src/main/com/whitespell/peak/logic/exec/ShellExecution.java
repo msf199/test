@@ -55,6 +55,9 @@ public class ShellExecution {
     private static String deleteCommand = "bash deletenode.sh $instance-id $zone";
 
     public static int deleteNode(String instanceId) {
+        if(!instanceId.contains("--")) {
+            return 1;
+        }
         String[] nameAndZone = instanceId.split("--");
         String name = nameAndZone[0];
         String zone = nameAndZone[1];
