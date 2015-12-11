@@ -95,7 +95,13 @@ public class CreateOrder extends EndpointHandler {
 
         final int orderType = j.get(PAYLOAD_ORDER_TYPE_KEY).getAsInt();
         final int buyerId = j.get(PAYLOAD_BUYER_ID_KEY).getAsInt();
-        final String orderPayload = j.get(PAYLOAD_ORDER_PAYLOAD).getAsString();
+
+
+         String orderPayload = null;
+
+        if(j.get(PAYLOAD_ORDER_PAYLOAD) != null) {
+            orderPayload = j.get(PAYLOAD_ORDER_PAYLOAD).getAsString();
+        }
 
         final int[] publisherId = {-1};
         if(j.get(PAYLOAD_PUBLISHER_ID_KEY) != null){
@@ -183,7 +189,7 @@ public class CreateOrder extends EndpointHandler {
                         }
                     }
                 } else {
-                    Logging.log("High", "Error with payload: " + stringResponse.getBody());
+                    Logging.log("High", "Error with payload: " + stringResponse.getBody() + " with payload" + orderPayload);
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
                    return;
                 }
