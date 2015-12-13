@@ -179,7 +179,7 @@ public class CreateOrder extends EndpointHandler {
 
 
                 if(stringResponse.getBody() != null && stringResponse.getBody().contains("\"status\":0")) {
-                    System.out.println(stringResponse.getBody());
+                    System.out.println("Receipt:" + stringResponse.getBody());
                     JsonParser parser = new JsonParser();
                     JsonObject o = parser.parse(stringResponse.getBody()).getAsJsonObject();
                     JsonArray inApp = o.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray();
@@ -499,7 +499,8 @@ public class CreateOrder extends EndpointHandler {
             });
         } catch (SQLException e) {
             if(e.getMessage().contains("Duplicate entry")) {
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EXISTING_SUBSCRIPTION_ON_ACC);
+                Logging.log("High", e);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EXISTING_SUBSCRIPTION_ON_ACC, "You have an existing subscription on another account: alex70. Contact support to transfer it over.");
                 return;
             }
             Logging.log("High", e);
