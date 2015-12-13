@@ -50,7 +50,7 @@ public class CreateOrder extends EndpointHandler {
 
     private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` FROM `order_type` WHERE `order_type_id` = ?";
     private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` FROM `order_origin` WHERE `order_origin_id` = ?";
-    private static final String GET_ORDER_USERNAME = "SELECT user.`username` from `user` INNER JOIN `order` ON `order`.buyer_id = `user`.user_id WHERE `order`.order_UUID = ?";
+    private static final String GET_ORDER_USERNAME = "SELECT `username` from `user` INNER JOIN `order` ON `order`.buyer_id = `user`.user_id WHERE `order`.order_UUID = ?";
 
     //payload enums
     private static final String PAYLOAD_ORDER_UUID_KEY = "orderUUID";
