@@ -50,6 +50,7 @@ public class CreateOrder extends EndpointHandler {
 
     private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` FROM `order_type` WHERE `order_type_id` = ?";
     private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` FROM `order_origin` WHERE `order_origin_id` = ?";
+    private static final String GET_ORDER_USERNAME = "SELECT user.`username` from `user` INNER JOIN `order` ON `order`.buyer_id = `user`.user_id WHERE `order`.order_UUID = ?";
 
     //payload enums
     private static final String PAYLOAD_ORDER_UUID_KEY = "orderUUID";
@@ -62,6 +63,7 @@ public class CreateOrder extends EndpointHandler {
 
     //db enums
     private static final String DB_ORDER_TYPE_NAME_KEY = "order_type_name";
+    private static final String DB_USERNAME_KEY = "`user`.username";
     private static final String DB_ORDER_ORIGIN_NAME_KEY = "order_origin_name";
 
     @Override
@@ -509,7 +511,32 @@ public class CreateOrder extends EndpointHandler {
         } catch (SQLException e) {
             if(e.getMessage().contains("Duplicate entry")) {
                 Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EXISTING_SUBSCRIPTION_ON_ACC, "You have an existing subscription on another account: alex70. Contact support to transfer it over.");
+
+                final String[] username = new String[1];
+
+
+                /**
+                 * Get orderTypeName
+                 */
+                try {
+                    StatementExecutor executor = new StatementExecutor(GET_ORDER_USERNAME);
+                    executor.execute(ps -> {
+                        ps.setInt(1, orderType);
+
+                        ResultSet results = ps.executeQuery();
+
+                        if (results.next()) {
+                            username[0] = results.getString(DB_USERNAME_KEY);
+                        }
+                    });
+                } catch (SQLException e2) {
+                    Logging.log("High", e2);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
+
+
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EXISTING_SUBSCRIPTION_ON_ACC, "You have an existing subscription on another account: "+username[0]+". Contact support to transfer it over.");
                 return;
             }
             Logging.log("High", e);
