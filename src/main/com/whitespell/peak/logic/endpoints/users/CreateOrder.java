@@ -521,7 +521,7 @@ public class CreateOrder extends EndpointHandler {
                 try {
                     StatementExecutor executor = new StatementExecutor(GET_ORDER_USERNAME);
                     executor.execute(ps -> {
-                        ps.setInt(1, orderType);
+                        ps.setInt(1, orderUUID);
 
                         ResultSet results = ps.executeQuery();
 
