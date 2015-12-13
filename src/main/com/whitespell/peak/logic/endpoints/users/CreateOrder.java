@@ -184,8 +184,21 @@ public class CreateOrder extends EndpointHandler {
                     JsonObject o = parser.parse(stringResponse.getBody()).getAsJsonObject();
                     JsonArray inApp = o.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray();
 
-                    orderUUID = inApp.get(inApp.size() -1 ).getAsJsonObject().get("transaction_id").getAsString();
-                    Logging.log("Info", "The order UUID is: "+ orderUUID);
+
+                    long lastPurchaseTime = -1;
+                    JsonObject latestPurchase = null;
+                    for (int i = 0; i < inApp.size(); i++) {
+
+                        if(inApp.get(i).getAsJsonObject().get("purchase_date_ms").getAsLong() > lastPurchaseTime) {
+                            lastPurchaseTime = inApp.get(i).getAsJsonObject().get("purchase_date_ms").getAsLong();
+                            latestPurchase = inApp.get(i).getAsJsonObject();
+                        }
+                    }
+                    if(latestPurchase == null) {
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
+                        return;
+                    }
+                    orderUUID = latestPurchase.get("transaction_id").getAsString();
                 } else {
                     Logging.log("High", "Error with payload: " + stringResponse.getBody() + " with payload" + orderPayload);
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
