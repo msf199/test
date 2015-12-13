@@ -179,7 +179,7 @@ public class CreateOrder extends EndpointHandler {
 
 
                 if(stringResponse.getBody() != null && stringResponse.getBody().contains("\"status\":0")) {
-                    System.out.println("Receipt:" + stringResponse.getBody());
+                    Logging.log("HIGH", stringResponse.getBody());
                     JsonParser parser = new JsonParser();
                     JsonObject o = parser.parse(stringResponse.getBody()).getAsJsonObject();
                     JsonArray inApp = o.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray();
