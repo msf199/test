@@ -63,7 +63,7 @@ public class CreateOrder extends EndpointHandler {
 
     //db enums
     private static final String DB_ORDER_TYPE_NAME_KEY = "order_type_name";
-    private static final String DB_USERNAME_KEY = "`user`.username";
+    private static final String DB_USERNAME_KEY = "username";
     private static final String DB_ORDER_ORIGIN_NAME_KEY = "order_origin_name";
 
     @Override
