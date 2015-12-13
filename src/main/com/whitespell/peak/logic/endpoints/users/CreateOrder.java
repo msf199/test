@@ -393,10 +393,10 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Insert the order in the database and return the receipt on success, fail with 500 if it fails
          */
-
+        final String finalOrderUUID = orderUUID;
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_ORDER_UPDATE);
-            final String finalOrderUUID = orderUUID;
+
             final double finalPublisherShare = publisherShare;
             final double finalNetRevenue = netRevenue;
             final double finalWhitespellShare = whitespellShare;
@@ -521,7 +521,7 @@ public class CreateOrder extends EndpointHandler {
                 try {
                     StatementExecutor executor = new StatementExecutor(GET_ORDER_USERNAME);
                     executor.execute(ps -> {
-                        ps.setInt(1, orderUUID);
+                        ps.setInt(1, finalOrderUUID);
 
                         ResultSet results = ps.executeQuery();
 
