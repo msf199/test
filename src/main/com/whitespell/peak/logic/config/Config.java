@@ -76,6 +76,20 @@ public final class Config {
     public static int ORDER_CURRENCY_USD = 1;
     public static double ORDER_SUBSCRIPTION_PRICE = 3.99;
 
+    //Google Order details
+    public static String GOOGLE_CLIENT_ID = "954032824901-8oifacg1pmnpn8fr3tmumoqjvovfa6ka@developer.gserviceaccount.com";
+    public static String GOOGLE_PRIVATE_KEY_PATH = "certificates/Google Play Android Developer-715af11a1027.p12";
+    public static String GOOGLE_PACKAGE_NAME = "com.whitespell.upfit";
+    public static String GOOGLE_PURCHASE_99 = "com.whitespell.upfit.inapp1";
+    public static String GOOGLE_PURCHASE_199 = "com.whitespell.upfit.inapp2";
+    public static String GOOGLE_PURCHASE_299 = "com.whitespell.upfit.inapp3";
+    public static String GOOGLE_PURCHASE_399 = "com.whitespell.upfit.inapp4";
+    public static String GOOGLE_PURCHASE_499 = "com.whitespell.upfit.inapp5";
+    public static String GOOGLE_PURCHASE_599 = "com.whitespell.upfit.inapp6";
+    public static String GOOGLE_PURCHASE_699 = "com.whitespell.upfit.inapp7";
+    public static String GOOGLE_SUBSCRIPTION_MO = "com.whitespell.upfit.substest1mo";
+
+    //Platform Details
     public static String PLATFORM_NAME = "Upfit";
     public static String PLATFORM_THUMBNAIL_URL = "https://s3.amazonaws.com/peak-users/img/upfit-og.png";
     public static String PLATFORM_VIEW_CONTENT_URL = "https://app.upfit.co/#/post/";

@@ -31,7 +31,7 @@ public class AddNewContent extends EndpointHandler {
 
     private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`) VALUES (?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
-    private static final String CHECK_DUPLICATE_CONTENT_QUERY = "SELECT `content_id` FROM `content` WHERE `user_id` = ? AND `content_url` = ?";
+    private static final String CHECK_DUPLICATE_CONTENT_QUERY = "SELECT `content_id` FROM `content` WHERE `user_id` = ? AND (`content_url` = ? OR `content_title` = ?)";
 
     private static final String GET_AVAILABLE_PROCESSING_INSTANCES = "SELECT 1 FROM `avcpvm_monitoring` WHERE `queue_size` < 3 AND `shutdown_reported` = 0 AND (`last_ping` IS NULL AND `creation_time` > ? OR `last_ping` > ?)";
     
