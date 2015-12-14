@@ -171,13 +171,23 @@ public class CreateOrder extends EndpointHandler {
 
         if(orderOriginId == Config.ORDER_ORIGIN_APPLE) {
             try {
-                    HttpResponse<String> stringResponse = Unirest.post("https://sandbox.itunes.apple.com/verifyReceipt")
+                    HttpResponse<String> stringResponse = Unirest.post("https://buy.itunes.apple.com/verifyReceipt")
                             .header("accept", "application/json")
                             .body("{\n" +
                                     "\"receipt-data\":" + "\"" +orderPayload+ "\"," +
                                     "\"password\":" + "\"4b2c76541cb641359bc5a981c1d36349\"" +
                                     "}")
                             .asString();
+
+                if(stringResponse.getBody().contains("21007")) {
+                    stringResponse = Unirest.post("https://sandbox.itunes.apple.com/verifyReceipt")
+                            .header("accept", "application/json")
+                            .body("{\n" +
+                                    "\"receipt-data\":" + "\"" +orderPayload+ "\"," +
+                                    "\"password\":" + "\"4b2c76541cb641359bc5a981c1d36349\"" +
+                                    "}")
+                            .asString();
+                }
 
 
                 if(stringResponse.getBody() != null && stringResponse.getBody().contains("\"status\":0")) {
