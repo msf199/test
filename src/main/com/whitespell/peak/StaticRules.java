@@ -127,7 +127,8 @@ public class StaticRules {
         CONTENT_URL_TOO_LONG(172, "Content Url is too long (" + StaticRules.MAX_CONTENT_URL_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_TYPE_ID_TOO_LONG(173, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_ID_0_DOESNT_EXIST(174, "Content Id 0 is invalid", HttpStatus.BAD_REQUEST_400),
-        SUBSCRIPTION_FAILED(175, "Subscription failed, try again later", HttpStatus.NOT_FOUND_404);
+        SUBSCRIPTION_FAILED(175, "Subscription failed, try again later", HttpStatus.NOT_FOUND_404),
+        ORDER_FAILED(176, "Order failed, try again later", HttpStatus.NOT_FOUND_404);
 
         int errorId;
         String errorMessage;

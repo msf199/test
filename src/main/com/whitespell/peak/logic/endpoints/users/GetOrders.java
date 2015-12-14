@@ -134,7 +134,7 @@ public class GetOrders extends EndpointHandler {
                     try {
                         StatementExecutor executor2 = new StatementExecutor(GET_ORDER_STATUS_NAME_QUERY);
                         executor2.execute(ps2 -> {
-                            ps2.setInt(1, results.getInt(DB_ORDER_UUID_KEY));
+                            ps2.setString(1, results.getString(DB_ORDER_UUID_KEY));
 
                             ResultSet results2 = ps2.executeQuery();
                             if (results2.next()) {

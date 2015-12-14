@@ -1,5 +1,13 @@
 package main.com.whitespell.peak.logic.endpoints.users;
 
+import com.google.api.client.auth.oauth2.Credential;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
+import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.http.HttpTransport;
+import com.google.api.client.json.JsonFactory;
+import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.androidpublisher.AndroidPublisher;
+import com.google.api.services.androidpublisher.AndroidPublisherScopes;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -18,10 +26,13 @@ import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -56,6 +67,8 @@ public class CreateOrder extends EndpointHandler {
     private static final String PAYLOAD_ORDER_TYPE_KEY = "orderType";
     private static final String PAYLOAD_PUBLISHER_ID_KEY = "publisherId";
     private static final String PAYLOAD_ORDER_PAYLOAD = "orderPayload";
+    private static final String PAYLOAD_PURCHASE_TOKEN = "purchaseToken";
+    private static final String PAYLOAD_PRODUCT_ID = "productId";
     private static final String PAYLOAD_BUYER_ID_KEY = "buyerId";
     private static final String PAYLOAD_CONTENT_ID_KEY = "contentId";
     private static final String PAYLOAD_ORDER_ORIGIN_KEY = "orderOriginId";
@@ -70,6 +83,8 @@ public class CreateOrder extends EndpointHandler {
         payloadInput.put(PAYLOAD_ORDER_TYPE_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(PAYLOAD_PUBLISHER_ID_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(PAYLOAD_ORDER_PAYLOAD, StaticRules.InputTypes.REG_STRING_OPTIONAL_UNLIMITED);
+        payloadInput.put(PAYLOAD_PURCHASE_TOKEN, StaticRules.InputTypes.REG_STRING_OPTIONAL_UNLIMITED);
+        payloadInput.put(PAYLOAD_PRODUCT_ID, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(PAYLOAD_BUYER_ID_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_ID_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL);
         payloadInput.put(PAYLOAD_ORDER_ORIGIN_KEY, StaticRules.InputTypes.REG_INT_REQUIRED);
@@ -78,7 +93,6 @@ public class CreateOrder extends EndpointHandler {
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 
-        //todo(cmcan)
         /**
          * If fail, make sure to update 'orderStatus' with order_status_name = FAIL and orderUUID, if success
          * update `orderStatus` with success and orderUUID
@@ -87,9 +101,9 @@ public class CreateOrder extends EndpointHandler {
         JsonObject j = context.getPayload().getAsJsonObject();
 
         //payload variables
-        String orderUUID = "fail-"+System.currentTimeMillis();
+        String[] orderUUID = {"fail-"+System.currentTimeMillis()};
         if(j.get(PAYLOAD_ORDER_UUID_KEY) != null){
-            orderUUID = j.get(PAYLOAD_ORDER_UUID_KEY).getAsString();
+            orderUUID[0] = j.get(PAYLOAD_ORDER_UUID_KEY).getAsString();
         }
 
 
@@ -101,6 +115,18 @@ public class CreateOrder extends EndpointHandler {
 
         if(j.get(PAYLOAD_ORDER_PAYLOAD) != null) {
             orderPayload = j.get(PAYLOAD_ORDER_PAYLOAD).getAsString();
+        }
+
+        String purchaseToken = null;
+
+        if(j.get(PAYLOAD_PURCHASE_TOKEN) != null) {
+            purchaseToken = j.get(PAYLOAD_PURCHASE_TOKEN).getAsString();
+        }
+
+        String productId = null;
+
+        if(j.get(PAYLOAD_PRODUCT_ID) != null) {
+            productId = j.get(PAYLOAD_PRODUCT_ID).getAsString();
         }
 
         final int[] publisherId = {-1};
@@ -119,7 +145,12 @@ public class CreateOrder extends EndpointHandler {
         /**
          * If orderType bundle, ensure contentId and publisherId specified
          */
-        if(orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)){
+        /**
+         * Also check that payload is accurate based on orderOrigin
+         */
+        if((orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)
+                || (orderOriginId == Config.ORDER_ORIGIN_GOOGLE && (productId == null || purchaseToken == null))
+                || (orderOriginId == Config.ORDER_ORIGIN_APPLE && orderPayload == null))){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
             return;
         }
@@ -152,7 +183,6 @@ public class CreateOrder extends EndpointHandler {
             return;
         }
 
-        //(todo) cmcan fix apple pay verification, could be malformed orderUUID
         /**
          * Use Google and Apple Requests to check that order information is valid and that order was submitted. Otherwise
          * reject order creation
@@ -161,11 +191,6 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Apple endpoint call to verify receipt data
          */
-
-        /**
-         * (todo) Complete validation once iOS app is ready.
-         */
-
 
         if(orderOriginId == Config.ORDER_ORIGIN_APPLE) {
             try {
@@ -185,54 +210,82 @@ public class CreateOrder extends EndpointHandler {
 
                     for (int i = 0; i < inApp.size(); i++) {
                         if (i == inApp.size() - 1) {
-                            orderUUID = inApp.get(i).getAsJsonObject().get("transaction_id").getAsString();
-                            System.out.println(orderUUID);
+                            orderUUID[0] = inApp.get(i).getAsJsonObject().get("transaction_id").getAsString();
+                            System.out.println(orderUUID[0]);
                         }
                     }
                 } else {
                     Logging.log("High", "Error with payload: " + stringResponse.getBody() + " with payload" + orderPayload);
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
-                   return;
+
+                    /**
+                     *   Update order status to FAIL
+                     */
+
+                    try {
+                        StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
+                        executor2.execute(ps2 -> {
+                            ps2.setString(1, orderUUID[0]);
+                            ps2.setString(2, "fail");
+
+                            ps2.executeUpdate();
+                        });
+                    } catch (SQLException s) {
+                        Logging.log("High", s);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
+                    }
+
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
+                    return;
                 }
 
 
             } catch (Exception e) {
                 Logging.log("HIGH", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
                 return;
             }
-        } /*else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE){
+        } else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE) {
 
-
-        }
-
+            /**
+             * Google purchases API to verify order
+             */
             try {
 
-                String emailAddress = "123456789000-abc123def456@developer.gserviceaccount.com";
-                JsonFactory JSON_FACTORY = JacksonFactory.getDefaultInstance();
                 HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
-                GoogleCredential credential = new GoogleCredential.Builder()
-                        .setTransport(httpTransport)
-                        .setJsonFactory(JSON_FACTORY)
-                        .setServiceAccountId(emailAddress)
-                        .setServiceAccountPrivateKeyFromP12File(new File("certificates/MyProject.p12"))
-                        .setServiceAccountScopes(Collections.singleton(SQLAdminScopes.SQLSERVICE_ADMIN))
-                        .build();
+                JsonFactory jsonFactory = new JacksonFactory();
 
-                SQLAdmin sqladmin =
-                        new SQLAdmin.Builder(httpTransport, JSON_FACTORY, credential).build();
+                List<String> scopes = new ArrayList<>();
+                scopes.add(AndroidPublisherScopes.ANDROIDPUBLISHER);
+
+                Credential credential = new GoogleCredential.Builder().setTransport(httpTransport).setJsonFactory(jsonFactory)
+                        .setServiceAccountId(Config.GOOGLE_CLIENT_ID)
+                        .setServiceAccountPrivateKeyFromP12File(new File(Config.GOOGLE_PRIVATE_KEY_PATH))
+                        .setServiceAccountScopes(scopes).build();
+                AndroidPublisher publisher = new AndroidPublisher.Builder(httpTransport, jsonFactory, credential).build();
+                AndroidPublisher.Purchases purchases = publisher.purchases();
+                final AndroidPublisher.Purchases.Get request = purchases.get(Config.GOOGLE_PACKAGE_NAME, productId, purchaseToken);
+
+                if(request != null && request.getToken() != null) {
+                    orderUUID[0] = request.getToken();
+                    System.out.println(orderUUID[0]);
+                } else {
+                    Logging.log("High", "Error with purchaseToken: " + purchaseToken + " with productId" + productId);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
+                    return;
+                }
+
 
             } catch (Exception e) {
 
-                *//**
-                 * Update order status to FAIL
-                 *//*
-
+                /**
+                 *   Update order status to FAIL
+                 */
 
                 try {
                     StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
                     executor2.execute(ps2 -> {
-                        ps2.setString(1, orderUUID);
+                        ps2.setString(1, orderUUID[0]);
                         ps2.setString(2, "fail");
 
                         ps2.executeUpdate();
@@ -244,11 +297,9 @@ public class CreateOrder extends EndpointHandler {
                 }
 
                 Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
                 return;
             }
-
-/*
         }
 
 
@@ -384,7 +435,7 @@ public class CreateOrder extends EndpointHandler {
 
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_ORDER_UPDATE);
-            final String finalOrderUUID = orderUUID;
+            final String finalOrderUUID = orderUUID[0];
             final double finalPublisherShare = publisherShare;
             final double finalNetRevenue = netRevenue;
             final double finalWhitespellShare = whitespellShare;
@@ -472,7 +523,6 @@ public class CreateOrder extends EndpointHandler {
                         } catch (SQLException e) {
                             Logging.log("High", e);
                             //don't throw client side error
-
                         }
 
                         System.out.println("subscription successfully placed for userId " + buyerId);
