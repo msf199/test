@@ -61,6 +61,7 @@ public class CreateOrder extends EndpointHandler {
 
     private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` FROM `order_type` WHERE `order_type_id` = ?";
     private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` FROM `order_origin` WHERE `order_origin_id` = ?";
+    private static final String GET_ORDER_USERNAME = "SELECT `username` from `user` INNER JOIN `order` ON `order`.buyer_id = `user`.user_id WHERE `order`.order_UUID = ?";
 
     //payload enums
     private static final String PAYLOAD_ORDER_UUID_KEY = "orderUUID";
@@ -75,6 +76,7 @@ public class CreateOrder extends EndpointHandler {
 
     //db enums
     private static final String DB_ORDER_TYPE_NAME_KEY = "order_type_name";
+    private static final String DB_USERNAME_KEY = "username";
     private static final String DB_ORDER_ORIGIN_NAME_KEY = "order_origin_name";
 
     @Override
@@ -194,7 +196,7 @@ public class CreateOrder extends EndpointHandler {
 
         if(orderOriginId == Config.ORDER_ORIGIN_APPLE) {
             try {
-                    HttpResponse<String> stringResponse = Unirest.post("https://sandbox.itunes.apple.com/verifyReceipt")
+                    HttpResponse<String> stringResponse = Unirest.post("https://buy.itunes.apple.com/verifyReceipt")
                             .header("accept", "application/json")
                             .body("{\n" +
                                     "\"receipt-data\":" + "\"" +orderPayload+ "\"," +
@@ -202,18 +204,37 @@ public class CreateOrder extends EndpointHandler {
                                     "}")
                             .asString();
 
+                if(stringResponse.getBody().contains("21007")) {
+                    stringResponse = Unirest.post("https://sandbox.itunes.apple.com/verifyReceipt")
+                            .header("accept", "application/json")
+                            .body("{\n" +
+                                    "\"receipt-data\":" + "\"" +orderPayload+ "\"," +
+                                    "\"password\":" + "\"4b2c76541cb641359bc5a981c1d36349\"" +
+                                    "}")
+                            .asString();
+                }
+
 
                 if(stringResponse.getBody() != null && stringResponse.getBody().contains("\"status\":0")) {
+                    Logging.log("HIGH", stringResponse.getBody());
                     JsonParser parser = new JsonParser();
                     JsonObject o = parser.parse(stringResponse.getBody()).getAsJsonObject();
                     JsonArray inApp = o.get("receipt").getAsJsonObject().get("in_app").getAsJsonArray();
 
+
+                    long lastPurchaseTime = -1;
+                    JsonObject latestPurchase = null;
                     for (int i = 0; i < inApp.size(); i++) {
-                        if (i == inApp.size() - 1) {
-                            orderUUID[0] = inApp.get(i).getAsJsonObject().get("transaction_id").getAsString();
-                            System.out.println(orderUUID[0]);
+                        if(inApp.get(i).getAsJsonObject().get("purchase_date_ms").getAsLong() > lastPurchaseTime) {
+                            lastPurchaseTime = inApp.get(i).getAsJsonObject().get("purchase_date_ms").getAsLong();
+                            latestPurchase = inApp.get(i).getAsJsonObject();
                         }
                     }
+                    if(latestPurchase == null) {
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
+                        return;
+                    }
+                    orderUUID[0] = latestPurchase.get("transaction_id").getAsString();
                 } else {
                     Logging.log("High", "Error with payload: " + stringResponse.getBody() + " with payload" + orderPayload);
 
@@ -432,10 +453,9 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Insert the order in the database and return the receipt on success, fail with 500 if it fails
          */
-
+        final String finalOrderUUID = orderUUID[0];
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_ORDER_UPDATE);
-            final String finalOrderUUID = orderUUID[0];
             final double finalPublisherShare = publisherShare;
             final double finalNetRevenue = netRevenue;
             final double finalWhitespellShare = whitespellShare;
@@ -547,6 +567,36 @@ public class CreateOrder extends EndpointHandler {
                 }
             });
         } catch (SQLException e) {
+            if(e.getMessage().contains("Duplicate entry")) {
+                Logging.log("High", e);
+
+                final String[] username = new String[1];
+
+
+                /**
+                 * Get orderTypeName
+                 */
+                try {
+                    StatementExecutor executor = new StatementExecutor(GET_ORDER_USERNAME);
+                    executor.execute(ps -> {
+                        ps.setString(1, finalOrderUUID);
+
+                        ResultSet results = ps.executeQuery();
+
+                        if (results.next()) {
+                            username[0] = results.getString(DB_USERNAME_KEY);
+                        }
+                    });
+                } catch (SQLException e2) {
+                    Logging.log("High", e2);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
+
+
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EXISTING_SUBSCRIPTION_ON_ACC, "You have an existing subscription on another account: "+username[0]+". Contact support to transfer it over.");
+                return;
+            }
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;

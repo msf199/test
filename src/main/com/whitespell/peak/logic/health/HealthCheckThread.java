@@ -90,7 +90,7 @@ public class HealthCheckThread extends Thread {
                            Logging.log("INFO", "we have enough video nodes");
                        }
                    });
-               } catch (SQLException e) {
+               } catch (Exception e) {
                    Logging.log("High", e);
                }
 
