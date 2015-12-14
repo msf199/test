@@ -91,7 +91,7 @@ public class EmailSend {
                         sent[0] =
                                 sendTokenTemplatedMessage(Config.PLATFORM_EMAIL_SEND_ADDRESS,
                                         Config.PLATFORM_EMAIL_SEND_NAME,
-                                        "Password Reset Confirmation", Config.PLATFORM_HOME_PAGE_URL,
+                                        "Password Reset Link", Config.PLATFORM_HOME_PAGE_URL,
                                         username, resetToken,
                                         "peak-1", "forgot_password", email);
                     }

@@ -289,20 +289,6 @@ public class ContentWrapper {
 
         int currentContentId = tempContent.getContentId();
         try {
-
-            //todo(cmcan) REMOVE AFTER BETA TO ALLOW PURCHASES
-            /**
-            * BETA ACCESS AND FREE CONTENT UNTIL RELEASE (around dec, 15, 2015)
-             * Allow publisher to see the price of their content
-            */
-            /*tempContent.setHasAccess(1);
-            if(requesterUserId != tempContent.getUserId()) {
-                tempContent.setContentPrice(0);
-            }*/
-
-            /**
-             * AFTER BETA, UNCOMMENT BELOW:
-             */
             /**
              * Set content access. If free or the user is the publisher, user has access (or if userId is master)
              */
@@ -460,6 +446,8 @@ public class ContentWrapper {
     }
 
     public ArrayList<ContentObject> recursiveGetChildren(ContentObject parent, RequestObject context) {
+
+        boolean freeBundle = parent.getContentPrice() == 0.00;
         try {
             StatementExecutor executor1 = new StatementExecutor(GET_BUNDLE_CHILDREN);
             executor1.execute(ps -> {
@@ -522,6 +510,14 @@ public class ContentWrapper {
                     );
 
                     child = this.personalizeContent(child, tempPublisher, results);
+
+                    /**
+                     * If bundle is free, content is free and accessible
+                     */
+                    if(freeBundle){
+                        child.setContentPrice(0);
+                        child.setHasAccess(1);
+                    }
 
                     /** personalize the child **/
 

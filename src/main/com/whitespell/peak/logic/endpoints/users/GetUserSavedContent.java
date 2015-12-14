@@ -96,6 +96,11 @@ public class GetUserSavedContent extends EndpointHandler {
                         return;
                     }
                 }
+
+                if(getSavedContent.getSavedContent().size() == 0){
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                }
+
                 Gson g = new Gson();
                 String response = g.toJson(getSavedContent);
                 context.getResponse().setStatus(200);

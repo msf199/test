@@ -49,9 +49,6 @@ public class UpdateSettings extends EndpointHandler {
     private static final String CHECK_EMAIL_TAKEN_QUERY = "SELECT `user_id`, `email` FROM `user` WHERE `email` = ? AND `user_id` != ? LIMIT 1";
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `user_id` = ? LIMIT 1";
 
-    private static final String UPDATE_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`) " +
-            "VALUES (?,?)";
-
     @Override
     public void safeCall(final RequestObject context) throws IOException {
 

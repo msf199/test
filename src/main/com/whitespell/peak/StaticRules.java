@@ -110,7 +110,7 @@ public class StaticRules {
         PROVIDE_DEVICE_DETAILS(155, "Unable to authenticate, please provide device details", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_RETRIEVE_DEVICE_DETAILS(156, "Unable to retrieve details about user's device", HttpStatus.NOT_FOUND_404),
         COULD_NOT_SEND_DEVICE_NOTIFICATION(157, "Unable to send push notification to user's device", HttpStatus.NOT_FOUND_404),
-        EMPTY_NEWSFEED(158, "Follow some users or categories and refresh the newsfeed", HttpStatus.NOT_FOUND_404),
+        EMPTY_NEWSFEED(158, "Follow some users and refresh the newsfeed", HttpStatus.NOT_FOUND_404),
         CONTENT_NOT_EDITED(159, "Content was not edited in updateContent", HttpStatus.BAD_REQUEST_400),
         NOTIFICATION_UPDATE_FAILED(160, "Could not update email notification status" , HttpStatus.NOT_FOUND_404),
         COULD_NOT_GRANT_CONTENT_ACCESS(161, "Could not grant content access", HttpStatus.NOT_FOUND_404),
@@ -129,7 +129,8 @@ public class StaticRules {
         CONTENT_ID_0_DOESNT_EXIST(174, "Content Id 0 is invalid", HttpStatus.BAD_REQUEST_400),
         SUBSCRIPTION_FAILED(175, "Subscription failed, try again later", HttpStatus.NOT_FOUND_404),
         ORDER_FAILED(176, "Order failed, try again later", HttpStatus.NOT_FOUND_404),
-        EXISTING_SUBSCRIPTION_ON_ACC(177, "You have an existing subscription on another account. Contact support to transfer it over. ", HttpStatus.BAD_REQUEST_400);
+        EXISTING_SUBSCRIPTION_ON_ACC(177, "You have an existing subscription on another account. Contact support to transfer it over. ", HttpStatus.BAD_REQUEST_400),
+        CANNOT_SAVE_INDIVIDUAL_CONTENT(178, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400);
 
         int errorId;
         String errorMessage;
