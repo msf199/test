@@ -465,8 +465,11 @@ public class UpdateContent extends EndpointHandler {
             Logging.log("High", e);
             //don't throw client side error, this is only for email notifications
         }
-        publisherEmail[0] = publisher.getEmail();
-        publisherName[0] = publisher.getUserName();
+
+        if(publisher != null) {
+            publisherEmail[0] = publisher.getEmail();
+            publisherName[0] = publisher.getUserName();
+        }
 
         /**
          * Construct the SET string based on the fields the user wants to update.

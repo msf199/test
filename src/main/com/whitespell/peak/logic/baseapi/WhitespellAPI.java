@@ -20,6 +20,7 @@ public abstract class WhitespellAPI {
 
         EndpointDispatcher dispatcher = new EndpointDispatcher();
         handler.addFilterWithMapping(Filters.class, "/*", EnumSet.of(DispatcherType.REQUEST));
+        handler.addFilterWithMapping(Filters.class, "/*", EnumSet.of(DispatcherType.));
         scheduleEndpoints(dispatcher);
         handler.addServletWithMapping(new ServletHolder(dispatcher), "/*");
 
