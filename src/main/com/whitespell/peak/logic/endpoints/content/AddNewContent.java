@@ -133,6 +133,7 @@ public class AddNewContent extends EndpointHandler {
                 executor.execute(ps -> {
                     ps.setInt(1, user_id);
                     ps.setString(2, content_url);
+                    ps.setString(3, content_title);
 
                     ResultSet results = ps.executeQuery();
                     if (results.next()) {

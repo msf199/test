@@ -152,12 +152,13 @@ public class Search extends EndpointHandler {
                 () -> {
                     try {
                         StatementExecutor executor = new StatementExecutor("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id`" +
-                                " WHERE `content_title`" +
+                                " WHERE (`parent` > 0 || `content_type` = "+StaticRules.BUNDLE_CONTENT_TYPE+") AND (" +
+                                " `content_title`" +
                                 " LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'" +
                                 " AND `content_id` > "+GenericAPIActions.getOffset(context.getQueryString())+"" +
                                 " OR `content_description`" +
                                 " LIKE '%"+context.getQueryString().get(QS_SEARCH_QUERY_KEY)[0]+"%'" +
-                                " AND `content_id` > "+GenericAPIActions.getOffset(context.getQueryString())+"" +
+                                " AND `content_id` > "+GenericAPIActions.getOffset(context.getQueryString())+")" +
                                 " LIMIT "+limit+" OFFSET "+offset+"");
                         executor.execute(ps -> {
                             ResultSet results = ps.executeQuery();

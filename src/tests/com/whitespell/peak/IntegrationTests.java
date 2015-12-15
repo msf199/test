@@ -643,8 +643,6 @@ public class IntegrationTests extends Server {
                         "\n}")
                 .asString();
 
-
-
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?userId=" + TEST_UID)
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
@@ -660,12 +658,12 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getUserId(), TEST_UID);
 
         Unirest.post("http://localhost:" + Config.API_PORT + "/content/" + content[0].getContentId() + "/add_child")
-                .header("accept", "application/json")
-                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n" +
-                        "\"childId\": \"" + content[1].getContentId() + "\"" +
-                        "\n}")
-                .asString();
+        .header("accept", "application/json")
+        .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+        .body("{\n" +
+                "\"childId\": \"" + content[1].getContentId() + "\"" +
+                "\n}")
+        .asString();
 
         stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/content?contentId=" + content[0].getContentId())
                 .header("accept", "application/json")
@@ -736,6 +734,8 @@ public class IntegrationTests extends Server {
         assertEquals(content[0].getThumbnailUrl(), "thumbguy.com");
         assertEquals(content[0].getContentPrice(), 1.99, 0.0);
         assertEquals(content[0].getUserId(), TEST_UID);
+
+
     }
 
     @Test
@@ -932,12 +932,12 @@ public class IntegrationTests extends Server {
         /**
          * Test search for the content we've added.
          */
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/search?q=excuse")
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/search?q=home")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-
-        assertEquals(stringResponse.getBody().contains("10-Minute No-Equipment Home Workout"), true);
+        System.out.println(stringResponse.getBody());
+        assertEquals(stringResponse.getBody().contains("Home"), true);
 
         /**
          * Test search for the user we've added.
@@ -1047,7 +1047,7 @@ public class IntegrationTests extends Server {
 
                 assertEquals(n[i].getNewsfeedContent().getContentId(), content[0].getContentId());
                 assertEquals(n[i].getNewsfeedContent().getPoster().getUserId(), TEST_UID);
-                assertEquals(n[i].getNewsfeedContent().getContentTitle(), "10-Minute No-Equipment Home Workout2");
+                assertEquals(n[i].getNewsfeedContent().getContentTitle(), "10-Minute No-Equipment Home Workout");
             }
         }
 
@@ -1178,7 +1178,7 @@ public class IntegrationTests extends Server {
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
-        assertEquals(stringResponse.getBody(), "{\"savedContent\":[]}");
+        assertEquals(stringResponse.getBody().contains("Content not found"), true);
     }
 
 
@@ -1466,7 +1466,7 @@ public class IntegrationTests extends Server {
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
-        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout3");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
@@ -1478,7 +1478,7 @@ public class IntegrationTests extends Server {
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
-        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout3");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
@@ -1491,7 +1491,7 @@ public class IntegrationTests extends Server {
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getCategoryId(), categories[0].getCategoryId());
         assertEquals(content[0].getContentType(), contentTypes[0].getContentTypeId());
-        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout");
+        assertEquals(content[0].getContentTitle(), "10-Minute No-Equipment Home Workout3");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=I6t0quh8Ick");
         assertEquals(content[0].getContentDescription(), "We have excuse-proofed your fitness routine with our latest Class FitSugar.");
         assertEquals(content[0].getThumbnailUrl(), "thumburl.com");
@@ -1504,7 +1504,7 @@ public class IntegrationTests extends Server {
         content = g.fromJson(stringResponse.getBody(), ContentObject[].class);
         assertEquals(content[0].getCategoryId(), categories[1].getCategoryId());
         assertEquals(content[0].getContentType(), contentTypes[1].getContentTypeId());
-        assertEquals(content[0].getContentTitle(), "content2");
+        assertEquals(content[0].getContentTitle(), "content32");
         assertEquals(content[0].getContentUrl(), "https://www.youtube.com/watch?v=content2");
         assertEquals(content[0].getContentDescription(), "content2");
         assertEquals(content[0].getThumbnailUrl(), "thumb.com");
@@ -2560,8 +2560,8 @@ public class IntegrationTests extends Server {
                         "\"categoryId\": \"" + categories[1].getCategoryId() + "\",\n" +
                         "\"contentType\": \"" + contentTypes[1].getContentTypeId() + "\",\n" +
                         "\"contentDescription\": \"newest\",\n" +
-                        "\"contentTitle\": \"new\",\n" +
-                        "\"contentUrl\": \"https://www.youtube.com/watch?v=newadmin\"," +
+                        "\"contentTitle\": \"new1\",\n" +
+                        "\"contentUrl\": \"https://www.youtube.com/watch?v=newadmin2\"," +
                         "\"contentPrice\": 3.99," +
                         "\"thumbnailUrl\": \"thumbnewadmin.com\"" +
                         "\n}")
@@ -2588,7 +2588,7 @@ public class IntegrationTests extends Server {
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .asString();
         System.out.println("content deleted stringresponse: " + stringResponse.getBody());
-        assertEquals(stringResponse.getBody(), "[]");
+        assertEquals(stringResponse.getBody().contains("Content not found"), true);
 
         /**
          * Test user delete test

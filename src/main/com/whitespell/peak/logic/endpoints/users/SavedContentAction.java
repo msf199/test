@@ -5,10 +5,12 @@ import com.google.gson.JsonObject;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
+import main.com.whitespell.peak.logic.ContentHelper;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
+import main.com.whitespell.peak.model.ContentObject;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -66,6 +68,25 @@ public class SavedContentAction extends EndpointHandler {
          */
         if(!action.equalsIgnoreCase("save") && !action.equalsIgnoreCase("unsave")){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_ACTION);
+            return;
+        }
+
+
+        ContentHelper h = new ContentHelper();
+        ContentObject currentContent = null;
+        try{
+            currentContent = h.getContentById(context, content_id, a.getUserId());
+        }catch(Exception e){
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+            return;
+        }
+
+        /**
+         * Do not allow individual videos to be saved
+         */
+        if(currentContent != null && currentContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
 
