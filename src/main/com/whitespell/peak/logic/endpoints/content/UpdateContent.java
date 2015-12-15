@@ -511,7 +511,6 @@ public class UpdateContent extends EndpointHandler {
                     int count = 1;
                     boolean sendSocialMediaEmail = false;
                     boolean editDescriptionComment = false;
-                    boolean editContentThumbnail = false;
 
                     if (updateKeys.contains(CONTENT_TITLE_DB)) {
                         ps.setString(count, final_title);
@@ -540,7 +539,6 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
                     if (updateKeys.contains(THUMBNAIL_ID_DB)) {
-                        editContentThumbnail = true;
                         ps.setString(count, final_thumbnail);
                         System.out.println("Set string " + count + " to " + final_thumbnail);
                         count++;
@@ -651,16 +649,8 @@ public class UpdateContent extends EndpointHandler {
                         count++;
                     }
 
-                    if (updateKeys.contains(PROCESSED) || editContentThumbnail) {
-                        /**
-                         * If we edited the contentThumbnail on client side, process the thumbnails.
-                         */
-                        if(editContentThumbnail){
-                            ps.setInt(count, 0);
-                        }else{
-                            ps.setInt(count, final_processed);
-                        }
-
+                    if (updateKeys.contains(PROCESSED)) {
+                        ps.setInt(count, final_processed);
                         System.out.println("Set int " + count + " to " + final_processed);
                         count++;
                     }
