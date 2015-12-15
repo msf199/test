@@ -149,9 +149,7 @@ public class UpdateSettings extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
-            executor.execute(new ExecutionBlock() {
-                @Override
-                public void process(PreparedStatement ps) throws SQLException {
+            executor.execute(ps -> {
                     ps.setInt(1, user_id);
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
@@ -161,7 +159,8 @@ public class UpdateSettings extends EndpointHandler {
 
                             if (!isVerified) {
                                 // if not verified, throw error
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
+                                Logging.log("High", "verified: "+isVerified+" user_id: "+user_id);
+                                context.throwHttpError("UpdateSettings", StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
                                 return;
                             }
                         } catch (NoSuchAlgorithmException e) {
@@ -177,7 +176,6 @@ public class UpdateSettings extends EndpointHandler {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
                         return;
                     }
-                }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
