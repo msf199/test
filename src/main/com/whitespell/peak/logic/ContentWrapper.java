@@ -289,6 +289,7 @@ public class ContentWrapper {
 
         int currentContentId = tempContent.getContentId();
         try {
+
             /**
              * Set content access. If free or the user is the publisher, user has access (or if userId is master)
              */
@@ -302,13 +303,6 @@ public class ContentWrapper {
                 tempContent.setHasAccess(1);
             } else {
                 tempContent.setHasAccess(0);
-                tempContent.setContentUrl(null);
-                tempContent.setContentUrl144p(null);
-                tempContent.setContentUrl240p(null);
-                tempContent.setContentUrl360p(null);
-                tempContent.setContentUrl480p(null);
-                tempContent.setContentUrl720p(null);
-                tempContent.setContentUrl1080p(null);
             }
 
             /** Construct the poster **/
@@ -435,6 +429,26 @@ public class ContentWrapper {
             } else {
                 tempContent.setContentPrice(0);
             }
+
+            /**
+             * If we don't have access to this content, remove the urls.
+             */
+            if(tempContent.getHasAccess() == 0){
+                tempContent.setContentUrl144p(null);
+                tempContent.setContentUrl240p(null);
+                tempContent.setContentUrl360p(null);
+                tempContent.setContentUrl480p(null);
+                tempContent.setContentUrl720p(null);
+                tempContent.setContentUrl1080p(null);
+            }
+
+            /**
+             * contentUrl should not show to normal users, video processing needs it
+             */
+            if(requesterUserId != 134) {
+                tempContent.setContentUrl(null);
+            }
+
 
         } catch (SQLException e) {
             Logging.log("High", e);
