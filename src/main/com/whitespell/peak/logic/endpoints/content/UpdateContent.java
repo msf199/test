@@ -460,7 +460,7 @@ public class UpdateContent extends EndpointHandler {
         UserHelper h = new UserHelper();
         UserObject publisher = null;
         try {
-            publisher = h.getUserById(publisherUserId[0]);
+            publisher = h.getUserById(publisherUserId[0], true, true, true, true);
         }catch(Exception e){
             Logging.log("High", e);
             //don't throw client side error, this is only for email notifications

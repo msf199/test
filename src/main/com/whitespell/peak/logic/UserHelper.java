@@ -24,12 +24,11 @@ import java.util.ArrayList;
 public class UserHelper {
 
 
-    private static final String FIND_FOLLOWERS_QUERY = "SELECT `userId` FROM `user_following` WHERE `following_id` = ?";
-    private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `userId` = ?";
-    private static final String FIND_CATEGORIES_QUERY = "SELECT `category_id` FROM `category_following` WHERE `userId` = ?";
-    private static final String FIND_PUBLISHING_QUERY = "SELECT `category_id` FROM `category_publishing` WHERE `userId` = ?";
-    private static final String GET_USER = "SELECT `userId`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher`, `email_verified`, `email_notifications`, `subscriber` FROM `user` WHERE `userId` = ?";
-    private static final String URL_USER_ID = "userId";
+    private static final String FIND_FOLLOWERS_QUERY = "SELECT `user_id` FROM `user_following` WHERE `following_id` = ?";
+    private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
+    private static final String FIND_CATEGORIES_QUERY = "SELECT `category_id` FROM `category_following` WHERE `user_id` = ?";
+    private static final String FIND_PUBLISHING_QUERY = "SELECT `category_id` FROM `category_publishing` WHERE `user_id` = ?";
+    private static final String GET_USER = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher`, `email_verified`, `email_notifications`, `subscriber` FROM `user` WHERE `user_id` = ?";
     private static final String USERNAME_KEY = "username";
     private static final String DISPLAYNAME_KEY = "displayname";
     private static final String EMAIL_KEY = "email";
@@ -37,10 +36,9 @@ public class UserHelper {
     private static final String COVER_PHOTO_KEY = "cover_photo";
     private static final String SLOGAN_KEY = "slogan";
     private static final String PUBLISHER_KEY = "publisher";
-    
-    boolean getFollowers, getFollowing, getCategories, getPublishing = true;
 
-    public UserObject getUserById(int userId) throws UnirestException {
+
+    public UserObject getUserById(int userId, boolean getFollowers, boolean getFollowing, boolean getCategories, boolean getPublishing){
         final UserObject[] u = {null};
 
 
@@ -49,11 +47,11 @@ public class UserHelper {
             try {
                 StatementExecutor executor = new StatementExecutor(FIND_FOLLOWERS_QUERY);
                 executor.execute(ps -> {
-                    ps.setString(1, String.valueOf(userId));
+                    ps.setInt(1, (userId));
 
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
-                        initialFollowers.add(results.getInt("userId"));
+                        initialFollowers.add(results.getInt("user_id"));
                     }
                 });
             } catch (SQLException e) {
@@ -67,7 +65,7 @@ public class UserHelper {
             try {
                 StatementExecutor executor = new StatementExecutor(FIND_FOLLOWING_QUERY);
                 executor.execute(ps -> {
-                    ps.setString(1, String.valueOf(userId));
+                    ps.setInt(1, (userId));
 
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
@@ -84,7 +82,7 @@ public class UserHelper {
             try {
                 StatementExecutor executor = new StatementExecutor(FIND_CATEGORIES_QUERY);
                 executor.execute(ps -> {
-                    ps.setString(1, String.valueOf(userId));
+                    ps.setInt(1, (userId));
 
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
@@ -101,7 +99,7 @@ public class UserHelper {
             try {
                 StatementExecutor executor = new StatementExecutor(FIND_PUBLISHING_QUERY);
                 executor.execute(ps -> {
-                    ps.setString(1, String.valueOf(userId));
+                    ps.setInt(1, (userId));
 
                     ResultSet results = ps.executeQuery();
                     while (results.next()) {
@@ -118,14 +116,12 @@ public class UserHelper {
             final int finalUser_id = userId;
             executor.execute(ps -> {
 
-
-
                 ps.setInt(1, finalUser_id);
 
                 final ResultSet results = ps.executeQuery();
 
                 if (results.next()) {
-                    u[0] = new UserObject(initialCategories, initialFollowers, initialFollowing, initialPublishing, results.getInt("userId"), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                    u[0] = new UserObject(initialCategories, initialFollowers, initialFollowing, initialPublishing, results.getInt("user_id"), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
                             results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
                     u[0].setEmailVerified(results.getInt("email_verified"));
                     u[0].setEmailNotifications(results.getInt("email_notifications"));

@@ -61,8 +61,7 @@ public class DeleteUser extends EndpointHandler {
         /**
          * Get userObject and images associated with it
          */
-        try {
-            toDelete = h.getUserById(userId);
+            toDelete = h.getUserById(userId, true, true, true , true);
 
             if(toDelete == null){
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
@@ -75,12 +74,8 @@ public class DeleteUser extends EndpointHandler {
             userThumbnail = toDelete.getThumbnail();
             coverPhotoUrl = toDelete.getCoverPhoto();
 
-        }
-        catch(UnirestException e){
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-            return;
-        }
+
+
 
 
         /**
