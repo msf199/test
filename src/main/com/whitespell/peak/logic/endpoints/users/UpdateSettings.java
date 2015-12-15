@@ -146,6 +146,7 @@ public class UpdateSettings extends EndpointHandler {
         /**
          * Validate the current password and create a new session key for this user_id
          */
+        boolean[] success = {false};
         try {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
@@ -158,10 +159,9 @@ public class UpdateSettings extends EndpointHandler {
                             boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(current_pass, s.getString(PAYLOAD_CURRENT_PASSWORD_KEY));
 
                             if (!isVerified) {
-                                // if not verified, throw error
-                                Logging.log("High", "verified: "+isVerified+" user_id: "+user_id);
-                                context.throwHttpError("UpdateSettings", StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
-                                return;
+                                success[0] = false;
+                            }else{
+                                success[0] = true;
                             }
                         } catch (NoSuchAlgorithmException e) {
                             Logging.log("High", e);
@@ -180,6 +180,15 @@ public class UpdateSettings extends EndpointHandler {
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        /**
+         * User is not verified based on password
+         */
+        if(!success[0]){
+            // if not verified, throw error
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_USERNAME_OR_PASS);
             return;
         }
 
