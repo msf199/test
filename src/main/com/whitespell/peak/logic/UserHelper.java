@@ -6,7 +6,16 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.config.Config;
+import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.sql.ExecutionBlock;
+import main.com.whitespell.peak.logic.sql.StatementExecutor;
+import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
+
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 /**
  * @author Cory McAn(cmcan), Whitespell Inc.
@@ -14,22 +23,122 @@ import main.com.whitespell.peak.model.UserObject;
  */
 public class UserHelper {
 
+
+    private static final String FIND_FOLLOWERS_QUERY = "SELECT `userId` FROM `user_following` WHERE `following_id` = ?";
+    private static final String FIND_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `userId` = ?";
+    private static final String FIND_CATEGORIES_QUERY = "SELECT `category_id` FROM `category_following` WHERE `userId` = ?";
+    private static final String FIND_PUBLISHING_QUERY = "SELECT `category_id` FROM `category_publishing` WHERE `userId` = ?";
+    private static final String GET_USER = "SELECT `userId`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher`, `email_verified`, `email_notifications`, `subscriber` FROM `user` WHERE `userId` = ?";
+    private static final String URL_USER_ID = "userId";
+    private static final String USERNAME_KEY = "username";
+    private static final String DISPLAYNAME_KEY = "displayname";
+    private static final String EMAIL_KEY = "email";
+    private static final String THUMBNAIL_KEY = "thumbnail";
+    private static final String COVER_PHOTO_KEY = "cover_photo";
+    private static final String SLOGAN_KEY = "slogan";
+    private static final String PUBLISHER_KEY = "publisher";
+    
+    boolean getFollowers, getFollowing, getCategories, getPublishing = true;
+
     public UserObject getUserById(int userId) throws UnirestException {
-        Gson g = new Gson();
-        HttpResponse<String> stringResponse;
+        final UserObject[] u = {null};
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + userId + "?includeFollowing=1&includeCategories=1" +
-                "&includePublishing=1&includeFollowers=1")
-                .header("accept", "application/json")
-                .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
-                .asString();
 
-        UserObject u = g.fromJson(stringResponse.getBody(), UserObject.class);
+        final ArrayList<Integer> initialFollowers = new ArrayList<>();
+        if(getFollowers) {
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_FOLLOWERS_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(userId));
 
-        if(stringResponse.getStatus() == 404){
-            return null;
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialFollowers.add(results.getInt("userId"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
         }
 
-        return u;
+
+        final ArrayList<Integer> initialFollowing = new ArrayList<>();
+        if(getFollowing) {
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_FOLLOWING_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(userId));
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialFollowing.add(results.getInt("following_id"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
+        }
+
+        final ArrayList<Integer> initialCategories = new ArrayList<>();
+        if(getCategories){
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_CATEGORIES_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(userId));
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialCategories.add(results.getInt("category_id"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
+        }
+
+        final ArrayList<Integer> initialPublishing = new ArrayList<>();
+        if(getPublishing){
+            try {
+                StatementExecutor executor = new StatementExecutor(FIND_PUBLISHING_QUERY);
+                executor.execute(ps -> {
+                    ps.setString(1, String.valueOf(userId));
+
+                    ResultSet results = ps.executeQuery();
+                    while (results.next()) {
+                        initialPublishing.add(results.getInt("category_id"));
+                    }
+                });
+            } catch (SQLException e) {
+                Logging.log("High", e);
+            }
+        }
+
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_USER);
+            final int finalUser_id = userId;
+            executor.execute(ps -> {
+
+
+
+                ps.setInt(1, finalUser_id);
+
+                final ResultSet results = ps.executeQuery();
+
+                if (results.next()) {
+                    u[0] = new UserObject(initialCategories, initialFollowers, initialFollowing, initialPublishing, results.getInt("userId"), results.getString(USERNAME_KEY), results.getString(DISPLAYNAME_KEY),
+                            results.getString(EMAIL_KEY), results.getString(THUMBNAIL_KEY), results.getString(COVER_PHOTO_KEY), results.getString(SLOGAN_KEY), results.getInt(PUBLISHER_KEY));
+                    u[0].setEmailVerified(results.getInt("email_verified"));
+                    u[0].setEmailNotifications(results.getInt("email_notifications"));
+                    u[0].setSubscriber(results.getInt("subscriber"));
+                }
+
+
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+
+        }
+
+        return u[0];
     }
 }
