@@ -408,6 +408,7 @@ public class LinkFB extends EndpointHandler {
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
 
                 if(a.getKey() == null){
+                    Logging.log("High", stringResponse.getBody());
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
                     return;
                 }
@@ -484,6 +485,7 @@ public class LinkFB extends EndpointHandler {
                 AuthenticationObject a = g.fromJson(stringResponse.getBody(), AuthenticationObject.class);
 
                 if(a.getKey() == null){
+                    Logging.log("High", stringResponse.getBody());
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
                     return;
                 }
