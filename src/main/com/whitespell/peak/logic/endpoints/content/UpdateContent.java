@@ -489,12 +489,6 @@ public class UpdateContent extends EndpointHandler {
             }
             count++;
         }
-        /**
-         * Add processed to update if updating thumbnail_url
-         */
-        if(updateKeys.contains(THUMBNAIL_ID_DB) && !updateKeys.contains(PROCESSED)){
-            setString.append(", `processed` = ? ");
-        }
         setString.append("WHERE `content_id` = ?");
         final String UPDATE_CONTENT = setString.toString();
 
