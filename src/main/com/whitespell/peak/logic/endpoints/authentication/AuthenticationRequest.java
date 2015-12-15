@@ -38,7 +38,7 @@ public class AuthenticationRequest extends EndpointHandler {
     @Override
     protected void setUserInputs() {
         payloadInput.put(PAYLOAD_USERNAME_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
-        payloadInput.put(PAYLOAD_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_PASSWORD_KEY, StaticRules.InputTypes.REG_STRING_REQUIRED_UNLIMITED);
         payloadInput.put(PAYLOAD_DEVICE_NAME_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(PAYLOAD_DEVICE_UUID_KEY, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(PAYLOAD_DEVICE_TYPE_KEY, StaticRules.InputTypes.REG_INT_OPTIONAL_ZERO);
