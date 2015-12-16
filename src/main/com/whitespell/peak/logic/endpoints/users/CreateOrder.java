@@ -15,16 +15,18 @@ import com.google.gson.JsonParser;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
+import com.stripe.Stripe;
+import com.stripe.exception.*;
+import com.stripe.model.Charge;
+import com.stripe.net.RequestOptions;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
-import main.com.whitespell.peak.logic.Authentication;
-import main.com.whitespell.peak.logic.ContentHelper;
-import main.com.whitespell.peak.logic.EndpointHandler;
-import main.com.whitespell.peak.logic.RequestObject;
+import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
+import main.com.whitespell.peak.model.UserObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +34,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -96,6 +100,11 @@ public class CreateOrder extends EndpointHandler {
     public void safeCall(final RequestObject context) throws IOException {
 
         /**
+         * The receipt HTML of the email we are about to send out when the user places an order.
+         */
+        String receiptHtml = "TODO BEFORE RELEASE";
+
+        /**
          * If fail, make sure to update 'orderStatus' with order_status_name = FAIL and orderUUID, if success
          * update `orderStatus` with success and orderUUID
          */
@@ -150,9 +159,12 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Also check that payload is accurate based on orderOrigin
          */
-        if((orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)
+        if(orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)
                 || (orderOriginId == Config.ORDER_ORIGIN_GOOGLE && (productId == null || purchaseToken == null))
-                || (orderOriginId == Config.ORDER_ORIGIN_APPLE && orderPayload == null))){
+                || (orderOriginId == Config.ORDER_ORIGIN_APPLE && orderPayload == null)
+                || (orderOriginId == Config.ORDER_ORIGIN_WEB && (purchaseToken == null || contentId == null))
+        )
+        {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
             return;
         }
@@ -264,6 +276,120 @@ public class CreateOrder extends EndpointHandler {
             } catch (Exception e) {
                 Logging.log("HIGH", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
+                return;
+            }
+        } else if (orderOriginId == Config.ORDER_ORIGIN_WEB) {
+
+            /**
+             * Some parameters so that we can update the stripe order after it's processed
+             */
+            Map<String, String> initialMetadata = new HashMap<>();
+            Map<String, Object> chargeParams = new HashMap<>();
+
+            RequestOptions options = RequestOptions
+                    .builder()
+                    .setIdempotencyKey(RandomGenerator.nextSessionId())
+                    .build();
+
+
+            Stripe.apiKey = "sk_test_dXjn0tvA0REBaueScdQKxQaN";
+
+            if(buyerId != a.getUserId()) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "You can only buy for yourself");
+                return;
+            }
+
+            // Get the credit card details submitted by the form
+            String token = purchaseToken;
+            Charge charge = null;
+            // Create the charge on Stripe's servers - this will charge the user's card
+            try {
+                // Use Stripe's library to make requests...
+
+
+                ContentObject c = null;
+                try {
+                     c = new ContentHelper().getContentById(context, contentId[0], 134);
+                } catch (Exception e) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Content lookup failed");
+                    return;
+                }
+
+                if(c.getContentPrice() < 0.1) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Can't buy free bundles");
+                    return;
+                }
+
+                chargeParams.put("amount", (int) c.getContentPrice() * 100); // amount in cents, again
+                chargeParams.put("currency", "usd");
+                chargeParams.put("source", token);
+                chargeParams.put("description", c.getContentTitle());
+
+
+                // sets the transaction meta data
+                initialMetadata.put("buyer_id", Integer.toString(buyerId));
+                initialMetadata.put("content_id", Integer.toString(c.getContentId()));
+                initialMetadata.put("price", Double.toString(c.getContentPrice()));
+                chargeParams.put("metadata", initialMetadata);
+
+
+
+
+                charge = Charge.create(chargeParams, options);
+
+                if(charge == null) {
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Charge is null");
+                    return;
+                }
+
+               if(charge.getPaid()) {
+                   //success
+                   orderUUID[0] = charge.getId();
+                   receiptHtml = charge.getInvoice();
+               }
+
+            } catch (CardException e) {
+                // Since it's a decline, CardException will be caught
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Declined:" + e.getMessage());
+                return;
+            } catch (RateLimitException e) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Card not charged. Rate Limit" + e.getMessage());
+                return;
+                // Too many requests made to the API too quickly
+            } catch (InvalidRequestException e) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Card not charged. InvRequest Failed:" + e.getMessage());
+                return;
+            } catch (AuthenticationException e) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Card not charged. Auth Failed:" + e.getMessage());
+                return;
+            } catch (APIConnectionException e) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Card not charged. Connection Failed:" + e.getMessage());
+                return;
+            } catch (StripeException e) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Card not charged. Stripe Exception Thrown:" + e.getMessage());
+                MandrillMailer.sendDebugEmail(
+                        "upfit@whitespell.com",
+                        "Upfit",
+                        "Stripe fail",
+                        "Stripe fail",
+                        "Fail:" + e.getMessage(),
+                        "Fail:" + e.getMessage(),
+                        "debug-email",
+                        "pim@whitespell.com"
+                );
+                return;
+            } catch (Exception e) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED, "Card not charged. Exception Thrown:" + e.getMessage());
+                MandrillMailer.sendDebugEmail(
+                        "upfit@whitespell.com",
+                        "Upfit",
+                        "Stripe excep fail",
+                        "Stripe excep fail",
+                        "Fail:" + e.getMessage(),
+                        "Fail:" + e.getMessage(),
+                        "debug-email",
+                        "pim@whitespell.com"
+                );
                 return;
             }
         } else if (orderOriginId == Config.ORDER_ORIGIN_GOOGLE) {
@@ -383,7 +509,7 @@ public class CreateOrder extends EndpointHandler {
 
         //will create a receipt with developerPayload received from transaction (android)
         //will create a receipt TBD (apple).
-        String receiptHtml;
+
 
         /**
          * Get orderTypeName
@@ -460,6 +586,8 @@ public class CreateOrder extends EndpointHandler {
             final double finalNetRevenue = netRevenue;
             final double finalWhitespellShare = whitespellShare;
 
+
+            final String finalReceiptHtml = receiptHtml;
             executor.execute(ps -> {
                 ps.setString(1, finalOrderUUID);
                 ps.setInt(2, orderType);
@@ -477,7 +605,7 @@ public class CreateOrder extends EndpointHandler {
                 //14 = whitespellBalance. Will be updated when the order has been successfully processed
                 ps.setDouble(13, finalWhitespellShare);
                 //15 = receiptHtml. Will be updated based on orderOrigin.
-                ps.setString(14, "receipt");
+                ps.setString(14, finalReceiptHtml);
                 //16 = emailSent. Will be updated in the emailSend method for orders.
                 ps.setInt(15, 0);
                 //18 = delivered. 0 initially, will be updated when user views content in app.
@@ -606,6 +734,14 @@ public class CreateOrder extends EndpointHandler {
          * Send an email with the receipt_html
          */
         //updateDBandSendWelcomeEmail(username, email);
+
+        UserObject u = new UserHelper().getUserById(buyerId, false, false, false, false);
+
+        if(u.getEmailVerified() == 1) {
+            MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "Thank you for your business", "Upfit", "Dear " + u.getUserName() + "." +
+                            " Thank you for placing your order. We have succesfully charged your card for an amount of " + price + " " + orderCurrency + ". If there are any issues, please reach out on upfit@whitespell.com, and mention your order ID: " + orderUUID[0] + ". You can find your receipt attached.", "Order-UUID: " + orderUUID[0] + "", "debug-email",
+                    u.getEmail());
+        }
 
         /**
          * Send a push notification to the user regarding a successful purchase
