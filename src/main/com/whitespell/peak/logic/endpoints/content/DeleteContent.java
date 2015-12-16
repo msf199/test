@@ -212,7 +212,5 @@ public class DeleteContent extends EndpointHandler {
             this.success = success;
         }
     }
-
-
 }
 

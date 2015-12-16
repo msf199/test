@@ -128,9 +128,11 @@ public class StaticRules {
         CONTENT_TYPE_ID_TOO_LONG(173, "Content Type Id is too long (" + StaticRules.MAX_CONTENT_TYPE_ID_LENGTH + " is the max)", HttpStatus.UNAUTHORIZED_401),
         CONTENT_ID_0_DOESNT_EXIST(174, "Content Id 0 is invalid", HttpStatus.BAD_REQUEST_400),
         SUBSCRIPTION_FAILED(175, "Subscription failed, try again later", HttpStatus.NOT_FOUND_404),
-        ORDER_FAILED(176, "Order failed, try again later", HttpStatus.NOT_FOUND_404),
+        ORDER_FAILED(176, "Order failed, try again later", HttpStatus.UNAUTHORIZED_401),
+        CARD_DECLINED(176, "Your card was declined", HttpStatus.UNAUTHORIZED_401),
         EXISTING_SUBSCRIPTION_ON_ACC(177, "You have an existing subscription on another account. Contact support to transfer it over. ", HttpStatus.BAD_REQUEST_400),
-        CANNOT_SAVE_INDIVIDUAL_CONTENT(178, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400);
+        CANNOT_SAVE_INDIVIDUAL_CONTENT(178, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400),
+        ALREADY_HAVE_ACCESS(179, "You already have access to this bundle", HttpStatus.BAD_REQUEST_400);
 
         int errorId;
         String errorMessage;

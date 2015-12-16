@@ -142,7 +142,20 @@ public class ResetPassword extends EndpointHandler {
                             context.getResponse().setStatus(HttpStatus.OK_200);
                             resetSuccessObject rs = new resetSuccessObject();
                             rs.setSuccess(true);
-                            rs.setEmail(s.getString("email"));
+
+                            /**
+                             * parse the email and return a secure email with asterisks (e.g. r****k@gmail.com)
+                             */
+                            String email = s.getString("email");
+                            String newString = "";
+                            if(email.contains("@")) {
+                                String[] split = email.split("@");
+                                newString = split[0].substring(0,1) + "******" +
+                                        split[0].substring(split[0].length() - 1) + "@" + split[1];
+                                System.out.println("safeEmail: " +newString);
+                            }
+
+                            rs.setEmail(newString);
                             Gson g = new Gson();
                             String json = g.toJson(rs);
                             try {
