@@ -85,10 +85,10 @@ public class SavedContentAction extends EndpointHandler {
         /**
          * Do not allow individual videos to be saved
          */
-        if(currentContent != null && currentContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE){
+        /*if(currentContent != null && currentContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
-        }
+        }*/
 
         /**
          * If payload action is save, check for duplicate and insert if not a duplicate
