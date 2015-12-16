@@ -305,11 +305,6 @@ public class GetNewsfeed extends EndpointHandler {
             }
         }
 
-        if(newsfeedResponse.size() == 0){
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMPTY_NEWSFEED);
-            return;
-        }
-
         final Gson f = new Gson();
         String response = f.toJson(newsfeedResponse);
         context.getResponse().setStatus(200);
