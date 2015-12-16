@@ -64,7 +64,7 @@ public class SavedContentAction extends EndpointHandler {
         /**
          * Ensure valid action
          */
-        if(!action.equalsIgnoreCase("save") && !action.equalsIgnoreCase("unsave")){
+        if (!action.equalsIgnoreCase("save") && !action.equalsIgnoreCase("unsave")) {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INVALID_ACTION);
             return;
         }
@@ -72,30 +72,31 @@ public class SavedContentAction extends EndpointHandler {
 
         ContentHelper h = new ContentHelper();
         ContentObject currentContent = null;
-        try{
+        try {
             currentContent = h.getContentById(context, content_id[0], a.getUserId());
-        }catch(Exception e){
+        } catch (Exception e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
             return;
         }
 
         /**
-         * Do not allow individual videos to be saved, if video is in a bundle save the bundle.
-         */
-        if(currentContent != null && currentContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE
-                && currentContent.getParent() > 0){
-            content_id[0] = currentContent.getParent();
-        } else if(currentContent != null && currentContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE
-                && currentContent.getParent() <= 0){
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CANNOT_SAVE_INDIVIDUAL_CONTENT);
-            return;
-        }
-
-        /**
          * If payload action is save, check for duplicate and insert if not a duplicate
          */
-        if(action.equalsIgnoreCase("save")) {
+        if (action.equalsIgnoreCase("save")) {
+
+            /**
+             * Do not allow individual videos to be saved, if video is in a bundle save the bundle.
+             */
+            if (currentContent != null && currentContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE
+                    && currentContent.getParent() > 0) {
+                content_id[0] = currentContent.getParent();
+            } else if (currentContent != null && currentContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE
+                    && currentContent.getParent() <= 0) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CANNOT_SAVE_INDIVIDUAL_CONTENT);
+                return;
+            }
+
             /**
              * Check that the content is not already in the user's workouts with that contentId
              */
@@ -153,7 +154,7 @@ public class SavedContentAction extends EndpointHandler {
                 Logging.log("High", e);
                 if (e.getMessage().contains("fk_content_saved_content_id")) {
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                }else if(e.getMessage().contains("fk_saved_content_user_id")){
+                } else if (e.getMessage().contains("fk_saved_content_user_id")) {
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
                 }
                 return;
@@ -163,7 +164,7 @@ public class SavedContentAction extends EndpointHandler {
         /**
          * Payload action is unsave, delete the saved content from the user's list
          */
-        else{
+        else {
             try {
                 final SavedContentActionResponse object = new SavedContentActionResponse();
 
@@ -173,7 +174,7 @@ public class SavedContentAction extends EndpointHandler {
                     ps.setInt(2, content_id[0]);
 
                     int rows = ps.executeUpdate();
-                    if(rows > 0){
+                    if (rows > 0) {
                         System.out.println("contentId " + content_id[0] + " was removed from the user's saved content successfully");
                         object.setRemovedContentId(content_id[0]);
                         object.setSuccess(true);
@@ -199,7 +200,7 @@ public class SavedContentAction extends EndpointHandler {
 
     public class SavedContentActionResponse {
 
-        public SavedContentActionResponse(){
+        public SavedContentActionResponse() {
             this.addedContentId = -1;
             this.removedContentId = -1;
             this.success = false;
