@@ -110,7 +110,7 @@ public class StaticRules {
         PROVIDE_DEVICE_DETAILS(155, "Unable to authenticate, please provide device details", HttpStatus.BAD_REQUEST_400),
         COULD_NOT_RETRIEVE_DEVICE_DETAILS(156, "Unable to retrieve details about user's device", HttpStatus.NOT_FOUND_404),
         COULD_NOT_SEND_DEVICE_NOTIFICATION(157, "Unable to send push notification to user's device", HttpStatus.NOT_FOUND_404),
-        EMPTY_NEWSFEED(158, "Follow some users and refresh the newsfeed", HttpStatus.NOT_FOUND_404),
+        EMPTY_NEWSFEED(158, "[]", HttpStatus.OK_200),
         CONTENT_NOT_EDITED(159, "Content was not edited in updateContent", HttpStatus.BAD_REQUEST_400),
         NOTIFICATION_UPDATE_FAILED(160, "Could not update email notification status" , HttpStatus.NOT_FOUND_404),
         COULD_NOT_GRANT_CONTENT_ACCESS(161, "Could not grant content access", HttpStatus.NOT_FOUND_404),
