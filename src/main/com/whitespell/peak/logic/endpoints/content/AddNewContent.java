@@ -29,7 +29,7 @@ import java.sql.Timestamp;
  */
 public class AddNewContent extends EndpointHandler {
 
-    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`) VALUES (?,?,?,?,?,?,?,?,?,?)";
+    private static final String INSERT_CONTENT_QUERY = "INSERT INTO `content`(`user_id`, `category_id`, `content_type`, `content_url`, `content_title`, `content_description`, `thumbnail_url`, `content_price`, `processed`,`timestamp`,`content_url_1080p`) VALUES (?,?,?,?,?,?,?,?,?,?,?)";
     private static final String UPDATE_USER_AS_PUBLISHER_QUERY = "UPDATE `user` SET `publisher` = ? WHERE `user_id` = ?";
     private static final String CHECK_DUPLICATE_CONTENT_QUERY = "SELECT `content_id` FROM `content` WHERE `user_id` = ? AND (`content_url` = ? OR `content_title` = ?)";
 
@@ -44,6 +44,7 @@ public class AddNewContent extends EndpointHandler {
     private static final String PAYLOAD_CONTENT_TYPE_ID = "contentType";
     private static final String PAYLOAD_CONTENT_TITLE = "contentTitle";
     private static final String PAYLOAD_CONTENT_URL = "contentUrl";
+    private static final String PAYLOAD_CONTENT_URL_1080p = "contentUrl1080p";
     private static final String PAYLOAD_CONTENT_DESCRIPTION = "contentDescription";
     private static final String PAYLOAD_CONTENT_THUMBNAIL = "thumbnailUrl";
     private static final String PAYLOAD_CONTENT_PRICE = "contentPrice";
@@ -57,6 +58,7 @@ public class AddNewContent extends EndpointHandler {
         payloadInput.put(PAYLOAD_CONTENT_TYPE_ID, StaticRules.InputTypes.REG_INT_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_TITLE, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_URL, StaticRules.InputTypes.REG_STRING_REQUIRED);
+        payloadInput.put(PAYLOAD_CONTENT_URL_1080p, StaticRules.InputTypes.REG_STRING_OPTIONAL);
         payloadInput.put(PAYLOAD_CONTENT_DESCRIPTION, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_THUMBNAIL, StaticRules.InputTypes.REG_STRING_REQUIRED);
         payloadInput.put(PAYLOAD_CONTENT_PRICE, StaticRules.InputTypes.REG_DOUBLE_OPTIONAL);
@@ -76,6 +78,12 @@ public class AddNewContent extends EndpointHandler {
         final String content_description = payload.get(PAYLOAD_CONTENT_DESCRIPTION).getAsString();
         final String thumbnail_url = payload.get(PAYLOAD_CONTENT_THUMBNAIL).getAsString();
         final double[] content_price ={0};
+        final String[] content_url1080p = {null};
+
+        if(payload.get(PAYLOAD_CONTENT_URL_1080p) != null){
+            content_url1080p[0] = payload.get(PAYLOAD_CONTENT_URL_1080p).getAsString();
+        }
+
         if(payload.get(PAYLOAD_CONTENT_PRICE) != null) {
             content_price[0] = payload.get(PAYLOAD_CONTENT_PRICE).getAsDouble();
         }
@@ -166,6 +174,8 @@ public class AddNewContent extends EndpointHandler {
                 // whether the video processed is true or not, true in all cases but when it's a video uploaded through peak
                 ps.setInt(9, content_type == StaticRules.PLATFORM_UPLOAD_CONTENT_TYPE ? 0 : 1);
                 ps.setTimestamp(10, now);
+                ps.setString(11, content_url1080p[0]);
+
 
                 int rows = ps.executeUpdate();
                 if (rows <= 0){

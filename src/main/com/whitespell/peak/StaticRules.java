@@ -131,7 +131,8 @@ public class StaticRules {
         ORDER_FAILED(176, "Order failed, try again later", HttpStatus.UNAUTHORIZED_401),
         CARD_DECLINED(176, "Your card was declined", HttpStatus.UNAUTHORIZED_401),
         EXISTING_SUBSCRIPTION_ON_ACC(177, "You have an existing subscription on another account. Contact support to transfer it over. ", HttpStatus.BAD_REQUEST_400),
-        CANNOT_SAVE_INDIVIDUAL_CONTENT(178, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400);
+        CANNOT_SAVE_INDIVIDUAL_CONTENT(178, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400),
+        ALREADY_HAVE_ACCESS(179, "You already have access to this bundle", HttpStatus.BAD_REQUEST_400);
 
         int errorId;
         String errorMessage;
