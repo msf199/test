@@ -1900,7 +1900,7 @@ public class IntegrationTests extends Server {
          * purchase the entire bundle and then check if all the content is accessible.
          */
 
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/access")
+        /*stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/access")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
                 .body("{\n" +
@@ -1910,7 +1910,32 @@ public class IntegrationTests extends Server {
         System.out.println("bundleId: " +finalBundleResponse.getContentId());
         GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
         System.out.println(stringResponse.getBody());
-        assertEquals(hasAccess.isSuccess(), true);
+        assertEquals(hasAccess.isSuccess(), true);*/
+
+        /**
+         * Test for bundle order.
+         */
+        String purchaseToken = "hlhdelmnlkoceoepenpcacel." +
+                "AO-J1Owcc72xnunaHxYQk_EsCQuGQQpDW2qhiy13ZLwpp" +
+                "A9opDUrxusIBCZjV5upBNzn6JhZbom0uI-Fl0mpuBApLCmyG" +
+                "KyD_5EDdaVJ9_RbNKgR0JbhnRC834XsP42XowSxL2OnYj6SzWxn9SzfdWDXDn-l9ftcRQ";
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST2_UID + "/order")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST2_UID + "," + TEST2_KEY + "")
+                .body("{\n" +
+                        "\"orderUUID\":\"GPA.1315-5537-4832-30875\",\n" +
+                        "\"orderType\": "+Config.ORDER_TYPE_BUNDLE+",\n" +
+                        "\"publisherId\" : " + finalBundleResponse.getUserId() + ",\n" +
+                        "\"buyerId\" :  " + TEST2_UID + ",\n" +
+                        "\"productId\" :  \"" + Config.GOOGLE_PURCHASE_99 + "\",\n" +
+                        "\"purchaseToken\" :  \"" + purchaseToken + "\",\n" +
+                        "\"contentId\" :  " + finalBundleResponse.getContentId() + ",\n" +
+                        "\"orderOriginId\" :  " + Config.ORDER_ORIGIN_GOOGLE + "\n" +
+                        "}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        CreateOrder.CreateOrderResponse c2 = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
+        assertEquals(c2.isSuccess(), true);
 
         /**
          * Check all the content inside the bundle is accessible
@@ -2438,8 +2463,8 @@ public class IntegrationTests extends Server {
         /**
          * Purchase the content on client side, then update the user's access
          */
-
-        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/access")
+        //removing this endpoint, moved the logic into createOrder
+        /*stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/access")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .body("{\n" +
@@ -2447,7 +2472,32 @@ public class IntegrationTests extends Server {
                         "\n}")
                 .asString();
         GrantContentAccess.ContentAccessResponse hasAccess = g.fromJson(stringResponse.getBody(), GrantContentAccess.ContentAccessResponse.class);
-        assertEquals(hasAccess.isSuccess(), true);
+        assertEquals(hasAccess.isSuccess(), true);*/
+
+        /**
+         * Test for bundle order.
+         */
+        String purchaseToken = "oiaencfadoiefjnfaiblbdnf." +
+                "AO-J1OxoxDDVJZqDpBcGFrt38fu48rx731Cy927u1Sv" +
+                "oJBQfiNshTyhWTymlQgyqgExPq7PuyR_eIoGOoxsa0YZ5a" +
+                "4y6qCgPEGEz4o420jNe8Q1xk_P-7vgAVNXSl-xiXOAZD2oWov5CVHjiGrPpGldUp2rT3YdKpA";
+        stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/order")
+                .header("accept", "application/json")
+                .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
+                .body("{\n" +
+                        "\"orderUUID\":\"GPA.1323-4378-5847-93156\",\n" +
+                        "\"orderType\": "+Config.ORDER_TYPE_BUNDLE+",\n" +
+                        "\"publisherId\" : " + ADMIN_UID + ",\n" +
+                        "\"buyerId\" :  " + TEST_UID + ",\n" +
+                        "\"productId\" :  \"" + Config.GOOGLE_PURCHASE_199 + "\",\n" +
+                        "\"purchaseToken\" :  \"" + purchaseToken + "\",\n" +
+                        "\"contentId\" :  " + content.getContentId() + ",\n" +
+                        "\"orderOriginId\" :  " + Config.ORDER_ORIGIN_GOOGLE + "\n" +
+                        "}")
+                .asString();
+        System.out.println(stringResponse.getBody());
+        CreateOrder.CreateOrderResponse c2 = g.fromJson(stringResponse.getBody(), CreateOrder.CreateOrderResponse.class);
+        assertEquals(c2.isSuccess(), true);
 
         /**
          * Check the content to ensure we have access as this user and the url is displayed
@@ -2773,21 +2823,21 @@ public class IntegrationTests extends Server {
 
         System.out.println(stringResponse.getBody());
         OrderObject[] o2 = g.fromJson(stringResponse.getBody(), OrderObject[].class);
-        assertEquals(o2[0].getOrderStatus(), "success");
-        assertEquals(o2[0].getOrderType(), "bundle");
-        assertEquals(o2[0].getOrderOrigin(), "google");
-        assertEquals(o2[0].getContentId(), content[0].getContentId());
-        assertEquals(o2[0].getBuyerId(), TEST_UID);
-        assertEquals(o2[0].getPublisherId(), content[0].getPoster().getUserId());
-        assertEquals(o2[0].getDelivered(), 0);
-
         assertEquals(o2[1].getOrderStatus(), "success");
-        assertEquals(o2[1].getOrderType(), "subscription");
+        assertEquals(o2[1].getOrderType(), "bundle");
         assertEquals(o2[1].getOrderOrigin(), "google");
-        assertEquals(o2[1].getContentId(), -1);
+        assertEquals(o2[1].getContentId(), content[0].getContentId());
         assertEquals(o2[1].getBuyerId(), TEST_UID);
-        assertEquals(o2[1].getPublisherId(), -1);
+        assertEquals(o2[1].getPublisherId(), content[0].getPoster().getUserId());
         assertEquals(o2[1].getDelivered(), 0);
+
+        assertEquals(o2[2].getOrderStatus(), "success");
+        assertEquals(o2[2].getOrderType(), "subscription");
+        assertEquals(o2[2].getOrderOrigin(), "google");
+        assertEquals(o2[2].getContentId(), -1);
+        assertEquals(o2[2].getBuyerId(), TEST_UID);
+        assertEquals(o2[2].getPublisherId(), -1);
+        assertEquals(o2[2].getDelivered(), 0);
 
         /**
          * Ensure this user now has access to any content.

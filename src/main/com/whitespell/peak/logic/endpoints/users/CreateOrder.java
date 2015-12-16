@@ -163,7 +163,6 @@ public class CreateOrder extends EndpointHandler {
         final int[] contentId = {-1};
         if(j.get(PAYLOAD_CONTENT_ID_KEY) != null){
             contentId[0] = j.get(PAYLOAD_CONTENT_ID_KEY).getAsInt();
-
         }
         final int orderOriginId = j.get(PAYLOAD_ORDER_ORIGIN_KEY).getAsInt();
         final long currTime = Server.getMilliTime();
@@ -175,12 +174,14 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Also check that payload is accurate based on orderOrigin
          */
-        if(orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)
+        System.out.println("contentId: " + contentId[0]);
+        System.out.println("publisherId: " + publisherId[0]);
+        System.out.println("orderType: " + orderType);
+
+        if((orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] <= 0 || publisherId[0] <= 0))
                 || (orderOriginId == Config.ORDER_ORIGIN_GOOGLE && (orderUUID == null || productId == null || purchaseToken == null))
                 || (orderOriginId == Config.ORDER_ORIGIN_APPLE && orderPayload == null)
-                || (orderOriginId == Config.ORDER_ORIGIN_WEB && (purchaseToken == null || contentId == null))
-        )
-        {
+                || (orderOriginId == Config.ORDER_ORIGIN_WEB && purchaseToken == null)){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
             return;
         }
