@@ -220,10 +220,6 @@ public class RequestContent extends EndpointHandler {
                     }
                 }
 
-                if(contents.size() == 0){
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                    return;
-                }
 
                 Gson g = new Gson();
                 String response = g.toJson(contents);
