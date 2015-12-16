@@ -73,7 +73,17 @@ public class ResendEmailVerification extends EndpointHandler {
         EmailVerificationSentStatus status = new EmailVerificationSentStatus();
         if(sent.getEmailToken() != null){
             status.setSent(true);
-            status.setEmail(email);
+            /**
+             * parse the email and return a secure email with asterisks (e.g. r****k@gmail.com)
+             */
+            String newString = "";
+            if(email.contains("@")) {
+                String[] split = email.split("@");
+                newString = split[0].substring(0,1) + "******" +
+                        split[0].substring(split[0].length() - 1) + "@" + split[1];
+                System.out.println("safeEmail: " +newString);
+            }
+            status.setEmail(newString);
         }else{
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_VERIFICATION_NOT_SENT);
         }

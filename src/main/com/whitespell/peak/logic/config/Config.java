@@ -73,7 +73,8 @@ public final class Config {
     public static int ORDER_ORIGIN_WEB = 3;
     public static int ORDER_TYPE_BUNDLE = 1;
     public static int ORDER_TYPE_SUBSCRIPTION = 2;
-    public static int ORDER_CURRENCY_USD = 1;
+    public static String ORDER_CURRENCY_USD_SYMBOL = "$";
+    public static String ORDER_CURRENCY_USD_NAME = "USD";
     public static double ORDER_SUBSCRIPTION_PRICE = 3.99;
 
     //Google Order details
@@ -95,7 +96,7 @@ public final class Config {
     public static String PLATFORM_VIEW_CONTENT_URL = "https://app.upfit.co/#/post/";
     public static String PLATFORM_HOME_PAGE_URL = "https://www.upfit.co";
     public static String PLATFORM_EMAIL_SEND_ADDRESS = "upfit@whitespell.com";
-    public static String PLATFORM_EMAIL_SEND_NAME = "Upfit by Whitespell";
+    public static String PLATFORM_EMAIL_SEND_NAME = "Upfit";
 
     //server.Server Ports
     public static int API_PORT = 80;
