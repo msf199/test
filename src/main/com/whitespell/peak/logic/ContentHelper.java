@@ -22,7 +22,7 @@ import java.sql.SQLException;
 public class ContentHelper {
 
     private static final String GET_CONTENT = "SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` = ? ";
-    private static final String GET_POPULAR_BUNDLE = "SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `category_id` = ? AND `processed` = 1 ORDER BY `content_id` DESC LIMIT 1";
+    private static final String GET_POPULAR_BUNDLE = "SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `category_id` = ? AND `content_type` = 6 AND `processed` = 1 ORDER BY `content_id` DESC LIMIT 1";
 
 
     public ContentObject getContentById(RequestObject context,int contentId, int requesterUserId) {
