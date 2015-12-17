@@ -59,37 +59,29 @@ public class DeleteContent extends EndpointHandler {
         /**
          * Check content poster and ensure content poster matches authentication (only publisher can delete content)
          */
-        try {
-            toDelete = h.getContentById(context, contentId, a.getUserId());
+        toDelete = h.getContentById(context, contentId, a.getUserId());
 
-            if(toDelete == null){
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                return;
-            }
-
-            /**
-             * If user is not the publisher of this content they are unauthorized
-             */
-
-            if(a.getUserId() == -1 && a.isMasterKey(a.getKey())){
-                System.out.println("master is authorized");
-            }else if(toDelete != null && toDelete.getPoster().getUserId() != a.getUserId()){
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
-                return;
-            }
-
-            /**
-             * Get the contentUrl and thumbnailUrl to delete from AWS or Cloudinary
-             */
-            contentUrl = toDelete.getContentUrl();
-            contentThumbnail = toDelete.getThumbnailUrl();
-
-        }
-        catch(UnirestException e){
-            Logging.log("High", e);
+        if(toDelete == null){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
             return;
         }
+
+        /**
+         * If user is not the publisher of this content they are unauthorized
+         */
+
+        if(a.getUserId() == -1 && a.isMasterKey(a.getKey())){
+            System.out.println("master is authorized");
+        }else if(toDelete != null && toDelete.getPoster().getUserId() != a.getUserId()){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
+            return;
+        }
+
+        /**
+         * Get the contentUrl and thumbnailUrl to delete from AWS or Cloudinary
+         */
+        contentUrl = toDelete.getContentUrl();
+        contentThumbnail = toDelete.getThumbnailUrl();
 
 
         /**

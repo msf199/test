@@ -202,58 +202,54 @@ public class GetNewsfeed extends EndpointHandler {
                             }
 
                             ContentHelper g = new ContentHelper();
-                            try {
-                                /**
-                                 * Get the parent of the current contentObject
-                                 */
+                            /**
+                             * Get the parent of the current contentObject
+                             */
 
-                                ContentObject parent = g.getContentById(context, newsfeedContent.getParent(), a.getUserId());
+                            ContentObject parent = g.getContentById(context, newsfeedContent.getParent(), a.getUserId());
 
-                                /**
-                                 * Return the parent bundle on the newsfeed since it has been updated since it was
-                                 * uploaded.
-                                 */
-                                newsfeedContent = parent;
+                            /**
+                             * Return the parent bundle on the newsfeed since it has been updated since it was
+                             * uploaded.
+                             */
+                            newsfeedContent = parent;
 
-                                /**
-                                 * For each child, if the child is newer than the bundle,
-                                 * save the largest child and use that contentId to represent the bundle,
-                                 * therefore moving it up in the newsfeed list (and maintaining offset order).
-                                 */
-                                int[] currentBundleDailyLikes = {0};
-                                for (ContentObject i : parent.getChildren()) {
-                                    if (i.getContentId() > parent.getContentId()) {
+                            /**
+                             * For each child, if the child is newer than the bundle,
+                             * save the largest child and use that contentId to represent the bundle,
+                             * therefore moving it up in the newsfeed list (and maintaining offset order).
+                             */
+                            int[] currentBundleDailyLikes = {0};
+                            for (ContentObject i : parent.getChildren()) {
+                                if (i.getContentId() > parent.getContentId()) {
 
-                                        /**
-                                         * Aggregate the daily likes for the bundle content,
-                                         * save the most popular bundle based on daily likes
-                                         */
-                                        currentBundleDailyLikes[0] += i.getTodaysLikes();
+                                    /**
+                                     * Aggregate the daily likes for the bundle content,
+                                     * save the most popular bundle based on daily likes
+                                     */
+                                    currentBundleDailyLikes[0] += i.getTodaysLikes();
 
-                                        /**
-                                         * Save bundle with largest daily likes as popular bundle
-                                         */
-                                        if (currentBundleDailyLikes[0] > mostDailyLikes[0]) {
-                                            mostDailyLikes[0] = currentBundleDailyLikes[0];
-                                            popularBundle[0] = parent;
-                                            popularBundle[0].setTodaysLikes(mostDailyLikes[0]);
-                                        }
-
-                                        /**
-                                         * Save the largest contentId in the bundle for updating the newsfeedId.
-                                         */
-                                        if (largestContentId[0] < i.getContentId()) {
-                                            largestContentId[0] = i.getContentId();
-                                        }
-
-                                        /**
-                                         * Set the newsfeedId to the largest child's contentId to maintain newsfeed order
-                                         */
-                                        newsfeedId[0] = largestContentId[0];
+                                    /**
+                                     * Save bundle with largest daily likes as popular bundle
+                                     */
+                                    if (currentBundleDailyLikes[0] > mostDailyLikes[0]) {
+                                        mostDailyLikes[0] = currentBundleDailyLikes[0];
+                                        popularBundle[0] = parent;
+                                        popularBundle[0].setTodaysLikes(mostDailyLikes[0]);
                                     }
+
+                                    /**
+                                     * Save the largest contentId in the bundle for updating the newsfeedId.
+                                     */
+                                    if (largestContentId[0] < i.getContentId()) {
+                                        largestContentId[0] = i.getContentId();
+                                    }
+
+                                    /**
+                                     * Set the newsfeedId to the largest child's contentId to maintain newsfeed order
+                                     */
+                                    newsfeedId[0] = largestContentId[0];
                                 }
-                            } catch (UnirestException e) {
-                                Logging.log("High", e);
                             }
                         }
 
@@ -305,10 +301,15 @@ public class GetNewsfeed extends EndpointHandler {
             }
         }
 
+        if(newsfeedResponse.size() == 0 && categoryId > 0){
+            newsfeedResponse.add(new NewsfeedObject(1, new ContentHelper().getPopularBundleByCategoryId(context,categoryId, a.getUserId())));
+        }
+
         final Gson f = new Gson();
         String response = f.toJson(newsfeedResponse);
         context.getResponse().setStatus(200);
         try {
+            Logging.log("info", response);
             context.getResponse().getWriter().write(response);
         } catch (Exception e) {
             Logging.log("High", e);

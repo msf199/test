@@ -667,19 +667,15 @@ public class UpdateContent extends EndpointHandler {
                          */
                         if(sendSocialMediaEmail) {
                             ContentHelper h = new ContentHelper();
-                            try {
-                                ContentObject c = h.getContentById(context, final_content_id, a.getUserId());
-                                if (c != null
-                                        && c.getThumbnail720p() != null && c.getContentTitle() != null
-                                        && c.getContentPreview720p() != null && c.getSocialMediaVideo() != null) {
-                                    if (publisherEmail[0] != null && publisherName[0] != null) {
-                                        EmailSend.sendSocialMediaLinkNotificationEmail(
-                                                c.getThumbnail720p(), publisherEmail[0], publisherName[0],
-                                                c.getContentTitle(), c.getSocialMediaVideo(), c.getContentUrl720p());
-                                    }
+                            ContentObject c = h.getContentById(context, final_content_id, a.getUserId());
+                            if (c != null
+                                    && c.getThumbnail720p() != null && c.getContentTitle() != null
+                                    && c.getContentPreview720p() != null && c.getSocialMediaVideo() != null) {
+                                if (publisherEmail[0] != null && publisherName[0] != null) {
+                                    EmailSend.sendSocialMediaLinkNotificationEmail(
+                                            c.getThumbnail720p(), publisherEmail[0], publisherName[0],
+                                            c.getContentTitle(), c.getSocialMediaVideo(), c.getContentUrl720p());
                                 }
-                            } catch (UnirestException e) {
-                                Logging.log("Low", e);
                             }
                         }
 
