@@ -140,7 +140,6 @@ public class GetNewsfeed extends EndpointHandler {
                  */
                 if(offset > 0){
                     selectString.append("ct.`content_id` < " + offset + " " + ceilString + " " + processedString + " " + parentString + " AND ut.`user_id` = " + s + " ");
-
                 }else{
                     selectString.append("ct.`content_id` > 0 " + ceilString + " " + processedString + " " + parentString + " AND ut.`user_id` = " + s + " ");
                 }
@@ -301,10 +300,15 @@ public class GetNewsfeed extends EndpointHandler {
             }
         }
 
-        if(newsfeedResponse.size() == 0 && categoryId > 0){
+        /**
+         * Don't add popular bundle if offset is set, otherwise add popular bundle.
+         */
+        if(newsfeedResponse.size() == 0 && offset > 0){
+            //if the offset is set, we should reach the end of our newsfeed.
+        }else if(newsfeedResponse.size() == 0 && categoryId > 0){
             newsfeedResponse.add(new NewsfeedObject(1, new ContentHelper().getPopularBundleByCategoryId(context,categoryId, a.getUserId())));
         } else if(newsfeedResponse.size() == 0 && categoryId <= 0) {
-            newsfeedResponse.add(new NewsfeedObject(1, new ContentHelper().getPopularBundleByCategoryId(context,3, a.getUserId())));
+            newsfeedResponse.add(new NewsfeedObject(1, new ContentHelper().getPopularBundleByCategoryId(context, 3, a.getUserId())));
         }
 
         final Gson f = new Gson();
