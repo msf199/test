@@ -129,10 +129,11 @@ public class StaticRules {
         CONTENT_ID_0_DOESNT_EXIST(174, "Content Id 0 is invalid", HttpStatus.BAD_REQUEST_400),
         SUBSCRIPTION_FAILED(175, "Subscription failed, try again later", HttpStatus.NOT_FOUND_404),
         ORDER_FAILED(176, "Order failed, try again later", HttpStatus.UNAUTHORIZED_401),
-        CARD_DECLINED(176, "Your card was declined", HttpStatus.UNAUTHORIZED_401),
-        EXISTING_SUBSCRIPTION_ON_ACC(177, "You have an existing subscription on another account. Contact support to transfer it over. ", HttpStatus.BAD_REQUEST_400),
-        CANNOT_SAVE_INDIVIDUAL_CONTENT(178, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400),
-        ALREADY_HAVE_ACCESS(179, "You already have access to this bundle", HttpStatus.BAD_REQUEST_400);
+        CARD_DECLINED(177, "Your card was declined", HttpStatus.UNAUTHORIZED_401),
+        EXISTING_SUBSCRIPTION_ON_ACC(178, "You have an existing subscription on another account. Contact support to transfer it over. ", HttpStatus.BAD_REQUEST_400),
+        CANNOT_SAVE_INDIVIDUAL_CONTENT(179, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400),
+        ALREADY_HAVE_ACCESS(180, "You already have access to this bundle", HttpStatus.BAD_REQUEST_400),
+        BECOME_PUBLISHER_MESSAGE(180, "To become a publisher please contact our Head of Marketing Arielle at arielle@whitespell.com!", HttpStatus.UNAUTHORIZED_401);
 
         int errorId;
         String errorMessage;

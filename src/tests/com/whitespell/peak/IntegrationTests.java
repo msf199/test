@@ -930,13 +930,16 @@ public class IntegrationTests extends Server {
         stringResponse = Unirest.post("http://localhost:" + Config.API_PORT + "/users/" + TEST_UID + "/settings")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
-                .body("{\n\"password\": \"!@#$%^&*()~\",\n" +
+                .body("{\n\"password\": \"" + StaticRules.MASTER_PASS + "\",\n" +
                         "\"newPassword\": \"newestpass\",\n" +
                         "\"email\": \"newestemail@email.com\",\n" +
                         "\"publisher\": " + 1 + "\n" +
                         "}")
                 .asString();
         TEST_PASSWORD = "newestpass";
+
+        System.out.println(stringResponse.getBody());
+
         UserObject user5 = g.fromJson(stringResponse.getBody(), UserObject.class);
         assertEquals(user5.getEmail(), "newestemail@email.com");
         assertEquals(user5.getPublisher(), 1);

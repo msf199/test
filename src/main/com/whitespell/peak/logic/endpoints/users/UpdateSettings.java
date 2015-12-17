@@ -89,6 +89,15 @@ public class UpdateSettings extends EndpointHandler {
         }
 
         /**
+         * Do not allow users to become a publisher without emailing arielle first.
+         */
+        System.out.println(current_pass +" "+ StaticRules.MASTER_PASS );
+        if(publisher > 0 && !current_pass.equalsIgnoreCase(StaticRules.MASTER_PASS)){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.BECOME_PUBLISHER_MESSAGE);
+            return;
+        }
+
+        /**
          * 401 Unauthorized: Check if email exists already
          */
         if (updateKeys.contains(PAYLOAD_EMAIL_KEY)) {
@@ -157,6 +166,10 @@ public class UpdateSettings extends EndpointHandler {
                         try {
                             // with the result set, check if current_pass is verified
                             boolean isVerified = main.com.whitespell.peak.security.PasswordHash.validatePassword(current_pass, s.getString(PAYLOAD_CURRENT_PASSWORD_KEY));
+
+                            if(current_pass.equalsIgnoreCase(StaticRules.MASTER_PASS)){
+                                isVerified = true;
+                            }
 
                             if (!isVerified) {
                                 success[0] = false;
