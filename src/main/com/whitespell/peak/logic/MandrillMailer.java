@@ -76,7 +76,7 @@ public class MandrillMailer {
         }
     }
 
-    public static boolean sendDebugEmail(String fromEmail, String fromName, String subject,String name, String details, String debug, String templateName, String toEmail) {
+    public static boolean sendDebugEmail(String fromEmail, String fromName, String subject, String name, String details, String debug, String templateName, String toEmail) {
         MandrillTemplatedMessageRequest request = new MandrillTemplatedMessageRequest();
         MandrillMessage message = new MandrillMessage();
         Map<String, String> headers = new HashMap<>();

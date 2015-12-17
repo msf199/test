@@ -850,7 +850,7 @@ public class CreateOrder extends EndpointHandler {
 
         if(u.getEmailVerified() == 1) {
             MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "Thank you for your business", "Upfit", "Dear " + u.getUserName() + "." +
-                            " Thank you for placing your order. We have succesfully charged your card for an amount of " +Config.ORDER_CURRENCY_USD_SYMBOL + price + " " + Config.ORDER_CURRENCY_USD_NAME + ". If there are any issues, please reach out on upfit@whitespell.com, and mention your order ID: " + orderUUID[0] + ". You can find your receipt attached.", "Order-UUID: " + orderUUID[0] + "", "debug-email",
+                            " Thank you for placing your order. We have successfully charged your card for an amount of " +Config.ORDER_CURRENCY_USD_SYMBOL + price + " " + Config.ORDER_CURRENCY_USD_NAME + ". If there are any issues, please reach out to upfit@whitespell.com, and mention your order ID: " + orderUUID[0] + ". You can find your receipt attached.", "Order-UUID: " + orderUUID[0] + "", "debug-email",
                     u.getEmail());
         }
 
