@@ -133,7 +133,7 @@ public class StaticRules {
         EXISTING_SUBSCRIPTION_ON_ACC(178, "You have an existing subscription on another account. Contact support to transfer it over. ", HttpStatus.BAD_REQUEST_400),
         CANNOT_SAVE_INDIVIDUAL_CONTENT(179, "Cannot save individual videos, please try saving a Bundle", HttpStatus.BAD_REQUEST_400),
         ALREADY_HAVE_ACCESS(180, "You already have access to this bundle", HttpStatus.BAD_REQUEST_400),
-        BECOME_PUBLISHER_MESSAGE(180, "To become a publisher please contact our Head of Marketing Arielle at arielle@whitespell.com!", HttpStatus.UNAUTHORIZED_401);
+        BECOME_PUBLISHER_MESSAGE(181, "To become a publisher please contact our Head of Marketing Arielle at arielle@whitespell.com!", HttpStatus.UNAUTHORIZED_401);
 
         int errorId;
         String errorMessage;
