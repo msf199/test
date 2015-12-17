@@ -14,7 +14,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
 import com.stripe.Stripe;
 import com.stripe.exception.*;
 import com.stripe.model.Charge;
@@ -519,13 +518,7 @@ public class CreateOrder extends EndpointHandler {
          * Only get content if order is a bundle
          */
         if(orderType == Config.ORDER_TYPE_BUNDLE) {
-            try {
-                orderContent = h.getContentById(context, contentId[0], a.getUserId());
-            } catch (UnirestException e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                return;
-            }
+            orderContent = h.getContentById(context, contentId[0], a.getUserId());
 
             /**
              * Ensure content publisher matches payload
