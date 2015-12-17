@@ -301,7 +301,7 @@ public class GetNewsfeed extends EndpointHandler {
             }
         }
 
-        if(newsfeedResponse.size() == 0){
+        if(newsfeedResponse.size() == 0 && categoryId > 0){
             newsfeedResponse.add(new NewsfeedObject(1, new ContentHelper().getPopularBundleByCategoryId(context,categoryId, a.getUserId())));
         }
 
