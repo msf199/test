@@ -115,6 +115,7 @@ public class IntegrationTests extends Server {
 
         // start the server
         Server.start();
+        Config.setDev(true);
 
         API = "http://localhost:" + Config.API_PORT;
 
@@ -130,7 +131,6 @@ public class IntegrationTests extends Server {
 
     @Test
     public void test0002_NewDatabase() throws IOException {
-
 
         if (Config.DB_USER.equals("testpeak")) { // ensure we are on the test server
             // truncate peak_ci_test_ddl

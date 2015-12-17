@@ -7,6 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.Authentication;
 import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.MandrillMailer;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -91,8 +92,11 @@ public class UpdateSettings extends EndpointHandler {
         /**
          * Do not allow users to become a publisher without emailing arielle first.
          */
-        System.out.println(current_pass +" "+ StaticRules.MASTER_PASS );
         if(publisher > 0 && !current_pass.equalsIgnoreCase(StaticRules.MASTER_PASS)){
+
+            MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "User wants to become a publisher!", "", "userId " + user_id + " at email " + email +
+                    " wants to become an Upfit publisher! Please get in touch soon!", "becomepub", "debug-email", "arielle@whitespell.com");
+
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.BECOME_PUBLISHER_MESSAGE);
             return;
         }

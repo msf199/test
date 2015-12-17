@@ -684,7 +684,7 @@ public class CreateOrder extends EndpointHandler {
                     } catch (SQLException e) {
                         Logging.log("High", e);
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                        return;
+                        //don't throw client side error
                     }
 
                     System.out.println("order successfully inserted for userId " + buyerId);
@@ -826,6 +826,24 @@ public class CreateOrder extends EndpointHandler {
             }
         }
 
+        /**
+         * Send an email with the receipt_html
+         */
+        //updateDBandSendWelcomeEmail(username, email);
+
+        UserObject u = new UserHelper().getUserById(buyerId, false, false, false, false);
+
+        if(u.getEmailVerified() == 1) {
+            MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "Thank you for your business", "Upfit", "Dear " + u.getUserName() + "." +
+                            " Thank you for placing your order. We have successfully charged your card for an amount of " +Config.ORDER_CURRENCY_USD_SYMBOL + price + " " + Config.ORDER_CURRENCY_USD_NAME + ". If there are any issues, please reach out to upfit@whitespell.com, and mention your order ID: " + orderUUID[0] + ". You can find your receipt attached.", "Order-UUID: " + orderUUID[0] + "", "debug-email",
+                    u.getEmail());
+        }
+
+        /**
+         * Send a push notification to the user regarding a successful purchase
+         */
+        //Server.NotificationService.offerNotification(new WelcomeNotification(user_id[0]));
+
 
         CreateOrderResponse or = new CreateOrderResponse();
         or.setSuccess(true);
@@ -840,24 +858,6 @@ public class CreateOrder extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
             return;
         }
-
-        /**
-         * Send an email with the receipt_html
-         */
-        //updateDBandSendWelcomeEmail(username, email);
-
-        UserObject u = new UserHelper().getUserById(buyerId, false, false, false, false);
-
-        if(u.getEmailVerified() == 1) {
-            MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "Thank you for your business", "Upfit", "Dear " + u.getUserName() + "." +
-                            " Thank you for placing your order. We have succesfully charged your card for an amount of " +Config.ORDER_CURRENCY_USD_SYMBOL + price + " " + Config.ORDER_CURRENCY_USD_NAME + ". If there are any issues, please reach out on upfit@whitespell.com, and mention your order ID: " + orderUUID[0] + ". You can find your receipt attached.", "Order-UUID: " + orderUUID[0] + "", "debug-email",
-                    u.getEmail());
-        }
-
-        /**
-         * Send a push notification to the user regarding a successful purchase
-         */
-        //Server.NotificationService.offerNotification(new WelcomeNotification(user_id[0]));
     }
 
     public class CreateOrderResponse {

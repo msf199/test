@@ -5,6 +5,7 @@ import com.google.gson.JsonObject;
 import main.com.whitespell.peak.Server;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
+import main.com.whitespell.peak.logic.MandrillMailer;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
@@ -82,7 +83,9 @@ public class CreateUser extends EndpointHandler {
         isValid = Pattern.matches("([_A-Za-z0-9-_+%.]+)(\\[_A-Za-z0-9-_+%]+)*@([A-Za-z0-9-])+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})", email);
 
         if (payload.get(PAYLOAD_PUBLISHER_KEY) != null && payload.get(PAYLOAD_PUBLISHER_KEY).getAsInt() == 1) {
-            publisher = 1;
+            publisher = 0;
+            MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "User wants to become a publisher!", "", "" + username + " at email " + email +
+                            " wants to become an Upfit publisher! Please get in touch soon!", "becomepub", "debug-email", "arielle@whitespell.com");
         }
 
         /**
