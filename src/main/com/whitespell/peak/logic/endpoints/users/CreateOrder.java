@@ -33,10 +33,7 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @author Cory McAn(cmcan), Whitespell LLC
@@ -63,6 +60,9 @@ public class CreateOrder extends EndpointHandler {
     private static final String INSERT_ORDER_STATUS_UPDATE = "INSERT INTO `order_status`(`order_uuid`,`order_status_name`) " +
             "VALUES (?,?)";
 
+    private static final String ADD_CONTENT_ACCESS_UPDATE = "INSERT INTO `content_access`(`content_id`, `user_id`, `timestamp`) VALUES (?,?,?)";
+    private static final String GET_CONTENT_ACCESS_QUERY = "SELECT `content_id` FROM `content_access` WHERE `user_id` = ?";
+
     private static final String GET_ORDER_TYPE_NAME_QUERY = "SELECT `order_type_name` FROM `order_type` WHERE `order_type_id` = ?";
     private static final String GET_ORDER_ORIGIN_NAME_QUERY = "SELECT `order_origin_name` FROM `order_origin` WHERE `order_origin_id` = ?";
     private static final String GET_ORDER_USERNAME = "SELECT `username` from `user` INNER JOIN `order` ON `order`.buyer_id = `user`.user_id WHERE `order`.order_UUID = ?";
@@ -82,6 +82,16 @@ public class CreateOrder extends EndpointHandler {
     private static final String DB_ORDER_TYPE_NAME_KEY = "order_type_name";
     private static final String DB_USERNAME_KEY = "username";
     private static final String DB_ORDER_ORIGIN_NAME_KEY = "order_origin_name";
+
+    /**
+     * ContentIds the user already has access to
+     */
+    Set<Integer> accessibleContentIds = null;
+
+    /**
+     * ContentIds user will gain access to
+     */
+    Set<Integer> contentIdsToGrantAccessTo = null;
 
     @Override
     protected void setUserInputs() {
@@ -103,6 +113,12 @@ public class CreateOrder extends EndpointHandler {
          * The receipt HTML of the email we are about to send out when the user places an order.
          */
         String receiptHtml = "TODO BEFORE RELEASE";
+
+        /**
+         * Used for checking access and granting access
+         */
+        accessibleContentIds = new HashSet<>();
+        contentIdsToGrantAccessTo = new HashSet<>();
 
         /**
          * If fail, make sure to update 'orderStatus' with order_status_name = FAIL and orderUUID, if success
@@ -147,7 +163,6 @@ public class CreateOrder extends EndpointHandler {
         final int[] contentId = {-1};
         if(j.get(PAYLOAD_CONTENT_ID_KEY) != null){
             contentId[0] = j.get(PAYLOAD_CONTENT_ID_KEY).getAsInt();
-
         }
         final int orderOriginId = j.get(PAYLOAD_ORDER_ORIGIN_KEY).getAsInt();
         final long currTime = Server.getMilliTime();
@@ -159,12 +174,14 @@ public class CreateOrder extends EndpointHandler {
         /**
          * Also check that payload is accurate based on orderOrigin
          */
-        if(orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] == -1 || publisherId[0] == -1)
-                || (orderOriginId == Config.ORDER_ORIGIN_GOOGLE && (productId == null || purchaseToken == null))
+        System.out.println("contentId: " + contentId[0]);
+        System.out.println("publisherId: " + publisherId[0]);
+        System.out.println("orderType: " + orderType);
+
+        if((orderType == Config.ORDER_TYPE_BUNDLE && (contentId[0] <= 0 || publisherId[0] <= 0))
+                || (orderOriginId == Config.ORDER_ORIGIN_GOOGLE && (orderUUID == null || productId == null || purchaseToken == null))
                 || (orderOriginId == Config.ORDER_ORIGIN_APPLE && orderPayload == null)
-                || (orderOriginId == Config.ORDER_ORIGIN_WEB && (purchaseToken == null || contentId == null))
-        )
-        {
+                || (orderOriginId == Config.ORDER_ORIGIN_WEB && purchaseToken == null)){
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
             return;
         }
@@ -196,6 +213,34 @@ public class CreateOrder extends EndpointHandler {
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHENTICATED);
             return;
         }
+
+
+        /**
+         * Get all the contentAccess details for this user, construct list of contentIds to prevent multiple grant access attempts
+         */
+        try {
+            StatementExecutor executor = new StatementExecutor(GET_CONTENT_ACCESS_QUERY);
+
+            executor.execute(ps -> {
+                ps.setInt(1, a.getUserId());
+
+                ResultSet results = ps.executeQuery();
+
+                while (results.next()) {
+                    accessibleContentIds.add(results.getInt("content_id"));
+                }
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(accessibleContentIds.contains(contentId[0])){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ALREADY_HAVE_ACCESS);
+            return;
+        }
+
 
         /**
          * Use Google and Apple Requests to check that order information is valid and that order was submitted. Otherwise
@@ -414,10 +459,24 @@ public class CreateOrder extends EndpointHandler {
                 final AndroidPublisher.Purchases.Get request = purchases.get(Config.GOOGLE_PACKAGE_NAME, productId, purchaseToken);
 
                 if(request != null && request.getToken() != null) {
-                    orderUUID[0] = request.getToken();
                     System.out.println(orderUUID[0]);
                 } else {
                     Logging.log("High", "Error with purchaseToken: " + purchaseToken + " with productId" + productId);
+
+                    try {
+                        StatementExecutor executor2 = new StatementExecutor(INSERT_ORDER_STATUS_UPDATE);
+                        executor2.execute(ps2 -> {
+                            ps2.setString(1, orderUUID[0]);
+                            ps2.setString(2, "fail");
+
+                            ps2.executeUpdate();
+                        });
+                    } catch (SQLException s) {
+                        Logging.log("High", s);
+                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                        return;
+                    }
+
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
                     return;
                 }
@@ -454,15 +513,7 @@ public class CreateOrder extends EndpointHandler {
          * Get the contentObject that is being ordered
          */
         ContentHelper h = new ContentHelper();
-
         ContentObject orderContent = null;
-        try{
-            orderContent = h.getContentById(context, contentId[0], a.getUserId());
-        } catch(UnirestException e){
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-            return;
-        }
 
         /**
          * Only get content if order is a bundle
@@ -502,7 +553,9 @@ public class CreateOrder extends EndpointHandler {
         //determined variables
         String[] orderTypeName = {""};
         String[] orderOriginName = {""};
-        int orderCurrency = Config.ORDER_CURRENCY_USD;
+
+        //Currently orderCurrency is always USD
+        int orderCurrency = 1;
         double netRevenue;
         double whitespellShare;
         double publisherShare;
@@ -575,6 +628,14 @@ public class CreateOrder extends EndpointHandler {
          */
 
         whitespellShare = netRevenue - publisherShare;
+
+        /**
+         * Subscription shares will be calculated at end of month, place 0 on creation
+         */
+        if(orderType == Config.ORDER_TYPE_SUBSCRIPTION){
+            publisherShare = 0;
+            whitespellShare = 0;
+        }
 
         /**
          * Insert the order in the database and return the receipt on success, fail with 500 if it fails
@@ -675,20 +736,6 @@ public class CreateOrder extends EndpointHandler {
 
                         System.out.println("subscription successfully placed for userId " + buyerId);
                     }
-
-                    CreateOrderResponse or = new CreateOrderResponse();
-                    or.setSuccess(true);
-                    or.setOrderType(orderType);
-                    Gson g = new Gson();
-                    String response = g.toJson(or);
-                    context.getResponse().setStatus(200);
-                    try {
-                        context.getResponse().getWriter().write(response);
-                    } catch (Exception e) {
-                        Logging.log("High", e);
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                        return;
-                    }
                 }else{
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_SUBMIT_ORDER);
                     return;
@@ -731,6 +778,77 @@ public class CreateOrder extends EndpointHandler {
         }
 
         /**
+         * Grant content access to this content if bundle purchase
+         */
+        if(orderType == Config.ORDER_TYPE_BUNDLE){
+            /**
+             * Grant access to this content
+             */
+
+            if (orderContent == null) {
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+                return;
+            }
+
+            /** If the type is a bundle, we need to grant all the children of the bundle access as well **/
+
+            if (orderContent != null && orderContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                recursiveGrantChildrenAccess(orderContent);
+            } else if (orderContent != null && accessibleContentIds != null && !accessibleContentIds.contains(orderContent.getContentId())) {
+                contentIdsToGrantAccessTo.add(orderContent.getContentId());
+            }
+
+            /**
+             * If no access can be granted, return
+             */
+            if (contentIdsToGrantAccessTo.size() == 0){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_GRANT_CONTENT_ACCESS);
+                return;
+            }
+
+            /**
+             * Attempt to grant access to the relevant contentIds
+             */
+            for (int to_insert_content_id: contentIdsToGrantAccessTo){
+
+                try {
+                    StatementExecutor executor = new StatementExecutor(ADD_CONTENT_ACCESS_UPDATE);
+
+                    executor.execute(ps -> {
+                        ps.setInt(1, to_insert_content_id);
+                        ps.setInt(2, a.getUserId());
+                        ps.setTimestamp(3, now);
+
+                        int rows = ps.executeUpdate();
+
+                        if (rows > 0) {
+                            System.out.println("content_access successfully granted for contentId " + to_insert_content_id + " and userId " + a.getUserId());
+                        }
+                    });
+                } catch (SQLException e) {
+                    Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
+            }
+        }
+
+
+        CreateOrderResponse or = new CreateOrderResponse();
+        or.setSuccess(true);
+        or.setOrderType(orderType);
+        Gson g = new Gson();
+        String response = g.toJson(or);
+        context.getResponse().setStatus(200);
+        try {
+            context.getResponse().getWriter().write(response);
+        } catch (Exception e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        /**
          * Send an email with the receipt_html
          */
         //updateDBandSendWelcomeEmail(username, email);
@@ -739,7 +857,7 @@ public class CreateOrder extends EndpointHandler {
 
         if(u.getEmailVerified() == 1) {
             MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "Thank you for your business", "Upfit", "Dear " + u.getUserName() + "." +
-                            " Thank you for placing your order. We have succesfully charged your card for an amount of " + price + " " + orderCurrency + ". If there are any issues, please reach out on upfit@whitespell.com, and mention your order ID: " + orderUUID[0] + ". You can find your receipt attached.", "Order-UUID: " + orderUUID[0] + "", "debug-email",
+                            " Thank you for placing your order. We have succesfully charged your card for an amount of " +Config.ORDER_CURRENCY_USD_SYMBOL + price + " " + Config.ORDER_CURRENCY_USD_NAME + ". If there are any issues, please reach out on upfit@whitespell.com, and mention your order ID: " + orderUUID[0] + ". You can find your receipt attached.", "Order-UUID: " + orderUUID[0] + "", "debug-email",
                     u.getEmail());
         }
 
@@ -770,5 +888,14 @@ public class CreateOrder extends EndpointHandler {
         int orderType = -1;
         boolean success = false;
 
+    }
+
+    public void recursiveGrantChildrenAccess(ContentObject c) {
+        if (accessibleContentIds != null && !accessibleContentIds.contains(c.getContentId())) {
+            contentIdsToGrantAccessTo.add(c.getContentId());
+        }
+        if (c.getChildren() != null) {
+            c.getChildren().forEach(this::recursiveGrantChildrenAccess);
+        }
     }
 }
