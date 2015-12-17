@@ -684,7 +684,7 @@ public class CreateOrder extends EndpointHandler {
                     } catch (SQLException e) {
                         Logging.log("High", e);
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                        return;
+                        //don't throw client side error
                     }
 
                     System.out.println("order successfully inserted for userId " + buyerId);
@@ -826,21 +826,6 @@ public class CreateOrder extends EndpointHandler {
             }
         }
 
-
-        CreateOrderResponse or = new CreateOrderResponse();
-        or.setSuccess(true);
-        or.setOrderType(orderType);
-        Gson g = new Gson();
-        String response = g.toJson(or);
-        context.getResponse().setStatus(200);
-        try {
-            context.getResponse().getWriter().write(response);
-        } catch (Exception e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
-        }
-
         /**
          * Send an email with the receipt_html
          */
@@ -858,6 +843,21 @@ public class CreateOrder extends EndpointHandler {
          * Send a push notification to the user regarding a successful purchase
          */
         //Server.NotificationService.offerNotification(new WelcomeNotification(user_id[0]));
+
+
+        CreateOrderResponse or = new CreateOrderResponse();
+        or.setSuccess(true);
+        or.setOrderType(orderType);
+        Gson g = new Gson();
+        String response = g.toJson(or);
+        context.getResponse().setStatus(200);
+        try {
+            context.getResponse().getWriter().write(response);
+        } catch (Exception e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
     }
 
     public class CreateOrderResponse {
