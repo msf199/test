@@ -303,6 +303,8 @@ public class GetNewsfeed extends EndpointHandler {
 
         if(newsfeedResponse.size() == 0 && categoryId > 0){
             newsfeedResponse.add(new NewsfeedObject(1, new ContentHelper().getPopularBundleByCategoryId(context,categoryId, a.getUserId())));
+        } else if(newsfeedResponse.size() == 0 && categoryId <= 0) {
+            newsfeedResponse.add(new NewsfeedObject(1, new ContentHelper().getPopularBundleByCategoryId(context,3, a.getUserId())));
         }
 
         final Gson f = new Gson();
