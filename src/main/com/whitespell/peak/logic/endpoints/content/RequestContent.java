@@ -49,7 +49,9 @@ public class RequestContent extends EndpointHandler {
                 temp_content_type_id = -1,
                 temp_category_id = -1,
                 temp_processed=1,
-                temp_parent=-1;
+                temp_parent=-1,
+                offset=GenericAPIActions.getOffset(context.getQueryString()),
+                limit=GenericAPIActions.getLimit(context.getQueryString());
         final boolean[] getUserVideos = {false};
         final boolean[] getCategoryVideos = {false};
 
@@ -142,8 +144,13 @@ public class RequestContent extends EndpointHandler {
          * Construct the SELECT FROM CONTENT query based on the the desired query output.
          */
         StringBuilder selectString = new StringBuilder();
-        selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` > ? " +
-                " ");
+        if(offset > 0) {
+            selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` < ? " +
+                    " ");
+        }else{
+            selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` > 0 " +
+                    " ");
+        }
 
         for (String s : queryKeys) {
             selectString.append("AND `ct`.`" + s + "` = ? ");
@@ -157,8 +164,8 @@ public class RequestContent extends EndpointHandler {
          */
         try {
             ArrayList<ContentObject> contents = new ArrayList<>();
-            final int finalLimit = GenericAPIActions.getLimit(context.getQueryString());
-            final int finalOffset = GenericAPIActions.getOffset(context.getQueryString());
+            final int finalLimit = limit;
+            final int finalOffset = offset;
             final int finalCategoryId = categoryId;
             final int finalUserId = userId;
             final int finalContentId = contentId;
@@ -169,10 +176,14 @@ public class RequestContent extends EndpointHandler {
             StatementExecutor executor = new StatementExecutor(REQUEST_CONTENT);
 
             executor.execute(ps -> {
-                
-                ps.setInt(1, finalOffset);
-                
-                int count = 2;
+
+                int count;
+                if(offset > 0) {
+                    ps.setInt(1, finalOffset);
+                    count = 2;
+                }else{
+                    count = 1;
+                }
 
                 //todo(cmcan) turn this into a loop, this is bad code
 
