@@ -142,13 +142,14 @@ public class RequestContent extends EndpointHandler {
          * Construct the SELECT FROM CONTENT query based on the the desired query output.
          */
         StringBuilder selectString = new StringBuilder();
-        selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` > ? ");
+        selectString.append("SELECT * FROM `content` as ct INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE `content_id` > ? " +
+                " ");
 
         for (String s : queryKeys) {
             selectString.append("AND `ct`.`" + s + "` = ? ");
         }
 
-        selectString.append("LIMIT ?");
+        selectString.append("ORDER BY `content_id` DESC LIMIT ?");
         final String REQUEST_CONTENT = selectString.toString();
 
         /**
