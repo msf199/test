@@ -32,7 +32,7 @@ import java.util.List;
 public class SendSMS extends EndpointHandler {
 
 
-    public static String PAYLOAD_NUMBER_KEY;
+    public static String PAYLOAD_NUMBER_KEY = "phoneNumber";
 
     private static String ACCOUNT_SID = "ACc499e1798e0e0e87609f4085e2fb4a8c";
     private static String ACCOUNT_TOKEN = "865157b3bb805b5a2c94cc8d1f348608";
