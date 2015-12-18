@@ -97,6 +97,7 @@ public final class Config {
     public static String PLATFORM_HOME_PAGE_URL = "https://www.upfit.co";
     public static String PLATFORM_EMAIL_SEND_ADDRESS = "upfit@whitespell.com";
     public static String PLATFORM_EMAIL_SEND_NAME = "Upfit";
+    public static String PLATFORM_DEFAULT_THUMBNAIL = "http://peakapp.me/img/app_assets/avatar.png";
 
     //server.Server Ports
     public static int API_PORT = 80;
