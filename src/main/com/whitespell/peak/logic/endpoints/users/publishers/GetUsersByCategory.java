@@ -6,6 +6,7 @@ import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.GenericAPIActions;
 import main.com.whitespell.peak.logic.RequestObject;
 import main.com.whitespell.peak.logic.Safety;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 
@@ -53,9 +54,9 @@ public class GetUsersByCategory extends EndpointHandler {
 
 
                 if (i == 0) {
-                    whereString.append("WHERE `category_id` = " + categories_str[i] + " ");
+                    whereString.append("WHERE (`category_id` = " + categories_str[i] + " AND user.thumbnail NOT LIKE \"%" + Config.PLATFORM_DEFAULT_THUMBNAIL + "%\" AND !(user.user_id = 134) ) ");
                 } else {
-                    whereString.append("OR `category_id` = " + categories_str[i] + " ");
+                    whereString.append("OR (`category_id` = " + categories_str[i] + " AND user.thumbnail NOT LIKE \"%" + Config.PLATFORM_DEFAULT_THUMBNAIL + "%\"  AND !(user.user_id = 134) ) ");
                 }
             }
 
