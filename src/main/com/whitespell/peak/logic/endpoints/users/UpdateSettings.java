@@ -97,7 +97,15 @@ public class UpdateSettings extends EndpointHandler {
             MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "User wants to become a publisher!", "", "userId " + user_id + " at email " + email +
                     " wants to become an Upfit publisher! Please get in touch soon!", "becomepub", "debug-email", "arielle@whitespell.com");
 
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.BECOME_PUBLISHER_MESSAGE);
+
+            /**
+             * Can't throw this error because the iOS app CRASHES instead of displaying the error message...
+             */
+            /**
+             * User will have no indication of the email, arielle will respond ASAP.
+             */
+            /*context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.BECOME_PUBLISHER_MESSAGE);
+             */
             return;
         }
 
