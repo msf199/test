@@ -21,9 +21,6 @@ import java.util.ArrayList;
  */
 public class GetUsers extends EndpointHandler {
 
-    private static final String GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ? ORDER BY `user_id` DESC LIMIT ?";
-    private static final String GET_USERS_EXCLUDE_TEMP = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ?  AND `email` NOT LIKE '%temporary.email' ORDER BY `user_id` DESC LIMIT ?";
-
 	private static final String USER_ID = "user_id";
 
 	private static final String USERNAME_KEY = "username";
@@ -43,6 +40,10 @@ public class GetUsers extends EndpointHandler {
 	@Override
     public void safeCall(final RequestObject context) throws IOException {
 
+
+        int offset=GenericAPIActions.getOffset(context.getQueryString()),
+        limit=GenericAPIActions.getLimit(context.getQueryString());
+
         boolean excludeTempUsers = false;
         String[] excludeTempUsersValue = context.getQueryString().get(EXCLUDE_TEMP_USERS);
         if(excludeTempUsersValue != null) {
@@ -50,13 +51,25 @@ public class GetUsers extends EndpointHandler {
                   excludeTempUsers = true;
           }
         }
+
+        String GET_USERS;
+        String GET_USERS_EXCLUDE_TEMP;
+
+        if(offset > 0){
+            GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` < ? ORDER BY `user_id` DESC LIMIT ?";
+            GET_USERS_EXCLUDE_TEMP = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` < ?  AND `email` NOT LIKE '%temporary.email' ORDER BY `user_id` DESC LIMIT ?";
+        }else{
+            GET_USERS = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ? ORDER BY `user_id` DESC LIMIT ?";
+            GET_USERS_EXCLUDE_TEMP = "SELECT `user_id`, `username`, `displayname`, `email`, `thumbnail`, `cover_photo`, `slogan`, `publisher` FROM `user` WHERE `user_id` > ?  AND `email` NOT LIKE '%temporary.email' ORDER BY `user_id` DESC LIMIT ?";
+        }
+
         try {
             StatementExecutor executor = new StatementExecutor(excludeTempUsers ? GET_USERS_EXCLUDE_TEMP : GET_USERS);
 
             executor.execute(ps -> {
 
-                ps.setInt(1, GenericAPIActions.getOffset(context.getQueryString()));
-                ps.setInt(2, GenericAPIActions.getLimit(context.getQueryString()));
+                ps.setInt(1, offset);
+                ps.setInt(2, limit);
                 final ResultSet results = ps.executeQuery();
                 ArrayList<UserObject> users = new ArrayList<>();
 
