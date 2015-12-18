@@ -65,7 +65,7 @@ public final class Config {
     public static boolean VIDEOS_IN_NEWSFEED = false;
 
     //Static ids and urls
-    public static int INTRO_CONTENT_ID = 14131;
+    public static int INTRO_CONTENT_ID = 14546;
 
     //Static order details
     public static int ORDER_ORIGIN_APPLE = 1;

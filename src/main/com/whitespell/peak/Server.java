@@ -37,7 +37,6 @@ public class Server {
         readConfigs();
         System.out.println("Starting API");
         startApi();
-        Config.setDev(true);
         System.out.println("Starting notification thread");
         startNotifications();
         System.out.println("Starting health check thread...");

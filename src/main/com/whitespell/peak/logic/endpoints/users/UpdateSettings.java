@@ -76,7 +76,7 @@ public class UpdateSettings extends EndpointHandler {
         final int user_id = Integer.parseInt(context.getUrlVariables().get(URL_USER_ID));
         final String email = temp;
         final String new_pass = temp1;
-        final int publisher = tempPub;
+        final int[] publisher = {tempPub};
         String passHash = "";
 
         /**
@@ -92,13 +92,21 @@ public class UpdateSettings extends EndpointHandler {
         /**
          * Do not allow users to become a publisher without emailing arielle first.
          */
-        if(publisher > 0 && !current_pass.equalsIgnoreCase(StaticRules.MASTER_PASS)){
+        if(publisher[0] > 0 && !current_pass.equalsIgnoreCase(StaticRules.MASTER_PASS)){
 
             MandrillMailer.sendDebugEmail("upfit@whitespell.com", "Upfit", "User wants to become a publisher!", "", "userId " + user_id + " at email " + email +
                     " wants to become an Upfit publisher! Please get in touch soon!", "becomepub", "debug-email", "arielle@whitespell.com");
 
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.BECOME_PUBLISHER_MESSAGE);
-            return;
+
+            /**
+             * Can't throw this error because the iOS app CRASHES instead of displaying the error message...
+             */
+            /**
+             * User will have no indication of the email, arielle will respond ASAP.
+             */
+            /*context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.BECOME_PUBLISHER_MESSAGE);
+             */
+            publisher[0] = 0;
         }
 
         /**
@@ -258,7 +266,7 @@ public class UpdateSettings extends EndpointHandler {
         try {
             StatementExecutor executor = new StatementExecutor(UPDATE_USER);
             final int finalUser_id = user_id;
-            final int finalPublisher = publisher;
+            final int finalPublisher = publisher[0];
             final String finalEmail = email;
             final String finalPassword = passHash;
 
@@ -270,7 +278,7 @@ public class UpdateSettings extends EndpointHandler {
                     int count = 1;
                     boolean resendEmailVerification = false;
 
-                    if(publisher > -1){
+                    if(publisher[0] > -1){
                         ps.setInt(count, finalPublisher);
                         count++;
                     }

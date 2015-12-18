@@ -252,6 +252,9 @@ public class PeakAPI extends WhitespellAPI {
 
         /** RESTORE ORDERS **/
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new RestorePurchases(), "/users/$/restore", "userId");
+
+        /** SMS **/
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SendSMS(), "/sms");
     }
 
 }

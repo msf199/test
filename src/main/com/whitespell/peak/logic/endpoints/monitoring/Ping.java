@@ -20,7 +20,6 @@ public class Ping extends EndpointHandler {
 
     @Override
     public void safeCall(final RequestObject context) throws IOException {
-
         Gson g = new Gson();
         PingObject p = new PingObject();
         String response = g.toJson(p);
