@@ -315,7 +315,6 @@ public class GetNewsfeed extends EndpointHandler {
         String response = f.toJson(newsfeedResponse);
         context.getResponse().setStatus(200);
         try {
-            Logging.log("info", response);
             context.getResponse().getWriter().write(response);
         } catch (Exception e) {
             Logging.log("High", e);
