@@ -295,7 +295,7 @@ public class ContentWrapper {
              */
 
             if (subscriber == 1
-                    ||  (currentObject.getDouble(CONTENT_PRICE) == 0.00 && tempContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE)
+                    ||  (currentObject.getDouble(CONTENT_PRICE) == 0.00)
                     || requesterUserId == tempPublisher.getUserId()
                     || requesterUserId == 134
                     || userAccess.contains(currentContentId)
