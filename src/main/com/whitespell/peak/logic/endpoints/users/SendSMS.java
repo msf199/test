@@ -3,21 +3,14 @@ package main.com.whitespell.peak.logic.endpoints.users;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.i18n.phonenumbers.Phonenumber;
-import com.twilio.sdk.TwilioRestClient;
-import com.twilio.sdk.TwilioRestException;
-import com.twilio.sdk.resource.factory.MessageFactory;
-import com.twilio.sdk.resource.instance.Account;
-import com.twilio.sdk.resource.instance.Message;
 import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.EndpointHandler;
 import main.com.whitespell.peak.logic.RequestObject;
-import main.com.whitespell.peak.logic.logging.Logging;
-import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
+
+
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -65,7 +58,7 @@ public class SendSMS extends EndpointHandler {
         }
 
 
-        TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, ACCOUNT_TOKEN);
+      /*  TwilioRestClient client = new TwilioRestClient(ACCOUNT_SID, ACCOUNT_TOKEN);
 
         Account account = client.getAccount();
 
@@ -78,7 +71,7 @@ public class SendSMS extends EndpointHandler {
             Message sms = messageFactory.create(params);
         } catch (TwilioRestException e) {
             Logging.log("Twilio error", e);
-        }
+        }*/
 
 
         Gson g = new Gson();
