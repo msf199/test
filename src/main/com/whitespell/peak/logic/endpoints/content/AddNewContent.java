@@ -135,6 +135,7 @@ public class AddNewContent extends EndpointHandler {
         /**
          * Ensure this content hasn't been uploaded already by this user to avoid duplicates (only check non-bundles)
          */
+        int[] duplicate = {0};
         if(content_type != (StaticRules.BUNDLE_CONTENT_TYPE)) {
             try {
                 StatementExecutor executor = new StatementExecutor(CHECK_DUPLICATE_CONTENT_QUERY);
@@ -145,8 +146,7 @@ public class AddNewContent extends EndpointHandler {
 
                     ResultSet results = ps.executeQuery();
                     if (results.next()) {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_EXISTS);
-                        return;
+                        duplicate[0] = 1;
                     }
                 });
             } catch (SQLException e) {
@@ -154,6 +154,14 @@ public class AddNewContent extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
+        }
+
+        /**
+         * Prevent upload of duplicate content
+         */
+        if(duplicate[0] == 1){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_EXISTS);
+            return;
         }
 
         /**

@@ -14,6 +14,7 @@ import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -28,6 +29,8 @@ public class ContentUploadedNotification implements NotificationImplementation {
 
     private ContentObject contentObject;
 
+    private HashSet deviceUUIDsSentTo;
+
 
     public ContentUploadedNotification(int owner_user_id, ContentObject contentObject) {
         this.owner_user_id = owner_user_id;
@@ -36,6 +39,7 @@ public class ContentUploadedNotification implements NotificationImplementation {
 
     @Override
     public void send() {
+        deviceUUIDsSentTo = new HashSet();
 
         /**
          * Send all of my followers a notification that I have uploaded a new video
@@ -78,29 +82,36 @@ public class ContentUploadedNotification implements NotificationImplementation {
                         String message = publisherUsername + " uploaded a video!";
 
 
-                        UserNotification n = new UserNotification(follower.getUserId(), message, "open-content:"+contentObject.getContentId(), me.getThumbnail());
+                        if(!deviceUUIDsSentTo.contains(followerDevice.getDeviceUUID())) {
+                            UserNotification n = new UserNotification(follower.getUserId(), message, "open-content:" + contentObject.getContentId(), me.getThumbnail());
 
-                        insertNotification(n);
+                            insertNotification(n);
 
-                        if(sendEmail && emailVerified) {
+                            if (sendEmail && emailVerified) {
+                                /**
+                                 * The content will be displayed on the peakapp post page, based on contentId
+                                 */
+                                String contentUrl = Config.PLATFORM_VIEW_CONTENT_URL + contentObject.getContentId();
+
+                                sent[0] = EmailSend.sendFollowerContentNotificationEmail(
+                                        me.getThumbnail(), follower.getEmail(),
+                                        publisherUsername, contentObject.getContentTitle(), contentUrl);
+                            }
+
                             /**
-                             * The content will be displayed on the peakapp post page, based on contentId
+                             * Handle device notifications
                              */
-                            String contentUrl = Config.PLATFORM_VIEW_CONTENT_URL + contentObject.getContentId();
-
-                            sent[0] = EmailSend.sendFollowerContentNotificationEmail(
-                                    me.getThumbnail(), follower.getEmail(),
-                                    publisherUsername, contentObject.getContentTitle(), contentUrl);
+                            if (followerDevice != null) {
+                                handleDeviceNotifications(followerDevice, n, message);
+                            } else {
+                                System.out.println("Couldn't find device information for user id: " + i);
+                            }
                         }
 
                         /**
-                         * Handle device notifications
+                         * Add each device to avoid sending the same notification to a device more than once
                          */
-                        if(followerDevice != null) {
-                            handleDeviceNotifications(followerDevice, n, message);
-                        } else {
-                            System.out.println("Couldn't find device information for user id: " + i);
-                        }
+                        deviceUUIDsSentTo.add(followerDevice.getDeviceUUID());
                     }
                 }
             }
