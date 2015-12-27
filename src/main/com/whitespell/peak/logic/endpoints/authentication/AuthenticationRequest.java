@@ -48,7 +48,7 @@ public class AuthenticationRequest extends EndpointHandler {
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
 
     private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`, `created`, `expires`, `last_activity`, `ip_address`) " +
-            "VALUES (?,?,?,?,?,?)";
+            "VALUES (?,?,?,?,?,?,?)";
 
     private static final String INSERT_DEVICE_DETAILS = "INSERT INTO `device`(`device_uuid`, `device_name`, `device_type`) " +
             "VALUES (?,?,?)";
