@@ -23,6 +23,8 @@ import main.com.whitespell.peak.StaticRules;
 import main.com.whitespell.peak.logic.*;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
+import main.com.whitespell.peak.logic.notifications.impl.SubscriptionNotification;
+import main.com.whitespell.peak.logic.notifications.impl.WelcomeNotification;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.UserObject;
@@ -728,6 +730,10 @@ public class CreateOrder extends EndpointHandler {
                         }
 
                         System.out.println("subscription successfully placed for userId " + buyerId);
+                        /**
+                         * Send a push notification to the user with the thank you notification
+                         */
+                        Server.NotificationService.offerNotification(new SubscriptionNotification(buyerId));
                     }
                 }else{
                     context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_SUBMIT_ORDER);
