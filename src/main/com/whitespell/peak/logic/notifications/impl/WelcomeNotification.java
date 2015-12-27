@@ -5,11 +5,13 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.UserHelper;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.endpoints.authentication.GetDeviceDetails;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.NotificationImplementation;
 import main.com.whitespell.peak.logic.notifications.UserNotification;
+import main.com.whitespell.peak.logic.slack.SendSlackMessage;
 import main.com.whitespell.peak.model.UserObject;
 
 /**
@@ -36,11 +38,9 @@ public class WelcomeNotification implements NotificationImplementation {
 
         try {
             HttpResponse<String> stringResponse;
-            stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + owner_user_id)
-                    .header("accept", "application/json")
-                    .header("X-Authentication", "-1," + StaticRules.MASTER_KEY + "")
-                    .asString();
-            UserObject me = g.fromJson(stringResponse.getBody(), UserObject.class);
+            UserHelper h = new UserHelper();
+
+            UserObject me = h.getUserById(owner_user_id, false, false, false, false);
 
             if (me != null) {
                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + me.getUserId() + "/device")
@@ -52,6 +52,8 @@ public class WelcomeNotification implements NotificationImplementation {
 
                 UserNotification n = new UserNotification(me.getUserId(), message, "open-content:" + Config.INTRO_CONTENT_ID, Config.PLATFORM_THUMBNAIL_URL);
                 insertNotification(n);
+
+                SendSlackMessage s = new SendSlackMessage("New user sign up! Username: "+me.getUserName()+", Email: "+me.getEmail());
 
                 /**
                  * Handle device notifications

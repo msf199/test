@@ -47,7 +47,7 @@ public class AuthenticationRequest extends EndpointHandler {
     private static final String RETRIEVE_USERNAME = "SELECT `username` FROM `user` WHERE `email` = ? LIMIT 1";
     private static final String RETRIEVE_PASSWORD = "SELECT `user_id`,`password` FROM `user` WHERE `username` = ? LIMIT 1";
 
-    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`, `created`, `expires`, `last_activity`) " +
+    private static final String INSERT_AUTHENTICATION = "INSERT INTO `authentication`(`user_id`, `key`, `device_uuid`, `created`, `expires`, `last_activity`, `ip_address`) " +
             "VALUES (?,?,?,?,?,?)";
 
     private static final String INSERT_DEVICE_DETAILS = "INSERT INTO `device`(`device_uuid`, `device_name`, `device_type`) " +
@@ -146,10 +146,18 @@ public class AuthenticationRequest extends EndpointHandler {
             return;
         }
 
+        String ip = null;
+        try {
+            ip = context.getRequest().getHeader("CF-Connecting-IP");
+        } catch(Exception e) {
+            Logging.log("High", "Failed to get IP address for user " + username);
+        }
+
         // retrieve the password based on the username
         try {
             StatementExecutor executor = new StatementExecutor(RETRIEVE_PASSWORD);
 
+            final String finalIp = ip;
             executor.execute(new ExecutionBlock() {
                 @Override
                 public void process(PreparedStatement ps) throws SQLException {
@@ -212,6 +220,8 @@ public class AuthenticationRequest extends EndpointHandler {
                                         ps2.setTimestamp(4, new Timestamp(Server.getMilliTime()));
                                         ps2.setTimestamp(5, new Timestamp(Server.getMilliTime() + (86400000 * 365 * 1)));
                                         ps2.setTimestamp(6, new Timestamp(Server.getMilliTime()));
+
+                                        ps2.setString(7, finalIp);
 
                                         ps2.executeUpdate();
                                     });
