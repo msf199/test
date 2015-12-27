@@ -5,8 +5,11 @@ import javapns.notification.PushNotificationPayload;
 import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.notifications.UserNotification;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.log4j.BasicConfigurator;
 import org.json.JSONException;
+
+import java.util.HashMap;
 
 /**
  * @author Pim de Witte(wwadewitte), Whitespell LLC
@@ -16,6 +19,25 @@ import org.json.JSONException;
 public class TestAPNS {
 
    static String uuid = "b7d2d81c233e12e3f2d0f85d35e6de0ef015bc4182c2db3451a0f7852890c3f1";
+
+
+    boolean incorrectPasscodeAttempts(String passcode, String[] attempts) {
+        int incorrectAttempts = 0;
+
+        for(String s : attempts) {
+            if(s.equals(passcode)) {
+                return false;
+            } else {
+                incorrectAttempts += 1;
+            }
+        }
+        return incorrectAttempts > 10;
+    }
+
+
+    int i = Short.MAX_VALUE;
+
+
 
 
 
