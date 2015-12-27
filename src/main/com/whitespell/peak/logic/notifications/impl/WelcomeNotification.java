@@ -43,6 +43,15 @@ public class WelcomeNotification implements NotificationImplementation {
             UserObject me = h.getUserById(owner_user_id, false, false, false, false);
 
             if (me != null) {
+
+                try {
+                    SendSlackMessage s = new SendSlackMessage("New user sign up! Username: "+me.getUserName()+", Email: "+me.getEmail());
+                    s.sendNotification();
+                } catch(Exception e) {
+                    e.printStackTrace();
+                }
+
+                
                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + me.getUserId() + "/device")
                         .header("accept", "application/json")
                         .asString();
@@ -53,7 +62,7 @@ public class WelcomeNotification implements NotificationImplementation {
                 UserNotification n = new UserNotification(me.getUserId(), message, "open-content:" + Config.INTRO_CONTENT_ID, Config.PLATFORM_THUMBNAIL_URL);
                 insertNotification(n);
 
-                SendSlackMessage s = new SendSlackMessage("New user sign up! Username: "+me.getUserName()+", Email: "+me.getEmail());
+
 
                 /**
                  * Handle device notifications
@@ -68,5 +77,7 @@ public class WelcomeNotification implements NotificationImplementation {
             Logging.log("High", e);
             //do not return error on client side
         }
+
+
     }
 }
