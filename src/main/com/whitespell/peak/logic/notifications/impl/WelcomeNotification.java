@@ -51,7 +51,7 @@ public class WelcomeNotification implements NotificationImplementation {
                     e.printStackTrace();
                 }
 
-                
+
                 stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/" + me.getUserId() + "/device")
                         .header("accept", "application/json")
                         .asString();

@@ -7,6 +7,8 @@ package main.com.whitespell.peak.logic.slack;
  */
 
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import main.com.whitespell.peak.logic.logging.Logging;
 
 
 /**
@@ -24,9 +26,15 @@ public class SendSlackMessage {
         this.message = message;
     }
     public void sendNotification() {
-       Unirest.post(WEBHOOK_URL)
-                .body("{\n" +
-                        "\"text\": \"" + message + "\"\n" +
-                        "\n}");
+        try {
+            String response = Unirest.post(WEBHOOK_URL)
+                     .body("{\n" +
+                             "\"text\": \"" + message + "\"\n" +
+                             "\n}").asString().getBody();
+            Logging.log("Info", "Sent slack notification, "+response+"");
+        } catch (UnirestException e) {
+           Logging.log("High", e);
+        }
+
     }
 }
