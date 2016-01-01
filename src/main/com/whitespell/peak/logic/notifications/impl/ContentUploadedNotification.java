@@ -40,9 +40,6 @@ public class ContentUploadedNotification implements NotificationImplementation {
     @Override
     public void send() {
 
-        if(true) {
-            return;
-        }
         deviceUUIDsSentTo = new HashSet();
 
         /**
