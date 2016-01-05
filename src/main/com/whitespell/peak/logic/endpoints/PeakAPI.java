@@ -20,7 +20,9 @@ import main.com.whitespell.peak.logic.endpoints.statistics.GetUserSignups;
 import main.com.whitespell.peak.logic.endpoints.users.*;
 import main.com.whitespell.peak.logic.endpoints.users.publishers.GetUsersByCategory;
 import main.com.whitespell.peak.logic.endpoints.videoprocessing.*;
+import main.com.whitespell.peak.logic.notifications.AndroidMassNotification;
 import main.com.whitespell.peak.logic.notifications.GetUserNotifications;
+import main.com.whitespell.peak.logic.notifications.iOSMassNotification;
 
 /**
  * @author Pim de Witte(wwadewitte) & Cory McAn(cmcan), Whitespell LLC
@@ -150,6 +152,12 @@ public class PeakAPI extends WhitespellAPI {
 
         //Get an order for a user to ensure an ordered content was delivered
         dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new GetOrders(), "/users/$/order", "userId");
+
+        //Send a premade message to all current users on Android
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new AndroidMassNotification(), "/users/notifications/android");
+
+        //Send a premade message to all current users on iOS
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new iOSMassNotification(), "/users/notifications/apple");
 
         /**
          * STATISTICS
