@@ -107,7 +107,6 @@ public interface NotificationImplementation {
                 payload.addAlert(message);
                 payload.addCustomDictionary("action", notification.getNotificationAction());
 
-
                 try {
                     Push.payload(payload, Config.APNS_CERTIFICATE_LOCATION,
                             Config.APNS_PASSWORD_KEY, true, deviceInfo.getDeviceUUID());

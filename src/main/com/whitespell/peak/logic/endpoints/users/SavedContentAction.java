@@ -97,6 +97,8 @@ public class SavedContentAction extends EndpointHandler {
                 return;
             }
 
+            int[] duplicate = {0};
+
             /**
              * Check that the content is not already in the user's workouts with that contentId
              */
@@ -110,14 +112,21 @@ public class SavedContentAction extends EndpointHandler {
 
                     while (results.next()) {
                         if (results.getInt("content_id") == content_id[0]) {
-                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_BUNDLE);
-                            return;
+                            duplicate[0] = 1;
                         }
                     }
                 });
             } catch (SQLException e) {
                 Logging.log("High", e);
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                return;
+            }
+
+            /**
+             * Return if attempting to add duplicate saved content
+             */
+            if(duplicate[0] == 1){
+                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_ALREADY_IN_BUNDLE);
                 return;
             }
 

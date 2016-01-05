@@ -67,6 +67,10 @@ public final class Config {
     //Static ids and urls
     public static int INTRO_CONTENT_ID = 14546;
 
+    //Static device details
+    public static int IOS_DEVICE_TYPE_ID = 0;
+    public static int ANDROID_DEVICE_TYPE_ID = 1;
+
     //Static order details
     public static int ORDER_ORIGIN_APPLE = 1;
     public static int ORDER_ORIGIN_GOOGLE = 2;
