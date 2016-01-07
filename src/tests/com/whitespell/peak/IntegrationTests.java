@@ -28,6 +28,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Collections;
@@ -1040,7 +1041,7 @@ public class IntegrationTests extends Server {
     @Test
     public void test0019_GetUsers() throws UnirestException {
 
-        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/?offset=1&limit=50")
+        stringResponse = Unirest.get("http://localhost:" + Config.API_PORT + "/users/")
                 .header("accept", "application/json")
                 .header("X-Authentication", "" + TEST_UID + "," + TEST_KEY + "")
                 .asString();
@@ -1268,7 +1269,7 @@ public class IntegrationTests extends Server {
     }
 
 
-    @Test
+    @Ignore
     public void test0025_TestMandrillEmailsAndTokens() throws UnirestException {
 
         EmailSend.tokenResponseObject et = EmailSend.updateDBandSendWelcomeEmail(ROLLERSKATER_USERNAME, ADMIN_EMAIL);
