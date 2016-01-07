@@ -11,6 +11,7 @@ import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
 import main.com.whitespell.peak.model.NewsfeedObject;
+import main.com.whitespell.peak.model.UserObject;
 
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -31,8 +32,6 @@ public class GetNewsfeed extends EndpointHandler {
     private static final String NEWSFEED_CEIL_KEY = "ceil";
     private static final String NEWSFEED_CATEGORY_KEY = "categoryId";
 
-    private static final String FIND_USER_FOLLOWING_QUERY = "SELECT `following_id` FROM `user_following` WHERE `user_id` = ?";
-
     //content keys
     private static final String CONTENT_ID_KEY = "content_id";
 
@@ -51,8 +50,8 @@ public class GetNewsfeed extends EndpointHandler {
         int limit = GenericAPIActions.getLimit(context.getQueryString());
         int offset = GenericAPIActions.getOffset(context.getQueryString());
         int ceil = GenericAPIActions.getCeil(context.getQueryString());
-        ArrayList<Integer> followerIds = new ArrayList<>();
-        ArrayList<Integer> categoryIds = new ArrayList<>();
+        //ArrayList<Integer> followerIds = new ArrayList<>();
+        ArrayList<Integer> categoryIds;
         ArrayList<NewsfeedObject> newsfeedResponse = new ArrayList<>();
         int categoryId = -1;
         boolean categorySelector = false;
@@ -74,230 +73,220 @@ public class GetNewsfeed extends EndpointHandler {
         }
 
         ContentWrapper contentWrapper = new ContentWrapper(context, user_id);
+        UserHelper userHelper = new UserHelper();
 
         /**
-         * Get the userIds current user is following.
+         * Only get followed categories for this user.
          */
-        try {
-            StatementExecutor executor = new StatementExecutor(FIND_USER_FOLLOWING_QUERY);
-            executor.execute(ps -> {
-                ps.setInt(1, user_id);
+        UserObject u = userHelper.getUserById(a.getUserId(), false, false, true, false);
+        //followerIds = u.getUserFollowers();
+        categoryIds = u.getCategoryFollowing();
 
-                ResultSet results = ps.executeQuery();
-                while (results.next()) {
-                    followerIds.add(results.getInt("following_id"));
+        /**
+         * Construct the SELECT FROM CONTENT query based on the the desired query output.
+         */
+        StringBuilder selectString = new StringBuilder();
+        selectString.append("SELECT DISTINCT * FROM `content` as ct " +
+                "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
+
+        int count = 1;
+
+        /**
+         * We only want to show videos that have been processed
+         */
+        String processedString = "AND `processed` = 1";
+
+        /**
+         * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves.
+         * Now handled when content is filled.
+         */
+        String parentString = " ";
+                //" AND `parent` IS NULL";
+
+        /**
+         * We only want to show newsfeed results from the category specified (if applicable)
+         */
+        String categoryString = " ";
+
+        /**
+         * If not category specified, get content from all categories the user is following
+         */
+        if(categorySelector){
+            categoryString = "AND ct.`category_id` = " + categoryId + " ";
+        }else {
+            categoryString += "AND (";
+            for (Integer s : categoryIds) {
+                categoryString += "ct.`category_id` = " + s + " ";
+                if (count < categoryIds.size()) {
+                    categoryString += "OR ";
+                    count++;
+                } else {
+                    categoryString += ") ";
                 }
-            });
-        } catch (SQLException e) {
-            Logging.log("High", e);
-            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-            return;
+            }
+        }
+
+        String ceilString = "";
+        if (ceil > 0) {
+            ceilString = "AND ct.`content_id` < " + ceil;
         }
 
         /**
-         * Ensure user is following another user
+         * If offset is set, use it. Otherwise check for content_id > 0. Include content the user has posted.
          */
-        if(followerIds != null && followerIds.size() > 0) {
-            /**
-             * Construct the SELECT FROM CONTENT query based on the the desired query output.
-             */
-            StringBuilder selectString = new StringBuilder();
-            selectString.append("SELECT DISTINCT * FROM `content` as ct " +
-                    "INNER JOIN `user` as ut ON ct.`user_id` = ut.`user_id` WHERE ");
+        if(offset > 0){
+            selectString.append("ct.`content_id` < " + offset + " " + ceilString + " " + processedString + " " + parentString + " " + categoryString +
+                    " " + " OR ut.`user_id` = " + user_id + " ");
+        } else {
+            selectString.append("ct.`content_id` > 0 " + ceilString + " " + processedString + " " + parentString + " " + categoryString +
+                    " " + " OR ut.`user_id` = " + user_id + " ");
+        }
 
-            /**
-             * Add newsfeed requesting user to followerIds to get your published content on your newsfeed
-             */
-            followerIds.add(user_id);
+        selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
 
-            int count = 1;
+        final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
 
-            /**
-             * We only want to show videos that have been processed
-             */
-            String processedString = "AND `processed` = 1";
+        /**
+         * Get content based on users you are following and construct newsfeed
+         */
+        try {
+            ArrayList<Integer> bundleContentIds = new ArrayList<>();
+            int[] newsfeedId = {0};
+            ContentObject[] popularBundle = {null};
+            int[] mostDailyLikes = {0};
+            StatementExecutor executor = new StatementExecutor(GET_FOLLOWERS_CONTENT_QUERY);
+            executor.execute(ps -> {
+                ContentObject newsfeedContent;
 
-            /**
-             * We only want to show videos that do not have any parents (are part of a bundle). We will show those by themselves.
-             * Now handled when content is filled.
-             */
-            String parentString = " ";
-                    //" AND `parent` IS NULL";
+                ResultSet results = ps.executeQuery();
+                while (results.next()) {
 
-            /**
-             * We only want to show newsfeed results from the category specified (if applicable)
-             */
-            String categoryString = " AND ct.`category_id` = " + categoryId + " ";
+                    int currentContentId = results.getInt(CONTENT_ID_KEY);
 
-            for (Integer s : followerIds) {
-                String ceilString = "";
-                if (ceil > 0) {
-                    ceilString = "AND ct.`content_id` < " + ceil;
-                }
+                    /**
+                     * Do not add intro video to newsfeed
+                     */
+                    if (currentContentId == Config.INTRO_CONTENT_ID) {
+                        continue;
+                    }
 
-                /**
-                 * If offset is set, use it. Otherwise check for content_id > 0
-                 */
-                if(offset > 0){
-                    selectString.append("ct.`content_id` < " + offset + " " + ceilString + " " + processedString + " " + parentString + " AND ut.`user_id` = " + s + " ");
-                }else{
-                    selectString.append("ct.`content_id` > 0 " + ceilString + " " + processedString + " " + parentString + " AND ut.`user_id` = " + s + " ");
-                }
+                    newsfeedContent = contentWrapper.wrapContent(results);
 
-                if(categorySelector){
-                    selectString.append(categoryString);
-                }
-                if (count < followerIds.size()) {
-                    selectString.append(" OR ");
-                    count++;
-                }
-            }
-            selectString.append("ORDER BY ct.`content_id` DESC LIMIT " + limit);
+                    newsfeedId[0] = newsfeedContent.getContentId();
 
-            final String GET_FOLLOWERS_CONTENT_QUERY = selectString.toString();
-
-            /**
-             * Get content based on users you are following and construct newsfeed
-             */
-            try {
-                ArrayList<Integer> bundleContentIds = new ArrayList<>();
-                int[] newsfeedId = {0};
-                ContentObject[] popularBundle = {null};
-                int[] mostDailyLikes = {0};
-                StatementExecutor executor = new StatementExecutor(GET_FOLLOWERS_CONTENT_QUERY);
-                executor.execute(ps -> {
-                    ContentObject newsfeedContent;
-
-                    ResultSet results = ps.executeQuery();
-                    while (results.next()) {
-
-                        int currentContentId = results.getInt(CONTENT_ID_KEY);
-
+                    /**
+                     * If current contentObject has a parent, check the id's of its contents. If any of the id's are greater than
+                     * the bundle's contentId, move newsfeedContent up in the list.
+                     */
+                    int[] largestContentId = {0};
+                    /**
+                     * Only applies to children of a bundle
+                     */
+                    if (newsfeedContent.getParent() > 0) {
                         /**
-                         * Do not add intro video to newsfeed
+                         * We already checked this bundle
                          */
-                        if (currentContentId == Config.INTRO_CONTENT_ID) {
+                        if (bundleContentIds.contains(newsfeedContent.getParent())) {
                             continue;
                         }
 
-                        newsfeedContent = contentWrapper.wrapContent(results);
+                        ContentHelper g = new ContentHelper();
+                        /**
+                         * Get the parent of the current contentObject
+                         */
 
-                        newsfeedId[0] = newsfeedContent.getContentId();
+                        ContentObject parent = g.getContentById(context, newsfeedContent.getParent(), a.getUserId());
 
                         /**
-                         * If current contentObject has a parent, check the id's of its contents. If any of the id's are greater than
-                         * the bundle's contentId, move newsfeedContent up in the list.
+                         * Return the parent bundle on the newsfeed since it has been updated since it was
+                         * uploaded.
                          */
-                        int[] largestContentId = {0};
+                        newsfeedContent = parent;
+
                         /**
-                         * Only applies to children of a bundle
+                         * For each child, if the child is newer than the bundle,
+                         * save the largest child and use that contentId to represent the bundle,
+                         * therefore moving it up in the newsfeed list (and maintaining offset order).
                          */
-                        if (newsfeedContent.getParent() > 0) {
-                            /**
-                             * We already checked this bundle
-                             */
-                            if (bundleContentIds.contains(newsfeedContent.getParent())) {
-                                continue;
-                            }
+                        int[] currentBundleDailyLikes = {0};
+                        for (ContentObject i : parent.getChildren()) {
+                            if (i.getContentId() > parent.getContentId()) {
 
-                            ContentHelper g = new ContentHelper();
-                            /**
-                             * Get the parent of the current contentObject
-                             */
+                                /**
+                                 * Aggregate the daily likes for the bundle content,
+                                 * save the most popular bundle based on daily likes
+                                 */
+                                currentBundleDailyLikes[0] += i.getTodaysLikes();
 
-                            ContentObject parent = g.getContentById(context, newsfeedContent.getParent(), a.getUserId());
-
-                            /**
-                             * Return the parent bundle on the newsfeed since it has been updated since it was
-                             * uploaded.
-                             */
-                            newsfeedContent = parent;
-
-                            /**
-                             * For each child, if the child is newer than the bundle,
-                             * save the largest child and use that contentId to represent the bundle,
-                             * therefore moving it up in the newsfeed list (and maintaining offset order).
-                             */
-                            int[] currentBundleDailyLikes = {0};
-                            for (ContentObject i : parent.getChildren()) {
-                                if (i.getContentId() > parent.getContentId()) {
-
-                                    /**
-                                     * Aggregate the daily likes for the bundle content,
-                                     * save the most popular bundle based on daily likes
-                                     */
-                                    currentBundleDailyLikes[0] += i.getTodaysLikes();
-
-                                    /**
-                                     * Save bundle with largest daily likes as popular bundle
-                                     */
-                                    if (currentBundleDailyLikes[0] > mostDailyLikes[0]) {
-                                        mostDailyLikes[0] = currentBundleDailyLikes[0];
-                                        popularBundle[0] = parent;
-                                        popularBundle[0].setTodaysLikes(mostDailyLikes[0]);
-                                    }
-
-                                    /**
-                                     * Save the largest contentId in the bundle for updating the newsfeedId.
-                                     */
-                                    if (largestContentId[0] < i.getContentId()) {
-                                        largestContentId[0] = i.getContentId();
-                                    }
-
-                                    /**
-                                     * Set the newsfeedId to the largest child's contentId to maintain newsfeed order
-                                     */
-                                    newsfeedId[0] = largestContentId[0];
+                                /**
+                                 * Save bundle with largest daily likes as popular bundle
+                                 */
+                                if (currentBundleDailyLikes[0] > mostDailyLikes[0]) {
+                                    mostDailyLikes[0] = currentBundleDailyLikes[0];
+                                    popularBundle[0] = parent;
+                                    popularBundle[0].setTodaysLikes(mostDailyLikes[0]);
                                 }
-                            }
-                        }
 
-                        /**
-                         * Only show content that is standalone or a bundle. Show each content only once.
-                         */
-                        if (newsfeedContent.getParent() > 0 || bundleContentIds.contains(newsfeedContent.getContentId())) {
-                            continue;
-                        }
+                                /**
+                                 * Save the largest contentId in the bundle for updating the newsfeedId.
+                                 */
+                                if (largestContentId[0] < i.getContentId()) {
+                                    largestContentId[0] = i.getContentId();
+                                }
 
-                        /**
-                         * Add the bundle to the bundle list to prevent duplicates.
-                         */
-                        if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
-                            bundleContentIds.add(newsfeedContent.getContentId());
-                        }
-
-                        if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE && newsfeedContent.getChildren().isEmpty()) {
-                            // send notification to add videos to bundle todo(cmcan) to publisher
-
-                        } else {
-                            /**
-                             * Allow videos/bundles in newsfeed based on video toggle.
-                             */
-                            /**
-                             * If bundle type, add. OR if videos allowed in newsfeed AND NOT bundle type add.
-                             */
-                            if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE ||
-                                    (Config.VIDEOS_IN_NEWSFEED && newsfeedContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE)) {
-                                newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
-                            } else {
-                                continue;
+                                /**
+                                 * Set the newsfeedId to the largest child's contentId to maintain newsfeed order
+                                 */
+                                newsfeedId[0] = largestContentId[0];
                             }
                         }
                     }
 
                     /**
-                     * If this is the last content in the newsfeed, add the popular bundle
+                     * Only show content that is standalone or a bundle. Show each content only once.
                      */
-                    if (popularBundle[0] != null) {
-                        newsfeedResponse.add(new NewsfeedObject(1, popularBundle[0]));
+                    if (newsfeedContent.getParent() > 0 || bundleContentIds.contains(newsfeedContent.getContentId())) {
+                        continue;
                     }
 
-                });
-            } catch (SQLException e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                return;
-            }
+                    /**
+                     * Add the bundle to the bundle list to prevent duplicates.
+                     */
+                    if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE) {
+                        bundleContentIds.add(newsfeedContent.getContentId());
+                    }
+
+                    if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE && newsfeedContent.getChildren().isEmpty()) {
+                        // send notification to add videos to bundle todo(cmcan) to publisher
+
+                    } else {
+                        /**
+                         * Allow videos/bundles in newsfeed based on video toggle.
+                         */
+                        /**
+                         * If bundle type, add. OR if videos allowed in newsfeed AND NOT bundle type add.
+                         */
+                        if (newsfeedContent.getContentType() == StaticRules.BUNDLE_CONTENT_TYPE ||
+                                (Config.VIDEOS_IN_NEWSFEED && newsfeedContent.getContentType() != StaticRules.BUNDLE_CONTENT_TYPE)) {
+                            newsfeedResponse.add(new NewsfeedObject(newsfeedId[0], newsfeedContent));
+                        } else {
+                            continue;
+                        }
+                    }
+                }
+
+                /**
+                 * If this is the last content in the newsfeed, add the popular bundle
+                 */
+                if (popularBundle[0] != null) {
+                    newsfeedResponse.add(new NewsfeedObject(1, popularBundle[0]));
+                }
+
+            });
+        } catch (SQLException e) {
+            Logging.log("High", e);
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
         }
 
         /**
