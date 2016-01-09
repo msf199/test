@@ -52,6 +52,8 @@ public class SendForgotPasswordEmail extends EndpointHandler {
         /**
          * Handle username is the user's email
          */
+
+        int[] accountFound = {0};
         if(payloadUsername.contains("@") && payloadUsername.contains(".")){
             try {
                 StatementExecutor executor = new StatementExecutor(RETRIEVE_USERNAME);
@@ -62,10 +64,7 @@ public class SendForgotPasswordEmail extends EndpointHandler {
                     if (s.next()) {
                         temp.add(s.getString(PAYLOAD_USERNAME_KEY));
                         temp1.add(s.getString("email"));
-                    }
-                    else{
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                        return;
+                        accountFound[0] = 1;
                     }
                 });
             } catch (SQLException e) {
@@ -94,10 +93,7 @@ public class SendForgotPasswordEmail extends EndpointHandler {
                     final ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         temp1.add(s.getString("email"));
-                    }
-                    else{
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                        return;
+                        accountFound[0] = 1;
                     }
                 });
             } catch (SQLException e) {
@@ -108,6 +104,12 @@ public class SendForgotPasswordEmail extends EndpointHandler {
             email = temp1.get(0);
         }
 
+        if(accountFound[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+            return;
+        }
+
+        accountFound[0] = 0;
         /**
          * Send Forgot Password? email and update DB with reset_token.
          */
@@ -120,13 +122,17 @@ public class SendForgotPasswordEmail extends EndpointHandler {
                 ResultSet s = ps.executeQuery();
                 if(s.next()){
                     updateDBandSendResetEmail(username, email);
-                }else{
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
+                    accountFound[0] = 1;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(accountFound[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
             return;
         }
 

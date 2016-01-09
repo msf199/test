@@ -46,6 +46,7 @@ public class AddReportingType extends EndpointHandler {
             return;
         }
 
+        int[] success = {-1};
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_REPORTING_TYPE_QUERY);
             executor.execute(ps -> {
@@ -54,8 +55,9 @@ public class AddReportingType extends EndpointHandler {
                 int rows = ps.executeUpdate();
 
                 if(rows <= 0){
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_ADD_REPORTING_TYPE);
-                    return;
+                    success[0] = 0;
+                }else{
+                    success[0] = 1;
                 }
 
             });
@@ -65,6 +67,11 @@ public class AddReportingType extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.DUPLICATE_REPORTING_TYPE);
                 return;
             }
+        }
+
+        if(success[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_ADD_REPORTING_TYPE);
+            return;
         }
 
         context.getResponse().setStatus(HttpStatus.OK_200);

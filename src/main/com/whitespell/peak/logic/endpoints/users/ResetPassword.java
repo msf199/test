@@ -66,6 +66,7 @@ public class ResetPassword extends EndpointHandler {
          * Ensure the reset token matches the one stored in the database.
          */
 
+        int[] resetTokenSuccess = {0};
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_RESET_TOKEN);
             final String finalUsername = username;
@@ -76,18 +77,21 @@ public class ResetPassword extends EndpointHandler {
                 if(s.next()){
                     if(s.getString("reset_token") != null) {
                         if (!resetToken.equals(s.getString("reset_token"))) {
-                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
-                            return;
+                            //resetToken fail
+                        }else{
+                            resetTokenSuccess[0] = 1;
                         }
-                    }else{
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
-                        return;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(resetTokenSuccess[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
             return;
         }
 
@@ -103,7 +107,7 @@ public class ResetPassword extends EndpointHandler {
             return;
         }
 
-
+        int[] resetSuccess = {0};
         try {
             StatementExecutor executor = new StatementExecutor(UPDATE_PASSWORD);
 
@@ -114,14 +118,20 @@ public class ResetPassword extends EndpointHandler {
                     ps.setString(2, username);
                     int rows = ps.executeUpdate();
                     if (rows <= 0) {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.RESET_FAILED);
-                        return;
+                        //resetFail
+                    }else{
+                        resetSuccess[0] = 1;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(resetSuccess[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.RESET_FAILED);
             return;
         }
 
@@ -152,7 +162,6 @@ public class ResetPassword extends EndpointHandler {
                                 String[] split = email.split("@");
                                 newString = split[0].substring(0,1) + "******" +
                                         split[0].substring(split[0].length() - 1) + "@" + split[1];
-                                System.out.println("safeEmail: " +newString);
                             }
 
                             rs.setEmail(newString);

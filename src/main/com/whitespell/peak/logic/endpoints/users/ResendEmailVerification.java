@@ -43,6 +43,7 @@ public class ResendEmailVerification extends EndpointHandler {
          * Get the username for the welcome email
          */
 
+        int[] accountFound = {0};
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_USERNAME_QUERY);
             final String finalEmail = email;
@@ -53,15 +54,17 @@ public class ResendEmailVerification extends EndpointHandler {
                 if(s.next()){
                     username[0] = s.getString("username");
                     userId[0] = s.getInt("user_id");
-                }
-                else{
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
-                    return;
+                    accountFound[0] = 1;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(accountFound[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ACCOUNT_NOT_FOUND);
             return;
         }
 
