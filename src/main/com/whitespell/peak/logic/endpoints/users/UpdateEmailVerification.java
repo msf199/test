@@ -53,6 +53,10 @@ public class UpdateEmailVerification extends EndpointHandler {
          * Ensure the email token matches the one stored in the database.
          */
 
+        int[] emailAlreadyVerified = {0};
+        int[] emailVerificationNotSent = {0};
+        int[] emailTokenExpired = {0};
+        int[] emailTokenInvalid = {0};
         try {
             StatementExecutor executor = new StatementExecutor(CHECK_EMAIL_TOKEN);
             final String finalUsername = username;
@@ -63,32 +67,48 @@ public class UpdateEmailVerification extends EndpointHandler {
                 if(s.next()){
                     Timestamp now = new Timestamp(Server.getMilliTime());
                     if(s.getInt("email_verified") == 1){
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_ALREADY_VERIFIED);
-                        return;
+                        emailAlreadyVerified[0] = 1;
                     }
                     if(s.getString("email_token") == null || s.getTimestamp("email_expiration") == null){
-                        /**
-                         * Need to resend verification email.
-                         */
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_VERIFICATION_NOT_SENT);
-                        return;
+                        emailVerificationNotSent[0] = 1;
                     }
                     if(s.getTimestamp("email_expiration").before(now)){
-                        /**
-                         * Need to resend verification email.
-                         */
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_EXPIRED);
-                        return;
+                        emailTokenExpired[0] = 1;
                     }
                     if(!s.getString("email_token").equals(emailToken)){
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
-                        return;
+                        emailTokenInvalid[0] = 1;
                     }
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(emailAlreadyVerified[0] == 1){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_ALREADY_VERIFIED);
+            return;
+        }
+
+        if(emailVerificationNotSent[0] == 1){
+            /**
+             * Need to resend verification email.
+             */
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_VERIFICATION_NOT_SENT);
+            return;
+        }
+
+        if(emailTokenExpired[0] == 1){
+            /**
+             * Need to resend verification email.
+             */
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_EXPIRED);
+            return;
+        }
+
+        if(emailTokenInvalid[0] == 1){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TOKEN_INVALID);
             return;
         }
 

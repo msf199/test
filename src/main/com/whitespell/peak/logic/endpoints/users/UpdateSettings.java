@@ -112,6 +112,7 @@ public class UpdateSettings extends EndpointHandler {
         /**
          * 401 Unauthorized: Check if email exists already
          */
+        int[] emailTaken = {0};
         if (updateKeys.contains(PAYLOAD_EMAIL_KEY)) {
             try {
                 StatementExecutor executor = new StatementExecutor(CHECK_EMAIL_TAKEN_QUERY);
@@ -126,7 +127,7 @@ public class UpdateSettings extends EndpointHandler {
                         ResultSet s = ps.executeQuery();
                         if (s.next()) {
                             if (s.getString(PAYLOAD_EMAIL_KEY).equalsIgnoreCase(finalEmail)) {
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TAKEN);
+                                emailTaken[0] = 1;
                             }
                             returnCall[0] = true;
                             return;
@@ -145,6 +146,11 @@ public class UpdateSettings extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
+        }
+
+        if(emailTaken[0] == 1){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.EMAIL_TAKEN);
+            return;
         }
 
         /**

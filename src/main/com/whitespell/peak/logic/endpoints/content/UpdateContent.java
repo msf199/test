@@ -427,6 +427,7 @@ public class UpdateContent extends EndpointHandler {
         /**
          * Ensure user attempting to update content is the uploader
          */
+        int[] authorized = {-1};
         int[] publisherUserId = {-1};
         String[] publisherEmail = {null};
         String[] publisherName = {null};
@@ -442,15 +443,21 @@ public class UpdateContent extends EndpointHandler {
                     publisherUserId[0] = results.getInt("user_id");
 
                     if(!a.isMaster() && publisherUserId[0] != a.getUserId() && a.getUserId() != 134){
-                        System.out.println(a.getUserId());
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
-                        return;
+                        authorized[0] = 0;
+                    }else{
+                        authorized[0] = 1;
                     }
                 }
                 });
         }catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
+            return;
+        }
+
+        if(authorized[0] == 0){
+            System.out.println(a.getUserId());
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_AUTHORIZED);
             return;
         }
 

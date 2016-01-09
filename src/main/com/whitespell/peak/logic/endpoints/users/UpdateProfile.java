@@ -92,6 +92,7 @@ public class UpdateProfile extends EndpointHandler {
         /**
          * 401 Unauthorized: Check if username exists
          */
+        int[] usernameTaken = {0};
         if (updateKeys.contains(PAYLOAD_USERNAME_KEY)) {
             /**
              * Check that username meets requirements
@@ -117,7 +118,7 @@ public class UpdateProfile extends EndpointHandler {
                         ResultSet s = ps.executeQuery();
                         if (s.next()) {
                             if (s.getString(PAYLOAD_USERNAME_KEY).equalsIgnoreCase(finalUsername)) {
-                                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TAKEN);
+                                usernameTaken[0] = 1;
                             }
                             returnCall[0] = true;
                             return;
@@ -136,6 +137,11 @@ public class UpdateProfile extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
+        }
+
+        if(usernameTaken[0] == 1){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_TAKEN);
+            return;
         }
 
 
