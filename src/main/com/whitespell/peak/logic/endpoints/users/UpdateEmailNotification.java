@@ -80,6 +80,7 @@ public class UpdateEmailNotification extends EndpointHandler {
          * Ensure user has verified their email and return the response.
          */
 
+        int[] emailNotificationUpdateSuccess = {0};
         try {
             StatementExecutor executor = new StatementExecutor(ENSURE_NOTIFICATION_QUERY);
             final int finalUserId = userId;
@@ -90,6 +91,12 @@ public class UpdateEmailNotification extends EndpointHandler {
                     ResultSet s = ps.executeQuery();
                     if (s.next()) {
                         if(emailNotification != s.getInt("email_notifications")){
+                            //emailNotificationUpdate failed
+                        }else{
+                            emailNotificationUpdateSuccess[0] = 1;
+                        }
+
+                        if(emailNotificationUpdateSuccess[0] == 0){
                             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOTIFICATION_UPDATE_FAILED);
                             return;
                         }

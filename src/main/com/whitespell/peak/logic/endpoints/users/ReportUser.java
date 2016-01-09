@@ -59,6 +59,7 @@ public class ReportUser extends EndpointHandler {
         /**
          * Update DB with report from user about another user
          */
+        int[] insertReportSuccess = {0};
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_REPORT);
 
@@ -74,13 +75,19 @@ public class ReportUser extends EndpointHandler {
                  * reporting details updated in table
                  */
                 if (rows <= 0) {
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_REPORT_USER);
-                    return;
+                    //unsuccessful reporting update
+                }else{
+                    insertReportSuccess[0] = 1;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(insertReportSuccess[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_REPORT_USER);
             return;
         }
 

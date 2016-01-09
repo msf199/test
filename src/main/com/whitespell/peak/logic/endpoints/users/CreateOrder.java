@@ -252,6 +252,7 @@ public class CreateOrder extends EndpointHandler {
          * Apple endpoint call to verify receipt data
          */
 
+        int[] success = {0};
         if(orderOriginId == Config.ORDER_ORIGIN_APPLE) {
             try {
                     HttpResponse<String> stringResponse = Unirest.post("https://buy.itunes.apple.com/verifyReceipt")
@@ -291,6 +292,8 @@ public class CreateOrder extends EndpointHandler {
                     if(latestPurchase == null) {
                         context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.SUBSCRIPTION_FAILED);
                         return;
+                    }else{
+                        success[0] = 1;
                     }
                     orderUUID[0] = latestPurchase.get("transaction_id").getAsString();
                 } else {
@@ -392,6 +395,7 @@ public class CreateOrder extends EndpointHandler {
                    //success
                    orderUUID[0] = charge.getId();
                    receiptHtml = charge.getInvoice();
+                   success[0] = 1;
                }
 
             } catch (CardException e) {
@@ -461,6 +465,7 @@ public class CreateOrder extends EndpointHandler {
 
                 if(request != null && request.getToken() != null) {
                     System.out.println(orderUUID[0]);
+                    success[0] = 1;
                 } else {
                     Logging.log("High", "Error with purchaseToken: " + purchaseToken + " with productId" + productId);
 
@@ -509,6 +514,11 @@ public class CreateOrder extends EndpointHandler {
             }
         }
 
+        if(success[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
+            return;
+        }
+
 
         /**
          * Get the contentObject that is being ordered
@@ -529,8 +539,17 @@ public class CreateOrder extends EndpointHandler {
             if (orderContent != null && orderContent.getPoster().getUserId() != publisherId[0]) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.INCORRECT_ORDER_PAYLOAD);
                 return;
+            }else{
+                success[0] = 1;
             }
         }
+
+        if(success[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.ORDER_FAILED);
+            return;
+        }
+
+
         /**
          * Get the price of this content to calculate revenue and shares
          */
