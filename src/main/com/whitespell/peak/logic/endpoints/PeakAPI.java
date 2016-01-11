@@ -265,7 +265,7 @@ public class PeakAPI extends WhitespellAPI {
         /** SMS **/
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SendSMS(), "/sms");
         /** EXPORT **/
-        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ExportEmails(), "/export/emails");
+        dispatcher.addHandler(EndpointDispatcher.RequestType.GET, new ExportEmails(), "/export/emails");
     }
 
 }
