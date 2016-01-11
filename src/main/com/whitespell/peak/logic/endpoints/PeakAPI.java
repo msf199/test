@@ -12,6 +12,7 @@ import main.com.whitespell.peak.logic.endpoints.content.types.AddContentType;
 import main.com.whitespell.peak.logic.endpoints.content.types.AddReportingType;
 import main.com.whitespell.peak.logic.endpoints.content.types.RequestContentTypes;
 import main.com.whitespell.peak.logic.endpoints.content.types.RequestReportingTypes;
+import main.com.whitespell.peak.logic.endpoints.export.ExportEmails;
 import main.com.whitespell.peak.logic.endpoints.monitoring.Ping;
 import main.com.whitespell.peak.logic.endpoints.newsfeed.AddNewsfeed;
 import main.com.whitespell.peak.logic.endpoints.newsfeed.GetEmptyNewsfeed;
@@ -263,6 +264,8 @@ public class PeakAPI extends WhitespellAPI {
 
         /** SMS **/
         dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new SendSMS(), "/sms");
+        /** EXPORT **/
+        dispatcher.addHandler(EndpointDispatcher.RequestType.POST, new ExportEmails(), "/export/emails");
     }
 
 }
