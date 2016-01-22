@@ -418,6 +418,13 @@ public class ContentWrapper {
                     1 // always a publisher
             );
 
+            /**
+             * Fix for youtube vids
+             */
+            if(tempContent.getContentType() == StaticRules.YOUTUBE_CONTENT_TYPE){
+                tempContent.setContentUrl(currentObject.getString(CONTENT_URL));
+            }
+
             tempContent = this.personalizeContent(tempContent, tempPublisher, currentObject);
 
             /**
