@@ -1,6 +1,7 @@
 package main.com.whitespell.peak.logic;
 
 import main.com.whitespell.peak.StaticRules;
+import main.com.whitespell.peak.logic.config.Config;
 import main.com.whitespell.peak.logic.logging.Logging;
 import main.com.whitespell.peak.logic.sql.StatementExecutor;
 import main.com.whitespell.peak.model.ContentObject;
@@ -418,13 +419,6 @@ public class ContentWrapper {
                     1 // always a publisher
             );
 
-            /**
-             * Fix for youtube vids
-             */
-            if(tempContent.getContentType() == StaticRules.YOUTUBE_CONTENT_TYPE){
-                tempContent.setContentUrl(currentObject.getString(CONTENT_URL));
-            }
-
             tempContent = this.personalizeContent(tempContent, tempPublisher, currentObject);
 
             /**
@@ -450,9 +444,9 @@ public class ContentWrapper {
             }
 
             /**
-             * contentUrl should not show to normal users, video processing needs it
+             * contentUrl should not show to normal users, video processing needs it. Ignore for intro vid
              */
-            if(requesterUserId != 134) {
+            if(requesterUserId != 134 && tempContent.getContentId() != Config.INTRO_CONTENT_ID) {
                 tempContent.setContentUrl(null);
             }
 
