@@ -40,6 +40,7 @@ public class StaticRules {
 
     public static int BUNDLE_CONTENT_TYPE = 6;
     public static int PLATFORM_UPLOAD_CONTENT_TYPE = 5;
+    public static int YOUTUBE_CONTENT_TYPE = 1;
 
     public static int MS_ONE_DAY = 86400000;
     public static int DAYS_IN_A_MONTH = 31;

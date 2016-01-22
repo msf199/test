@@ -168,6 +168,7 @@ public class AddNewContent extends EndpointHandler {
          * Insert the content into the database
          */
 
+        int[] success = {0};
         try {
             StatementExecutor executor = new StatementExecutor(INSERT_CONTENT_QUERY);
             executor.execute(ps -> {
@@ -187,8 +188,9 @@ public class AddNewContent extends EndpointHandler {
 
                 int rows = ps.executeUpdate();
                 if (rows <= 0){
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
-                    return;
+                    success[0] = 0;
+                }else{
+                    success[0] = 1;
                 }
             });
         } catch (SQLException e) {
@@ -196,6 +198,11 @@ public class AddNewContent extends EndpointHandler {
             if (e.getMessage().contains("FK_user_content_content_type")) {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NO_SUCH_CATEGORY);
             }
+            return;
+        }
+
+        if(success[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.CONTENT_NOT_FOUND);
             return;
         }
 
@@ -269,6 +276,7 @@ public class AddNewContent extends EndpointHandler {
          * Update user as publisher in database
          */
 
+        success[0] = -1;
         try {
             StatementExecutor executor = new StatementExecutor(UPDATE_USER_AS_PUBLISHER_QUERY);
             executor.execute(ps -> {
@@ -277,13 +285,19 @@ public class AddNewContent extends EndpointHandler {
 
                 int rows = ps.executeUpdate();
                 if (rows <= 0) {
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_PUBLISHING_CATEGORY);
-                    return;
+                    success[0] = 0;
+                }else{
+                    success[0] = 1;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(success[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.NOT_PUBLISHING_CATEGORY);
             return;
         }
 

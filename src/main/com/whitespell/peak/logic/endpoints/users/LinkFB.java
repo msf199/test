@@ -192,6 +192,7 @@ public class LinkFB extends EndpointHandler {
             return;
         }
 
+        int[] newUserDuplicate = {0};
         if (newUser[0]) {
 
             /**
@@ -207,8 +208,7 @@ public class LinkFB extends EndpointHandler {
                     final ResultSet s = ps.executeQuery();
 
                     if (s.next()) {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_OR_EMAIL_TAKEN);
-                        return;
+                        newUserDuplicate[0] = 1;
                     }
                 });
             } catch (SQLException e) {
@@ -220,58 +220,65 @@ public class LinkFB extends EndpointHandler {
             /**
              * Create a new user
              */
-            try {
-                final String finalUsername = username;
-                final String finalPassword = passHash;
-                final String finalEmail = email;
-                final String finalCover = facebookCover;
-                final String finalProfilePic = facebookProfilePic;
-                final String finalFBId = facebookUserId;
-                StatementExecutor executor2 = new StatementExecutor(INSERT_USER_QUERY);
+            if(newUserDuplicate[0] == 0) {
+                try {
+                    final String finalUsername = username;
+                    final String finalPassword = passHash;
+                    final String finalEmail = email;
+                    final String finalCover = facebookCover;
+                    final String finalProfilePic = facebookProfilePic;
+                    final String finalFBId = facebookUserId;
+                    StatementExecutor executor2 = new StatementExecutor(INSERT_USER_QUERY);
 
-                executor2.execute(ps2 -> {
-                    ps2.setString(1, finalUsername);
-                    ps2.setString(2, finalPassword);
-                    ps2.setString(3, finalEmail);
-                    ps2.setString(4, finalCover);
-                    ps2.setString(5, finalProfilePic);
-                    ps2.setString(6, finalFBId);
-                    ps2.setTimestamp(7, now);
-                    int rows = ps2.executeUpdate();
+                    executor2.execute(ps2 -> {
+                        ps2.setString(1, finalUsername);
+                        ps2.setString(2, finalPassword);
+                        ps2.setString(3, finalEmail);
+                        ps2.setString(4, finalCover);
+                        ps2.setString(5, finalProfilePic);
+                        ps2.setString(6, finalFBId);
+                        ps2.setTimestamp(7, now);
+                        int rows = ps2.executeUpdate();
 
-                    /**
-                     * User inserted with email, 'password' and username
-                     */
-                    if (rows <= 0) {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_PROCESS_FB_LOGIN);
-                        return;
-                    }
-                });
-            } catch (Exception e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                return;
+                        /**
+                         * User inserted with email, 'password' and username
+                         */
+                        if (rows <= 0) {
+                            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_PROCESS_FB_LOGIN);
+                            return;
+                        }
+                    });
+                } catch (Exception e) {
+                    Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
+
+                /**
+                 * Get the userId
+                 */
+                try {
+                    StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
+                    final String finalFBId = facebookUserId;
+                    executor.execute(ps -> {
+                        ps.setString(1, finalFBId);
+                        final ResultSet s = ps.executeQuery();
+                        if (s.next()) {
+                            userId[0] = s.getInt("user_id");
+                            authUsername[0] = s.getString("username");
+                        }
+                    });
+                } catch (Exception e) {
+                    Logging.log("High", e);
+                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+                    return;
+                }
             }
+        }
 
-            /**
-             * Get the userId
-             */
-            try {
-                StatementExecutor executor = new StatementExecutor(RETRIEVE_USERID_QUERY);
-                final String finalFBId = facebookUserId;
-                executor.execute(ps -> {
-                    ps.setString(1, finalFBId);
-                    final ResultSet s = ps.executeQuery();
-                    if (s.next()) {
-                        userId[0] = s.getInt("user_id");
-                        authUsername[0] = s.getString("username");
-                    }
-                });
-            } catch (Exception e) {
-                Logging.log("High", e);
-                context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                return;
-            }
+        if(newUserDuplicate[0] == 1){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.USERNAME_OR_EMAIL_TAKEN);
+            return;
         }
 
         try {
@@ -303,6 +310,7 @@ public class LinkFB extends EndpointHandler {
             return;
         }
 
+        int[] insertUserSuccess = {-1};
         if(newFbUser[0]) {
             /**
              * Insert fb_users record
@@ -321,8 +329,9 @@ public class LinkFB extends EndpointHandler {
                      * User inserted into fb_users table
                      */
                     if (rows <= 0) {
-                        context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                        return;
+                        insertUserSuccess[0] = 0;
+                    }else{
+                        insertUserSuccess[0] = 1;
                     }
                 });
             } catch (SQLException e) {
@@ -330,6 +339,11 @@ public class LinkFB extends EndpointHandler {
                 context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
                 return;
             }
+        }
+
+        if(insertUserSuccess[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_PROCESS_FB_LOGIN);
+            return;
         }
 
         /**
@@ -360,6 +374,7 @@ public class LinkFB extends EndpointHandler {
             }
         }
 
+        int[] fbLinkSuccess = {0};
         try {
             final int fbLink = 1;
             final String finalFBId = facebookUserId;
@@ -376,13 +391,19 @@ public class LinkFB extends EndpointHandler {
                  * fb_link updated in user table
                  */
                 if (rows <= 0) {
-                    context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
-                    return;
+                    //unsuccessful link
+                }else{
+                    fbLinkSuccess[0] = 1;
                 }
             });
         } catch (SQLException e) {
             Logging.log("High", e);
             context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.UNKNOWN_SERVER_ISSUE);
+            return;
+        }
+
+        if(fbLinkSuccess[0] == 0){
+            context.throwHttpError(this.getClass().getSimpleName(), StaticRules.ErrorCodes.COULD_NOT_PROCESS_FB_LOGIN);
             return;
         }
 
