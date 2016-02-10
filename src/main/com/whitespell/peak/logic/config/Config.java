@@ -22,40 +22,40 @@ public final class Config {
     public static int SERVER_VERSION = 1;
 
     //General mandrill mail information
-    public static String MANDRILL_API_KEY = "_nuIwbGbVG1bvkxZo7LoiQ";
+    public static String MANDRILL_API_KEY = "";
     public static String MANDRILL_API_VERSION = "1.0";
-    public static String MANDRILL_API_URL = "https://mandrillapp.com/api";
+    public static String MANDRILL_API_URL = "";
 
     //Facebook API information
-    public static String FB_APP_ID = "452573284915725";
-    public static String FB_APP_SECRET = "f57760a7d12677fab8f8b99edc09bfba";
+    public static String FB_APP_ID = "";
+    public static String FB_APP_SECRET = "";
     public static String FB_API_VERSION = "v2.4";
     public static String FB_APP_ACCESS_TOKEN = FB_APP_ID + "|" + FB_APP_SECRET;
 
     //Google Cloud Messaging API information
-    public static String GOOGLE_MESSAGING_API_KEY = "AIzaSyDTv7nfVlKXo73ykx-PYpecPWMMR9iIBXA";
+    public static String GOOGLE_MESSAGING_API_KEY = "";
 
     //APNS Push API information
-    public static String APNS_CERTIFICATE_LOCATION = "certificates/final-prod.p12";
-    public static String APNS_PASSWORD_KEY = "Halo2";
+    public static String APNS_CERTIFICATE_LOCATION = "";
+    public static String APNS_PASSWORD_KEY = "";
 
     //AWS S3 API information
-    public static String AWS_API_KEY_ID = "AKIAIKEHG3TEUSIZLVVQ";
-    public static String AWS_API_SECRET = "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";
-    public static String AWS_API_BUCKET = "peak-users";
-    public static String AWS_API_VID_BUCKET = "peak-users/vid";
-    public static String AWS_API_IMG_BUCKET = "peak-users/img";
-    public static String AWS_API_HOSTNAME = "s3.amazonaws.com";
+    public static String AWS_API_KEY_ID = "";
+    public static String AWS_API_SECRET = "";
+    public static String AWS_API_BUCKET = "";
+    public static String AWS_API_VID_BUCKET = "";
+    public static String AWS_API_IMG_BUCKET = "";
+    public static String AWS_API_HOSTNAME = "";
 
     //Cloudinary API information
-    public static String CL_API_KEY_ID = "417454796385697";
-    public static String CL_API_SECRET = "_i8gmSm5ZSVcURutBeAOFI93UZ4";
-    public static String CL_API_FOLDER = "whitespell-inc";
-    public static String CL_API_HOSTNAME = "res.cloudinary.com";
+    public static String CL_API_KEY_ID = "";
+    public static String CL_API_SECRET = "";
+    public static String CL_API_FOLDER = "";
+    public static String CL_API_HOSTNAME = "";
 
     //General mysql information
     public static String DB = "peak";
-    public static String DB_HOST = "127.0.0.1";
+    public static String DB_HOST = "";
     public static String DB_USER = "root";
     public static String DB_PASS = "";
     public static int DB_PORT = 3306;
@@ -82,17 +82,17 @@ public final class Config {
     public static double ORDER_SUBSCRIPTION_PRICE = 3.99;
 
     //Google Order details
-    public static String GOOGLE_CLIENT_ID = "954032824901-8oifacg1pmnpn8fr3tmumoqjvovfa6ka@developer.gserviceaccount.com";
-    public static String GOOGLE_PRIVATE_KEY_PATH = "certificates/Google Play Android Developer-715af11a1027.p12";
-    public static String GOOGLE_PACKAGE_NAME = "com.whitespell.upfit";
-    public static String GOOGLE_PURCHASE_99 = "com.whitespell.upfit.inapp1";
-    public static String GOOGLE_PURCHASE_199 = "com.whitespell.upfit.inapp2";
-    public static String GOOGLE_PURCHASE_299 = "com.whitespell.upfit.inapp3";
-    public static String GOOGLE_PURCHASE_399 = "com.whitespell.upfit.inapp4";
-    public static String GOOGLE_PURCHASE_499 = "com.whitespell.upfit.inapp5";
-    public static String GOOGLE_PURCHASE_599 = "com.whitespell.upfit.inapp6";
-    public static String GOOGLE_PURCHASE_699 = "com.whitespell.upfit.inapp7";
-    public static String GOOGLE_SUBSCRIPTION_MO = "com.whitespell.upfit.substest1mo";
+    public static String GOOGLE_CLIENT_ID = "";
+    public static String GOOGLE_PRIVATE_KEY_PATH = "";
+    public static String GOOGLE_PACKAGE_NAME = "";
+    public static String GOOGLE_PURCHASE_99 = "";
+    public static String GOOGLE_PURCHASE_199 = "";
+    public static String GOOGLE_PURCHASE_299 = "";
+    public static String GOOGLE_PURCHASE_399 = "";
+    public static String GOOGLE_PURCHASE_499 = "";
+    public static String GOOGLE_PURCHASE_599 = "";
+    public static String GOOGLE_PURCHASE_699 = "";
+    public static String GOOGLE_SUBSCRIPTION_MO = "";
 
     //Platform Details
     public static String PLATFORM_NAME = "Upfit";
