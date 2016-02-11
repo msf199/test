@@ -1,7 +1,18 @@
-# Peak Java API
-The Peak Java API is an internal Whitespell API for Peak. It is a scalable Java API based 
-on Jetty, a library for web servers in Java. We've used Jetty to create an
-amazing multi-threaded API. The API consists of a core (with a routing system) and it is super easy to create your own endpoints.
-Please contact Pim before making modifications to the API.
+# Video Streaming API
+This API is the backend we use for our video streaming apps at Whitespell. All documentation is available on:
 
-Test commits are on /dev/
+[link text itself]: http://whitespell.github.io/slate/
+
+In order to get started, import the DDL (ddl/peak.sql) in your database and run the server by running:
+
+```./run.sh bin```
+
+Build by using:
+
+```./build.sh bin```
+
+To see the app this API featured, see:
+
+[link text itself]: https://drive.google.com/file/d/0BwsMM5hElkXESW0xMHFvMG9Ic1U/view
+
+Credits to Cory McAn & Pim de Witte for building this. 
