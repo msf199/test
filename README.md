@@ -16,6 +16,10 @@ Build by using:
 
 ```./build.sh bin```
 
+Also edit the values in tests.prop (test properties), config.prop (production properties) and config-dev.prop (dev properties) with your database details and other configs in order to get your service running.
+
+In order to make it automatically spin up Google Cloud nodes with the video converter service, you will need to install the google cloud CLI, log in, and create a disk with the video converter service that it automatically spins up.
+
 
 ##API Video
 To see the app this API featured, see:
