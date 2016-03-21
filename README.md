@@ -24,6 +24,6 @@ In order to make it automatically spin up Google Cloud nodes with the video conv
 ##API Video
 To see the app this API featured, see:
 
-https://drive.google.com/file/d/0BwsMM5hElkXESW0xMHFvMG9Ic1U/view]
+https://drive.google.com/file/d/0BwsMM5hElkXESW0xMHFvMG9Ic1U/view
 
 Credits to Cory McAn & Pim de Witte for building this. 
