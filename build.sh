@@ -37,6 +37,6 @@ mkdir -p $OUTDIR/errors $OUTDIR/install
   cp tests.prop $OUTDIR/tests.prop
   cp deletenode.sh $OUTDIR/deletenode.sh
   cp createnode.sh $OUTDIR/createnode.sh
-  cp -r certificates $OUTDIR/certificates
+  #cp -r certificates $OUTDIR/certificates
 
 

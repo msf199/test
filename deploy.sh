@@ -18,7 +18,7 @@ ssh peakapi-internal.whitespell.com "sudo mkdir /usr/share/peak-api/lib && sudo 
 #place the right content in the directories
 scp -r bin/* peakapi-internal.whitespell.com:/usr/share/peak-api/bin
 scp -r lib/* peakapi-internal.whitespell.com:/usr/share/peak-api/lib
-scp -r certificates/* peakapi-internal.whitespell.com:/usr/share/peak-api/bin/certificates
+#scp -r certificates/* peakapi-internal.whitespell.com:/usr/share/peak-api/bin/certificates
 scp run.sh peakapi-internal.whitespell.com:/usr/share/peak-api
 scp config.prop peakapi-internal.whitespell.com:/usr/share/peak-api
 scp build.sh peakapi-internal.whitespell.com:/usr/share/peak-api
