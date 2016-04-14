@@ -18,7 +18,7 @@ import java.util.HashMap;
  */
 public class TestAPNS {
 
-   static String uuid = "b7d2d81c233e12e3f2d0f85d35e6de0ef015bc4182c2db3451a0f7852890c3f1";
+   static String uuid = "";
 
 
     boolean incorrectPasscodeAttempts(String passcode, String[] attempts) {
