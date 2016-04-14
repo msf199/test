@@ -21,7 +21,7 @@ import java.util.List;
 public class TestGoogleOrder {
 
     public static void main(String args[]){
-        String purchaseToken = "anenllngcchiepellfonhklj.AO-J1Ox_mv3fLZgYMf6i6EYw5sYET3DqYEMAdBBUHi0-LZ25X3--JSH8jmDM2fl4j1wgXkNLze5y5vJcv8tjl33mufBfTu8q-xCUVElNsrFeoT7Tj7wWO634Wx5aGcDJVoNOjfQYwztb0VvZG7mRSVFM449vlcyYwQ";
+        String purchaseToken = "";
         try {
             HttpTransport httpTransport = GoogleNetHttpTransport.newTrustedTransport();
             JsonFactory jsonFactory = new JacksonFactory();
