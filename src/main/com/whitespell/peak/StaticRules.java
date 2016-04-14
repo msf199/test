@@ -11,7 +11,6 @@ public class StaticRules {
 
 
 
-    /** Old input checking system */
 
     public static final int MIN_USERNAME_LENGTH = 1;
     public static final int MAX_USERNAME_LENGTH = 30;
@@ -34,8 +33,8 @@ public class StaticRules {
     public static final int DEFAULT_MAX_LIMIT = 50;
     public static final int DEFAULT_MIN_OFFSET = 0;
     public static final int DEFAULT_MAX_CEIL = -1;
-    public static final String MASTER_KEY = "4ajerifjaierjf34ijfi34jij3a4ifj34ijf";
-    public static final String MASTER_PASS = "03Bt0T4HbY";
+    public static final String MASTER_KEY = "";
+    public static final String MASTER_PASS = "";
     public static final int MIN_FEEDBACK_LENGTH = 10;
 
     public static int BUNDLE_CONTENT_TYPE = 6;
